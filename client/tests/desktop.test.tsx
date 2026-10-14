@@ -143,6 +143,19 @@ describe("desktop navigation", () => {
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
 
+  it("lets an open overlay consume Escape before it closes the focused window", async () => {
+    const user = userEvent.setup();
+    render(<Home />);
+    await user.click(screen.getByRole("button", { name: "Archive" }));
+    expect(screen.getByRole("dialog", { name: "Archive" })).toBeVisible();
+    await user.click(screen.getByRole("button", { name: "Start" }));
+    // The launcher handles this press, so the focused window must survive it.
+    await user.keyboard("{Escape}");
+    expect(screen.getByRole("dialog", { name: "Archive" })).toBeVisible();
+    await user.keyboard("{Escape}");
+    expect(screen.queryByRole("dialog", { name: "Archive" })).not.toBeInTheDocument();
+  });
+
   it("opens and closes the start launcher", async () => {
     const user = userEvent.setup();
     render(<Home />);

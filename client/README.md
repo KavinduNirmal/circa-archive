@@ -2,12 +2,12 @@
 
 ## Responsibility
 
-Next.js frontend with an initial CIRCA/OS desktop at `/` and `/desktop`: shortcut navigation, draggable and resizable destination windows, a Start launcher, taskbar, emblem wallpaper, and a switchable CRT overlay. Window contents are labeled placeholders; application screens and backend integration remain unimplemented.
+Next.js frontend with an initial CIRCA/OS desktop at `/` and `/desktop`: shortcut navigation, draggable and resizable destination windows, a Start launcher, taskbar, emblem wallpaper, and a switchable CRT overlay. The Search destination opens the archive browser, a single-tab in-world browser over an illustrative preview index; every other window is still a labeled placeholder, and backend integration remains unimplemented.
 
 ## Structure and boundaries
 
 - `src/app/`: routes, root layout, global theme, and [desktop design decisions](src/app/desktop/README.md).
-- `src/components/`: desktop shell, reusable navigation and icons, and shadcn/ui primitives.
+- `src/components/`: desktop shell, the archive [browser](src/components/browser/README.md), reusable navigation and icons, and shadcn/ui primitives.
 - `src/lib/`: shared class-composition helper.
 - `tests/`: Vitest interaction and utility tests.
 - `e2e/`: responsive Playwright desktop tests.

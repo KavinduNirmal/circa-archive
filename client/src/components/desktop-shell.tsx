@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Dialog, Popover } from "radix-ui";
+import { ArchiveBrowser } from "./browser/browser-window";
+import { BROWSER_WINDOW_TITLE } from "./browser/browser-identity";
 import { TaskbarWindows, WindowLayer, useWorkstationWindows } from "./window-manager";
 import { DesktopIcon, notificationGlyph, settingsGlyph, type DesktopIconSpec } from "./desktop-icons";
 import { desktopFolders, DesktopNavigation, myPcContents, type DesktopFolder } from "./desktop-navigation";
@@ -11,7 +13,7 @@ const NotificationIcon = notificationGlyph;
 const SettingsIcon = settingsGlyph;
 
 /** A destination opened as a window, plus the copy its own status strip shows. */
-type DestinationWindow = { id: string; title: string; status: string; icon: DesktopIconSpec; detail: string | null };
+type DestinationWindow = { id: string; title: string; status: string | null; icon: DesktopIconSpec; detail: string | null };
 
 function WorkstationClock() {
   const [now, setNow] = useState<Date | null>(null);
@@ -134,10 +136,13 @@ export function DesktopShell() {
 
   /** Opens a desktop shortcut as a window, naming the entry for the titlebar and status strip. */
   function openFolder(folder: DesktopFolder, trigger?: HTMLButtonElement) {
+    // The browser names its own window and prints its own status bar, so the
+    // frame drops the generic strip rather than stacking a second one on it.
+    const browser = folder.id === "search";
     openWindow({
       id: folder.id,
-      title: folder.label,
-      status: folder.id === "my-pc" ? "WORKSTATION" : folder.detail ?? "LOCATION",
+      title: browser ? BROWSER_WINDOW_TITLE : folder.label,
+      status: browser ? null : folder.id === "my-pc" ? "WORKSTATION" : folder.detail ?? "LOCATION",
       icon: folder.icon,
       detail: folder.detail,
     }, trigger);
@@ -176,7 +181,9 @@ export function DesktopShell() {
 
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
-      if (event.key !== "Escape" || !topWindow) return;
+      // A menu, popover, or alert that already handled Escape closed itself; closing
+      // the focused window on the same press would dismiss two layers at once.
+      if (event.key !== "Escape" || event.defaultPrevented || !topWindow) return;
       closeWindow(topWindow.id);
     }
     window.addEventListener("keydown", onKeyDown);
@@ -184,6 +191,10 @@ export function DesktopShell() {
   });
 
   function windowContent(id: string) {
+    // Search is the archive browser: one permanent tab onto the internal index.
+    if (id === "search") {
+      return <ArchiveBrowser onCloseWindow={() => closeWindow(id)} />;
+    }
     if (id === "system") {
       return (
         <div className="window-pane">

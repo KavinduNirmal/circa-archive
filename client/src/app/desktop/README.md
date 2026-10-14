@@ -8,7 +8,7 @@
 
 The user's reference image controls composition: a left shortcut rail, open wallpaper, and compact desktop chrome. The supplied emblem is the wallpaper, dimmed without desaturating it. The detailed DESIGN.md steel palette supplies colors; ARCHITECTURE.md supplies provisional shortcut names, not binding functionality. A bottom Windows-style taskbar replaces the reference's dock, and the desktop layer runs the full height behind it. A static, pointer-transparent CRT overlay covers the whole screen.
 
-This pass implements local shortcut selection, a Start launcher, the taskbar tray, and the window manager: one draggable and resizable window per destination, with minimize, maximize/restore, stacking, and a taskbar entry for each open window. Window contents are explicit unconnected placeholders; records, authentication, and application screens are outside scope. Shortcuts support single-click, touch, and keyboard activation. Escape closes the focused window or the Settings dialog, and a window's own close button returns focus to the shortcut that opened it.
+This pass implements local shortcut selection, a Start launcher, the taskbar tray, and the window manager: one draggable and resizable window per destination, with minimize, maximize/restore, stacking, and a taskbar entry for each open window. Every window is still an explicit unconnected placeholder except **Search**, which opens the archive browser ([README](../../components/browser/README.md)): a single permanent tab onto the CIRCA internal archive index, with a working search over an illustrative preview index, real Back and Forward, and a refused new tab. Records, filing, authentication, and the remaining application screens are outside scope. Shortcuts support single-click, touch, and keyboard activation. Escape closes the focused window or the Settings dialog, and a window's own close button returns focus to the shortcut that opened it.
 
 Navigation and icon decisions from the redesign request:
 
@@ -17,6 +17,7 @@ Navigation and icon decisions from the redesign request:
 - **Archive** and **_EXPUNGED** carry the Windows 98 `.lnk` shortcut marker in the lower-left corner. The marker is decorative: no filesystem linking behavior is implied.
 - Shortcut art renders at 48 CSS pixels from the Win98 bitmaps with nearest-neighbour scaling, then dulls toward the workstation's grey-blue with a per-pixel CSS filter (`saturate(.4) brightness(.85)`, 88% opacity). Two constraints keep it honest: the filter is applied to the bitmap element rather than as a blended overlay, because the PNGs are transparent and an overlay paints a visible tile behind each icon; and it desaturates without shifting hue, because a sepia or hue-rotate chain turned the globe's greens magenta. Labels sit directly on the wallpaper with a four-way text outline instead of the previous filled plate, so the emblem reads through.
 - Desktop reading order is fixed as My PC, My Documents, Archive, Organizations, Inbox, CIRCA Word, Search, _EXPUNGED, Recycle Bin: workstation containers first, then the editor, then the archive tools. The editor keeps its place between Inbox and Search rather than being pushed to the end.
+- **Search opens the browser, and the browser names its own window.** The shortcut keeps its label and its explorer bitmap, but the frame is titled `Titan Browser - CIRCA Archive`, and its taskbar entry matches. Because the browser prints its own status bar, the frame omits its generic destination strip (`WorkstationWindow` now renders that strip only for a non-null status), so the chrome is not stacked twice.
 - The taskbar follows the reference arrangement: Start, a beveled divider with 8px breathing room, then **Settings** as a wide task-button item, with the notification bell sitting in the tray directly beside the UTC clock. The reference build's activation notice was dropped rather than imitated. Settings presses into its sunken state while its dialog is open. Notifications open an honest unconnected panel; **Settings** hosts the CRT screen filter, which replaced the old taskbar CRT button. The screen filter remains on by default.
 
 ## Verification
@@ -27,7 +28,7 @@ Run `bun run test`, `bun run lint`, `bun run typecheck`, and `bun run test:e2e` 
 
 Reading this as an archive workstation for fictional CIRCA analysts, in a restrained early desktop visual language. ENERGY 2 / RHYTHM 1 / MOTION 1. The supplied reference and project design provide direction; antislop-ui and UI Taste guide implementation and review.
 
-- The navy/steel palette and local DM Sans preserve the existing institutional identity; IBM Plex Mono is reserved for the real UTC clock.
+- The navy/steel palette and local DM Sans preserve the existing institutional identity. IBM Plex Mono is reserved for values that must align or read as data: the real UTC clock, archive codes and filing dates, and the browser's address bar.
 - A single left-aligned shortcut rail leaves desktop space for the emblem; shared bitmap artwork plus the shortcut marker distinguishes destinations without decorative emoji. The rail's nine rows share the desktop layer's height, and row height is declared together with cell content so a cell can never outgrow its row and push later icons out of the layer.
 - The emblem remains the focal point. It is darkened with `brightness(.78) contrast(1.06)` while saturation is nudged up (`saturate(1.12)`) so the seal's blue survives the dimming; plain desaturation was rejected because it greyed the blue out. Icon artwork is desaturated toward the shell's grey-blue so it reads against the photograph instead of competing with it.
 - A window's taskbar entry is pressed while it is open and pressed further while it holds focus, so the active window is readable from the taskbar. The close control is the one red element, marking the only destructive action. A muted amber Start mark identifies the launcher. The notification panel states that delivery is not connected.
@@ -37,4 +38,22 @@ Reading this as an archive workstation for fictional CIRCA analysts, in a restra
 - Windows open inset from the desktop-layer edge with a cascading offset, and drag and resize are clamped to that layer so no frame can be parked under the taskbar. Opening a destination that is already open focuses its window instead of duplicating it.
 - Window placeholders keep focus management: Escape closes the focused window, closing with the titlebar control returns focus to the launching shortcut, and each open window has a taskbar entry that restores it from a minimized state. No network requests means loading and server-error states are not applicable yet.
 
-Finish condition: verify all shortcuts, Start, the tray controls, window drag/resize/minimize/maximize, dismissal and focus, the CRT toggle, and overflow at desktop, reference-size, and mobile viewports; inspect the resulting screenshots.
+Finish condition: verify all shortcuts, Start, the tray controls, window drag/resize/minimize/maximize, dismissal and focus, the CRT toggle, the archive browser's documents and refusals, and overflow at desktop, reference-size, and mobile viewports; inspect the resulting screenshots.
+
+## Archive browser chrome
+
+The browser is a new surface inside an established product, so it inherits the shell's visual system and changes only its composition. Its chrome is steel, beveled, and uppercase; the document inside the tab is not, because a browser is a frame around someone else's page. Full detail, including the paper-surface decision, the reflow breakpoints, and the refusals, is in the browser's own [README](../../components/browser/README.md).
+
+One shell-level change came with it: a menu, popover, or alert that handles Escape now consumes that press, so dismissing an open overlay no longer also closes the focused window. The shell's Escape handler skips an event that was already `defaultPrevented`.
+
+## Verification log: archive browser
+
+Verified on 2026-10-15 by server-rendering the browser into headless Firefox (157.0.1) at seven window sizes and inspecting pixels, plus the unit suite. Rendered and inspected: the index as a primary search page, the incidents listing as an eight-row table, a withheld record, the no-match recovery, the compact search block above a record, the refusal and About message boxes, the View menu panel, text size at large, and the 400px frame. Findings fixed in the same pass:
+
+- The compact search block had been reduced to two dotted rules, which read as a broken border; it is now an outlined block of the same fields, and the filled plate is what distinguishes the index's primary search block.
+- Firefox drew its own native chrome for the `<select>` elements, so the two dropdowns ignored the paper palette and disagreed with the text input beside them. Both fields now clear `appearance` and share one sunken well, and the select's caret is drawn in CSS.
+- The masthead wrapped the seal onto a line of its own in a narrow frame. The seal and its text are now one flex item, so only the clearance stamp can wrap.
+- Two measure overruns left a single word on the second line; the measure and one sentence were tightened.
+- The record's back button promised "Return to results" even when the record was opened from the index; it now names the document it actually returns to.
+
+Limitation: headless Firefox screenshots fire before React hydrates, so the two Radix-portaled surfaces (the message boxes and the menu panel) were inspected as static replicas of their production markup and class names. Their behaviour is covered by the unit tests instead. The Playwright suite was again not run: Chromium is not installed and this environment's Playwright install target is read-only.

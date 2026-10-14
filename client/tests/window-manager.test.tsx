@@ -3,6 +3,7 @@ import { fireEvent, render, screen, waitFor, within } from "@testing-library/rea
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 import Home from "@/app/page";
+import { BROWSER_WINDOW_TITLE } from "@/components/browser/browser-identity";
 
 /**
  * jsdom performs no layout, so these stubs give the desktop layer and window
@@ -181,10 +182,10 @@ describe("workstation windows", () => {
     await user.click(screen.getByRole("button", { name: "Minimize Inbox" }));
     expect(taskbar().getByRole("button", { name: "Archive" })).toHaveAttribute("aria-pressed", "true");
     expect(taskbar().getByRole("button", { name: "Inbox" })).toHaveAttribute("aria-pressed", "true");
-    expect(taskbar().getByRole("button", { name: "Search" })).toHaveAttribute("aria-pressed", "false");
+    expect(taskbar().getByRole("button", { name: BROWSER_WINDOW_TITLE })).toHaveAttribute("aria-pressed", "false");
     expect(screen.queryByRole("dialog", { name: "Archive" })).not.toBeInTheDocument();
     expect(screen.queryByRole("dialog", { name: "Inbox" })).not.toBeInTheDocument();
-    expect(screen.getByRole("dialog", { name: "Search" })).toBeVisible();
+    expect(screen.getByRole("dialog", { name: BROWSER_WINDOW_TITLE })).toBeVisible();
 
     // A minimized window is still open, and restores on demand.
     await user.click(taskbar().getByRole("button", { name: "Inbox" }));
@@ -196,8 +197,8 @@ describe("workstation windows", () => {
     // the last one leaves a clean desktop with no stale taskbar entries.
     await user.click(within(screen.getByRole("dialog", { name: "Inbox" })).getByRole("button", { name: "Close folder" }));
     expect(screen.queryByRole("dialog", { name: "Inbox" })).not.toBeInTheDocument();
-    expect(screen.getByRole("dialog", { name: "Search" })).toBeVisible();
-    await user.click(within(screen.getByRole("dialog", { name: "Search" })).getByRole("button", { name: "Close folder" }));
+    expect(screen.getByRole("dialog", { name: BROWSER_WINDOW_TITLE })).toBeVisible();
+    await user.click(within(screen.getByRole("dialog", { name: BROWSER_WINDOW_TITLE })).getByRole("button", { name: "Close folder" }));
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     await user.click(taskbar().getByRole("button", { name: "Archive" }));
     expect(screen.getByRole("dialog", { name: "Archive" })).toBeVisible();

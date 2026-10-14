@@ -5,6 +5,10 @@
 - `setup.ts`: DOM matchers and cleanup.
 - `utils.test.ts`: class composition and Tailwind conflict resolution.
 - `desktop.test.tsx`: folder navigation, Escape dismissal, and Start launcher behavior.
+- `window-registry.test.ts`: focus handover when a window is minimized or closed.
+- `window-manager.test.tsx`: window placement, drag and resize, maximize, stacking, and taskbar state.
+- `archive-index.test.ts`: the archive query rules, ranking, and the shipped fixture's formats.
+- `browser.test.tsx`: the single tab, the search flow, the record view, the refusals, and the blocked controls.
 
 ## Usage and boundaries
 

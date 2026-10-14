@@ -10,6 +10,8 @@ export type DesktopEntry = {
   label: string;
   /** Tooltip and placeholder copy for destinations without content yet. */
   detail: string | null;
+  /** Set once a destination opens a real screen, so its hint stops promising one. */
+  ready?: boolean;
   icon: DesktopIconSpec;
 };
 
@@ -26,7 +28,7 @@ export const desktopFolders = [
   { id: "organizations", label: "Organizations", detail: "Organization dossiers and continuities", icon: { glyph: "organizations" } },
   { id: "inbox", label: "Inbox", detail: "Correspondence and dead letters", icon: { glyph: "inbox" } },
   { id: "write", label: "CIRCA Word", detail: "Document editor", icon: { glyph: "circa-word" } },
-  { id: "search", label: "Search", detail: "Find records, incidents, and organizations", icon: { glyph: "search" } },
+  { id: "search", label: "Search", detail: "Search the internal archive index", ready: true, icon: { glyph: "search" } },
   { id: "expunged", label: "_EXPUNGED", detail: "The archive of removed things", icon: { glyph: "expunged", shortcut: true } },
   { id: "recycle", label: "Recycle Bin", detail: "Deleted drafts and records", icon: { glyph: "recycle" } },
 ] as const satisfies readonly DesktopEntry[];
@@ -44,7 +46,9 @@ export type DesktopDestination = DesktopFolder | MyPcItem;
 
 /** The Start menu already shows each label inline, so only the desktop rail explains destinations on hover. */
 function desktopHint(folder: DesktopFolder) {
-  return folder.detail ? `${folder.detail} (coming soon)` : "Workstation contents";
+  if (!folder.detail) return "Workstation contents";
+  // Only a destination that opens a real screen opts in, so the promise stays truthful.
+  return "ready" in folder && folder.ready ? folder.detail : `${folder.detail} (coming soon)`;
 }
 
 export function DesktopNavigation({ onOpen, activeId, compact = false }: {

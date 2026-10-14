@@ -1,6 +1,6 @@
 # Desktop implementation verification
 
-Verified on 2026-10-15 against the client at port 3001. This report covers the shell (navigation, icons, taskbar), not future application contents.
+Verified on 2026-10-15 against the client at port 3001. This report covers the shell (navigation, icons, taskbar) at that point in time; the archive browser added later behind the Search shortcut is covered by the verification log in `../src/app/desktop/README.md`, and the rest of the application contents remain unimplemented.
 
 ## Evidence
 

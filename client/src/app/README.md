@@ -9,4 +9,4 @@
 
 ## Boundaries and verification
 
-Routes compose reusable components from `../components/`. Backend integration and application contents are not implemented. Run client lint, typecheck, unit tests, and build after changes; browser tests exercise both routes.
+Routes compose reusable components from `../components/`. Backend integration is not implemented; the only application screen so far is the archive browser behind the desktop's Search shortcut. Run client lint, typecheck, unit tests, and build after changes; browser tests exercise both routes.

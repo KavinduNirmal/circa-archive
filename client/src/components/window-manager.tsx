@@ -13,8 +13,12 @@ export type WorkstationWindowState = {
   /** Stable key: the destination id, so reopening focuses instead of duplicating. */
   id: string;
   title: string;
-  /** Uppercase status shown in the window's own status strip. */
-  status: string;
+  /**
+   * Uppercase status shown in the window's own status strip. Applications that
+   * carry their own status bar (the archive browser) leave this null so the
+   * frame does not stack a second, duplicate strip above them.
+   */
+  status: string | null;
   icon: DesktopIconSpec;
   /** Geometry used when not maximized. */
   geometry: WindowGeometry;
@@ -56,7 +60,7 @@ export function useWorkstationWindows() {
     });
   }, []);
 
-  const open = useCallback((entry: { id: string; title: string; status: string; icon: DesktopIconSpec }, area: DesktopArea) => {
+  const open = useCallback((entry: { id: string; title: string; status: string | null; icon: DesktopIconSpec }, area: DesktopArea) => {
     setLastFocused(entry.id);
     setWindows((current) => {
       const existing = current.find((item) => item.id === entry.id);
@@ -235,9 +239,11 @@ export function WorkstationWindow({ window: item, area, active, children, onFocu
           </button>
         </div>
       </div>
-      <div className="window-address">
-        <span>{item.status}</span>
-      </div>
+      {item.status !== null && (
+        <div className="window-address">
+          <span>{item.status}</span>
+        </div>
+      )}
       <div className="window-body">
         {children}
       </div>
