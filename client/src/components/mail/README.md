@@ -31,9 +31,13 @@ The fiction decides the interaction model, the same way it does in the archive b
 
 ## Visual contract
 
-The same formula as the browser: steel furniture around a paper store. The menu bar, toolbar, Outlook Bar, find bar, and status bar are chrome; the message grid and the reading pane are documents, so they take the shared paper surface and the record ink.
+The same formula as the browser: steel furniture around a document surface. The menu bar, toolbar, Outlook Bar, find bar, and status bar are chrome; the message grid and the reading pane are documents.
+
+**The viewer is white.** The reference client's preview pane was white, so `.mail-view` overrides the shared surface tokens: paper, raised panel, and sunken field become white and near-white and the ink darkens to match. The message list above it keeps the shared grey-blue paper, and the archive is untouched, because the override is scoped to the viewer. The composer lives in the same pane, so its fields are white wells too.
 
 - **Three panes, one column of chrome.** The Outlook Bar is a fixed track beside a column that stacks the find bar, the grid, and the reading pane. The list keeps a floor height, so a short window squeezes the panes rather than the controls.
+- **Every mark comes from the Windows 98 set.** Folders name their own bitmap, so no two share one; the read and unread marks in the list are Lucide hairlines, because a 12px bitmap loses the shape a hairline keeps.
+- **Every navigation row is one width.** The folder buttons fill the Outlook Bar and their labels fill the button, so a label's length or line count can never decide where its icon sits; only the button's own height was uniform before, which left the icons drifting.
 - **The glyph column is three fixed slots.** Importance, read state, and attachment each own a 15px slot, so the marks line up down the list the way the reference's icon columns did; a single flex row of glyphs left them ragged.
 - **Rows are uniform.** Every folder button has one height, so the icons and labels form a column instead of drifting with each label's line count.
 - **State is never colour alone.** Unread mail is bold with a closed envelope against the read row's open one; the selected row is filled and carries a spine; the importance mark is a glyph, not a tint.

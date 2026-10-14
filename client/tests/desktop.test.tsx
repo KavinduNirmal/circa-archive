@@ -66,7 +66,8 @@ describe("desktop navigation", () => {
       Archive: "/icons/directory_open_cabinet_fc-2.png",
       Organizations: "/icons/world-0.png",
       "My Documents": "/icons/directory_closed-0.png",
-      Inbox: "/icons/envelope_closed-0.png",
+      // The Inbox shortcut is the mail client's launcher, so it wears the app mark.
+      Inbox: "/icons/outlook_express-1.png",
       "CIRCA Word": "/icons/write_file-1.png",
       Search: "/icons/search_web-0.png",
       _EXPUNGED: "/icons/erase_file-0.png",

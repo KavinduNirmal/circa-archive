@@ -18,7 +18,7 @@ const icons = {
   archive: { asset: "/icons/directory_open_cabinet_fc-2.png", shortcut: true },
   organizations: { asset: "/icons/world-0.png" },
   records: { asset: "/icons/directory_closed-0.png" },
-  inbox: { asset: "/icons/envelope_closed-0.png" },
+  inbox: { asset: "/icons/outlook_express-1.png" },
   "circa-word": { asset: "/icons/write_file-1.png" },
   search: { asset: "/icons/search_web-0.png" },
   expunged: { asset: "/icons/erase_file-0.png", shortcut: true },

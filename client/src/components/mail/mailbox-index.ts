@@ -44,11 +44,11 @@ export const MAILBOX_ADDRESS: MailAddress = { name: "Analyst, Terminal 04", addr
  */
 export const MAIL_FOLDERS: readonly { id: MailFolderId; label: string; icon: string }[] = [
   { id: "inbox", label: "Inbox", icon: "/icons/envelope_closed-0.png" },
-  { id: "drafts", label: "Drafts", icon: "/icons/write_file-1.png" },
-  { id: "outbox", label: "Outbox", icon: "/icons/console_prompt-0.png" },
-  { id: "sent", label: "Sent Items", icon: "/icons/directory_open_cabinet_fc-2.png" },
+  { id: "drafts", label: "Drafts", icon: "/icons/registration-0.png" },
+  { id: "outbox", label: "Outbox", icon: "/icons/envelope_open_sheet-0.png" },
+  { id: "sent", label: "Sent Items", icon: "/icons/message_file-0.png" },
   { id: "deleted", label: "Deleted Items", icon: "/icons/recycle_bin_empty-4.png" },
-  { id: "dead", label: "Dead Letters", icon: "/icons/erase_file-0.png" },
+  { id: "dead", label: "Dead Letters", icon: "/icons/msg_error-0.png" },
 ];
 
 const OFFICE = {

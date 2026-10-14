@@ -954,6 +954,8 @@
   align-items: center;
   justify-content: center;
   gap: 5px;
+  box-sizing: border-box;
+  width: 100%;
   min-height: 54px;
   padding: 4px;
   border: 1px solid transparent;
@@ -969,8 +971,10 @@
 .mail-folder:hover { border-color: #6f899d; background: rgb(82 110 148 / 26%); }
 .mail-folder[aria-current="page"] { border-color: #a4c2e6; background: var(--secondary); color: #dce9f5; }
 .mail-folder:focus-visible { outline: 1px dashed #c8d6e5; outline-offset: -2px; }
-.mail-folder-icon { width: 24px; height: 24px; image-rendering: pixelated; filter: saturate(.4) brightness(.85); opacity: .9; }
-.mail-folder-label { display: block; min-height: 22px; text-align: center; line-height: 11px; }
+/* One box for every folder mark, whatever canvas the bitmap came on. */
+.mail-folder-icon { flex: 0 0 24px; width: 24px; height: 24px; image-rendering: pixelated; filter: saturate(.4) brightness(.85); opacity: .9; }
+/* Full width and centred: the label must not size the row. */
+.mail-folder-label { display: block; width: 100%; min-height: 22px; overflow: hidden; text-align: center; text-overflow: ellipsis; line-height: 11px; }
 .mail-folder-badge { position: absolute; top: 2px; right: 3px; min-width: 13px; padding: 0 3px; background: var(--circa-hazard); color: #1b1206; font-size: 9px; font-weight: 700; }
 .mail-main { display: flex; flex: 1; flex-direction: column; min-width: 0; }
 .mail-find { display: flex; flex: 0 0 auto; align-items: center; gap: 6px; padding: 4px 6px; background: var(--card); border-bottom: 1px solid var(--circa-bevel-shadow); }
@@ -1041,14 +1045,31 @@
 .mail-importance[data-level="low"] { color: var(--circa-link); }
 .mail-returned { color: #8a2b2b; font-size: .82em; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
 .mail-grid-empty { padding: 12px; color: var(--circa-ink-soft); font-size: 11px; }
-.mail-view { flex: 1 1 58%; min-height: 0; overflow: auto; background: var(--circa-paper); color: var(--circa-ink); }
+/*
+ * The viewer is white, the way the reference client's preview pane was, while
+ * the message list above it keeps the shared grey-blue paper. Only the surface
+ * tokens differ, and only inside this pane, so nothing else in the shell moves.
+ */
+.mail-view {
+  flex: 1 1 58%;
+  min-height: 0;
+  overflow: auto;
+  background: var(--circa-paper);
+  color: var(--circa-ink);
+  --circa-paper: #ffffff;
+  --circa-paper-raised: #eceff2;
+  --circa-paper-sunken: #ffffff;
+  --circa-ink: #101a24;
+  --circa-ink-soft: #4a5a6b;
+  --circa-rule: #97a6b4;
+}
 .mail-reading { padding: 10px 14px 14px; font-size: 12px; line-height: 17px; }
 .mail-reading-head { padding-bottom: 8px; border-bottom: 1px solid var(--circa-rule); }
 .mail-subject { margin: 0 0 6px; font-size: 15px; font-weight: 700; line-height: 20px; }
 .mail-headers { display: grid; grid-template-columns: 76px 1fr; gap: 2px 8px; margin: 0; }
 .mail-headers dt { color: var(--circa-ink-soft); font-size: .82em; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
 .mail-headers dd { margin: 0; overflow-wrap: anywhere; }
-.mail-returned-notice { margin: 10px 0 0; padding: 6px 8px; border: 1px solid #8a2b2b; background: #e4d3d3; color: #5c1d1d; font-size: 11px; }
+.mail-returned-notice { margin: 10px 0 0; padding: 6px 8px; border: 1px solid #8a2b2b; background: #f7e8e8; color: #5c1d1d; font-size: 11px; }
 .mail-attachments { display: flex; align-items: center; gap: 6px; margin: 8px 0 0; color: var(--circa-ink-soft); font-size: 11px; }
 .mail-letter { max-width: 68ch; margin: 12px 0 0; }
 .mail-letter p { margin: 0 0 8px; }

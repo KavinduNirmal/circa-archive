@@ -112,5 +112,9 @@ describe("mailbox index", () => {
     const icons = MAIL_FOLDERS.map((folder) => folder.icon);
     expect(new Set(icons).size).toBe(icons.length);
     for (const icon of icons) expect(icon).toMatch(/^\/icons\/[a-z0-9_\-]+\.png$/);
+    // Outbox and Drafts use the artwork supplied for them, not a stand-in.
+    expect(folderMessages(MAILBOX_FIXTURE, "outbox").length).toBeGreaterThan(0);
+    expect(MAIL_FOLDERS.find((folder) => folder.id === "outbox")?.icon).toBe("/icons/envelope_open_sheet-0.png");
+    expect(MAIL_FOLDERS.find((folder) => folder.id === "drafts")?.icon).toBe("/icons/registration-0.png");
   });
 });
