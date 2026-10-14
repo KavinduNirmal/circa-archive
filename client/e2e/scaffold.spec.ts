@@ -15,10 +15,6 @@ for (const viewport of [{ width: 1440, height: 900 }, { width: 390, height: 844 
     await expect(page).toHaveTitle("CIRCA Archive");
     await page.evaluate(() => document.fonts.ready);
     await expect(page.getByRole("main", { name: "CIRCA desktop" })).toBeVisible();
-    const header = page.getByRole("banner", { name: "Workstation status" });
-    await expect(header.getByText("SIMULATED LINK")).toBeVisible();
-    await expect(header.getByText("10.42.0.19")).toBeVisible();
-    expect((await header.boundingBox())?.height ?? 0).toBeGreaterThanOrEqual(40);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
     const navigation = page.getByRole("navigation", { name: "Desktop folders" });
     for (const folder of shortcuts) {

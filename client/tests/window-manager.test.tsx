@@ -149,6 +149,27 @@ describe("workstation windows", () => {
     await waitFor(() => expect(Number(archive.style.zIndex)).toBeGreaterThan(Number(inbox.style.zIndex)));
   });
 
+  it("marks the focused window in the taskbar", async () => {
+    stubLayout();
+    const user = userEvent.setup();
+    render(<Home />);
+    const taskbar = () => within(screen.getByRole("contentinfo", { name: "Taskbar" }));
+    await user.click(screen.getByRole("button", { name: "Archive" }));
+    expect(taskbar().getByRole("button", { name: "Archive" })).toHaveAttribute("data-active", "true");
+
+    await user.click(screen.getByRole("button", { name: "Inbox" }));
+    const archiveEntry = taskbar().getByRole("button", { name: "Archive" });
+    expect(archiveEntry).not.toHaveAttribute("data-active");
+    expect(taskbar().getByRole("button", { name: "Inbox" })).toHaveAttribute("data-active", "true");
+
+    await user.click(archiveEntry);
+    expect(archiveEntry).toHaveAttribute("data-active", "true");
+    expect(taskbar().getByRole("button", { name: "Inbox" })).not.toHaveAttribute("data-active");
+
+    await user.click(screen.getByRole("button", { name: "Minimize Archive" }));
+    expect(taskbar().getByRole("button", { name: "Archive" })).not.toHaveAttribute("data-active");
+  });
+
   it("remembers which window is minimized or closed across many open windows", async () => {
     stubLayout();
     const user = userEvent.setup();

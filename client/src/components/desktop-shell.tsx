@@ -13,24 +13,6 @@ const SettingsIcon = settingsGlyph;
 /** A destination opened as a window, plus the copy its own status strip shows. */
 type DestinationWindow = { id: string; title: string; status: string; icon: DesktopIconSpec; detail: string | null };
 
-/**
- * Fixed workstation status shown in the header strip.
- *
- * Every network value is fiction. The shell has no backend, so the link state,
- * address, latency, and the archive-wide terminal count are decorative copy
- * that dresses the interface as a CIRCA terminal. The `simulated` flag renders
- * the SIMULATED tag in the strip so nobody reads them as live telemetry; set it
- * to false and replace the values when the backend exists.
- */
-const WORKSTATION_STATUS = {
-  uplink: { state: "SIMULATED LINK", signal: "simulated" },
-  address: "10.42.0.19",
-  latency: "24ms",
-  terminals: "7 terminals signed in",
-  sync: "SYNCED 06:12",
-  simulated: true,
-} as const;
-
 function WorkstationClock() {
   const [now, setNow] = useState<Date | null>(null);
   useEffect(() => {
@@ -43,23 +25,6 @@ function WorkstationClock() {
     {now ? now.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", timeZone: "UTC" }) : "--:--"}
     <span> UTC</span>
   </time>;
-}
-
-function WorkstationStatus() {
-  const { uplink, address, latency, terminals, sync, simulated } = WORKSTATION_STATUS;
-  return (
-    <div className="workstation-status">
-      <span className={`status-chip status-${uplink.signal}`}>{uplink.state}</span>
-      <span className="status-item">{address}</span>
-      <span className="status-separator" aria-hidden="true">/</span>
-      <span className="status-item">{latency}</span>
-      <span className="status-separator" aria-hidden="true">/</span>
-      <span className="status-item">{terminals}</span>
-      <span className="status-separator" aria-hidden="true">/</span>
-      <span className="status-item">{sync}</span>
-      {simulated && <span className="status-sim" title="Placeholder values shown while the archive backend is unavailable">SIMULATED</span>}
-    </div>
-  );
 }
 
 /** Pinned task item. The reference keeps window buttons directly beside Start, so this sits left-aligned. */
@@ -273,14 +238,6 @@ export function DesktopShell() {
     <main className="desktop-shell" aria-label="CIRCA desktop" ref={shellRef}>
       <TooltipProvider>
         <div className="desktop-wallpaper" aria-hidden="true" />
-        <header className="desktop-topline" aria-label="Workstation status">
-          <span className="topline-station">
-            CIRCA/OS <span className="topline-separator" aria-hidden="true">/</span> ARCHIVE WORKSTATION
-            <span className="topline-separator" aria-hidden="true">/</span>
-            <span className="topline-console">CONSOLE 04</span>
-          </span>
-          <WorkstationStatus />
-        </header>
         <div className="desktop-area" ref={areaRef} tabIndex={-1}>
           <DesktopNavigation onOpen={openFolder} activeId={lastFocused ?? undefined} />
           <WindowLayer
@@ -311,7 +268,7 @@ export function DesktopShell() {
           </Popover.Root>
           <div className="taskbar-divider" />
           {/* Window buttons grow from the left, directly beside the pinned task item. */}
-          <TaskbarWindows windows={windows} onSelect={focusWindow} />
+          <TaskbarWindows windows={windows} activeId={activeWindow?.id ?? null} onSelect={focusWindow} />
           <SettingsTaskItem open={settingsOpen} onOpen={() => setSettingsOpen(true)} />
           <div className="taskbar-spacer" />
           <TaskbarTray />

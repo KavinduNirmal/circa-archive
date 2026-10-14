@@ -278,13 +278,26 @@ export function WindowLayer({ windows, area, activeId, childrenFor, ...handlers 
   );
 }
 
-/** Titlebar entries for the taskbar, mirroring the open-window stack. */
-export function TaskbarWindows({ windows, onSelect }: { windows: WorkstationWindowState[]; onSelect: (id: string) => void }) {
+/**
+ * Titlebar entries for the taskbar, mirroring the open-window stack. An entry is
+ * pressed while its window is open and pressed further while it holds focus, the
+ * same way the Settings task item shows its own state.
+ */
+export function TaskbarWindows({ windows, activeId, onSelect }: {
+  windows: WorkstationWindowState[];
+  activeId: string | null;
+  onSelect: (id: string) => void;
+}) {
   return (
     <>
       {windows.map((item) => (
-        <button key={item.id} type="button" className="taskbar-task-anchor taskbar-window" aria-label={item.title}
-          aria-pressed={item.minimized} data-open={item.minimized ? undefined : "true"} onClick={() => onSelect(item.id)}>
+        <button key={item.id} type="button"
+          className={["taskbar-task-anchor", "taskbar-window", item.id === activeId ? "is-active" : null].filter(Boolean).join(" ")}
+          aria-label={item.title}
+          aria-pressed={item.minimized}
+          data-open={item.minimized ? undefined : "true"}
+          data-active={item.id === activeId ? "true" : undefined}
+          onClick={() => onSelect(item.id)}>
           <span className="taskbar-task">
             <DesktopIcon icon={item.icon} className="taskbar-window-icon" />
             <span>{item.title}</span>

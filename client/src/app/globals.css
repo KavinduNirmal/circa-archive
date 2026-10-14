@@ -42,7 +42,6 @@
   --circa-bevel-shadow: #0d131a;
   --circa-title-active: #24334a;
   --circa-title-inactive: #151d27;
-  --circa-topline-height: 40px;
   --circa-taskbar-height: 40px;
 }
 
@@ -172,49 +171,7 @@
   background: url('/Government_agency_emblem_seal_de…_2K_20261014194612.jpg') center / cover no-repeat;
   filter: brightness(.78) contrast(1.06) saturate(1.12);
 }
-.desktop-topline {
-  position: relative;
-  height: var(--circa-topline-height);
-  z-index: 30;
-  min-height: 40px;
-  padding: 6px 14px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  background: rgb(11 17 24 / 90%);
-  border-bottom: 1px solid #4b5d6a;
-  font-size: 10px;
-  letter-spacing: .06em;
-}
-.topline-station { display: flex; align-items: center; white-space: nowrap; }
-.topline-station strong { color: #d0dce5; }
-.topline-console { color: #cfe0ec; }
-.topline-separator { padding: 0 10px; color: #6f899d; }
 /* Fixed machine readout: status chips and monospaced values, marked as simulated copy. */
-.workstation-status { display: flex; align-items: center; gap: 8px; min-width: 0; overflow: hidden; white-space: nowrap; }
-.status-chip {
-  padding: 3px 8px;
-  border: 1px solid;
-  font-size: 9px;
-  font-weight: 600;
-  letter-spacing: .1em;
-  color: #a4c2e6;
-}
-.status-simulated { border-color: #526e94; background: #1b2c40; }
-.status-uplink { border-color: #4f7a5a; background: #16281d; color: #9ecfae; }
-.status-standby { border-color: #8a6a2b; background: #2a2113; color: #d9b26a; }
-.status-offline { border-color: #7a3232; background: #2a1416; color: #d99a9a; }
-.status-item { font-family: "IBM Plex Mono", monospace; font-size: 11px; color: #b3c2cc; }
-.status-separator { color: #526e94; }
-.status-sim {
-  padding: 3px 7px;
-  border: 1px dashed #6f899d;
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: .12em;
-  color: #edbd8d;
-}
 /* Reads as the reference's left shortcut rail: one left-aligned column, top to bottom. */
 /*
  * One left rail whose nine rows share the desktop layer's height, so the block
@@ -313,6 +270,19 @@
   background: var(--card);
   font-weight: 700;
 }
+/* The focused window reads as the deepest pressed state, matching the window's own active titlebar. */
+.taskbar-task-anchor[data-active] {
+  border-color: var(--circa-bevel-shadow) var(--border) var(--border) var(--circa-bevel-shadow);
+  background: var(--circa-title-active);
+  font-weight: 700;
+}
+.taskbar-task-anchor[data-active] .taskbar-task { color: #dce9f5; }
+.taskbar-task-anchor[data-active]::before {
+  content: "";
+  width: 2px;
+  align-self: stretch;
+  background: var(--primary);
+}
 .taskbar-task > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .taskbar-tray {
   display: flex;
@@ -341,7 +311,7 @@
 .tray-panel { z-index: 30; width: 220px; padding: 5px; }
 .tray-heading { padding: 8px 10px; background: #111a25; font-weight: 700; font-size: 10px; letter-spacing: .06em; }
 .tray-note { padding: 12px 10px; color: #bacada; font-size: 10px; }
-.settings-backdrop { position: fixed; inset: 40px 0 40px; z-index: 50; background: rgb(8 17 25 / 24%); }
+.settings-backdrop { position: fixed; inset: 0 0 40px; z-index: 50; background: rgb(8 17 25 / 24%); }
 .settings-window { position: fixed; z-index: 51; left: 50%; top: 46%; transform: translate(-50%, -50%); width: min(340px, calc(100vw - 24px)); padding: 3px; box-shadow: 6px 6px 0 rgb(8 17 25 / 38%); }
 .settings-titlebar { display: flex; align-items: center; justify-content: space-between; padding-left: 8px; background: #30445e; }
 .settings-titlebar h2 { font-size: 11px; font-weight: 600; text-transform: uppercase; }
@@ -372,7 +342,7 @@
 .start-navigation .desktop-shortcut > span { background: none; text-shadow: none; }
 .start-note { border-top: 1px solid #526e94; padding: 10px; color: #bacada; font-size: 10px; }
 /* Desktop layer: the drag/resize canvas, inset by the status strip and taskbar. */
-.desktop-area { position: relative; height: calc(100dvh - var(--circa-topline-height) - var(--circa-taskbar-height)); overflow: hidden; outline: none; }
+.desktop-area { position: relative; height: calc(100dvh - var(--circa-taskbar-height)); overflow: hidden; outline: none; }
 .window-layer { position: absolute; inset: 0; pointer-events: none; }
 .window-layer > * { pointer-events: auto; }
 /*
@@ -419,7 +389,13 @@
   line-height: 1;
   cursor: pointer;
 }
-.window-control-close { font-size: 15px; }
+.window-control-close {
+  border-color: #7a3232 #2a1010 #2a1010 #7a3232;
+  background: #5c1d1d;
+  color: #f0c9c9;
+  font-size: 15px;
+}
+.window-control-close:hover { background: var(--destructive); color: #ffe3e3; }
 .window-address {
   display: flex;
   align-items: center;
@@ -460,10 +436,7 @@
   .desktop-icon { width: 38px; height: 38px; }
 }
 @media (max-width: 600px) {
-  .desktop-topline { min-height: 46px; font-size: 9px; padding: 6px 10px; gap: 8px; }
   /* The readout collapses to link state and address; the rest is chrome that costs space. */
-  .topline-console, .topline-station .topline-separator:last-of-type, .status-separator, .status-item:nth-of-type(n + 4), .status-sim { display: none; }
-  .workstation-status { gap: 6px; }
   .desktop-wallpaper { background-size: auto 100%; background-position: 55% center; }
   .desktop-navigation { grid-template-columns: 88px; gap: 2px; height: calc(100% - 8px); margin: 4px 8px; }
   .desktop-taskbar { height: 52px; gap: 7px; }

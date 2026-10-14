@@ -2,7 +2,7 @@
 
 ## Responsibility
 
-Next.js frontend with an initial CIRCA/OS desktop at `/` and `/desktop`: shortcut navigation, draggable and resizable destination windows, a Start launcher, taskbar, status strip, emblem wallpaper, and a switchable CRT overlay. Window contents are labeled placeholders; application screens and backend integration remain unimplemented.
+Next.js frontend with an initial CIRCA/OS desktop at `/` and `/desktop`: shortcut navigation, draggable and resizable destination windows, a Start launcher, taskbar, emblem wallpaper, and a switchable CRT overlay. Window contents are labeled placeholders; application screens and backend integration remain unimplemented.
 
 ## Structure and boundaries
 
