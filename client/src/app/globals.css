@@ -380,6 +380,9 @@
  * cluster, address strip, and a client area that scrolls independently.
  */
 .workstation-window {
+  /* Required: without absolute positioning the frames are static blocks, so they
+     stack in document order and left/top/z-index have nothing to act on. */
+  position: absolute;
   display: flex;
   flex-direction: column;
   overflow: hidden;

@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
@@ -188,6 +189,28 @@ describe("workstation windows", () => {
     await user.click(screen.getByRole("button", { name: "Minimize Archive" }));
     await user.click(within(screen.getByRole("contentinfo", { name: "Taskbar" })).getByRole("button", { name: "Archive" }));
     expect(screen.getAllByRole("dialog", { name: "Archive" })).toHaveLength(1);
+  });
+
+  it("places each window out of document flow so frames cannot stack", async () => {
+    stubLayout();
+    const user = userEvent.setup();
+    render(<Home />);
+    for (const name of ["Archive", "Inbox"]) await user.click(screen.getByRole("button", { name }));
+    const archive = screen.getByRole("dialog", { name: "Archive" });
+    const inbox = screen.getByRole("dialog", { name: "Inbox" });
+    // absolute positioning comes from the stylesheet, which jsdom does not apply,
+    // so assert the box the component writes plus the rules the frame depends on.
+    const sheet = readFileSync("src/app/globals.css", "utf8");
+    expect(sheet).toMatch(/\.workstation-window \{[^}]*position: absolute;/);
+    expect(sheet).toMatch(/\.window-layer \{[^}]*position: absolute;/);
+    for (const frame of [archive, inbox]) {
+      expect(frame).toHaveClass("workstation-window");
+      expect(Number.isFinite(parseInt(frame.style.left, 10))).toBe(true);
+      expect(Number.isFinite(parseInt(frame.style.top, 10))).toBe(true);
+      expect(Number(frame.style.zIndex)).toBeGreaterThan(0);
+    }
+    // Cascading offsets keep two frames from landing on the same spot.
+    expect(frameOrigin(archive)).not.toEqual(frameOrigin(inbox));
   });
 
   it("commits a drag once, on release", async () => {

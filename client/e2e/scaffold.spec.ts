@@ -79,6 +79,8 @@ test("windows drag, resize, minimize, and maximize", async ({ page }) => {
   const windowFrame = page.getByRole("dialog", { name: "Archive", exact: true });
   await expect(windowFrame).toBeVisible();
 
+  // A frame that is not absolutely positioned flows into a vertical stack.
+  expect(await windowFrame.evaluate((node) => getComputedStyle(node).position)).toBe("absolute");
   const start = (await windowFrame.boundingBox())!;
   const titlebar = page.getByTestId("window-titlebar-archive");
   const bar = (await titlebar.boundingBox())!;
