@@ -1,400 +1,526 @@
 import Link from "next/link";
 import { CopyCommand } from "./copy-command";
+import { TERMINAL } from "./terminal-copy";
 import {
-  COMMANDS,
+  BRIEF,
+  BUILDER_STEPS,
   DOCUMENTS,
-  FIGURES,
+  FILINGS,
+  HINGE,
   LAYOUT,
+  ORGANIZATIONS,
   PROJECT,
-  ROLES,
-  SECTIONS,
   SPECIMEN,
   STACK,
-  STEPS,
+  TRACKS,
+  WRITER_FILINGS,
+  WRITER_RULES,
+  WRITER_STEPS,
+  classLabel,
   commandById,
-  type SiteSection,
+  statusLabel,
+  type Track,
 } from "./site-meta";
 
 /**
- * The public landing page.
+ * The public landing page, in two movements.
  *
- * This is the one screen in the project that is not inside the fiction: it is
- * addressed to contributors, so it states the real status, the real stack, and
- * the real commands from the real manifests. It wears the CIRCA/OS chrome
- * anyway, because the workstation is what a contributor is being asked to help
- * build, and the docket is the honest front for it. Every fact it prints comes
- * from `site-meta.ts`, which the metadata test checks against the repository.
+ * The first movement is the archive itself, written in the institution's voice
+ * over its own index: a masthead, the three duties, the entries on file, one
+ * filing set as paper, and the bodies the archive files under. The second is
+ * the project, on paper, divided into the two kinds of contributor it needs.
+ * A hinge names the change out loud, because a page that slips from fiction to
+ * recruitment without saying so is the one thing worse than either half.
+ *
+ * Composition is deliberate rather than even: the masthead owns a viewport of
+ * quiet, a constant label rail anchors every scene, dense ledgers alternate
+ * with airy clauses, and the two full-bleed bands (hinge, closing) mark the
+ * movements the way a document's sections break.
  */
 
-/** The stock rules that keep the archive one machine instead of several. */
-const STUDIO_RULES: readonly { title: string; note: string }[] = [
-  { title: "Test first", note: "A behaviour change starts as a failing test, then passes, then gets tidied up." },
-  { title: "One change per pull request", note: "A focused branch is reviewed faster and can be reverted on its own." },
-  { title: "Document the folder", note: "Every authored folder carries a README, staged with the code that needs it." },
-  { title: "Keep the vocabulary", note: "Incidents, records, organizations, continuities, and tombstones are the fixed terms." },
-  { title: "Original work only", note: "Do not copy reference fiction, artwork, or assets into the archive." },
-  { title: "Report what you verified", note: "Name the checks that ran, and name the ones that could not run." },
-];
-
-function Section({ section, children }: { section: SiteSection; children: React.ReactNode }) {
+/** A scene: a rail carrying the § number and one word, then the body. */
+function Scene({ id, index, rail, heading, note, children, className }: {
+  id: string;
+  index: string;
+  rail: string;
+  heading: string;
+  note?: string;
+  children: React.ReactNode;
+  className?: string;
+}) {
   return (
-    <section className="landing-section" id={section.id} aria-labelledby={`${section.id}-title`}>
-      <div className="landing-head">
-        <span className="landing-index circa-mono" aria-hidden="true">
-          {section.index}
-        </span>
-        <h2 className="landing-title" id={`${section.id}-title`}>
-          {section.title}
+    <section className={["scene", className].filter(Boolean).join(" ")} id={id} aria-labelledby={`${id}-title`}>
+      <p className="scene-rail">
+        <span className="scene-index circa-mono">{index}</span>
+        <span className="scene-word">{rail}</span>
+      </p>
+      <div className="scene-body">
+        <h2 className="scene-title" id={`${id}-title`}>
+          {heading}
         </h2>
-        <p className="landing-standfirst">{section.standfirst}</p>
+        {note && <p className="scene-note">{note}</p>}
+        {children}
       </div>
-      {children}
     </section>
   );
 }
 
-function Docket() {
+function TerminalBar() {
   return (
-    <section className="landing-docket" aria-labelledby="docket-title">
-      <div className="landing-docket-copy">
-        <p className="landing-overline circa-label">{PROJECT.commission}</p>
-        <h1 className="landing-wordmark" id="docket-title">
-          {PROJECT.name}
+    <header className="terminal-bar">
+      <span className="terminal-sys">
+        <span className="terminal-sys-mark" aria-hidden="true">
+          ▦
+        </span>
+        {TERMINAL.system}
+      </span>
+      <span className="terminal-node">{TERMINAL.node}</span>
+      <span className="terminal-spacer" />
+      <span className="terminal-clearance">{TERMINAL.clearance}</span>
+      <a className="terminal-jump" href="#brief">
+        The project behind the archive
+      </a>
+    </header>
+  );
+}
+
+function TerminalMasthead() {
+  return (
+    <div className="terminal-masthead">
+      <span className="terminal-seal" aria-hidden="true" />
+      <div className="terminal-identity">
+        <h1 className="terminal-wordmark" id="terminal-title">
+          {TERMINAL.wordmark}
         </h1>
-        <p className="landing-thesis">{PROJECT.thesis}</p>
-        <div className="landing-actions">
-          {/* The only filled control on the page: it is the way into the machine. */}
-          <Link className="landing-enter" href="/desktop">
-            <span>Enter workstation</span>
-            <span className="landing-enter-path circa-mono">/desktop</span>
-          </Link>
-          <a className="landing-secondary" href="#documents">
-            Read the documents
-          </a>
-        </div>
-        <blockquote className="landing-doctrine">
-          <p>{PROJECT.doctrine}</p>
-          <cite>CIRCA/OS manual, section 1.1</cite>
-        </blockquote>
+        <p className="terminal-commission">{PROJECT.commission}</p>
+        <p className="terminal-line">
+          <span className="terminal-address circa-mono">{TERMINAL.address}</span>
+          <span className="terminal-line-note">
+            {TERMINAL.system} · {TERMINAL.node}
+          </span>
+        </p>
       </div>
-      <aside className="landing-plate circa-raised" aria-labelledby="docket-plate-title">
-        <div className="landing-plate-head">
-          <h2 className="landing-plate-title" id="docket-plate-title">
-            Public docket
-          </h2>
-          <span className="landing-plate-code circa-mono">04.12</span>
-        </div>
-        <dl className="landing-figures">
-          {FIGURES.map((figure) => (
-            <div key={figure.key} className="landing-figure">
-              <dt className="circa-label">{figure.key}</dt>
-              <dd className="circa-mono">{figure.value}</dd>
+      <aside className="terminal-notice">
+        <p className="terminal-notice-label circa-label">{TERMINAL.notice.label}</p>
+        <p className="terminal-notice-body">{TERMINAL.notice.body}</p>
+        <p className="terminal-doctrine">{PROJECT.doctrine}</p>
+        <p className="terminal-monitoring circa-mono">{TERMINAL.monitoring}</p>
+      </aside>
+    </div>
+  );
+}
+
+function ClauseScene() {
+  const scene = TERMINAL.scenes.clauses;
+  return (
+    <Scene id="clauses" index={scene.index} rail={scene.rail} heading={scene.heading} note={scene.note}>
+      <ol className="clause-list">
+        {TERMINAL.clauses.map((clause) => (
+          <li className="clause" key={clause.index}>
+            <p className="clause-index circa-mono">{clause.index}</p>
+            <h3 className="clause-title">{clause.title}</h3>
+            <p className="clause-body">{clause.body}</p>
+          </li>
+        ))}
+      </ol>
+    </Scene>
+  );
+}
+
+function LedgerScene() {
+  const scene = TERMINAL.scenes.ledger;
+  return (
+    <Scene id="ledger" index={scene.index} rail={scene.rail} heading={scene.heading} note={scene.note}>
+      <div className="table-scroll">
+        <table className="ledger" aria-label={TERMINAL.ledger.label}>
+          <thead>
+            <tr>
+              <th scope="col">{TERMINAL.ledger.columns.code}</th>
+              <th scope="col">{TERMINAL.ledger.columns.designation}</th>
+              <th scope="col">{TERMINAL.ledger.columns.klass}</th>
+              <th scope="col">{TERMINAL.ledger.columns.filed}</th>
+              <th scope="col">{TERMINAL.ledger.columns.status}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {FILINGS.map((filing) => (
+              <tr key={filing.code}>
+                <td className="ledger-code circa-mono">{filing.code}</td>
+                <td className="ledger-designation">
+                  {filing.designation ?? <span className="ledger-withheld">{TERMINAL.ledger.withheld}</span>}
+                </td>
+                <td className="ledger-class">{classLabel(filing)}</td>
+                <td className="ledger-filed circa-mono">{filing.filed}</td>
+                <td className="ledger-status" data-status={filing.status}>
+                  {statusLabel(filing)}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </Scene>
+  );
+}
+
+function FilingScene() {
+  const scene = TERMINAL.scenes.filing;
+  return (
+    <Scene id="filing" index={scene.index} rail={scene.rail} heading={scene.heading} note={scene.note} className="scene-filing">
+      <div className="filing-grid terminal-filing">
+        <figure className="filing-sheet">
+          <div className="filing-sheet-head">
+            <span className="filing-code circa-mono">{SPECIMEN.code}</span>
+            <span className="filing-tag" data-status={SPECIMEN.status}>
+              {statusLabel(SPECIMEN)}
+            </span>
+            <span className="filing-tag">{classLabel(SPECIMEN)}</span>
+          </div>
+          <h3 className="filing-title">{SPECIMEN.designation}</h3>
+          <p className="filing-meta circa-mono">
+            Filed {SPECIMEN.filed} by {SPECIMEN.organization} at {SPECIMEN.clearance}
+          </p>
+          <p className="filing-abstract">{SPECIMEN.abstract}</p>
+          <figcaption className="filing-foot">Entry rendered from Markdown</figcaption>
+        </figure>
+        <dl className="field-list">
+          {TERMINAL.filing.fields.map((field) => (
+            <div className="field-row" key={field.key}>
+              <dt className="field-key">{field.key}</dt>
+              <dd className="field-note">{field.note}</dd>
             </div>
           ))}
         </dl>
-        <p className="landing-stamp">{PROJECT.status}</p>
-        <p className="landing-plate-note">{PROJECT.summary}</p>
-      </aside>
+      </div>
+    </Scene>
+  );
+}
+
+function OrganizationScene() {
+  const scene = TERMINAL.scenes.organizations;
+  return (
+    <Scene id="organizations" index={scene.index} rail={scene.rail} heading={scene.heading} note={scene.note} className="scene-organizations">
+      <div className="table-scroll">
+        <table className="ledger ledger-bodies" aria-label={TERMINAL.organizations.label}>
+          <thead>
+            <tr>
+              <th scope="col">{TERMINAL.organizations.columns.code}</th>
+              <th scope="col">{TERMINAL.organizations.columns.designation}</th>
+              <th scope="col">{TERMINAL.organizations.columns.filed}</th>
+              <th scope="col">{TERMINAL.organizations.vocabularyLabel}</th>
+              <th scope="col">{TERMINAL.organizations.columns.status}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {ORGANIZATIONS.map((organization) => (
+              <tr key={organization.code}>
+                <td className="ledger-code circa-mono">{organization.code}</td>
+                <td className="ledger-designation">
+                  {organization.designation ?? <span className="ledger-withheld">{TERMINAL.ledger.withheld}</span>}
+                </td>
+                <td className="ledger-filed circa-mono">{organization.filed}</td>
+                <td className="ledger-vocabulary">{TERMINAL.organizations.vocabulary[organization.code]}</td>
+                <td className="ledger-status" data-status={organization.status}>
+                  {statusLabel(organization)}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </Scene>
+  );
+}
+
+function EntryBand() {
+  return (
+    <section className="terminal-entry" aria-labelledby="entry-title">
+      <div className="site-frame">
+        <div>
+          <p className="entry-label circa-label">{TERMINAL.entry.label}</p>
+          <h2 className="entry-title" id="entry-title">
+            {TERMINAL.entry.heading}
+          </h2>
+          <p className="entry-note">{TERMINAL.entry.note}</p>
+        </div>
+        <div className="entry-action">
+          <Link className="terminal-enter" href="/desktop">
+            <span>{TERMINAL.entry.cta}</span>
+            <span className="terminal-enter-path circa-mono">{TERMINAL.entry.path}</span>
+          </Link>
+          <p className="entry-cue circa-mono">
+            {TERMINAL.system} · {TERMINAL.clearance}
+          </p>
+        </div>
+      </div>
     </section>
   );
 }
 
-function CommunitySection() {
+function Hinge() {
   return (
-    <Section section={SECTIONS[0]}>
-      <div className="landing-lede">
-        <p>
-          The archive is kept by people who write records and people who build the machine that holds them. Both
-          halves ship in the same repository, and neither is finished.
+    <section className="hinge" aria-labelledby="hinge-label">
+      <div className="site-frame">
+        <p className="hinge-label circa-mono" id="hinge-label">
+          {HINGE.label}
         </p>
-        <p>
-          There is no account to create and no editor to petition. Organization dossiers are entities rather than
-          users, votes are advisory signals rather than decisions, and the only authority that rejects a filing is
-          coherence review. Documentation is reviewed like code, so a decision that is not written down is still an
-          open question.
-        </p>
+        <p className="hinge-line">{HINGE.line}</p>
       </div>
-      <ul className="landing-roles">
-        {ROLES.map((role) => (
-          <li key={role.id} className="landing-role circa-sunken">
-            <span className="landing-role-index circa-mono" aria-hidden="true">
-              {role.index}
-            </span>
-            <h3 className="landing-role-title">{role.title}</h3>
-            <p className="landing-role-discipline circa-label">{role.discipline}</p>
-            <p className="landing-role-work">{role.work}</p>
-            <p className="landing-role-path circa-mono">{role.path}</p>
+    </section>
+  );
+}
+
+function BriefLetterhead() {
+  return (
+    <>
+      <header className="brief-letterhead">
+        <div className="brief-identity">
+          <p className="brief-owner">{PROJECT.name}</p>
+          <h2 className="brief-title" id="brief-title">
+            {BRIEF.title}
+          </h2>
+          <p className="brief-status circa-mono">
+            {PROJECT.status} · {PROJECT.license} licensed · no release yet
+          </p>
+        </div>
+        <nav className="brief-contents" aria-label={BRIEF.contentsLabel}>
+          {TRACKS.map((track) => (
+            <a className="brief-track" href={`#${track.id}`} key={track.id}>
+              <span className="brief-track-index circa-mono">{track.index}</span>
+              <span className="brief-track-name">{track.title}</span>
+              <span className="brief-track-kicker">{track.kicker}</span>
+            </a>
+          ))}
+        </nav>
+      </header>
+      <p className="brief-lead">{BRIEF.lead}</p>
+    </>
+  );
+}
+
+function TrackShell({ track, children }: { track: Track; children: React.ReactNode }) {
+  return (
+    <section className="track" id={track.id} aria-labelledby={`${track.id}-title`}>
+      <p className="track-rail">
+        <span className="track-index circa-mono" aria-hidden="true">
+          {track.index}
+        </span>
+        <span className="track-kicker">{track.kicker}</span>
+      </p>
+      <div className="track-body">
+        <h3 className="track-title" id={`${track.id}-title`}>
+          {track.title}
+        </h3>
+        <p className="track-lead">{track.lead}</p>
+        {children}
+      </div>
+    </section>
+  );
+}
+
+function WritersTrack({ track }: { track: Track }) {
+  return (
+    <TrackShell track={track}>
+      <ol className="filing-types">
+        {WRITER_FILINGS.map((filing) => (
+          <li className="filing-type" key={filing.id}>
+            <p className="filing-type-code circa-mono">{filing.code}</p>
+            <h4 className="filing-type-title">{filing.title}</h4>
+            <p className="filing-type-note">{filing.note}</p>
           </li>
         ))}
-      </ul>
-    </Section>
-  );
-}
-
-function RecordSection() {
-  return (
-    <Section section={SECTIONS[1]}>
-      <div className="landing-record">
-        <div className="landing-record-copy">
-          <p>
-            A record is a found document: an incident nobody can explain, a dossier on an organization that files the
-            paranormal in its own language, or the continuation of somebody else&apos;s story. Write it in Markdown and
-            it is rendered as paper inside the workstation.
-          </p>
-          <p>
-            The archive has no opinion about whether any of it happened. It files what it is given, keeps every code
-            resolvable, and never rewrites history when an organization is erased. A rejected organization loses its
-            code and keeps its records, which stay readable as rumors.
-          </p>
-          <dl className="landing-notes">
-            <div className="landing-note">
-              <dt className="circa-label">Filed as</dt>
-              <dd>Its own code, for example INC-00042, issued once and never reused.</dd>
-            </div>
-            <div className="landing-note">
-              <dt className="circa-label">Read as</dt>
-              <dd>Paper. Markdown rendered in the workstation, never a file to download.</dd>
-            </div>
-            <div className="landing-note">
-              <dt className="circa-label">Cleared by</dt>
-              <dd>A level, from LEVEL 3 to LEVEL 5. Some designations stay withheld and stay listed.</dd>
-            </div>
-            <div className="landing-note">
-              <dt className="circa-label">Erased</dt>
-              <dd>Still browsable. Nothing is deleted from the archive, including the things it denies.</dd>
-            </div>
-          </dl>
+      </ol>
+      <div className="track-columns">
+        <div>
+          <p className="sub-label">What the canon holds</p>
+          <ul className="rule-list">
+            {WRITER_RULES.map((rule) => (
+              <li className="rule" key={rule.id}>
+                <p className="rule-title">{rule.title}</p>
+                <p className="rule-note">{rule.note}</p>
+              </li>
+            ))}
+          </ul>
         </div>
-        <figure className="landing-specimen">
-          <figcaption className="circa-label">Specimen, as the archive browser files it</figcaption>
-          <div className="landing-specimen-sheet">
-            <div className="landing-specimen-head">
-              <span className="landing-specimen-code circa-mono">{SPECIMEN.code}</span>
-              <span className="landing-specimen-tag circa-label" data-status={SPECIMEN.status}>
-                {SPECIMEN.statusLabel}
-              </span>
-              <span className="landing-specimen-tag circa-label">{SPECIMEN.classLabel}</span>
-            </div>
-            <h3 className="landing-specimen-title">{SPECIMEN.designation}</h3>
-            <p className="landing-specimen-meta circa-mono">
-              Filed {SPECIMEN.filed} by {SPECIMEN.organization} at {SPECIMEN.clearance}
-            </p>
-            <p className="landing-specimen-abstract">{SPECIMEN.abstract}</p>
-            <p className="landing-specimen-foot circa-label">Rendered from Markdown</p>
-          </div>
-        </figure>
+        <div>
+          <p className="sub-label">How to start</p>
+          <ol className="step-list">
+            {WRITER_STEPS.map((step) => (
+              <li className="step" key={step.index}>
+                <span className="step-index circa-mono" aria-hidden="true">
+                  {step.index}
+                </span>
+                <span className="step-copy">
+                  <span className="rule-title">{step.title}</span>
+                  <span className="rule-note">{step.note}</span>
+                </span>
+              </li>
+            ))}
+          </ol>
+          <p className="track-landing">
+            The setting and its canon live in <span className="circa-mono">docs/lore/</span> and in the context
+            document. Records themselves are written at the workstation.
+          </p>
+        </div>
       </div>
-    </Section>
+    </TrackShell>
   );
 }
 
-function ProjectSection() {
-  const dev = commandById("dev");
+function DevelopersTrack({ track }: { track: Track }) {
   return (
-    <Section section={SECTIONS[2]}>
-      <div className="landing-project">
-        <div className="landing-project-table">
-          <table className="landing-table" aria-label="Project record">
-            <caption className="circa-label">Interface, services, and data, as they stand today</caption>
+    <TrackShell track={track}>
+      <div className="track-columns">
+        <div>
+          <p className="sub-label">{BRIEF.stackLabel}</p>
+          <table className="stack" aria-label={BRIEF.stackLabel}>
             <thead>
               <tr>
-                <th scope="col">Detail</th>
-                <th scope="col">Value</th>
+                <th scope="col">Piece</th>
+                <th scope="col">What it is</th>
                 <th scope="col">State</th>
               </tr>
             </thead>
             <tbody>
-              <tr className="landing-table-lead">
+              <tr data-state="shipped">
                 <th scope="row">Status</th>
-                <td>
-                  <span className="landing-value">{PROJECT.status}</span>
-                </td>
-                <td>
-                  <span className="landing-state" data-state="shipped">
-                    Current
-                  </span>
-                </td>
+                <td className="stack-value">{PROJECT.status}</td>
+                <td className="stack-state">Current</td>
               </tr>
               {STACK.map((row) => (
-                <tr key={row.key}>
+                <tr key={row.key} data-state={row.state}>
                   <th scope="row">{row.key}</th>
-                  <td>
-                    <span className="landing-value">{row.value}</span>
-                  </td>
-                  <td>
-                    <span className="landing-state" data-state={row.state}>
-                      {row.state === "planned" ? "Planned" : "Shipped"}
-                    </span>
-                  </td>
+                  <td className="stack-value">{row.value}</td>
+                  <td className="stack-state">{row.state === "planned" ? "Planned" : "Shipped"}</td>
                 </tr>
               ))}
             </tbody>
           </table>
-          {dev && (
-            <div className="landing-serve circa-sunken">
-              <p className="landing-serve-note">
-                The workstation runs on port 3001. The backend is not implemented, so every screen reads from its own
-                index instead of a service.
-              </p>
-              <p className="landing-command">
-                <span className="landing-command-text circa-mono">{dev.text}</span>
-                <CopyCommand text={dev.text} />
-              </p>
-            </div>
-          )}
         </div>
-        <div className="landing-layout">
-          <h3 className="landing-subtitle">Repository layout</h3>
-          <ul className="landing-tree">
+        <div>
+          <p className="sub-label">{BRIEF.layoutLabel}</p>
+          <ul className="layout-list">
             {LAYOUT.map((row) => (
-              <li key={row.path} className="landing-tree-row">
-                <span className="landing-tree-path circa-mono">{row.path}</span>
-                <span className="landing-tree-purpose">{row.purpose}</span>
+              <li className="layout-row" key={row.path}>
+                <span className="layout-path circa-mono">{row.path}</span>
+                <span className="layout-purpose">{row.purpose}</span>
               </li>
             ))}
           </ul>
         </div>
       </div>
-    </Section>
-  );
-}
-
-function ContributeSection() {
-  return (
-    <Section section={SECTIONS[3]}>
-      <div className="landing-contribute">
-        <ol className="landing-steps">
-          {STEPS.map((step) => (
-            <li key={step.id} className="landing-step">
-              <span className="landing-step-index circa-mono" aria-hidden="true">
-                {step.index}
+      <div className="builder-block">
+        <p className="sub-label">{BRIEF.loopLabel}</p>
+        <ol className="builder-list">
+          {BUILDER_STEPS.map((step, position) => (
+            <li className="builder-step" key={step.id}>
+              <span className="builder-index circa-mono" aria-hidden="true">
+                {String(position + 1).padStart(2, "0")}
               </span>
-              <div className="landing-step-body">
-                <h3 className="landing-step-title">{step.title}</h3>
-                <p className="landing-step-note">{step.body}</p>
-                {step.commands.length > 0 && (
-                  <ul className="landing-commands">
-                    {step.commands.map((id) => {
-                      const command = commandById(id);
-                      if (!command) return null;
-                      return (
-                        <li key={id} className="landing-command">
-                          {command.cwd && <span className="landing-command-cwd circa-mono">{command.cwd}</span>}
-                          <span className="landing-command-text circa-mono">{command.text}</span>
-                          <CopyCommand text={command.text} />
-                          <span className="landing-command-note">{command.note}</span>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                )}
+              <div>
+                <p className="rule-title">{step.title}</p>
+                <p className="rule-note">{step.note}</p>
+                {step.commands.map((id) => {
+                  const command = commandById(id);
+                  if (!command) return null;
+                  return (
+                    <p className="command-row" key={id}>
+                      {command.cwd && <span className="command-cwd circa-mono">in {command.cwd}</span>}
+                      <span className="command-text circa-mono">{command.text}</span>
+                      <CopyCommand text={command.text} />
+                      <span className="command-note">{command.note}</span>
+                    </p>
+                  );
+                })}
               </div>
             </li>
           ))}
         </ol>
-        <aside className="landing-rules circa-raised" aria-labelledby="landing-rules-title">
-          <h3 className="landing-subtitle" id="landing-rules-title">
-            Studio rules
-          </h3>
-          <ul className="landing-rule-list">
-            {STUDIO_RULES.map((rule) => (
-              <li key={rule.title} className="landing-rule">
-                <span className="landing-rule-title">{rule.title}</span>
-                <span className="landing-rule-note">{rule.note}</span>
-              </li>
-            ))}
-          </ul>
-          <p className="landing-rules-foot">
-            {COMMANDS.length} documented commands, and every one of them is defined in a manifest rather than in this
-            page.
-          </p>
-        </aside>
       </div>
-    </Section>
+    </TrackShell>
   );
 }
 
-function DocumentsSection() {
+function Colophon() {
   return (
-    <Section section={SECTIONS[4]}>
-      <p className="landing-lede-note">
+    <section className="colophon" aria-labelledby="colophon-title">
+      <p className="sub-label" id="colophon-title">
+        {BRIEF.documentsLabel}
+      </p>
+      <p className="colophon-note">
         No remote is configured yet, so these are paths in the checkout rather than links. Copy one and open it in your
         editor, or read it on the repository host once the project is published.
       </p>
-      <ul className="landing-documents">
+      <ul className="document-list">
         {DOCUMENTS.map((document) => (
-          <li key={document.id} className="landing-document">
-            <span className="landing-document-path circa-mono">{document.path}</span>
-            <span className="landing-document-decides">{document.decides}</span>
+          <li className="document-row" key={document.id}>
+            <span className="document-copy">
+              <span className="document-path circa-mono">{document.path}</span>
+              <span className="document-decides">{document.decides}</span>
+            </span>
             <CopyCommand text={document.path} label={`Copy path ${document.path}`} />
           </li>
         ))}
       </ul>
-    </Section>
+    </section>
+  );
+}
+
+function Closing() {
+  return (
+    <footer className="closing">
+      <div className="site-frame">
+        <div className="closing-action">
+          <p className="closing-label circa-label">The archive is the other half of this page</p>
+          <Link className="closing-link" href="/desktop">
+            <span>Open the workstation</span>
+            <span className="closing-link-path circa-mono">/desktop</span>
+          </Link>
+        </div>
+        <div className="closing-terms">
+          <p className="closing-legal">
+            {PROJECT.license} licensed code and documentation. Contributions are accepted under the terms in
+            CONTRIBUTING.md, and the code of conduct applies to every conversation about the archive.
+          </p>
+          <p className="closing-terminal circa-mono">{TERMINAL.footer}</p>
+        </div>
+      </div>
+    </footer>
   );
 }
 
 export function LandingPage() {
+  const [writers, developers] = TRACKS;
   return (
     <div className="landing">
-      <div className="landing-scanlines circa-scanlines" aria-hidden="true" />
-      <a className="landing-skip" href="#main">
-        Skip to content
+      <a className="landing-skip" href="#brief">
+        Skip to the project brief
       </a>
-      <header className="landing-bar">
-        <div className="landing-bar-inner">
-          <span className="landing-sys">
-            <span className="landing-sys-mark" aria-hidden="true">
-              ▦
-            </span>
-            <span className="landing-sys-name">{PROJECT.system}</span>
-            <span className="landing-sys-note circa-label">{PROJECT.terminal}</span>
-          </span>
-          <nav className="landing-nav" aria-label="Site sections">
-            {SECTIONS.map((section) => (
-              <a key={section.id} href={`#${section.id}`}>
-                {section.nav}
-              </a>
-            ))}
-          </nav>
-          <span className="landing-bar-status circa-label">{PROJECT.status}</span>
-        </div>
-      </header>
-      <main className="landing-main" id="main">
-        <Docket />
-        <ul className="landing-ledger" aria-label="Shipped stack">
-          {STACK.filter((row) => row.state === "shipped").map((row) => (
-            <li key={row.key} className="landing-ledger-row">
-              <span className="landing-ledger-key circa-label">{row.key}</span>
-              <span className="landing-ledger-value circa-mono">{row.value}</span>
-            </li>
-          ))}
-        </ul>
-        <CommunitySection />
-        <RecordSection />
-        <ProjectSection />
-        <ContributeSection />
-        <DocumentsSection />
-      </main>
-      <footer className="landing-footer">
-        <div className="landing-footer-inner">
-          <div className="landing-footer-mark">
-            <p className="landing-footer-name">{PROJECT.name}</p>
-            <p className="landing-footer-commission">{PROJECT.commission}</p>
-          </div>
-          <nav className="landing-footer-nav" aria-label="Documents and sections">
-            {SECTIONS.map((section) => (
-              <a key={section.id} href={`#${section.id}`}>
-                {section.title}
-              </a>
-            ))}
-          </nav>
-          <p className="landing-footer-legal">
-            {PROJECT.license} licensed code and documentation. Contributions are accepted under the terms in
-            CONTRIBUTING.md, and the code of conduct applies to every conversation about the archive.
+      <section className="terminal" id="terminal" aria-labelledby="terminal-title">
+        <div className="terminal-scanlines circa-scanlines" aria-hidden="true" />
+        <div className="site-frame">
+          <TerminalBar />
+          <TerminalMasthead />
+          <p className="terminal-cue">
+            <a href="#clauses">{TERMINAL.cue}</a>
           </p>
         </div>
-      </footer>
+        <ClauseScene />
+        <LedgerScene />
+        <FilingScene />
+        <OrganizationScene />
+        <EntryBand />
+      </section>
+      <Hinge />
+      <section className="brief" id="brief" aria-labelledby="brief-title">
+        <div className="site-frame">
+          <BriefLetterhead />
+          <WritersTrack track={writers} />
+          <DevelopersTrack track={developers} />
+          <Colophon />
+        </div>
+      </section>
+      <Closing />
     </div>
   );
 }

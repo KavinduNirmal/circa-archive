@@ -1,187 +1,190 @@
-import { ARCHIVE_INDEX, CLASS_LABELS, STATUS_LABELS } from "../browser/archive-index";
+import { ARCHIVE_INDEX, CLASS_LABELS, STATUS_LABELS, type ArchiveClass, type ArchiveEntry } from "../browser/archive-index";
 
 /**
- * The facts the public landing page publishes about this repository.
+ * The facts the project half of the landing page publishes, and the editorial
+ * furniture around them.
  *
- * Every value here is checkable against something that already exists: a
- * manifest, a file in the checkout, the README's own status line, or the archive
- * index the browser files. `tests/site-meta.test.ts` does that checking, so the
- * landing page cannot quietly drift into advertising a project that is not there.
+ * Everything checkable here is checked: `tests/site-meta.test.ts` reads the
+ * manifests for versions and commands, the checkout for document and folder
+ * paths, the README for the status line, and the archive index for every record
+ * the page shows. The fiction lives in `terminal-copy.ts`; this file never
+ * speaks in the institution's voice.
  */
 
-export type SiteSection = {
-  id: string;
-  /** Zero-padded reading order, drawn beside the title as an index. */
+export type Track = {
+  /** Also the section id and the anchor the contents list points at. */
+  id: "writers" | "developers";
   index: string;
   title: string;
-  /** Shorter label for the top navigation. */
-  nav: string;
-  standfirst: string;
+  /** What this track is about, in three or four words. */
+  kicker: string;
+  lead: string;
 };
 
-export type CommunityRole = {
+export type WriterFiling = {
   id: string;
-  index: string;
+  klass: ArchiveClass;
+  /** A worked example that the archive index really resolves. */
+  code: string;
   title: string;
-  discipline: string;
-  work: string;
-  /** The place in the checkout where this work lands. */
-  path: string;
-};
-
-export type StackRow = {
-  key: string;
-  value: string;
-  /** `planned` means nothing exists yet, and the page must say so. */
-  state: "shipped" | "planned";
-};
-
-export type LayoutRow = { path: string; purpose: string };
-
-export type CommandRef = {
-  id: string;
-  text: string;
   note: string;
-  /** Set when the command has to run inside a subdirectory. */
-  cwd?: string;
 };
 
-export type ContributionStep = {
-  id: string;
-  index: string;
-  title: string;
-  body: string;
-  commands: readonly string[];
-};
-
-export type DocumentRow = {
-  id: string;
-  path: string;
-  decides: string;
-};
-
-export type ProjectFigure = { key: string; value: string };
+export type WriterRule = { id: string; title: string; note: string };
+export type WriterStep = { index: string; title: string; note: string };
+export type BuilderStep = { id: string; title: string; note: string; commands: readonly string[] };
+export type StackRow = { key: string; value: string; state: "shipped" | "planned" };
+export type LayoutRow = { path: string; purpose: string };
+export type CommandRef = { id: string; text: string; note: string; cwd?: string };
+export type DocumentRow = { id: string; path: string; decides: string };
 
 export const PROJECT = {
   name: "CIRCA Archive",
   commission: "Commission for Incident Review and Corrective Action",
-  system: "CIRCA/OS 4.12",
-  terminal: "Public intake terminal",
   status: "Pre-production",
   license: "MIT",
-  summary: "A collaborative ghost-story archive presented as a fictional desktop workstation.",
-  thesis:
-    "Anyone can file an incident, an organization dossier, or a continuity. The archive keeps them in one shared universe, renders every record as paper, and lets a fictional workstation be the only way in. The code that builds that workstation is open, and the specification is still being argued over.",
   doctrine: "CIRCA does not decide truth. It decides what's on file.",
-  access: "No account required",
 } as const;
 
-/** The public docket, drawn beside the wordmark. */
-export const FIGURES: readonly ProjectFigure[] = [
-  { key: "Status", value: PROJECT.status },
-  { key: "Build", value: PROJECT.system },
-  { key: "Interface", value: "Next.js 16.4" },
-  { key: "Runtimes", value: "Bun 1.3.14" },
-  { key: "Licence", value: PROJECT.license },
-  { key: "Access", value: PROJECT.access },
-];
+/** The line between the two movements, said out loud rather than implied. */
+export const HINGE = {
+  label: "End of archive preview",
+  line: "Everything above this line belongs to the fiction. Everything below it is the project itself: what it is made of, and how to add to it.",
+} as const;
 
-export const SECTIONS: readonly SiteSection[] = [
-  {
-    id: "community",
-    index: "01",
-    title: "Community",
-    nav: "Community",
-    standfirst: "Who keeps the archive, and where each kind of work lands.",
-  },
-  {
-    id: "record",
-    index: "02",
-    title: "The record",
-    nav: "The record",
-    standfirst: "What a contribution is made of, and what the archive does with it.",
-  },
-  {
-    id: "project",
-    index: "03",
-    title: "Project record",
-    nav: "Meta",
-    standfirst: "Status, stack, and repository layout, as they stand today.",
-  },
-  {
-    id: "contribute",
-    index: "04",
-    title: "Contributing",
-    nav: "Contribute",
-    standfirst: "From an empty checkout to a merged pull request.",
-  },
-  {
-    id: "documents",
-    index: "05",
-    title: "Documents",
-    nav: "Documents",
-    standfirst: "The papers that decide how this project works.",
-  },
-];
+export const BRIEF = {
+  title: "Project brief",
+  lead: "CIRCA Archive is open source and in pre-production. Two kinds of contributor are needed, and they need different things from this page, so the brief is divided in two.",
+  contentsLabel: "Two tracks",
+  stackLabel: "Stack",
+  layoutLabel: "Where things live",
+  loopLabel: "The way in",
+  documentsLabel: "Documents",
+} as const;
 
-/**
- * Six ways in, ordered by how much of the project already exists for them. The
- * last two keep the first four honest, which is why they are not extras.
- */
-export const ROLES: readonly CommunityRole[] = [
+export const TRACKS: readonly Track[] = [
   {
     id: "writers",
-    index: "01",
-    title: "Record writers",
-    discipline: "Fiction",
-    work:
-      "File incidents, organization dossiers, and continuities in your own voice. Original work only: the archive has its own language, and it does not borrow anyone else's.",
-    path: "docs/lore/",
+    index: "A",
+    title: "Writers",
+    kicker: "Fiction and canon",
+    lead: "You file the records the archive is about: incidents that should not have happened, dossiers on the bodies that file them, and continuities that carry someone else's telling forward.",
   },
   {
-    id: "engineers",
-    index: "02",
-    title: "Interface engineers",
-    discipline: "Frontend",
-    work:
-      "Build the workstation screens: the archive browser, the mail client, the file browser, and the record editor. Each one is a window in the same machine.",
-    path: "client/",
+    id: "developers",
+    index: "B",
+    title: "Developers",
+    kicker: "Interface and services",
+    lead: "You build the machine that holds those records: the workstation at /desktop and, later, the services behind it. The interface runs today over fixture indexes. The backend does not exist yet.",
+  },
+];
+
+export const WRITER_FILINGS: readonly WriterFiling[] = [
+  {
+    id: "incident",
+    klass: "incident",
+    code: "INC-00042",
+    title: "Incident",
+    note: "Something happened that the record cannot account for. The entry carries what was filed and nothing that was not.",
   },
   {
-    id: "services",
-    index: "03",
-    title: "Service engineers",
-    discipline: "Backend",
-    work:
-      "Bring the planned API, persistence, and live updates to life. Nothing here is running yet, so the contracts in the architecture draft are still open to challenge.",
-    path: "backend/",
+    id: "organization",
+    klass: "organization",
+    code: "ORG-C-005102",
+    title: "Organization",
+    note: "A body that files the phenomenon in its own language. Organizations are entities, not users: nobody owns one and nobody speaks for it.",
   },
   {
-    id: "design",
-    index: "04",
-    title: "Interface designers",
-    discipline: "Design",
-    work:
-      "Extend the CIRCA/OS visual language: bevels, phosphor, and paper. The specification is written down, and every deviation has to earn its place in it.",
-    path: ".agents/brain/DESIGN.md",
+    id: "continuity",
+    klass: "continuity",
+    code: "ORG-C-005102/C1",
+    title: "Continuity",
+    note: "A second telling that keeps the earlier filings rather than replacing them. Branches are forked in the open and both stay readable.",
+  },
+];
+
+export const WRITER_RULES: readonly WriterRule[] = [
+  {
+    id: "original",
+    title: "Original work only",
+    note: "Do not copy reference fiction, artwork, or assets into the archive. The setting is its own, and it borrows no one else's vocabulary.",
   },
   {
-    id: "review",
-    index: "05",
-    title: "Reviewers",
-    discipline: "Coherence",
-    work:
-      "Check a filing against established canon, and check the code against the lifecycle, visibility, and authorization rules that keep the archive consistent.",
-    path: ".agents/rules/README.md",
+    id: "vocabulary",
+    title: "Keep the vocabulary",
+    note: "Incidents, records, organizations, continuities, and tombstones are the fixed terms. Codes are stable and are displayed as written.",
   },
   {
-    id: "docs",
-    index: "06",
-    title: "Documentarians",
-    discipline: "Documentation",
-    work:
-      "Keep the specifications, the folder READMEs, and the contributor guidance true to the code as it changes. Documentation is reviewed like code here.",
-    path: "CONTRIBUTING.md",
+    id: "entities",
+    title: "Organizations are entities",
+    note: "No accounts, no handlers, no gatekeeping. An organization is the aggregate of what has been written about it, which is why a single incident reads differently under each lens.",
+  },
+  {
+    id: "erased",
+    title: "Erased is not deleted",
+    note: "A rejected organization loses its code and keeps its records. They stay readable as rumors, and the entries written while it was erased stay linked to it.",
+  },
+  {
+    id: "coherence",
+    title: "Coherence is the only authority",
+    note: "Votes are advisory signals. What decides a submission is whether the brief is consistent, the voice is distinct, and the seed contradicts nothing already on file.",
+  },
+];
+
+export const WRITER_STEPS: readonly WriterStep[] = [
+  {
+    index: "1",
+    title: "Read the source of truth",
+    note: "The project context holds the direction, the mechanics, and the open questions. Write inside it, or argue with it in the open before writing around it.",
+  },
+  {
+    index: "2",
+    title: "Propose before you plant",
+    note: "A new organization needs a brief, a short sample in its voice, and a seed incident. Anything that changes a mechanic needs a proposal first, so the shape settles before the prose does.",
+  },
+  {
+    index: "3",
+    title: "File the record",
+    note: "Settings and canon land in the lore folder; the records themselves are written in the workstation and rendered as paper. An entry is filed once and is not rewritten afterwards.",
+  },
+];
+
+export const BUILDER_STEPS: readonly BuilderStep[] = [
+  {
+    id: "install",
+    title: "Install the toolchain",
+    note: "Bun 1.3.14 drives the root tooling and the interface, and they keep separate dependency trees. Use the frozen lockfile so the versions you test are the versions everyone else gets.",
+    commands: ["install", "client-install", "prepare"],
+  },
+  {
+    id: "serve",
+    title: "Serve the workstation",
+    note: "The interface runs on port 3001 with nothing behind it. Every screen reads from the fixture index it ships with, which is why an empty state here means a missing fixture and not a failed request.",
+    commands: ["dev"],
+  },
+  {
+    id: "branch",
+    title: "Work one change at a time",
+    note: "Fork, then cut one focused branch. A pull request that does one coherent thing is reviewed faster, and it can be reverted on its own.",
+    commands: ["branch"],
+  },
+  {
+    id: "test",
+    title: "Write the test first",
+    note: "Behaviour changes start as a failing test: red, then green, then refactor. Prioritise authorization, lifecycle transitions, vote uniqueness, and visibility, because those are the rules a plausible-looking change can still break.",
+    commands: ["test", "client-test"],
+  },
+  {
+    id: "verify",
+    title: "Run the checks you claim to have run",
+    note: "The hooks validate staged folder READMEs, whitespace, the tooling tests, and the interface checks. Report exactly what you verified and name anything that could not run.",
+    commands: ["check", "precommit"],
+  },
+  {
+    id: "document",
+    title: "Document the folder you touched",
+    note: "Every authored folder carries a README describing its responsibility, structure, boundaries, and usage, staged with the code that needs it. Generated folders are excluded.",
+    commands: [],
   },
 ];
 
@@ -214,88 +217,20 @@ export const COMMANDS: readonly CommandRef[] = [
     id: "client-install",
     text: "bun install --frozen-lockfile",
     cwd: "client/",
-    note: "The frontend keeps its own dependency tree and lockfile.",
+    note: "The interface keeps its own dependency tree.",
   },
   { id: "prepare", text: "bun run prepare", note: "Installs the Git hooks." },
   { id: "dev", text: "bun run --cwd=client dev", note: "Serves the workstation on port 3001." },
   { id: "branch", text: "git switch -c feat/record-editor", note: "One coherent change per branch." },
-  { id: "check", text: "bun run check", note: "Confirms every authored folder has its README." },
   { id: "test", text: "bun run test", note: "The repository tooling tests." },
   { id: "client-test", text: "bun run --cwd=client test", note: "The interface tests, once, in jsdom." },
-  { id: "client-checks", text: "bun run check:client", note: "Frontend lint, typecheck, and tests together." },
+  { id: "check", text: "bun run check", note: "Confirms every authored folder has its README." },
   { id: "precommit", text: "bun run precommit", note: "Everything the hooks run, on demand." },
 ];
 
 export function commandById(id: string): CommandRef | undefined {
   return COMMANDS.find((command) => command.id === id);
 }
-
-export const STEPS: readonly ContributionStep[] = [
-  {
-    id: "read",
-    index: "01",
-    title: "Read the record first",
-    body:
-      "The project direction, the design specification, and the architecture draft are all written down. Read the ones your change touches before you plan it, then say which of them your change obeys or overturns.",
-    commands: [],
-  },
-  {
-    id: "propose",
-    index: "02",
-    title: "Say what you intend",
-    body:
-      "Open an issue for architecture, dependency, or story-mechanic changes and let the shape settle before you build it. Spelling corrections and small documentation fixes can go straight to a pull request.",
-    commands: [],
-  },
-  {
-    id: "branch",
-    index: "03",
-    title: "Branch from a fork",
-    body:
-      "Fork the repository, then cut one focused branch. A pull request that does one coherent thing is reviewed faster than one that does five, and it can be reverted on its own.",
-    commands: ["branch"],
-  },
-  {
-    id: "install",
-    index: "04",
-    title: "Install the toolchain",
-    body:
-      "Bun 1.3.14 drives both the root tooling and the frontend. Use the frozen lockfile so the versions you test are the versions everyone else gets.",
-    commands: ["install", "client-install", "prepare"],
-  },
-  {
-    id: "test-first",
-    index: "05",
-    title: "Write the test first",
-    body:
-      "Behaviour changes start with a failing test: red, then green, then refactor. Prioritise authorization, lifecycle transitions, vote uniqueness, and visibility, because those are the rules a plausible-looking change can still break.",
-    commands: ["test", "client-test"],
-  },
-  {
-    id: "verify",
-    index: "06",
-    title: "Run the checks you claim to have run",
-    body:
-      "The hooks validate staged folder READMEs, whitespace, the tooling tests, and the frontend checks. Run them yourself before you push, and report exactly what you verified rather than asserting that it passes.",
-    commands: ["check", "client-checks", "precommit"],
-  },
-  {
-    id: "document",
-    index: "07",
-    title: "Document the folder you touched",
-    body:
-      "Every authored folder carries a README that explains its responsibility, structure, boundaries, and usage. Stage it with the code in the same commit. Generated folders are excluded.",
-    commands: [],
-  },
-  {
-    id: "file",
-    index: "08",
-    title: "File the pull request",
-    body:
-      "Complete the template: the problem, the resulting behaviour, the related issue or specification, and your verification. Interface changes need screenshots, and migration or configuration changes need their notes.",
-    commands: [],
-  },
-];
 
 export const DOCUMENTS: readonly DocumentRow[] = [
   { id: "readme", path: "README.md", decides: "Scope, status, and the principles the archive runs on." },
@@ -317,31 +252,35 @@ export const DOCUMENTS: readonly DocumentRow[] = [
     decides: "Preparation required before the repository is published.",
   },
   { id: "license", path: "LICENSE", decides: "MIT terms for the code and the documentation." },
-  { id: "client", path: "client/README.md", decides: "Frontend setup, commands, and the screen inventory." },
+  { id: "client", path: "client/README.md", decides: "Interface setup, commands, and the screen inventory." },
 ];
 
 /**
- * The specimen on the landing page is the archive browser's own filing, so the
- * example a visitor reads is the same one the workstation returns for that code.
+ * The terminal shows the index rather than a description of it, so every record
+ * on the page is a real entry from the same fixture the browser files. A code
+ * that stops resolving fails the metadata test instead of quietly disappearing.
  */
-const specimenCode = "INC-00042";
+const FILING_CODES = ["INC-00014", "INC-00042", "INC-00118", "INC-00204", "ORG-A-020748", "CIRCA-M-0002"] as const;
 
-function findSpecimen() {
-  const entry = ARCHIVE_INDEX.find((item) => item.code === specimenCode);
-  if (!entry) throw new Error(`the archive index no longer files ${specimenCode}`);
+function resolveFiling(code: string): ArchiveEntry {
+  const entry = ARCHIVE_INDEX.find((item) => item.code === code);
+  if (!entry) throw new Error(`the archive index no longer files ${code}`);
   return entry;
 }
 
-const specimen = findSpecimen();
+export const FILINGS: readonly ArchiveEntry[] = FILING_CODES.map(resolveFiling);
 
-export const SPECIMEN = {
-  code: specimen.code,
-  designation: specimen.designation,
-  abstract: specimen.abstract,
-  filed: specimen.filed,
-  organization: specimen.organization,
-  clearance: specimen.clearance,
-  classLabel: CLASS_LABELS[specimen.klass],
-  statusLabel: STATUS_LABELS[specimen.status],
-  status: specimen.status,
-} as const;
+/** Bodies the index files under, in archive order. */
+export const ORGANIZATIONS: readonly ArchiveEntry[] = ARCHIVE_INDEX.filter(
+  (entry) => entry.klass === "organization",
+);
+
+export const SPECIMEN = resolveFiling("INC-00042");
+
+export function classLabel(entry: ArchiveEntry): string {
+  return CLASS_LABELS[entry.klass];
+}
+
+export function statusLabel(entry: ArchiveEntry): string {
+  return STATUS_LABELS[entry.status];
+}

@@ -1,87 +1,160 @@
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import Landing from "@/app/page";
+import { TERMINAL } from "@/components/site/terminal-copy";
 import {
-  COMMANDS,
+  BRIEF,
+  BUILDER_STEPS,
   DOCUMENTS,
+  FILINGS,
+  HINGE,
+  LAYOUT,
+  ORGANIZATIONS,
   PROJECT,
-  ROLES,
-  SECTIONS,
   SPECIMEN,
   STACK,
-  STEPS,
+  TRACKS,
+  WRITER_FILINGS,
+  WRITER_RULES,
+  WRITER_STEPS,
 } from "@/components/site/site-meta";
 
-describe("landing page", () => {
-  it("leads with the archive's own name and the one way into the workstation", () => {
+/** Reads the movements in document order, which is the page's composition. */
+function movements(container: HTMLElement) {
+  const terminal = container.querySelector("#terminal");
+  const hinge = container.querySelector(".hinge");
+  const brief = container.querySelector("#brief");
+  if (!terminal || !hinge || !brief) throw new Error("the page is missing a movement");
+  const follows = (first: Element, second: Element) =>
+    Boolean(first.compareDocumentPosition(second) & Node.DOCUMENT_POSITION_FOLLOWING);
+  return { terminal, hinge, brief, follows };
+}
+
+describe("the archive half", () => {
+  it("opens on the Commission, in its own voice, with one way in", () => {
     render(<Landing />);
     const headings = screen.getAllByRole("heading", { level: 1 });
     expect(headings).toHaveLength(1);
-    expect(headings[0]).toHaveTextContent(PROJECT.name);
-    const enter = screen.getByRole("link", { name: /enter workstation/i });
+    expect(headings[0]).toHaveTextContent(TERMINAL.wordmark);
+    expect(screen.getByText(PROJECT.commission)).toBeVisible();
+    expect(screen.getByText(TERMINAL.address)).toBeVisible();
+    // The doctrine is quoted, not paraphrased: it is the archive's own rule.
+    expect(screen.getByText(PROJECT.doctrine)).toBeVisible();
+    const enter = screen.getByRole("link", { name: new RegExp(TERMINAL.entry.cta, "i") });
     expect(enter).toHaveAttribute("href", "/desktop");
-    // One primary action on the page, and it is the one that boots the machine.
-    expect(enter).toHaveClass("landing-enter");
+    expect(enter).toHaveClass("terminal-enter");
   });
 
-  it("navigates to every section it names", () => {
+  it("keeps the fiction and the project on opposite sides of one hinge", () => {
     const { container } = render(<Landing />);
-    const navigation = screen.getByRole("navigation", { name: "Site sections" });
-    for (const section of SECTIONS) {
-      const link = within(navigation).getByRole("link", { name: section.nav });
-      expect(link).toHaveAttribute("href", `#${section.id}`);
-      expect(container.querySelector(`#${section.id}`)).not.toBeNull();
-      expect(container.querySelector(`#${section.id}`)?.getAttribute("aria-labelledby")).toBe(
-        `${section.id}-title`,
-      );
+    const { terminal, hinge, brief, follows } = movements(container);
+    expect(follows(terminal, hinge)).toBe(true);
+    expect(follows(hinge, brief)).toBe(true);
+    expect(screen.getByText(HINGE.label)).toBeVisible();
+    expect(screen.getByText(HINGE.line)).toBeVisible();
+    // Inside the fiction there is nowhere to go but into the machine or down the page.
+    for (const link of within(terminal as HTMLElement).getAllByRole("link")) {
+      expect(link.getAttribute("href")).toMatch(/^(\/desktop|#)/);
+    }
+    // The brief is the project's: no repository link is invented inside it either.
+    for (const link of within(brief as HTMLElement).queryAllByRole("link")) {
+      expect(link.getAttribute("href")).toMatch(/^#/);
     }
   });
 
-  it("introduces the community and where each kind of contributor works", () => {
-    const { container } = render(<Landing />);
-    const community = container.querySelector("#community");
-    if (!community) throw new Error("the community section is missing");
-    expect(screen.getByRole("heading", { name: "Community" })).toBeVisible();
-    for (const role of ROLES) {
-      const card = within(community as HTMLElement).getByRole("heading", { name: role.title });
-      expect(card).toBeVisible();
-      expect(within(community as HTMLElement).getByText(role.path)).toBeVisible();
-    }
-  });
-
-  it("shows the specimen record the browser files, on paper", () => {
-    const { container } = render(<Landing />);
-    const specimen = container.querySelector(".landing-specimen");
-    if (!specimen) throw new Error("the specimen record is missing");
-    expect(within(specimen as HTMLElement).getByText(SPECIMEN.code)).toBeVisible();
-    expect(within(specimen as HTMLElement).getByText(SPECIMEN.designation ?? "")).toBeVisible();
-    expect(specimen).toHaveTextContent(SPECIMEN.abstract);
-  });
-
-  it("publishes the project record with the unbuilt parts marked", () => {
+  it("files the ledger from the archive's own index", () => {
     render(<Landing />);
-    const table = screen.getByRole("table", { name: "Project record" });
-    expect(within(table).getByText(PROJECT.status)).toBeVisible();
+    const ledger = screen.getByRole("table", { name: TERMINAL.ledger.label });
+    for (const filing of FILINGS) {
+      expect(within(ledger).getByText(filing.code)).toBeVisible();
+    }
+    // A withheld designation stays on the index and says so.
+    const withheld = FILINGS.find((filing) => filing.designation === null);
+    expect(withheld).toBeDefined();
+    expect(within(ledger).getAllByText(TERMINAL.ledger.withheld).length).toBeGreaterThan(0);
+  });
+
+  it("sets the specimen on paper beside the fields an entry carries", () => {
+    const { container } = render(<Landing />);
+    const filing = container.querySelector(".terminal-filing");
+    if (!filing) throw new Error("the filing specimen is missing");
+    const sheet = within(filing as HTMLElement);
+    expect(sheet.getByText(SPECIMEN.code)).toBeVisible();
+    expect(sheet.getByText(SPECIMEN.designation ?? "")).toBeVisible();
+    expect(filing).toHaveTextContent(SPECIMEN.abstract);
+    for (const field of TERMINAL.filing.fields) {
+      expect(sheet.getByText(field.key)).toBeVisible();
+    }
+  });
+
+  it("names the organizations the index resolves, and what they call the phenomenon", () => {
+    const { container } = render(<Landing />);
+    const table = screen.getByRole("table", { name: TERMINAL.organizations.label });
+    expect(within(table).getAllByRole("row").length).toBe(ORGANIZATIONS.length + 1);
+    for (const organization of ORGANIZATIONS) {
+      expect(within(table).getByText(organization.code)).toBeVisible();
+      expect(
+        within(table).getByText(TERMINAL.organizations.vocabulary[organization.code]),
+      ).toBeVisible();
+    }
+    expect(container.querySelector("#terminal")).toHaveTextContent(PROJECT.doctrine);
+  });
+});
+
+describe("the project half", () => {
+  it("divides the brief into two tracks and points at both", () => {
+    const { container } = render(<Landing />);
+    expect(screen.getByRole("heading", { name: BRIEF.title })).toBeVisible();
+    const contents = screen.getByRole("navigation", { name: BRIEF.contentsLabel });
+    for (const track of TRACKS) {
+      const link = within(contents).getByRole("link", { name: new RegExp(track.title, "i") });
+      expect(link).toHaveAttribute("href", `#${track.id}`);
+      const section = container.querySelector(`#${track.id}`);
+      expect(section).not.toBeNull();
+      expect(section?.getAttribute("aria-labelledby")).toBe(`${track.id}-title`);
+      expect(within(section as HTMLElement).getByRole("heading", { name: track.title })).toBeVisible();
+      expect(within(section as HTMLElement).getByText(track.lead)).toBeVisible();
+    }
+  });
+
+  it("tells a writer what to file, what the canon holds, and how to start", () => {
+    const { container } = render(<Landing />);
+    const writers = container.querySelector("#writers") as HTMLElement;
+    for (const filing of WRITER_FILINGS) {
+      expect(within(writers).getByText(filing.title)).toBeVisible();
+      expect(within(writers).getByText(filing.code)).toBeVisible();
+    }
+    for (const rule of WRITER_RULES) {
+      expect(within(writers).getByText(rule.title)).toBeVisible();
+    }
+    for (const step of WRITER_STEPS) {
+      expect(within(writers).getByText(step.title)).toBeVisible();
+    }
+    // The lore's home is named, so a writer knows where the work lands.
+    expect(within(writers).getByText("docs/lore/")).toBeVisible();
+  });
+
+  it("tells a developer what runs, what is planned, and how to verify", () => {
+    const { container } = render(<Landing />);
+    const developers = container.querySelector("#developers") as HTMLElement;
+    const stack = within(developers).getByRole("table", { name: BRIEF.stackLabel });
+    expect(within(stack).getByText(PROJECT.status)).toBeVisible();
     for (const row of STACK) {
-      const cell = within(table).getByText(row.key);
-      const line = cell.closest("tr");
+      const line = within(stack).getByText(row.key).closest("tr");
       if (!line) throw new Error(`${row.key} is not in a row`);
       expect(line).toHaveTextContent(row.value);
-      expect(line.querySelector(`[data-state="${row.state}"]`)).not.toBeNull();
+      expect(line).toHaveAttribute("data-state", row.state);
     }
-  });
-
-  it("walks a contributor from the checkout to the pull request", () => {
-    const { container } = render(<Landing />);
-    const contribute = container.querySelector("#contribute");
-    if (!contribute) throw new Error("the contributing section is missing");
-    for (const step of STEPS) {
-      expect(within(contribute as HTMLElement).getByRole("heading", { name: step.title })).toBeVisible();
-      for (const id of step.commands) {
-        const command = COMMANDS.find((item) => item.id === id);
-        if (!command) throw new Error(`${id} is missing from the command list`);
-        expect(within(contribute as HTMLElement).getAllByText(command.text).length).toBeGreaterThan(0);
-      }
+    for (const step of BUILDER_STEPS) {
+      expect(within(developers).getByText(step.title)).toBeVisible();
+    }
+    for (const row of LAYOUT) {
+      expect(within(developers).getByText(row.path)).toBeVisible();
+    }
+    // The documents close the brief for both tracks, so they sit outside either one.
+    const brief = container.querySelector("#brief") as HTMLElement;
+    for (const document of DOCUMENTS) {
+      expect(within(brief).getByText(document.path)).toBeVisible();
     }
   });
 
@@ -98,17 +171,5 @@ describe("landing page", () => {
     fireEvent.click(precommit);
     expect(await screen.findByText("Copy blocked")).toBeVisible();
     Reflect.deleteProperty(navigator, "clipboard");
-  });
-
-  it("indexes the documents by the path a contributor has to open", () => {
-    const { container } = render(<Landing />);
-    const documents = container.querySelector("#documents");
-    if (!documents) throw new Error("the documents section is missing");
-    for (const document of DOCUMENTS) {
-      expect(within(documents as HTMLElement).getByText(document.path)).toBeVisible();
-    }
-    // No remote is configured, so the page must not pretend these are links.
-    expect(within(documents as HTMLElement).getByText(/no remote/i)).toBeVisible();
-    expect(within(documents as HTMLElement).queryAllByRole("link")).toHaveLength(0);
   });
 });

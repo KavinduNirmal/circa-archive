@@ -2,7 +2,7 @@
 
 ## Responsibility
 
-Next.js frontend with a public landing page at `/` and the CIRCA/OS workstation at `/desktop`. The landing page states the project's real status, stack, commands, and documents and links into the machine; the workstation answers that arrival with a post screen, then runs shortcut navigation, draggable and resizable destination windows, a Start launcher, taskbar, emblem wallpaper, and a switchable CRT overlay. Every desktop destination opens a real screen over illustrative preview data: Search the archive browser, Inbox the mail client, each folder the file browser, and CIRCA Word the Markdown record editor. Backend integration remains unimplemented, so every screen reads from its own index rather than a service.
+Next.js frontend with a public landing page at `/` and the CIRCA/OS workstation at `/desktop`. The landing page runs in two movements: the archive itself, written in the institution's voice over its own index, then a hinge into the project brief, which is set on paper and divided into writers and developers. The workstation answers the arrival with a post screen, then runs shortcut navigation, draggable and resizable destination windows, a Start launcher, taskbar, emblem wallpaper, and a switchable CRT overlay. Every desktop destination opens a real screen over illustrative preview data: Search the archive browser, Inbox the mail client, each folder the file browser, and CIRCA Word the Markdown record editor. Backend integration remains unimplemented, so every screen reads from its own index rather than a service.
 
 ## Structure and boundaries
 

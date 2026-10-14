@@ -25,10 +25,10 @@ export function CopyCommand({ text, label }: { text: string; label?: string }) {
   }
 
   return (
-    <span className="landing-copy">
+    <span className="copy">
       <button
         type="button"
-        className="landing-copy-button"
+        className="copy-button"
         data-state={state}
         aria-label={label ?? `Copy ${text}`}
         onClick={() => {
@@ -37,7 +37,7 @@ export function CopyCommand({ text, label }: { text: string; label?: string }) {
       >
         Copy
       </button>
-      <span className="landing-copy-state circa-label" role="status">
+      <span className="copy-state circa-label" role="status">
         {state === "copied" ? "Copied" : state === "blocked" ? "Copy blocked" : ""}
       </span>
     </span>
