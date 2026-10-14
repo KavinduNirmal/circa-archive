@@ -135,7 +135,7 @@ function SearchForm({ variant, draft, onDraftChange, onSearch, onClear }: {
       onSubmit={(event) => { event.preventDefault(); onSearch(); }}>
       <fieldset className="archive-fieldset">
         <legend className="archive-legend">Search the archive</legend>
-        <div className="archive-fields">
+        <div className="archive-search-fields">
           <div className="archive-field archive-field-query">
             <label htmlFor="archive-query">Search records</label>
             <input id="archive-query" className="archive-input circa-mono" type="text" autoComplete="off"

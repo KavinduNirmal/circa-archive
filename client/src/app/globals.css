@@ -490,8 +490,8 @@
   height: 100%;
   min-height: 0;
 }
-.browser-menubar { display: flex; flex: 0 0 auto; align-items: stretch; background: #24334a; border-bottom: 1px solid #0d131a; }
-.browser-menutitle {
+.circa-menubar { display: flex; flex: 0 0 auto; align-items: stretch; background: #24334a; border-bottom: 1px solid #0d131a; }
+.circa-menutitle {
   padding: 3px 9px;
   border: 0;
   background: none;
@@ -503,9 +503,9 @@
   text-transform: uppercase;
   cursor: pointer;
 }
-.browser-menutitle:hover, .browser-menutitle[data-state="open"] { background: #3a4f6d; color: #dce9f5; }
-.browser-menutitle:focus-visible { outline: 1px dashed #c8d6e5; outline-offset: -2px; }
-.browser-menu {
+.circa-menutitle:hover, .circa-menutitle[data-state="open"] { background: #3a4f6d; color: #dce9f5; }
+.circa-menutitle:focus-visible { outline: 1px dashed #c8d6e5; outline-offset: -2px; }
+.circa-menu {
   z-index: 60;
   min-width: 190px;
   padding: 2px;
@@ -514,7 +514,7 @@
   background: var(--popover);
   box-shadow: 3px 3px 0 rgb(8 17 25 / 45%);
 }
-.browser-menuitem {
+.circa-menuitem {
   position: relative;
   display: flex;
   align-items: center;
@@ -527,14 +527,14 @@
   user-select: none;
   outline: none;
 }
-.browser-menuitem[data-highlighted] { background: var(--accent); color: #eaf2fa; }
-.browser-menuitem[data-disabled] { color: #6b7f92; cursor: default; }
+.circa-menuitem[data-highlighted] { background: var(--accent); color: #eaf2fa; }
+.circa-menuitem[data-disabled] { color: #6b7f92; cursor: default; }
 /*
  * The current page and a checked text size share one gutter, so the menu reads
  * as a column. Hazard amber marks "you are here"; the text size uses a real
  * radio, which per the design system is a square enclosing a solid core.
  */
-.browser-menuitem[data-current]::before {
+.circa-menuitem[data-current]::before {
   content: "";
   position: absolute;
   left: 7px;
@@ -544,7 +544,7 @@
   margin-top: -3px;
   background: var(--circa-hazard);
 }
-.browser-menuitem[data-state="checked"]::after {
+.circa-menuitem[data-state="checked"]::after {
   content: "";
   position: absolute;
   left: 5px;
@@ -555,9 +555,9 @@
   border: 1px solid var(--ring);
   background: linear-gradient(var(--ring), var(--ring)) center / 4px 4px no-repeat;
 }
-.browser-menukey { color: #8fa3b6; font-size: 10px; letter-spacing: .04em; }
-.browser-menuseparator { height: 1px; margin: 3px 4px; background: var(--border); }
-.browser-menulabel { padding: 4px 8px 2px 18px; color: #8fa3b6; font-size: 9px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+.circa-menukey { color: #8fa3b6; font-size: 10px; letter-spacing: .04em; }
+.circa-menuseparator { height: 1px; margin: 3px 4px; background: var(--border); }
+.circa-menulabel { padding: 4px 8px 2px 18px; color: #8fa3b6; font-size: 9px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
 .browser-toolbar { display: flex; flex: 0 0 auto; flex-wrap: wrap; align-items: center; gap: 6px; padding: 4px 6px; background: #1b2636; border-bottom: 1px solid #0d131a; }
 .browser-nav { display: flex; flex: 0 0 auto; gap: 3px; }
 .browser-tool {
@@ -749,7 +749,7 @@
 .archive-search { margin: 0 0 14px; }
 .archive-fieldset { margin: 0; padding: 8px 10px 10px; border: 1px solid var(--circa-rule); background: var(--circa-paper-raised); }
 .archive-legend { padding: 0 6px; color: var(--circa-ink-soft); font-size: .78em; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
-.archive-fields { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 8px; }
+.archive-search-fields { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 8px; }
 .archive-field { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
 .archive-field-query { flex: 1 1 12em; }
 .archive-field label { color: var(--circa-ink-soft); font-size: .72em; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
@@ -868,7 +868,7 @@
   .browser-status-cell:last-child { display: none; }
   .archive-seal { width: 44px; height: 44px; }
   .archive-field, .archive-field-query, .archive-actions { flex: 1 1 100%; }
-  .archive-fields { align-items: stretch; }
+  .archive-search-fields { align-items: stretch; }
   .archive-search[data-variant="compact"] .archive-field-query { flex: 1 1 100%; }
 }
 
@@ -878,3 +878,262 @@
  * layer, so a `font-mono` utility could not win here; this does.
  */
 .circa-mono { font-family: var(--font-mono); }
+
+/*
+ * Mail client (the Inbox destination).
+ *
+ * Same formula as the browser: steel furniture around a paper store. The
+ * Outlook Bar, toolbar, find bar, and status bar are chrome; the message list
+ * and the reading pane are the documents, so they take the shared paper surface
+ * and the record ink. The window is its own size container because a workstation
+ * window is resized independently of the screen.
+ */
+/*
+ * Rows are declared as grid tracks rather than left to flex stretch: a nested
+ * flex row here was measured at its fit-content width instead of the frame's
+ * width, which left the list and reading pane stranded in the corner.
+ */
+.mail {
+  container-type: inline-size;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+/* Chrome never shrinks: a short window squeezes the panes, not the controls. */
+.mail-toolbar { display: flex; flex: 0 0 auto; flex-wrap: wrap; align-items: center; gap: 3px; padding: 4px 6px; background: var(--card); border-bottom: 1px solid var(--circa-bevel-shadow); }
+.mail-tool {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  border: 1px solid;
+  border-color: var(--circa-bevel-light) var(--circa-bevel-shadow) var(--circa-bevel-shadow) var(--circa-bevel-light);
+  background: var(--secondary);
+  color: #a4c2e6;
+  font: inherit;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.mail-tool:hover:not(:disabled) { background: #304155; color: #dce9f5; }
+.mail-tool:active:not(:disabled),
+.mail-tool[aria-pressed="true"] { border-color: var(--circa-bevel-shadow) var(--circa-bevel-light) var(--circa-bevel-light) var(--circa-bevel-shadow); background: var(--card); color: #dce9f5; }
+.mail-tool:disabled { border-color: #3d4c5e #131b24 #131b24 #3d4c5e; background: #1e2836; color: #64757f; cursor: default; }
+.mail-tool:focus-visible { outline: 1px dashed #c8d6e5; outline-offset: -3px; }
+.mail-tool-glyph { width: 13px; height: 13px; }
+.mail-toolbar-divider { align-self: stretch; width: 1px; margin: 0 4px; border-left: 1px solid var(--circa-bevel-shadow); border-right: 1px solid #4b5d6a; }
+.mail-body { display: flex; flex: 1; min-height: 0; }
+.mail-outlookbar { display: flex; flex: 0 0 auto; flex-direction: column; width: 104px; background: #151d27; border-right: 1px solid var(--circa-bevel-shadow); }
+.mail-folder-group { display: flex; flex: 0 0 auto; align-items: center; justify-content: space-between; gap: 4px; padding: 3px 5px; background: var(--secondary); border-bottom: 1px solid var(--circa-bevel-shadow); }
+.mail-folder-group-label { color: #a4c2e6; font-size: 9px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.mail-group-arrows { display: flex; gap: 1px; }
+.mail-group-arrow {
+  width: 13px;
+  height: 13px;
+  padding: 0;
+  border: 1px solid;
+  border-color: #3d4c5e #131b24 #131b24 #3d4c5e;
+  background: #1e2836;
+  color: #55697c;
+  font-size: 5px;
+  line-height: 1;
+  cursor: default;
+}
+.mail-folder-list { display: flex; flex-direction: column; gap: 2px; padding: 4px; overflow-y: auto; }
+/*
+ * One height for every row, so the icons and labels form a column instead of
+ * drifting with each label's line count.
+ */
+.mail-folder {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-height: 54px;
+  padding: 4px;
+  border: 1px solid transparent;
+  background: none;
+  color: #c8d6e5;
+  font: inherit;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.mail-folder:hover { border-color: #6f899d; background: rgb(82 110 148 / 26%); }
+.mail-folder[aria-current="page"] { border-color: #a4c2e6; background: var(--secondary); color: #dce9f5; }
+.mail-folder:focus-visible { outline: 1px dashed #c8d6e5; outline-offset: -2px; }
+.mail-folder-icon { width: 24px; height: 24px; image-rendering: pixelated; filter: saturate(.4) brightness(.85); opacity: .9; }
+.mail-folder-label { display: block; min-height: 22px; text-align: center; line-height: 11px; }
+.mail-folder-badge { position: absolute; top: 2px; right: 3px; min-width: 13px; padding: 0 3px; background: var(--circa-hazard); color: #1b1206; font-size: 9px; font-weight: 700; }
+.mail-main { display: flex; flex: 1; flex-direction: column; min-width: 0; }
+.mail-find { display: flex; flex: 0 0 auto; align-items: center; gap: 6px; padding: 4px 6px; background: var(--card); border-bottom: 1px solid var(--circa-bevel-shadow); }
+.mail-find-label { color: #8fa3b6; font-size: 9px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.mail-find-input { flex: 1; min-width: 0; height: 20px; padding: 0 5px; font: inherit; font-size: 11px; }
+.mail-find-button {
+  height: 20px;
+  padding: 0 8px;
+  border: 1px solid;
+  border-color: var(--circa-bevel-light) var(--circa-bevel-shadow) var(--circa-bevel-shadow) var(--circa-bevel-light);
+  background: var(--secondary);
+  color: #a4c2e6;
+  font: inherit;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.mail-find-button:hover { background: #304155; color: #dce9f5; }
+.mail-find-button:focus-visible { outline: 1px dashed #c8d6e5; outline-offset: 1px; }
+/* The list keeps a floor so a short window cannot collapse it to nothing. */
+.mail-grid-scroll { flex: 1 1 42%; min-height: 92px; overflow: auto; background: var(--circa-paper); border-bottom: 1px solid var(--circa-bevel-shadow); }
+.mail-grid { width: 100%; border-collapse: collapse; color: var(--circa-ink); font-size: 11px; }
+.mail-grid thead th { position: sticky; top: 0; z-index: 1; padding: 0; background: var(--circa-paper-raised); border: 1px solid var(--circa-rule); text-align: left; }
+.mail-sort {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  padding: 2px 5px;
+  border: 1px solid transparent;
+  background: none;
+  color: var(--circa-ink);
+  font: inherit;
+  font-size: .78em;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.mail-sort:hover { background: #e4eaf0; }
+/* The active column reads as a pressed plate, the way a sorted header did. */
+.mail-sort[data-active] { border-color: #6f7f90 #f4f8fb #f4f8fb #6f7f90; background: #ccd6df; }
+.mail-sort:focus-visible { outline: 2px solid var(--circa-link); outline-offset: -2px; }
+.mail-sort-glyph { width: 11px; height: 11px; }
+.mail-sort-label { white-space: nowrap; }
+.mail-row { cursor: pointer; }
+.mail-row > td { padding: 3px 6px; border-bottom: 1px dotted var(--circa-rule); vertical-align: middle; }
+.mail-row:hover > td { background: #d5dde5; }
+/* Selection is a filled row plus a spine, never colour alone. */
+.mail-row[aria-selected="true"] > td { background: #a8b7c4; }
+.mail-row[aria-selected="true"] > td:first-child { box-shadow: inset 2px 0 0 var(--circa-ink); }
+.mail-row[data-unread] > td { font-weight: 700; }
+.mail-row:focus-visible { outline: 2px solid var(--circa-link); outline-offset: -2px; }
+.mail-col-state { width: 62px; white-space: nowrap; }
+.mail-col-from { width: 26%; }
+.mail-col-received { width: 124px; white-space: nowrap; }
+/* A fixed box per glyph keeps importance, read state, and attachments in columns. */
+.mail-glyph-slot { display: inline-flex; align-items: center; justify-content: center; width: 15px; vertical-align: middle; }
+.mail-col-state .mail-sort { position: absolute; width: 15px; height: 100%; padding: 0; }
+.mail-col-state { position: relative; }
+.mail-header-importance { color: var(--circa-ink-soft); font-weight: 700; }
+.mail-glyph { flex: 0 0 auto; width: 12px; height: 12px; color: var(--circa-ink-soft); }
+.mail-glyph-read { opacity: .5; }
+.mail-importance { font-weight: 700; line-height: 1; }
+.mail-importance[data-level="high"] { color: #8a2b2b; }
+.mail-importance[data-level="low"] { color: var(--circa-link); }
+.mail-returned { color: #8a2b2b; font-size: .82em; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.mail-grid-empty { padding: 12px; color: var(--circa-ink-soft); font-size: 11px; }
+.mail-view { flex: 1 1 58%; min-height: 0; overflow: auto; background: var(--circa-paper); color: var(--circa-ink); }
+.mail-reading { padding: 10px 14px 14px; font-size: 12px; line-height: 17px; }
+.mail-reading-head { padding-bottom: 8px; border-bottom: 1px solid var(--circa-rule); }
+.mail-subject { margin: 0 0 6px; font-size: 15px; font-weight: 700; line-height: 20px; }
+.mail-headers { display: grid; grid-template-columns: 76px 1fr; gap: 2px 8px; margin: 0; }
+.mail-headers dt { color: var(--circa-ink-soft); font-size: .82em; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.mail-headers dd { margin: 0; overflow-wrap: anywhere; }
+.mail-returned-notice { margin: 10px 0 0; padding: 6px 8px; border: 1px solid #8a2b2b; background: #e4d3d3; color: #5c1d1d; font-size: 11px; }
+.mail-attachments { display: flex; align-items: center; gap: 6px; margin: 8px 0 0; color: var(--circa-ink-soft); font-size: 11px; }
+.mail-letter { max-width: 68ch; margin: 12px 0 0; }
+.mail-letter p { margin: 0 0 8px; }
+.mail-reading-note { margin: 14px 0 0; padding-top: 8px; border-top: 1px dotted var(--circa-rule); color: var(--circa-ink-soft); font-size: .85em; }
+.mail-reading-empty { color: var(--circa-ink-soft); }
+.mail-empty-title { margin-bottom: 4px; color: var(--circa-ink); font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.mail-compose { display: flex; flex-direction: column; height: 100%; padding: 8px 10px 10px; background: var(--circa-paper); color: var(--circa-ink); }
+.mail-compose-head { display: grid; flex: 0 0 auto; grid-template-columns: 62px 1fr; align-items: center; gap: 4px 8px; }
+.mail-compose-label { color: var(--circa-ink-soft); font-size: 9px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.mail-compose-field {
+  height: 22px;
+  padding: 0 5px;
+  border: 1px solid;
+  border-color: #5f6e7d #f4f8fb #f4f8fb #5f6e7d;
+  background: var(--circa-paper-sunken);
+  color: var(--circa-ink);
+  font-family: inherit;
+  font-size: 11px;
+  appearance: none;
+}
+.mail-compose-field:focus-visible { outline: 2px solid var(--circa-link); outline-offset: 0; }
+.mail-compose-body {
+  flex: 1;
+  min-height: 72px;
+  margin-top: 6px;
+  padding: 6px;
+  border: 1px solid;
+  border-color: #5f6e7d #f4f8fb #f4f8fb #5f6e7d;
+  background: var(--circa-paper-sunken);
+  color: var(--circa-ink);
+  font-family: inherit;
+  font-size: 12px;
+  line-height: 17px;
+  resize: none;
+}
+.mail-compose-body:focus-visible { outline: 2px solid var(--circa-link); outline-offset: 0; }
+.mail-compose-actions { display: flex; flex: 0 0 auto; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 8px; }
+.mail-compose-send {
+  height: 24px;
+  padding: 0 12px;
+  border: 1px solid;
+  border-color: #5a7ea0 #101c29 #101c29 #5a7ea0;
+  background: #24425f;
+  color: #e8eef5;
+  font: inherit;
+  font-size: .8em;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.mail-compose-send:hover { background: #2c5075; }
+.mail-compose-discard {
+  height: 24px;
+  padding: 0 12px;
+  border: 1px solid;
+  border-color: #e8eef4 #6f7f90 #6f7f90 #e8eef4;
+  background: var(--circa-paper-raised);
+  color: var(--circa-ink);
+  font: inherit;
+  font-size: .8em;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.mail-compose-discard:hover { background: #e4eaf0; }
+.mail-compose-send:focus-visible,
+.mail-compose-discard:focus-visible { outline: 2px solid var(--circa-link); outline-offset: 1px; }
+.mail-compose-note { color: var(--circa-ink-soft); font-size: 10px; }
+.mail-statusbar { display: flex; flex: 0 0 auto; align-items: stretch; background: var(--card); border-top: 1px solid var(--circa-bevel-shadow); font-size: 9px; letter-spacing: .05em; text-transform: uppercase; }
+.mail-status-counts { flex: 0 0 auto; padding: 4px 8px; color: #a4c2e6; white-space: nowrap; }
+.mail-status-report { flex: 1; min-width: 0; padding: 4px 8px; border-left: 1px solid var(--border); color: #8fa3b6; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mail-status-cell { padding: 4px 8px; border-left: 1px solid var(--circa-bevel-shadow); color: #8fa3b6; white-space: nowrap; }
+
+@container (max-width: 640px) {
+  /* Icon-only tools: the accessible name lives on aria-label, so nothing is lost. */
+  .mail-tool-label { display: none; }
+  .mail-tool { padding: 4px 6px; }
+  .mail-outlookbar { width: 66px; }
+  .mail-folder-label { display: none; }
+}
+@container (max-width: 460px) {
+  .mail-outlookbar { width: 46px; }
+  .mail-status-cell:last-child { display: none; }
+  /* The date stays; the pane scrolls sideways rather than dropping a column. */
+  .mail-col-from { width: 34%; }
+}

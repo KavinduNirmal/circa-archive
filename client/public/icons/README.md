@@ -20,6 +20,7 @@ Desktop shortcut artwork for the CIRCA/OS shell. Files are the original Windows 
 | `help_question_mark-0.png` | Help row inside the System window |
 | `recycle_bin_empty-4.png` | Recycle Bin (48px) |
 | `overlay_shortcut-2.png` | `.lnk` marker layered over Archive and _EXPUNGED (48px) |
+| `outlook_express-1.png` | Supplied for the mail client; not yet wired to a surface |
 
 ## Boundaries and usage
 

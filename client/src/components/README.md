@@ -7,7 +7,8 @@
 - `window-manager.tsx`: the open-window registry (`useWorkstationWindows`), the draggable and resizable `WorkstationWindow`, the `WindowLayer` canvas, and `TaskbarWindows` entries.
 - `desktop-shell.tsx`: wallpaper, taskbar, real UTC clock, Start launcher, notification popover, Settings modal, and the desktop layer that hosts windows.
 - `browser/`: the in-world archive browser behind the Search destination; see its [README](browser/README.md).
-- `ui/`: shadcn/ui primitives with CIRCA styling.
+- `mail/`: the Outlook-era mail client behind the Inbox destination; see its [README](mail/README.md).
+- `ui/`: shadcn/ui primitives with CIRCA styling, including the in-world [message box](ui/message-box.tsx) both applications share.
 
 ## Structure of the navigation model
 

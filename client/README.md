@@ -2,12 +2,12 @@
 
 ## Responsibility
 
-Next.js frontend with an initial CIRCA/OS desktop at `/` and `/desktop`: shortcut navigation, draggable and resizable destination windows, a Start launcher, taskbar, emblem wallpaper, and a switchable CRT overlay. The Search destination opens the archive browser, a single-tab in-world browser over an illustrative preview index; every other window is still a labeled placeholder, and backend integration remains unimplemented.
+Next.js frontend with an initial CIRCA/OS desktop at `/` and `/desktop`: shortcut navigation, draggable and resizable destination windows, a Start launcher, taskbar, emblem wallpaper, and a switchable CRT overlay. Two destinations open real applications over illustrative preview data: Search opens the archive browser, a single-tab in-world browser over the internal index, and Inbox opens the mail client, a three-pane Outlook-era reader with a composer that queues into an Outbox with no transport. Every other window is still a labeled placeholder, and backend integration remains unimplemented.
 
 ## Structure and boundaries
 
 - `src/app/`: routes, root layout, global theme, and [desktop design decisions](src/app/desktop/README.md).
-- `src/components/`: desktop shell, the archive [browser](src/components/browser/README.md), reusable navigation and icons, and shadcn/ui primitives.
+- `src/components/`: desktop shell, the archive [browser](src/components/browser/README.md), the [mail client](src/components/mail/README.md), reusable navigation and icons, and shadcn/ui primitives.
 - `src/lib/`: shared class-composition helper.
 - `tests/`: Vitest interaction and utility tests.
 - `e2e/`: responsive Playwright desktop tests.

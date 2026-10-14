@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import { Dialog, Popover } from "radix-ui";
 import { ArchiveBrowser } from "./browser/browser-window";
 import { BROWSER_WINDOW_TITLE } from "./browser/browser-identity";
+import { MAIL_WINDOW_TITLE } from "./mail/mail-identity";
+import { MailWindow } from "./mail/mail-window";
 import { TaskbarWindows, WindowLayer, useWorkstationWindows } from "./window-manager";
 import { DesktopIcon, notificationGlyph, settingsGlyph, type DesktopIconSpec } from "./desktop-icons";
 import { desktopFolders, DesktopNavigation, myPcContents, type DesktopFolder } from "./desktop-navigation";
@@ -136,13 +138,14 @@ export function DesktopShell() {
 
   /** Opens a desktop shortcut as a window, naming the entry for the titlebar and status strip. */
   function openFolder(folder: DesktopFolder, trigger?: HTMLButtonElement) {
-    // The browser names its own window and prints its own status bar, so the
-    // frame drops the generic strip rather than stacking a second one on it.
-    const browser = folder.id === "search";
+    // An application that names its own window and prints its own status bar
+    // drops the frame's generic strip rather than stacking a second one on it.
+    const titles: Partial<Record<string, string>> = { search: BROWSER_WINDOW_TITLE, inbox: MAIL_WINDOW_TITLE };
+    const title = titles[folder.id];
     openWindow({
       id: folder.id,
-      title: browser ? BROWSER_WINDOW_TITLE : folder.label,
-      status: browser ? null : folder.id === "my-pc" ? "WORKSTATION" : folder.detail ?? "LOCATION",
+      title: title ?? folder.label,
+      status: title ? null : folder.id === "my-pc" ? "WORKSTATION" : folder.detail ?? "LOCATION",
       icon: folder.icon,
       detail: folder.detail,
     }, trigger);
@@ -194,6 +197,10 @@ export function DesktopShell() {
     // Search is the archive browser: one permanent tab onto the internal index.
     if (id === "search") {
       return <ArchiveBrowser onCloseWindow={() => closeWindow(id)} />;
+    }
+    // Inbox is the mail client over the terminal's own correspondence store.
+    if (id === "inbox") {
+      return <MailWindow onCloseWindow={() => closeWindow(id)} />;
     }
     if (id === "system") {
       return (

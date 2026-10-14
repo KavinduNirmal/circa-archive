@@ -9,6 +9,8 @@
 - `window-manager.test.tsx`: window placement, drag and resize, maximize, stacking, and taskbar state.
 - `archive-index.test.ts`: the archive query rules, ranking, and the shipped fixture's formats.
 - `browser.test.tsx`: the single tab, the search flow, the record view, the refusals, and the blocked controls.
+- `mailbox-index.test.ts`: folder splits, read state, sorting, find, and the queue stamp.
+- `mail.test.tsx`: the panes, reading and marking read, sorting, find, delete, queueing, and the retention refusal.
 
 ## Usage and boundaries
 

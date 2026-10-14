@@ -4,6 +4,7 @@ import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 import Home from "@/app/page";
 import { BROWSER_WINDOW_TITLE } from "@/components/browser/browser-identity";
+import { MAIL_WINDOW_TITLE } from "@/components/mail/mail-identity";
 
 /**
  * jsdom performs no layout, so these stubs give the desktop layer and window
@@ -144,7 +145,7 @@ describe("workstation windows", () => {
     await user.click(screen.getByRole("button", { name: "Archive" }));
     await user.click(screen.getByRole("button", { name: "Inbox" }));
     const archive = screen.getByRole("dialog", { name: "Archive" });
-    const inbox = screen.getByRole("dialog", { name: "Inbox" });
+    const inbox = screen.getByRole("dialog", { name: MAIL_WINDOW_TITLE });
     expect(Number(inbox.style.zIndex)).toBeGreaterThan(Number(archive.style.zIndex));
     fireEvent.pointerDown(archive);
     await waitFor(() => expect(Number(archive.style.zIndex)).toBeGreaterThan(Number(inbox.style.zIndex)));
@@ -161,11 +162,11 @@ describe("workstation windows", () => {
     await user.click(screen.getByRole("button", { name: "Inbox" }));
     const archiveEntry = taskbar().getByRole("button", { name: "Archive" });
     expect(archiveEntry).not.toHaveAttribute("data-active");
-    expect(taskbar().getByRole("button", { name: "Inbox" })).toHaveAttribute("data-active", "true");
+    expect(taskbar().getByRole("button", { name: MAIL_WINDOW_TITLE })).toHaveAttribute("data-active", "true");
 
     await user.click(archiveEntry);
     expect(archiveEntry).toHaveAttribute("data-active", "true");
-    expect(taskbar().getByRole("button", { name: "Inbox" })).not.toHaveAttribute("data-active");
+    expect(taskbar().getByRole("button", { name: MAIL_WINDOW_TITLE })).not.toHaveAttribute("data-active");
 
     await user.click(screen.getByRole("button", { name: "Minimize Archive" }));
     expect(taskbar().getByRole("button", { name: "Archive" })).not.toHaveAttribute("data-active");
@@ -179,24 +180,24 @@ describe("workstation windows", () => {
     for (const name of ["Archive", "Inbox", "Search"]) await user.click(screen.getByRole("button", { name }));
 
     await user.click(screen.getByRole("button", { name: "Minimize Archive" }));
-    await user.click(screen.getByRole("button", { name: "Minimize Inbox" }));
+    await user.click(screen.getByRole("button", { name: `Minimize ${MAIL_WINDOW_TITLE}` }));
     expect(taskbar().getByRole("button", { name: "Archive" })).toHaveAttribute("aria-pressed", "true");
-    expect(taskbar().getByRole("button", { name: "Inbox" })).toHaveAttribute("aria-pressed", "true");
+    expect(taskbar().getByRole("button", { name: MAIL_WINDOW_TITLE })).toHaveAttribute("aria-pressed", "true");
     expect(taskbar().getByRole("button", { name: BROWSER_WINDOW_TITLE })).toHaveAttribute("aria-pressed", "false");
     expect(screen.queryByRole("dialog", { name: "Archive" })).not.toBeInTheDocument();
-    expect(screen.queryByRole("dialog", { name: "Inbox" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("dialog", { name: MAIL_WINDOW_TITLE })).not.toBeInTheDocument();
     expect(screen.getByRole("dialog", { name: BROWSER_WINDOW_TITLE })).toBeVisible();
 
     // A minimized window is still open, and restores on demand.
-    await user.click(taskbar().getByRole("button", { name: "Inbox" }));
-    expect(screen.getByRole("dialog", { name: "Inbox" })).toBeVisible();
-    expect(taskbar().getByRole("button", { name: "Inbox" })).toHaveAttribute("aria-pressed", "false");
+    await user.click(taskbar().getByRole("button", { name: MAIL_WINDOW_TITLE }));
+    expect(screen.getByRole("dialog", { name: MAIL_WINDOW_TITLE })).toBeVisible();
+    expect(taskbar().getByRole("button", { name: MAIL_WINDOW_TITLE })).toHaveAttribute("aria-pressed", "false");
     expect(taskbar().getByRole("button", { name: "Archive" })).toHaveAttribute("aria-pressed", "true");
 
     // Closing the active window hands over to the next visible one, and closing
     // the last one leaves a clean desktop with no stale taskbar entries.
-    await user.click(within(screen.getByRole("dialog", { name: "Inbox" })).getByRole("button", { name: "Close folder" }));
-    expect(screen.queryByRole("dialog", { name: "Inbox" })).not.toBeInTheDocument();
+    await user.click(within(screen.getByRole("dialog", { name: MAIL_WINDOW_TITLE })).getByRole("button", { name: "Close folder" }));
+    expect(screen.queryByRole("dialog", { name: MAIL_WINDOW_TITLE })).not.toBeInTheDocument();
     expect(screen.getByRole("dialog", { name: BROWSER_WINDOW_TITLE })).toBeVisible();
     await user.click(within(screen.getByRole("dialog", { name: BROWSER_WINDOW_TITLE })).getByRole("button", { name: "Close folder" }));
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
@@ -219,7 +220,7 @@ describe("workstation windows", () => {
     render(<Home />);
     for (const name of ["Archive", "Inbox"]) await user.click(screen.getByRole("button", { name }));
     const archive = screen.getByRole("dialog", { name: "Archive" });
-    const inbox = screen.getByRole("dialog", { name: "Inbox" });
+    const inbox = screen.getByRole("dialog", { name: MAIL_WINDOW_TITLE });
     // absolute positioning comes from the stylesheet, which jsdom does not apply,
     // so assert the box the component writes plus the rules the frame depends on.
     const sheet = readFileSync("src/app/globals.css", "utf8");

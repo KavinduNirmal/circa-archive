@@ -35,32 +35,32 @@ export function BrowserMenu({ textSize, onTextSizeChange, canGoBack, canGoForwar
   actions: BrowserActions;
 }) {
   return (
-    <Menubar.Root className="browser-menubar" aria-label="Browser menu">
+    <Menubar.Root className="circa-menubar" aria-label="Browser menu">
       <Menubar.Menu>
-        <Menubar.Trigger className="browser-menutitle">File</Menubar.Trigger>
+        <Menubar.Trigger className="circa-menutitle">File</Menubar.Trigger>
         <Menubar.Portal>
-          <Menubar.Content className="browser-menu" align="start" sideOffset={0}>
-            <Menubar.Item className="browser-menuitem" onSelect={actions.newTab}>
-              New tab<span className="browser-menukey">Ctrl+T</span>
+          <Menubar.Content className="circa-menu" align="start" sideOffset={0}>
+            <Menubar.Item className="circa-menuitem" onSelect={actions.newTab}>
+              New tab<span className="circa-menukey">Ctrl+T</span>
             </Menubar.Item>
-            <Menubar.Separator className="browser-menuseparator" />
-            <Menubar.Item className="browser-menuitem" onSelect={actions.closeWindow}>Close window</Menubar.Item>
+            <Menubar.Separator className="circa-menuseparator" />
+            <Menubar.Item className="circa-menuitem" onSelect={actions.closeWindow}>Close window</Menubar.Item>
           </Menubar.Content>
         </Menubar.Portal>
       </Menubar.Menu>
 
       <Menubar.Menu>
-        <Menubar.Trigger className="browser-menutitle">View</Menubar.Trigger>
+        <Menubar.Trigger className="circa-menutitle">View</Menubar.Trigger>
         <Menubar.Portal>
-          <Menubar.Content className="browser-menu" align="start" sideOffset={0}>
-            <Menubar.Item className="browser-menuitem" onSelect={actions.refresh}>
-              Refresh<span className="browser-menukey">F5</span>
+          <Menubar.Content className="circa-menu" align="start" sideOffset={0}>
+            <Menubar.Item className="circa-menuitem" onSelect={actions.refresh}>
+              Refresh<span className="circa-menukey">F5</span>
             </Menubar.Item>
-            <Menubar.Separator className="browser-menuseparator" />
-            <Menubar.Label className="browser-menulabel">Text size</Menubar.Label>
+            <Menubar.Separator className="circa-menuseparator" />
+            <Menubar.Label className="circa-menulabel">Text size</Menubar.Label>
             <Menubar.RadioGroup value={textSize} onValueChange={(value) => onTextSizeChange(value as ArchiveTextSize)}>
               {TEXT_SIZES.map((size) => (
-                <Menubar.RadioItem key={size} className="browser-menuitem" value={size}>
+                <Menubar.RadioItem key={size} className="circa-menuitem" value={size}>
                   {TEXT_SIZE_LABELS[size]}
                 </Menubar.RadioItem>
               ))}
@@ -70,24 +70,24 @@ export function BrowserMenu({ textSize, onTextSizeChange, canGoBack, canGoForwar
       </Menubar.Menu>
 
       <Menubar.Menu>
-        <Menubar.Trigger className="browser-menutitle">Go</Menubar.Trigger>
+        <Menubar.Trigger className="circa-menutitle">Go</Menubar.Trigger>
         <Menubar.Portal>
-          <Menubar.Content className="browser-menu" align="start" sideOffset={0}>
-            <Menubar.Item className="browser-menuitem" disabled={!canGoBack} onSelect={actions.back}>Back</Menubar.Item>
-            <Menubar.Item className="browser-menuitem" disabled={!canGoForward} onSelect={actions.forward}>Forward</Menubar.Item>
-            <Menubar.Separator className="browser-menuseparator" />
-            <Menubar.Item className="browser-menuitem" onSelect={actions.home}>Archive home</Menubar.Item>
+          <Menubar.Content className="circa-menu" align="start" sideOffset={0}>
+            <Menubar.Item className="circa-menuitem" disabled={!canGoBack} onSelect={actions.back}>Back</Menubar.Item>
+            <Menubar.Item className="circa-menuitem" disabled={!canGoForward} onSelect={actions.forward}>Forward</Menubar.Item>
+            <Menubar.Separator className="circa-menuseparator" />
+            <Menubar.Item className="circa-menuitem" onSelect={actions.home}>Archive home</Menubar.Item>
           </Menubar.Content>
         </Menubar.Portal>
       </Menubar.Menu>
 
       <Menubar.Menu>
-        <Menubar.Trigger className="browser-menutitle">Bookmarks</Menubar.Trigger>
+        <Menubar.Trigger className="circa-menutitle">Bookmarks</Menubar.Trigger>
         <Menubar.Portal>
-          <Menubar.Content className="browser-menu" align="start" sideOffset={0}>
-            <Menubar.Item className="browser-menuitem" data-current="true" onSelect={actions.home}>CIRCA Internal Archive</Menubar.Item>
-            <Menubar.Separator className="browser-menuseparator" />
-            <Menubar.Item className="browser-menuitem" disabled
+          <Menubar.Content className="circa-menu" align="start" sideOffset={0}>
+            <Menubar.Item className="circa-menuitem" data-current="true" onSelect={actions.home}>CIRCA Internal Archive</Menubar.Item>
+            <Menubar.Separator className="circa-menuseparator" />
+            <Menubar.Item className="circa-menuitem" disabled
               title="Bookmarking is disabled on a restricted local connection">
               Add bookmark
             </Menubar.Item>
@@ -96,12 +96,12 @@ export function BrowserMenu({ textSize, onTextSizeChange, canGoBack, canGoForwar
       </Menubar.Menu>
 
       <Menubar.Menu>
-        <Menubar.Trigger className="browser-menutitle">Help</Menubar.Trigger>
+        <Menubar.Trigger className="circa-menutitle">Help</Menubar.Trigger>
         <Menubar.Portal>
-          <Menubar.Content className="browser-menu" align="start" sideOffset={0}>
-            <Menubar.Item className="browser-menuitem" onSelect={actions.policy}>Local network policy</Menubar.Item>
-            <Menubar.Separator className="browser-menuseparator" />
-            <Menubar.Item className="browser-menuitem" onSelect={actions.about}>About CIRCA Browser</Menubar.Item>
+          <Menubar.Content className="circa-menu" align="start" sideOffset={0}>
+            <Menubar.Item className="circa-menuitem" onSelect={actions.policy}>Local network policy</Menubar.Item>
+            <Menubar.Separator className="circa-menuseparator" />
+            <Menubar.Item className="circa-menuitem" onSelect={actions.about}>About CIRCA Browser</Menubar.Item>
           </Menubar.Content>
         </Menubar.Portal>
       </Menubar.Menu>
