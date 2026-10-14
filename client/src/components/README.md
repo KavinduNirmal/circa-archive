@@ -14,7 +14,7 @@
 
 ## Window model
 
-A destination opens as one window per destination id: reopening focuses the existing frame rather than duplicating it. `useWorkstationWindows` owns geometry, stacking (`z`), minimize, and maximize; `geometry` is the restore target so maximize never loses the frame. Dragging and resizing are pointer handlers on the titlebar and corner grip that write explicit `left`/`top` and width/height, clamped to the desktop layer; react-rnd renders the frame and its handles but does not drive position, because its own drag path double-applies the offset when a position prop is supplied. Settings stays a full-screen modal: it is workstation chrome, not a document window.
+A destination opens as one window per destination id: reopening focuses the existing frame rather than duplicating it. `useWorkstationWindows` owns geometry, stacking (`z`), minimize, and maximize; `geometry` is the restore target so maximize never loses the frame. Dragging and resizing are pointer handlers on the titlebar and corner grip: during a gesture they write `left`/`top`/width/height straight to the frame and commit to the registry once on release, so a drag does not re-render the shell at pointer frequency. Geometry is also passed to react-rnd as explicit CSS, because react-rnd's own transform double-applies a controlled position; keeping the frame's box authoritative is what makes the drop land under the cursor. Pointer capture is taken on the titlebar so release always reaches the handler that started the gesture. Settings stays a full-screen modal: it is workstation chrome, not a document window.
 
 ## Boundaries and verification
 

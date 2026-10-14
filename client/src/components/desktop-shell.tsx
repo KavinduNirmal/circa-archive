@@ -217,7 +217,10 @@ export function DesktopShell() {
       return (
         <div className="window-pane">
           <h2>Workstation configuration</h2>
-          <p>System files and help are filed inside My PC.</p>
+          <div className="window-help">
+            <DesktopIcon icon={{ glyph: "help" }} className="window-help-icon" />
+            <p>System files and help are filed inside My PC.</p>
+          </div>
           <button type="button" className="return-button circa-raised" onClick={() => openWindow({
             id: myPcFolder.id, title: myPcFolder.label, status: "WORKSTATION", icon: myPcFolder.icon, detail: myPcFolder.detail,
           })}>

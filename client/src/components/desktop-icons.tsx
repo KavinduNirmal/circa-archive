@@ -23,6 +23,7 @@ const icons = {
   search: { asset: "/icons/search_web-0.png" },
   expunged: { asset: "/icons/erase_file-0.png", shortcut: true },
   system: { asset: "/icons/console_prompt-0.png" },
+  help: { asset: "/icons/help_question_mark-0.png" },
   recycle: { asset: "/icons/recycle_bin_empty-4.png" },
 } as const satisfies Record<string, { asset: string; shortcut?: boolean }>;
 

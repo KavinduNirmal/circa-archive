@@ -22,8 +22,8 @@ function stubLayout() {
     const width = this.classList.contains("workstation-window") || this.classList.contains("desktop-area") ? 1200 : 0;
     const height = width ? 700 : 0;
     const matrix = this.style.transform.match(/matrix\(([^)]+)\)/)?.[1].split(",").map(Number);
-    const x = matrix ? matrix[4] : 0;
-    const y = matrix ? matrix[5] : 0;
+    const x = (Number.isFinite(parseInt(this.style.left, 10)) ? parseInt(this.style.left, 10) : 0) + (matrix ? matrix[4] : 0);
+    const y = (Number.isFinite(parseInt(this.style.top, 10)) ? parseInt(this.style.top, 10) : 0) + (matrix ? matrix[5] : 0);
     return { x, y, width, height, top: 40 + y, left: x, right: x + width, bottom: 40 + y + height, toJSON: () => ({}) } as DOMRect;
   };
   // The shell measures the desktop layer with clientWidth/clientHeight, which jsdom reports as 0.
@@ -73,6 +73,11 @@ function frameSize(frame: HTMLElement) {
   return { w: parseInt(frame.style.width, 10), h: parseInt(frame.style.height, 10) };
 }
 
+/** Drags and resizes write explicit left/top, so geometry reads straight off the frame. */
+function frameOrigin(frame: HTMLElement) {
+  return { x: parseInt(frame.style.left, 10), y: parseInt(frame.style.top, 10) };
+}
+
 describe("workstation windows", () => {
   it("opens a destination as a movable window inside the desktop area", async () => {
     stubLayout();
@@ -91,15 +96,11 @@ describe("workstation windows", () => {
     stubLayout();
     const { windowFrame } = await openArchive();
     const titlebar = screen.getByTestId("window-titlebar-archive");
-    const translate = () => {
-      const value = windowFrame.style.transform;
-      const pair = value.match(/matrix\([^)]*,\s*(-?[\d.]+),\s*(-?[\d.]+)\)/);
-      const named = value.match(/translate\((-?[\d.]+)px,\s*(-?[\d.]+)px\)/);
-      return (pair ?? named)!.slice(1).map(Number);
-    };
-    const [startX, startY] = translate();
+    const start = frameOrigin(windowFrame);
     dragBy(titlebar, 120, 60);
-    await waitFor(() => expect(translate()).toEqual([startX + 120, startY + 60]));
+    await waitFor(() => expect(frameOrigin(windowFrame)).toEqual({ x: start.x + 120, y: start.y + 60 }));
+    // The committed position is the position that was dragged, not a re-derived one.
+    expect(frameOrigin(windowFrame)).toEqual({ x: 210, y: 130 });
   });
 
   it("resizes a window from its resize handle", async () => {
@@ -156,6 +157,24 @@ describe("workstation windows", () => {
     await user.click(screen.getByRole("button", { name: "Minimize Archive" }));
     await user.click(within(screen.getByRole("contentinfo", { name: "Taskbar" })).getByRole("button", { name: "Archive" }));
     expect(screen.getAllByRole("dialog", { name: "Archive" })).toHaveLength(1);
+  });
+
+  it("commits a drag once, on release", async () => {
+    stubLayout();
+    const { windowFrame } = await openArchive();
+    const titlebar = screen.getByTestId("window-titlebar-archive");
+    const start = frameOrigin(windowFrame);
+    // Several moves inside one gesture: the DOM follows immediately, without a registry round trip.
+    fireEvent.pointerDown(titlebar, { clientX: 10, clientY: 10, pointerId: 3 });
+    const origin = frameOrigin(windowFrame);
+    fireEvent.pointerMove(titlebar, { clientX: 60, clientY: 40, pointerId: 3 });
+    expect(frameOrigin(windowFrame)).toEqual({ x: origin.x + 50, y: origin.y + 30 });
+    fireEvent.pointerMove(titlebar, { clientX: 130, clientY: 70, pointerId: 3 });
+    expect(frameOrigin(windowFrame)).toEqual({ x: origin.x + 120, y: origin.y + 60 });
+    fireEvent.pointerUp(titlebar, { clientX: 130, clientY: 70, pointerId: 3 });
+    // ...and the committed registry geometry matches the frame that was dragged.
+    await waitFor(() => expect(frameOrigin(windowFrame)).toEqual({ x: start.x + 120, y: start.y + 60 }));
+    expect(frameSize(windowFrame)).toEqual({ w: 520, h: 400 });
   });
 
   it("restores focus to the launching shortcut after closing", async () => {

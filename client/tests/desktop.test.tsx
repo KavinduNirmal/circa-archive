@@ -89,6 +89,16 @@ describe("desktop navigation", () => {
     expect(desktopIconIn(within(navigation).getByRole("button", { name: "Archive" })).querySelector("img.desktop-icon-shortcut"))
       .toHaveAttribute("src", "/icons/overlay_shortcut-2.png");
   });
+  it("shows the help glyph inside the System window", async () => {
+    const user = userEvent.setup();
+    render(<Home />);
+    await user.click(screen.getByRole("button", { name: "My PC" }));
+    await user.click(screen.getByRole("button", { name: "System" }));
+    const systemWindow = screen.getByRole("dialog", { name: "System" });
+    const icon = systemWindow.querySelector('[data-icon="help"] img');
+    expect(icon).toHaveAttribute("src", "/icons/help_question_mark-0.png");
+  });
+
   it("moves System into My PC and renames the editor", async () => {
     const user = userEvent.setup();
     render(<Home />);

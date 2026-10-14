@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useRef, useState, type Ref } from "react";
 import { Rnd } from "react-rnd";
 import { DesktopIcon, type DesktopIconSpec } from "./desktop-icons";
 
@@ -41,7 +41,8 @@ export function useWorkstationWindows() {
   const [lastFocused, setLastFocused] = useState<string | null>(null);
 
   const focus = useCallback((id: string) => {
-    setLastFocused(id);
+    // No-op for the window that is already on top, so a drag does not re-render the shell.
+    setLastFocused((current) => (current === id ? current : id));
     setWindows((current) => {
       const top = current.reduce((max, item) => Math.max(max, item.z), 0);
       const target = current.find((item) => item.id === id);
@@ -100,11 +101,12 @@ export function useWorkstationWindows() {
 /**
  * One draggable, resizable workstation window.
  *
- * Positioning is written as explicit `left`/`top` from the registry. react-rnd
- * owns only the resize handles: driving its drag path as well double-applied the
- * offset (react-draggable adds its own transform on top of the position it is
- * handed), so the shell moves the frame and react-rnd resizes it. Maximize also
- * stays on registry geometry, which is what makes restore exact.
+ * The frame's geometry lives in the registry, but a drag or resize writes
+ * straight to the DOM and only commits on release. Routing every pointer move
+ * through React re-rendered the whole shell (status strip, rail, taskbar) at
+ * pointer frequency, which is what made dragging feel like it ran behind the
+ * cursor. Pointer capture lives on the titlebar, so release always lands on the
+ * handler that started the gesture.
  */
 export function WorkstationWindow({ window: item, area, active, children, onFocus, onClose, onMinimize, onMaximize, onGeometryChange }: {
   window: WorkstationWindowState;
@@ -119,67 +121,92 @@ export function WorkstationWindow({ window: item, area, active, children, onFocu
 }) {
   const maximized = item.maximized;
   const geometry = maximized ? { x: 0, y: 0, width: area.width, height: area.height } : item.geometry;
-  const drag = useRef<{ startX: number; startY: number; originX: number; originY: number } | null>(null);
-  const resize = useRef<{ startX: number; startY: number; width: number; height: number } | null>(null);
+  const frameNode = useRef<HTMLElement | null>(null);
+  const frameRef = useCallback((node: Rnd | null) => { frameNode.current = node?.resizableElement?.current ?? null; }, []);
+  const drag = useRef<{ startX: number; startY: number; originX: number; originY: number; next: WindowGeometry } | null>(null);
+  const resize = useRef<{ startX: number; startY: number; width: number; height: number; next: WindowGeometry } | null>(null);
 
-  /**
-   * Pointer-based titlebar dragging. The frame is clamped to the desktop layer
-   * here, so a dragged window can never be parked under the status strip or the
-   * taskbar and its controls stay reachable at any viewport.
-   */
+  function paint(next: WindowGeometry) {
+    const frame = frameNode.current;
+    if (!frame) return;
+    frame.style.left = `${next.x}px`;
+    frame.style.top = `${next.y}px`;
+    frame.style.width = `${next.width}px`;
+    frame.style.height = `${next.height}px`;
+  }
+
+  /** Starts a titlebar drag; the frame is clamped to the desktop layer as it moves. */
   function beginDrag(event: React.PointerEvent<HTMLElement>) {
     onFocus();
     if (maximized || (event.target as HTMLElement).closest("button")) return;
-    (event.currentTarget.parentElement?.parentElement as HTMLElement | null)?.setPointerCapture?.(event.pointerId);
-    drag.current = { startX: event.clientX, startY: event.clientY, originX: geometry.x, originY: geometry.y };
+    // Capture keeps the gesture on the frame even when the pointer outruns it.
+    event.currentTarget.setPointerCapture?.(event.pointerId);
+    drag.current = { startX: event.clientX, startY: event.clientY, originX: geometry.x, originY: geometry.y, next: geometry };
   }
 
   function moveDrag(event: React.PointerEvent<HTMLElement>) {
     const state = drag.current;
     if (!state) return;
-    const maxX = Math.max(0, area.width - geometry.width);
-    const maxY = Math.max(0, area.height - geometry.height);
-    onGeometryChange({
-      ...geometry,
+    const maxX = Math.max(0, area.width - state.next.width);
+    const maxY = Math.max(0, area.height - state.next.height);
+    state.next = {
+      ...state.next,
       x: Math.min(maxX, Math.max(0, state.originX + (event.clientX - state.startX))),
       y: Math.min(maxY, Math.max(0, state.originY + (event.clientY - state.startY))),
-    });
+    };
+    paint(state.next);
   }
 
-  /** Corner resizing keeps the frame inside the layer and above the minimum size. */
+  function endDrag() {
+    const state = drag.current;
+    drag.current = null;
+    if (state && (state.next.x !== geometry.x || state.next.y !== geometry.y)) onGeometryChange(state.next);
+  }
+
+  /** Starts a corner resize; the commit happens once on release, like the drag. */
   function beginResize(event: React.PointerEvent<HTMLElement>) {
     event.stopPropagation();
     onFocus();
-    (event.currentTarget.parentElement?.parentElement as HTMLElement | null)?.setPointerCapture?.(event.pointerId);
-    resize.current = { startX: event.clientX, startY: event.clientY, width: geometry.width, height: geometry.height };
+    // Capture keeps the gesture on the frame even when the pointer outruns it.
+    event.currentTarget.setPointerCapture?.(event.pointerId);
+    resize.current = { startX: event.clientX, startY: event.clientY, width: geometry.width, height: geometry.height, next: geometry };
   }
 
   function moveResize(event: React.PointerEvent<HTMLElement>) {
     const state = resize.current;
     if (!state) return;
-    onGeometryChange({
-      ...geometry,
+    state.next = {
+      ...state.next,
       width: Math.max(WINDOW_MIN_SIZE.width, Math.min(area.width - geometry.x, state.width + (event.clientX - state.startX))),
       height: Math.max(WINDOW_MIN_SIZE.height, Math.min(area.height - geometry.y, state.height + (event.clientY - state.startY))),
-    });
+    };
+    paint(state.next);
+  }
+
+  function endResize() {
+    const state = resize.current;
+    resize.current = null;
+    if (state && (state.next.width !== geometry.width || state.next.height !== geometry.height)) onGeometryChange(state.next);
   }
 
   return (
     <Rnd
+      ref={frameRef as unknown as Ref<Rnd>}
       className={["workstation-window", "circa-raised", active ? "is-active" : "is-inactive"].join(" ")}
       role="dialog"
       aria-label={item.title}
-      style={{ zIndex: item.z }}
+      // Explicit geometry wins over react-rnd's internal transform, which keeps
+      // the frame and the registry in step for the whole gesture and after it.
+      style={{ zIndex: item.z, left: geometry.x, top: geometry.y, width: geometry.width, height: geometry.height }}
       data-maximized={maximized ? "true" : undefined}
-      position={{ x: geometry.x, y: geometry.y }}
       size={{ width: geometry.width, height: geometry.height }}
+      position={{ x: geometry.x, y: geometry.y }}
       disableDragging
       enableResizing={false}
       onPointerDown={onFocus}
     >
       <div className="window-titlebar" data-testid={`window-titlebar-${item.id}`}
-        onPointerDown={beginDrag} onPointerMove={moveDrag} onPointerUp={() => { drag.current = null; }}
-        onPointerCancel={() => { drag.current = null; }}>
+        onPointerDown={beginDrag} onPointerMove={moveDrag} onPointerUp={endDrag} onPointerCancel={endDrag}>
         <span className="window-title">{item.title}</span>
         <div className="window-controls">
           <button type="button" className="window-control circa-raised" aria-label={`Minimize ${item.title}`} onClick={onMinimize}>
@@ -202,7 +229,7 @@ export function WorkstationWindow({ window: item, area, active, children, onFocu
       {!maximized && (
         <div className="workstation-window-resize" role="presentation" aria-hidden="true"
           onPointerDown={beginResize} onPointerMove={moveResize}
-          onPointerUp={() => { resize.current = null; }} onPointerCancel={() => { resize.current = null; }} />
+          onPointerUp={endResize} onPointerCancel={endResize} />
       )}
     </Rnd>
   );

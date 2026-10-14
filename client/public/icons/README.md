@@ -17,6 +17,7 @@ Desktop shortcut artwork for the CIRCA/OS shell. Files are the original Windows 
 | `search_web-0.png` | Search |
 | `erase_file-0.png` | _EXPUNGED |
 | `console_prompt-0.png` | System, shown inside My PC |
+| `help_question_mark-0.png` | Help row inside the System window |
 | `recycle_bin_empty-4.png` | Recycle Bin (48px) |
 | `overlay_shortcut-2.png` | `.lnk` marker layered over Archive and _EXPUNGED (48px) |
 
