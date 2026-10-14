@@ -1,0 +1,23 @@
+name: Documentation improvement
+description: Report unclear, missing, or inconsistent documentation.
+title: "[Docs] "
+body:
+  - type: input
+    id: location
+    attributes:
+      label: Document and section
+      placeholder: "ARCHITECTURE.md — Organization Lifecycle"
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: What needs improvement?
+      description: Explain the gap or inconsistency and its impact on contributors.
+    validations:
+      required: true
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: Suggested change
+      description: Include proposed wording or relevant references if available.

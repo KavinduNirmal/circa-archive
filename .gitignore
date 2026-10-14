@@ -1,0 +1,40 @@
+# Local configuration and credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# JavaScript dependencies and build output
+node_modules/
+.next/
+out/
+dist/
+coverage/
+*.tsbuildinfo
+*.log
+
+# .NET build and local tooling output
+bin/
+obj/
+TestResults/
+.vs/
+*.user
+*.suo
+
+# Editor and operating-system files
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Machine-specific agent/cloud configuration
+.codex/
+.aws/
+
+# Husky-generated support files
+.husky/_/
+
+# Browser test artifacts
+playwright-report/
+test-results/

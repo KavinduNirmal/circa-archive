@@ -1,0 +1,45 @@
+name: Bug report
+description: Report a reproducible implementation or specification defect.
+title: "[Bug] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Check existing issues first. The project is currently in pre-production.
+        Do not report security vulnerabilities here; follow SECURITY.md.
+  - type: input
+    id: component
+    attributes:
+      label: Affected component or document
+      placeholder: "ARCHITECTURE.md section 7, client, backend, or admin"
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      description: For a specification defect, identify the conflicting passages.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected result
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual result
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Revision and environment
+      description: Include the commit, OS, browser, and runtime versions when relevant.
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Logs or screenshots
+      description: Redact secrets, personal information, and private story content.
