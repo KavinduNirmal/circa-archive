@@ -39,14 +39,20 @@ export function useWorkstationWindows() {
   const [windows, setWindows] = useState<WorkstationWindowState[]>([]);
   const [lastFocused, setLastFocused] = useState<string | null>(null);
 
+  // The active window is always the top visible one, which keeps a stale id from
+  // surviving a close or a minimize and handing focus to a window that is gone.
+  const activeId = (list: WorkstationWindowState[]) =>
+    [...list].filter((item) => !item.minimized).sort((a, b) => b.z - a.z)[0]?.id ?? null;
+
   const focus = useCallback((id: string) => {
-    // No-op for the window that is already on top, so a drag does not re-render the shell.
-    setLastFocused((current) => (current === id ? current : id));
+    setLastFocused(id);
     setWindows((current) => {
-      const top = current.reduce((max, item) => Math.max(max, item.z), 0);
       const target = current.find((item) => item.id === id);
-      if (!target || (target.z === top && !target.minimized)) return current;
-      return current.map((item) => item.id === id ? { ...item, z: top + 1, minimized: false } : item);
+      if (!target) return current;
+      const top = current.reduce((max, item) => Math.max(max, item.z), 0);
+      // Already on top and visible: leave the list untouched so a drag does not re-render.
+      if (target.z === top && !target.minimized) return current;
+      return current.map((item) => (item.id === id ? { ...item, z: top + 1, minimized: false } : item));
     });
   }, []);
 
@@ -55,7 +61,7 @@ export function useWorkstationWindows() {
     setWindows((current) => {
       const existing = current.find((item) => item.id === entry.id);
       const top = current.reduce((max, item) => Math.max(max, item.z), 0);
-      if (existing) return current.map((item) => item.id === entry.id ? { ...item, z: top + 1, minimized: false } : item);
+      if (existing) return current.map((item) => (item.id === entry.id ? { ...item, z: top + 1, minimized: false } : item));
       const step = (current.length % CASCADE_WRAP) * CASCADE_STEP;
       return [...current, {
         id: entry.id,
@@ -76,22 +82,29 @@ export function useWorkstationWindows() {
   }, []);
 
   const close = useCallback((id: string) => {
-    setWindows((current) => current.filter((item) => item.id !== id));
+    setWindows((current) => {
+      const next = current.filter((item) => item.id !== id);
+      setLastFocused((active) => (active === id ? activeId(next) : active));
+      return next;
+    });
   }, []);
 
   const minimize = useCallback((id: string) => {
-    setWindows((current) => current.map((item) => item.id === id ? { ...item, minimized: true } : item));
-    setLastFocused((current) => current === id ? null : current);
+    setWindows((current) => {
+      const next = current.map((item) => (item.id === id ? { ...item, minimized: true } : item));
+      setLastFocused((active) => (active === id ? activeId(next) : active));
+      return next;
+    });
   }, []);
 
   const toggleMaximize = useCallback((id: string) => {
-    setWindows((current) => current.map((item) => item.id === id ? { ...item, maximized: !item.maximized, minimized: false } : item));
+    setWindows((current) => current.map((item) => (item.id === id ? { ...item, maximized: !item.maximized, minimized: false } : item)));
   }, []);
 
   const setGeometry = useCallback((id: string, geometry: WindowGeometry) => {
-    setWindows((current) => current.map((item) => item.id === id
+    setWindows((current) => current.map((item) => (item.id === id
       ? { ...item, geometry: { ...geometry, width: Math.max(WINDOW_MIN_SIZE.width, geometry.width), height: Math.max(WINDOW_MIN_SIZE.height, geometry.height) } }
-      : item));
+      : item)));
   }, []);
 
   return { windows, lastFocused, open, close, focus, minimize, toggleMaximize, setGeometry };

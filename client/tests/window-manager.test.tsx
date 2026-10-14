@@ -148,6 +148,40 @@ describe("workstation windows", () => {
     await waitFor(() => expect(Number(archive.style.zIndex)).toBeGreaterThan(Number(inbox.style.zIndex)));
   });
 
+  it("remembers which window is minimized or closed across many open windows", async () => {
+    stubLayout();
+    const user = userEvent.setup();
+    render(<Home />);
+    const taskbar = () => within(screen.getByRole("contentinfo", { name: "Taskbar" }));
+    for (const name of ["Archive", "Inbox", "Search"]) await user.click(screen.getByRole("button", { name }));
+
+    await user.click(screen.getByRole("button", { name: "Minimize Archive" }));
+    await user.click(screen.getByRole("button", { name: "Minimize Inbox" }));
+    expect(taskbar().getByRole("button", { name: "Archive" })).toHaveAttribute("aria-pressed", "true");
+    expect(taskbar().getByRole("button", { name: "Inbox" })).toHaveAttribute("aria-pressed", "true");
+    expect(taskbar().getByRole("button", { name: "Search" })).toHaveAttribute("aria-pressed", "false");
+    expect(screen.queryByRole("dialog", { name: "Archive" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("dialog", { name: "Inbox" })).not.toBeInTheDocument();
+    expect(screen.getByRole("dialog", { name: "Search" })).toBeVisible();
+
+    // A minimized window is still open, and restores on demand.
+    await user.click(taskbar().getByRole("button", { name: "Inbox" }));
+    expect(screen.getByRole("dialog", { name: "Inbox" })).toBeVisible();
+    expect(taskbar().getByRole("button", { name: "Inbox" })).toHaveAttribute("aria-pressed", "false");
+    expect(taskbar().getByRole("button", { name: "Archive" })).toHaveAttribute("aria-pressed", "true");
+
+    // Closing the active window hands over to the next visible one, and closing
+    // the last one leaves a clean desktop with no stale taskbar entries.
+    await user.click(within(screen.getByRole("dialog", { name: "Inbox" })).getByRole("button", { name: "Close folder" }));
+    expect(screen.queryByRole("dialog", { name: "Inbox" })).not.toBeInTheDocument();
+    expect(screen.getByRole("dialog", { name: "Search" })).toBeVisible();
+    await user.click(within(screen.getByRole("dialog", { name: "Search" })).getByRole("button", { name: "Close folder" }));
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    await user.click(taskbar().getByRole("button", { name: "Archive" }));
+    expect(screen.getByRole("dialog", { name: "Archive" })).toBeVisible();
+    expect(taskbar().getByRole("button", { name: "Archive" })).toHaveAttribute("aria-pressed", "false");
+  });
+
   it("focuses an existing window instead of opening a duplicate", async () => {
     stubLayout();
     const { user } = await openArchive();

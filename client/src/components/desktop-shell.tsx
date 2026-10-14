@@ -163,8 +163,8 @@ export function DesktopShell() {
   }, []);
 
   useEffect(() => {
-    if (!lastFocused) return;
-    areaRef.current?.focus({ preventScroll: true });
+    // Focusing the layer would also steal focus from the window's own controls.
+    if (lastFocused) areaRef.current?.focus({ preventScroll: true });
   }, [lastFocused]);
 
   /** Opens a desktop shortcut as a window, naming the entry for the titlebar and status strip. */
@@ -192,7 +192,10 @@ export function DesktopShell() {
     const trigger = launchTriggers.current[id];
     delete launchTriggers.current[id];
     close(id);
-    window.setTimeout(() => trigger?.focus(), 0);
+    // Return focus only when the desktop is what remains, so a surviving window keeps focus.
+    window.setTimeout(() => {
+      if (windows.filter((item) => item.id !== id).length === 0) trigger?.focus();
+    }, 0);
   }
 
   function focusWindow(id: string) {
