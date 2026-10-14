@@ -1,4 +1,4 @@
-import { render, screen, within } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 import Home from "@/app/page";
@@ -10,6 +10,31 @@ function desktopIconIn(button: HTMLElement) {
 }
 
 describe("desktop navigation", () => {
+  it("explains a desktop destination with the redesigned tooltip instead of a native title", async () => {
+    const user = userEvent.setup();
+    render(<Home />);
+    const organizations = screen.getByRole("button", { name: "Organizations" });
+    expect(organizations).not.toHaveAttribute("title");
+    expect(screen.queryByRole("tooltip")).not.toBeInTheDocument();
+    await user.hover(organizations);
+    const tooltip = await screen.findByRole("tooltip");
+    expect(tooltip).toHaveTextContent("Organization dossiers and continuities (coming soon)");
+    expect(tooltip).toHaveClass("tooltip-content");
+    expect(tooltip.querySelector(".tooltip-arrow")).not.toBeNull();
+    // Pointer-leave tracking needs real pointer events, so dismissal is exercised with Escape.
+    await user.keyboard("{Escape}");
+    await waitFor(() => expect(tooltip).toHaveAttribute("data-state", "closed"));
+  });
+
+  it("keeps the Start menu free of redundant hints", async () => {
+    const user = userEvent.setup();
+    render(<Home />);
+    await user.click(screen.getByRole("button", { name: "Start" }));
+    const startNavigation = screen.getByRole("navigation", { name: "Start applications" });
+    await user.hover(within(startNavigation).getByRole("button", { name: "Archive" }));
+    expect(screen.queryByRole("tooltip")).not.toBeInTheDocument();
+  });
+
   it("maps each destination to its requested icon and shortcut marker", () => {
     render(<Home />);
     const navigation = screen.getByRole("navigation", { name: "Desktop folders" });

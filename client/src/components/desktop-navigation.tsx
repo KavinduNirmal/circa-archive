@@ -1,5 +1,6 @@
 "use client";
 
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 import { DesktopIcon, type DesktopIconSpec } from "./desktop-icons";
 
 export type DesktopEntry = {
@@ -41,6 +42,11 @@ export type MyPcItem = (typeof myPcContents)[number];
 
 export type DesktopDestination = DesktopFolder | MyPcItem;
 
+/** The Start menu already shows each label inline, so only the desktop rail explains destinations on hover. */
+function desktopHint(folder: DesktopFolder) {
+  return folder.detail ? `${folder.detail} (coming soon)` : "Workstation contents";
+}
+
 export function DesktopNavigation({ onOpen, activeId, compact = false }: {
   onOpen: (entry: DesktopFolder, trigger: HTMLButtonElement) => void;
   activeId?: string;
@@ -48,15 +54,29 @@ export function DesktopNavigation({ onOpen, activeId, compact = false }: {
 }) {
   return (
     <nav aria-label={compact ? "Start applications" : "Desktop folders"} className={compact ? "start-navigation" : "desktop-navigation"}>
-      {desktopFolders.map((folder) => (
-        <button key={folder.id} type="button" className="desktop-shortcut" aria-label={folder.label}
-          aria-pressed={activeId === folder.id}
-          title={folder.detail ? `${folder.detail} (coming soon)` : "Workstation contents"}
-          onClick={(event) => onOpen(folder, event.currentTarget)}>
-          <DesktopIcon icon={folder.icon} />
-          <span>{folder.label}</span>
-        </button>
-      ))}
+      {desktopFolders.map((folder) => {
+        const shortcut = (
+          <button type="button" className="desktop-shortcut" aria-label={folder.label}
+            aria-pressed={activeId === folder.id}
+            onClick={(event) => onOpen(folder, event.currentTarget)}>
+            <DesktopIcon icon={folder.icon} />
+            <span>{folder.label}</span>
+          </button>
+        );
+        return compact ? (
+          <button key={folder.id} type="button" className="desktop-shortcut" aria-label={folder.label}
+            aria-pressed={activeId === folder.id}
+            onClick={(event) => onOpen(folder, event.currentTarget)}>
+            <DesktopIcon icon={folder.icon} />
+            <span>{folder.label}</span>
+          </button>
+        ) : (
+          <Tooltip key={folder.id}>
+            <TooltipTrigger asChild>{shortcut}</TooltipTrigger>
+            <TooltipContent className="circa-label" side="right" align="center">{desktopHint(folder)}</TooltipContent>
+          </Tooltip>
+        );
+      })}
     </nav>
   );
 }

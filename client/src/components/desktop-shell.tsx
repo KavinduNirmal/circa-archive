@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { Dialog, Popover } from "radix-ui";
 import { DesktopIcon, notificationGlyph, settingsGlyph } from "./desktop-icons";
 import { desktopFolders, DesktopNavigation, myPcContents, type DesktopDestination, type DesktopFolder, type MyPcItem } from "./desktop-navigation";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
 
 const NotificationIcon = notificationGlyph;
 const SettingsIcon = settingsGlyph;
@@ -37,26 +38,42 @@ function TaskbarTray({ screenFilter, onToggleScreenFilter }: { screenFilter: boo
   const [settingsOpen, setSettingsOpen] = useState(false);
   return (
     <>
-      {/* Settings reads as an open task item, matching the reference taskbar's wide window buttons. */}
-      <button className="taskbar-task circa-raised" type="button" aria-label="Settings" title="Settings"
-        data-open={settingsOpen ? "true" : undefined} onClick={() => setSettingsOpen(true)}>
-        <SettingsIcon className="tray-glyph" />
-        <span>Settings</span>
-      </button>
+      {/* Settings reads as an open task item, matching the reference taskbar's wide window buttons.
+          The anchor carries the bevel so the tooltip trigger can wrap the button without
+          disturbing the taskbar's flex rhythm. */}
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <span className="taskbar-task-anchor">
+            <button className="taskbar-task" type="button" aria-label="Settings"
+              data-open={settingsOpen ? "true" : undefined} onClick={() => setSettingsOpen(true)}>
+              <SettingsIcon className="tray-glyph" />
+              <span>Settings</span>
+            </button>
+          </span>
+        </TooltipTrigger>
+        <TooltipContent className="circa-label" side="top">Workstation preferences</TooltipContent>
+      </Tooltip>
       <div className="taskbar-spacer" />
       <div className="taskbar-tray">
-        <Popover.Root open={notificationsOpen} onOpenChange={setNotificationsOpen}>
-          <Popover.Trigger className="tray-button" aria-label="Notifications" title="Notifications">
-            <NotificationIcon className="tray-glyph" />
-          </Popover.Trigger>
-          <Popover.Portal>
-            <Popover.Content className="tray-panel circa-raised" side="top" align="end" sideOffset={8}>
-              <div className="tray-heading">NOTIFICATIONS</div>
-              {/* TODO: Replace with real notification delivery when the backend exists. */}
-              <p className="tray-note">Notifications are not connected yet.</p>
-            </Popover.Content>
-          </Popover.Portal>
-        </Popover.Root>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <span className="tray-anchor">
+              <Popover.Root open={notificationsOpen} onOpenChange={setNotificationsOpen}>
+                <Popover.Trigger className="tray-button" aria-label="Notifications">
+                  <NotificationIcon className="tray-glyph" />
+                </Popover.Trigger>
+                <Popover.Portal>
+                  <Popover.Content className="tray-panel circa-raised" side="top" align="end" sideOffset={8}>
+                    <div className="tray-heading">NOTIFICATIONS</div>
+                    {/* TODO: Replace with real notification delivery when the backend exists. */}
+                    <p className="tray-note">Notifications are not connected yet.</p>
+                  </Popover.Content>
+                </Popover.Portal>
+              </Popover.Root>
+            </span>
+          </TooltipTrigger>
+          <TooltipContent className="circa-label" side="top">Notifications</TooltipContent>
+        </Tooltip>
       </div>
       <WorkstationClock />
       <Dialog.Root open={settingsOpen} onOpenChange={setSettingsOpen}>
@@ -108,81 +125,85 @@ export function DesktopShell() {
 
   return (
     <main className="desktop-shell" aria-label="CIRCA desktop">
-      <div className="desktop-wallpaper" aria-hidden="true" />
-      <header className="desktop-topline">
-        <span><strong>CIRCA/OS</strong><span className="topline-separator">/</span> ARCHIVE WORKSTATION</span>
-        <span className="desktop-session">LOCAL PREVIEW</span>
-      </header>
-      <DesktopNavigation onOpen={openFolder} activeId={activeId} />
-      <footer className="desktop-taskbar" aria-label="Taskbar">
-        <Popover.Root open={startOpen} onOpenChange={setStartOpen}>
-          <Popover.Trigger ref={startTrigger} className="taskbar-start circa-raised" aria-label="Start">
-            <span className="start-symbol" aria-hidden="true">▦</span> START
-          </Popover.Trigger>
-          <Popover.Portal>
-            <Popover.Content className="start-panel circa-raised" side="top" align="start" sideOffset={8}
-              onCloseAutoFocus={(event) => { if (view.kind !== "desktop") event.preventDefault(); }}>
-              <div className="start-heading">CIRCA/OS <span>APPLICATIONS</span></div>
-              <DesktopNavigation compact onOpen={openFolder} activeId={activeId} />
-              <p className="start-note">Application contents coming soon.</p>
-            </Popover.Content>
-          </Popover.Portal>
-        </Popover.Root>
-        <div className="taskbar-divider" />
-        {/* Replaces the reference build's activation notice with CIRCA's own filing language. */}
-        <span className="taskbar-status">CIRCA/OS <span aria-hidden="true">·</span> REGISTERED TO THE ARCHIVE</span>
-        <TaskbarTray screenFilter={screenFilter} onToggleScreenFilter={setScreenFilter} />
-      </footer>
-      <Dialog.Root open={view.kind !== "desktop"} onOpenChange={(open) => { if (!open) closeView(); }}>
-        <Dialog.Portal>
-          <Dialog.Overlay className="folder-backdrop" />
-          <Dialog.Content className="folder-window circa-raised" onCloseAutoFocus={(event) => {
-            event.preventDefault();
-            lastTrigger.current?.focus();
-          }}>
-            <div className="folder-titlebar">
-              <Dialog.Title>{dialogTitle}</Dialog.Title>
-              <Dialog.Close className="folder-close circa-raised" aria-label="Close folder">×</Dialog.Close>
-            </div>
-            <div className="folder-address">
-              {view.kind === "system" ? <>DESKTOP / MY PC / SYSTEM</> : <>DESKTOP / {dialogTitle}</>}
-            </div>
-            <Dialog.Description className="folder-note">This folder is not connected yet.</Dialog.Description>
-            {view.kind === "system" ? (
-              <div className="folder-empty">
-                <h2>Workstation configuration</h2>
-                <p>System files and help move here from the desktop list.</p>
-                <button type="button" className="return-button circa-raised" onClick={() => setView({ kind: "folder", entry: view.parent })}>
-                  Back to My PC
-                </button>
+      <TooltipProvider>
+        <div className="desktop-wallpaper" aria-hidden="true" />
+        <header className="desktop-topline">
+          <span><strong>CIRCA/OS</strong><span className="topline-separator">/</span> ARCHIVE WORKSTATION</span>
+          <span className="desktop-session">LOCAL PREVIEW</span>
+        </header>
+        <DesktopNavigation onOpen={openFolder} activeId={activeId} />
+        <footer className="desktop-taskbar" aria-label="Taskbar">
+          <Popover.Root open={startOpen} onOpenChange={setStartOpen}>
+            <Popover.Trigger ref={startTrigger} className="taskbar-start circa-raised" aria-label="Start">
+              <span className="start-symbol" aria-hidden="true">▦</span> START
+            </Popover.Trigger>
+            <Popover.Portal>
+              <Popover.Content className="start-panel circa-raised" side="top" align="start" sideOffset={8}
+                onCloseAutoFocus={(event) => { if (view.kind !== "desktop") event.preventDefault(); }}>
+                <div className="start-heading">CIRCA/OS <span>APPLICATIONS</span></div>
+                <DesktopNavigation compact onOpen={openFolder} activeId={activeId} />
+                <p className="start-note">Application contents coming soon.</p>
+              </Popover.Content>
+            </Popover.Portal>
+          </Popover.Root>
+          <div className="taskbar-divider" />
+          <TaskbarTray screenFilter={screenFilter} onToggleScreenFilter={setScreenFilter} />
+        </footer>
+        <Dialog.Root open={view.kind !== "desktop"} onOpenChange={(open) => { if (!open) closeView(); }}>
+          <Dialog.Portal>
+            <Dialog.Overlay className="folder-backdrop" />
+            <Dialog.Content className="folder-window circa-raised" onCloseAutoFocus={(event) => {
+              event.preventDefault();
+              lastTrigger.current?.focus();
+            }}>
+              <div className="folder-titlebar">
+                <Dialog.Title>{dialogTitle}</Dialog.Title>
+                <Dialog.Close className="folder-close circa-raised" aria-label="Close folder">×</Dialog.Close>
               </div>
-            ) : (
-              <div className="folder-body">
-                {view.kind === "folder" && view.entry.id === "my-pc" ? (
-                  <div className="pc-contents" aria-label="My PC contents">
-                    {myPcContents.map((entry) => (
-                      <button key={entry.id} type="button" className="pc-item" aria-label={entry.label}
-                        title={entry.detail ?? undefined} onClick={() => openMyPcItem(entry)}>
-                        <DesktopIcon icon={entry.icon} className="pc-item-icon" />
-                        <span>{entry.label}</span>
-                      </button>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="folder-empty">
-                    {dialogIcon && <DesktopIcon icon={dialogIcon} className="folder-destination-icon" />}
-                    <h2>Coming soon</h2>
-                    {/* TODO: Connect each destination when its application screen is implemented. */}
-                    {view.kind === "folder" && view.entry.detail && <p>{view.entry.detail} will appear here.</p>}
-                  </div>
-                )}
-                <Dialog.Close className="return-button circa-raised">Return to desktop</Dialog.Close>
+              <div className="folder-address">
+                {view.kind === "system" ? <>DESKTOP / MY PC / SYSTEM</> : <>DESKTOP / {dialogTitle}</>}
               </div>
-            )}
-          </Dialog.Content>
-        </Dialog.Portal>
-      </Dialog.Root>
-      {screenFilter && <div className="desktop-screen-filter" aria-hidden="true" data-testid="screen-filter" />}
+              <Dialog.Description className="folder-note">This folder is not connected yet.</Dialog.Description>
+              {view.kind === "system" ? (
+                <div className="folder-empty">
+                  <h2>Workstation configuration</h2>
+                  <p>System files and help move here from the desktop list.</p>
+                  <button type="button" className="return-button circa-raised" onClick={() => setView({ kind: "folder", entry: view.parent })}>
+                    Back to My PC
+                  </button>
+                </div>
+              ) : (
+                <div className="folder-body">
+                  {view.kind === "folder" && view.entry.id === "my-pc" ? (
+                    <div className="pc-contents" aria-label="My PC contents">
+                      {myPcContents.map((entry) => (
+                        <Tooltip key={entry.id}>
+                          <TooltipTrigger asChild>
+                            <button type="button" className="pc-item" aria-label={entry.label} onClick={() => openMyPcItem(entry)}>
+                              <DesktopIcon icon={entry.icon} className="pc-item-icon" />
+                              <span>{entry.label}</span>
+                            </button>
+                          </TooltipTrigger>
+                          <TooltipContent className="circa-label" side="top">{entry.detail}</TooltipContent>
+                        </Tooltip>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="folder-empty">
+                      {dialogIcon && <DesktopIcon icon={dialogIcon} className="folder-destination-icon" />}
+                      <h2>Coming soon</h2>
+                      {/* TODO: Connect each destination when its application screen is implemented. */}
+                      {view.kind === "folder" && view.entry.detail && <p>{view.entry.detail} will appear here.</p>}
+                    </div>
+                  )}
+                  <Dialog.Close className="return-button circa-raised">Return to desktop</Dialog.Close>
+                </div>
+              )}
+            </Dialog.Content>
+          </Dialog.Portal>
+        </Dialog.Root>
+        {screenFilter && <div className="desktop-screen-filter" aria-hidden="true" data-testid="screen-filter" />}
+      </TooltipProvider>
     </main>
   );
 }

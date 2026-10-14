@@ -122,6 +122,35 @@
     background-image: repeating-linear-gradient(0deg, rgb(0 0 0 / 18%) 0px, rgb(0 0 0 / 18%) 1px, transparent 1px, transparent 2px);
     pointer-events: none;
   }
+  /*
+   * Tooltip chrome as a beveled machine plate: a hard offset rather than a soft
+   * glow keeps depth consistent with the rest of the shell, and the hazard
+   * hairline ties the hint to a focused or hovered destination. Enter and exit
+   * are a 1px settle, short enough to read as mechanical displacement rather
+   * than motion, and they collapse under reduced-motion.
+   */
+  .tooltip-content {
+    padding: 4px 7px;
+    border: 1px solid;
+    border-color: var(--circa-bevel-light) var(--circa-bevel-shadow) var(--circa-bevel-shadow) var(--circa-bevel-light);
+    background: #101a24;
+    color: #a4c2e6;
+    box-shadow: 2px 2px 0 rgb(8 17 25 / 55%), inset 1px 1px 0 rgb(164 194 230 / 12%);
+  }
+  .tooltip-content[data-state="delayed-open"],
+  .tooltip-content[data-state="instant-open"] {
+    animation: circa-tooltip-in 90ms steps(2, end);
+  }
+  .tooltip-arrow { display: block; }
+  .tooltip-arrow-fill { fill: #101a24; }
+  .tooltip-arrow-stroke { fill: none; stroke: var(--circa-bevel-shadow); stroke-width: 1; }
+  @keyframes circa-tooltip-in {
+    from { opacity: 0; transform: translate(1px, 1px); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .tooltip-content[data-state="delayed-open"],
+    .tooltip-content[data-state="instant-open"] { animation: none; }
+  }
 }
 
 /* Fixed workstation chrome leaves the supplied seal as the desktop's focal point. */
@@ -208,30 +237,40 @@
 }
 .taskbar-start { display: flex; align-items: center; gap: 8px; height: 30px; padding: 0 12px; font-weight: 700; font-size: 11px; cursor: pointer; }
 .start-symbol { color: #c59c6d; font-size: 22px; line-height: 1; }
-.taskbar-divider { height: 24px; width: 2px; border-left: 1px solid #0d131a; border-right: 1px solid #4b5d6a; }
-.taskbar-status { font-size: 10px; letter-spacing: .04em; color: #b3c2cc; white-space: nowrap; }
-.taskbar-status > span { padding: 0 5px; color: #6f899d; }
+.taskbar-divider { height: 24px; flex: 0 0 auto; margin: 0 8px; border-left: 1px solid #0d131a; border-right: 1px solid #4b5d6a; }
 .taskbar-spacer { flex: 1; }
-/* Task-button treatment: the reference taskbar shows open destinations as wide labelled items. */
-.taskbar-task {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+/* Task-button treatment: the reference taskbar shows open destinations as wide labelled items.
+   The anchor carries the box and bevel so a tooltip trigger can wrap the button without
+   changing the taskbar's flex rhythm. */
+.taskbar-task-anchor {
+  display: inline-flex;
   height: 30px;
   min-width: 152px;
   max-width: 260px;
+  border: 1px solid;
+  border-color: var(--circa-bevel-light) var(--circa-bevel-shadow) var(--circa-bevel-shadow) var(--circa-bevel-light);
+  background: var(--secondary);
+}
+.taskbar-task {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
   padding: 0 10px;
+  border: 0 none;
+  background: none;
   color: #d4e0e9;
   font-size: 11px;
   cursor: pointer;
 }
-.taskbar-task > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.taskbar-task:hover { border-color: var(--circa-bevel-light); }
-.taskbar-task[data-open] {
+.taskbar-task-anchor:hover { border-color: var(--circa-bevel-light); }
+.taskbar-task-anchor:has([data-open]) {
   border-color: var(--circa-bevel-shadow) var(--border) var(--border) var(--circa-bevel-shadow);
   background: var(--card);
   font-weight: 700;
 }
+.taskbar-task > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .taskbar-tray {
   display: flex;
   align-items: center;
@@ -241,6 +280,7 @@
   border-color: var(--circa-bevel-shadow) var(--border) var(--border) var(--circa-bevel-shadow);
   background: var(--card);
 }
+.tray-anchor { display: inline-flex; }
 .tray-button {
   display: grid;
   place-items: center;
@@ -322,7 +362,6 @@
   .taskbar-task > span { display: none; }
   .tray-button { width: 34px; height: 34px; }
   .tray-glyph { width: 18px; height: 18px; }
-  .taskbar-status { display: none; }
   .folder-close { width: 44px; height: 44px; }
   .settings-close { width: 44px; height: 44px; }
   .folder-backdrop { bottom: 52px; }

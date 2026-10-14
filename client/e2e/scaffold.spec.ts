@@ -53,6 +53,19 @@ for (const viewport of [{ width: 1440, height: 900 }, { width: 390, height: 844 
   });
 }
 
+test("desktop shortcuts explain themselves with the beveled tooltip", async ({ page }) => {
+  await page.goto("/desktop");
+  const organizations = page.getByRole("navigation", { name: "Desktop folders" }).getByRole("button", { name: "Organizations", exact: true });
+  await expect(organizations).not.toHaveAttribute("title", /.+/);
+  await organizations.hover();
+  const tooltip = page.getByRole("tooltip");
+  await expect(tooltip).toBeVisible();
+  await expect(tooltip).toContainText("Organization dossiers and continuities");
+  await expect(tooltip.locator(".tooltip-arrow-fill")).toBeVisible();
+  await page.mouse.move(720, 500);
+  await expect(tooltip).toBeHidden();
+});
+
 test("My PC contains System and back-tracks", async ({ page }) => {
   await page.goto("/desktop");
   await page.getByRole("button", { name: "My PC", exact: true }).click();
