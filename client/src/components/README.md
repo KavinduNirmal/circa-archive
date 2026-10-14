@@ -14,7 +14,11 @@
 
 ## Window model
 
-A destination opens as one window per destination id: reopening focuses the existing frame rather than duplicating it. `useWorkstationWindows` owns geometry, stacking (`z`), minimize, and maximize; `geometry` is the restore target so maximize never loses the frame. Dragging and resizing are pointer handlers on the titlebar and corner grip: during a gesture they write `left`/`top`/width/height straight to the frame and commit to the registry once on release, so a drag does not re-render the shell at pointer frequency. Geometry is also passed to react-rnd as explicit CSS, because react-rnd's own transform double-applies a controlled position; keeping the frame's box authoritative is what makes the drop land under the cursor. Pointer capture is taken on the titlebar so release always reaches the handler that started the gesture. Settings stays a full-screen modal: it is workstation chrome, not a document window.
+A destination opens as one window per destination id: reopening focuses the existing frame rather than duplicating it. `useWorkstationWindows` owns geometry, stacking (`z`), minimize, and maximize; `geometry` is the restore target so maximize never loses the frame.
+
+Windows are plain positioned elements, not modal dialogs, so several can be open at once. A gesture paints `left`/`top`/width/height straight onto the frame and commits to the registry once on release, which keeps a drag off the React render path entirely; gestures are keyed by pointer id and take pointer capture on the titlebar, with a window-level `pointerup` fallback so a gesture can never outlive its pointer. `react-rnd` was the first attempt and was removed from rendering: it always writes its own `transform` and will not yield to inline geometry, which double-applied a controlled position and made a drop land somewhere other than the cursor. The dependency is still installed but unused.
+
+Settings stays a full-screen modal: it is workstation chrome, not a document window.
 
 ## Boundaries and verification
 

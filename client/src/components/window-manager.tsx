@@ -1,7 +1,6 @@
 "use client";
 
-import { useCallback, useRef, useState, type Ref } from "react";
-import { Rnd } from "react-rnd";
+import { useCallback, useRef, useState } from "react";
 import { DesktopIcon, type DesktopIconSpec } from "./desktop-icons";
 
 /** Pixel geometry of a workstation window, in desktop-layer coordinates. */
@@ -101,12 +100,13 @@ export function useWorkstationWindows() {
 /**
  * One draggable, resizable workstation window.
  *
- * The frame's geometry lives in the registry, but a drag or resize writes
- * straight to the DOM and only commits on release. Routing every pointer move
- * through React re-rendered the whole shell (status strip, rail, taskbar) at
- * pointer frequency, which is what made dragging feel like it ran behind the
- * cursor. Pointer capture lives on the titlebar, so release always lands on the
- * handler that started the gesture.
+ * The frame is a plain element positioned with explicit `left`/`top`/size, and
+ * gestures are pointer handlers. react-rnd was tried first and removed from
+ * rendering: it always writes its own `transform` and will not yield to inline
+ * geometry, so a controlled position was applied twice (the frame sitting 90px
+ * off and past the viewport edge) and the drag only took effect when the
+ * gesture committed, which read as the window snapping somewhere else on
+ * release. A gesture paints the frame directly and commits once on release.
  */
 export function WorkstationWindow({ window: item, area, active, children, onFocus, onClose, onMinimize, onMaximize, onGeometryChange }: {
   window: WorkstationWindowState;
@@ -121,13 +121,12 @@ export function WorkstationWindow({ window: item, area, active, children, onFocu
 }) {
   const maximized = item.maximized;
   const geometry = maximized ? { x: 0, y: 0, width: area.width, height: area.height } : item.geometry;
-  const frameNode = useRef<HTMLElement | null>(null);
-  const frameRef = useCallback((node: Rnd | null) => { frameNode.current = node?.resizableElement?.current ?? null; }, []);
-  const drag = useRef<{ startX: number; startY: number; originX: number; originY: number; next: WindowGeometry } | null>(null);
-  const resize = useRef<{ startX: number; startY: number; width: number; height: number; next: WindowGeometry } | null>(null);
+  const frameRef = useRef<HTMLElement | null>(null);
+  const drag = useRef<{ pointerId: number; startX: number; startY: number; originX: number; originY: number; next: WindowGeometry } | null>(null);
+  const resize = useRef<{ pointerId: number; startX: number; startY: number; width: number; height: number; next: WindowGeometry } | null>(null);
 
   function paint(next: WindowGeometry) {
-    const frame = frameNode.current;
+    const frame = frameRef.current;
     if (!frame) return;
     frame.style.left = `${next.x}px`;
     frame.style.top = `${next.y}px`;
@@ -135,24 +134,32 @@ export function WorkstationWindow({ window: item, area, active, children, onFocu
     frame.style.height = `${next.height}px`;
   }
 
-  /** Starts a titlebar drag; the frame is clamped to the desktop layer as it moves. */
+  function clampX(value: number, width: number) {
+    return Math.min(Math.max(0, area.width - width), Math.max(0, value));
+  }
+
+  function clampY(value: number, height: number) {
+    return Math.min(Math.max(0, area.height - height), Math.max(0, value));
+  }
+
+  /** Starts a titlebar drag; the frame follows the pointer and is clamped to the layer. */
   function beginDrag(event: React.PointerEvent<HTMLElement>) {
     onFocus();
-    if (maximized || (event.target as HTMLElement).closest("button")) return;
-    // Capture keeps the gesture on the frame even when the pointer outruns it.
+    // `button` is absent on some pointer events, so only reject an explicit secondary button.
+    if (maximized || event.button > 0 || (event.target as HTMLElement).closest("button")) return;
     event.currentTarget.setPointerCapture?.(event.pointerId);
-    drag.current = { startX: event.clientX, startY: event.clientY, originX: geometry.x, originY: geometry.y, next: geometry };
+    drag.current = { pointerId: event.pointerId, startX: event.clientX, startY: event.clientY, originX: geometry.x, originY: geometry.y, next: geometry };
+    // Safety net for a release the frame never sees, so a gesture can never outlive its pointer.
+    window.addEventListener("pointerup", endDrag);
   }
 
   function moveDrag(event: React.PointerEvent<HTMLElement>) {
     const state = drag.current;
-    if (!state) return;
-    const maxX = Math.max(0, area.width - state.next.width);
-    const maxY = Math.max(0, area.height - state.next.height);
+    if (!state || state.pointerId !== event.pointerId) return;
     state.next = {
       ...state.next,
-      x: Math.min(maxX, Math.max(0, state.originX + (event.clientX - state.startX))),
-      y: Math.min(maxY, Math.max(0, state.originY + (event.clientY - state.startY))),
+      x: clampX(state.originX + (event.clientX - state.startX), state.next.width),
+      y: clampY(state.originY + (event.clientY - state.startY), state.next.height),
     };
     paint(state.next);
   }
@@ -160,6 +167,7 @@ export function WorkstationWindow({ window: item, area, active, children, onFocu
   function endDrag() {
     const state = drag.current;
     drag.current = null;
+    window.removeEventListener("pointerup", endDrag);
     if (state && (state.next.x !== geometry.x || state.next.y !== geometry.y)) onGeometryChange(state.next);
   }
 
@@ -167,42 +175,36 @@ export function WorkstationWindow({ window: item, area, active, children, onFocu
   function beginResize(event: React.PointerEvent<HTMLElement>) {
     event.stopPropagation();
     onFocus();
-    // Capture keeps the gesture on the frame even when the pointer outruns it.
+    if (event.button > 0) return;
     event.currentTarget.setPointerCapture?.(event.pointerId);
-    resize.current = { startX: event.clientX, startY: event.clientY, width: geometry.width, height: geometry.height, next: geometry };
+    resize.current = { pointerId: event.pointerId, startX: event.clientX, startY: event.clientY, width: geometry.width, height: geometry.height, next: geometry };
+    window.addEventListener("pointerup", endResize);
   }
 
   function moveResize(event: React.PointerEvent<HTMLElement>) {
     const state = resize.current;
-    if (!state) return;
-    state.next = {
-      ...state.next,
-      width: Math.max(WINDOW_MIN_SIZE.width, Math.min(area.width - geometry.x, state.width + (event.clientX - state.startX))),
-      height: Math.max(WINDOW_MIN_SIZE.height, Math.min(area.height - geometry.y, state.height + (event.clientY - state.startY))),
-    };
+    if (!state || state.pointerId !== event.pointerId) return;
+    const width = Math.max(WINDOW_MIN_SIZE.width, Math.min(area.width - geometry.x, state.width + (event.clientX - state.startX)));
+    const height = Math.max(WINDOW_MIN_SIZE.height, Math.min(area.height - geometry.y, state.height + (event.clientY - state.startY)));
+    state.next = { ...state.next, width, height };
     paint(state.next);
   }
 
   function endResize() {
     const state = resize.current;
     resize.current = null;
+    window.removeEventListener("pointerup", endResize);
     if (state && (state.next.width !== geometry.width || state.next.height !== geometry.height)) onGeometryChange(state.next);
   }
 
   return (
-    <Rnd
-      ref={frameRef as unknown as Ref<Rnd>}
+    <section
+      ref={(node) => { frameRef.current = node; }}
       className={["workstation-window", "circa-raised", active ? "is-active" : "is-inactive"].join(" ")}
       role="dialog"
       aria-label={item.title}
-      // Explicit geometry wins over react-rnd's internal transform, which keeps
-      // the frame and the registry in step for the whole gesture and after it.
-      style={{ zIndex: item.z, left: geometry.x, top: geometry.y, width: geometry.width, height: geometry.height }}
       data-maximized={maximized ? "true" : undefined}
-      size={{ width: geometry.width, height: geometry.height }}
-      position={{ x: geometry.x, y: geometry.y }}
-      disableDragging
-      enableResizing={false}
+      style={{ zIndex: item.z, left: geometry.x, top: geometry.y, width: geometry.width, height: geometry.height }}
       onPointerDown={onFocus}
     >
       <div className="window-titlebar" data-testid={`window-titlebar-${item.id}`}
@@ -231,7 +233,7 @@ export function WorkstationWindow({ window: item, area, active, children, onFocu
           onPointerDown={beginResize} onPointerMove={moveResize}
           onPointerUp={endResize} onPointerCancel={endResize} />
       )}
-    </Rnd>
+    </section>
   );
 }
 

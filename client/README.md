@@ -13,7 +13,7 @@ Next.js frontend with an initial CIRCA/OS desktop at `/` and `/desktop`: shortcu
 - `e2e/`: responsive Playwright desktop tests.
 - `public/`: supplied emblem wallpaper and the Windows 98 shortcut [icon set](public/icons/README.md).
 
-`react-rnd` provides the window frame and resize handles; the shell drives position, stacking, minimize, and maximize. Domain rules and API authorization belong in `../backend/`.
+Windows are positioned elements with pointer-driven drag and corner resize; the shell owns geometry, stacking, minimize, and maximize. `react-rnd` is still installed but unused, kept only so a future pass can evaluate it without a reinstall. Domain rules and API authorization belong in `../backend/`.
 
 ## Development and verification
 

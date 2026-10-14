@@ -87,8 +87,13 @@ test("windows drag, resize, minimize, and maximize", async ({ page }) => {
   await page.mouse.move(bar.x + bar.width / 2 + 120, bar.y + bar.height / 2 + 60, { steps: 8 });
   await page.mouse.up();
   const moved = (await windowFrame.boundingBox())!;
+  // The drop must land exactly where the pointer released it.
   expect(Math.round(moved.x - start.x)).toBe(120);
   expect(Math.round(moved.y - start.y)).toBe(60);
+  await page.waitForTimeout(150);
+  const settled = (await windowFrame.boundingBox())!;
+  expect(Math.round(settled.x)).toBe(Math.round(moved.x));
+  expect(Math.round(settled.y)).toBe(Math.round(moved.y));
 
   const resizeHandle = windowFrame.locator(".workstation-window-resize");
   const handle = (await resizeHandle.boundingBox())!;
@@ -102,7 +107,13 @@ test("windows drag, resize, minimize, and maximize", async ({ page }) => {
 
   await page.getByRole("button", { name: "Maximize Archive", exact: true }).click();
   await expect(windowFrame).toHaveAttribute("data-maximized", "true");
-  expect((await windowFrame.boundingBox())!.width).toBeGreaterThan(resized.width);
+  // A maximized window fills the desktop layer exactly, never overflowing it.
+  const maximized = (await windowFrame.boundingBox())!;
+  const layer = (await page.locator(".desktop-area").boundingBox())!;
+  expect(Math.round(maximized.width)).toBe(Math.round(layer.width));
+  expect(Math.round(maximized.height)).toBe(Math.round(layer.height));
+  expect(Math.round(maximized.x)).toBe(Math.round(layer.x));
+  expect(Math.round(maximized.y)).toBe(Math.round(layer.y));
   await page.getByRole("button", { name: "Restore Archive", exact: true }).click();
   await expect(windowFrame).not.toHaveAttribute("data-maximized");
   expect(Math.round((await windowFrame.boundingBox())!.width)).toBe(Math.round(resized.width));

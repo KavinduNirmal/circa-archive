@@ -4,17 +4,14 @@ import { describe, expect, it } from "vitest";
 import Home from "@/app/page";
 
 /**
- * react-rnd and react-draggable measure the window frame in jsdom, where layout
- * is not computed. These stubs give dragging and resizing something to reason
- * about; they do not fake window behaviour itself.
+ * jsdom performs no layout, so these stubs give the desktop layer and window
+ * frames believable metrics; they do not fake window behaviour itself.
  */
 /**
  * jsdom performs no layout. These stubs give the desktop layer and window
  * frames believable metrics, and `getBoundingClientRect` honours each frame's
- * inline transform and size. That matters: react-rnd derives an
- * `offsetFromParent` correction by comparing measured screen position with its
- * logical position, so a rect that ignores the transform makes every reported
- * coordinate wrong rather than merely unscaled.
+ * inline transform and size, so measurements stay consistent as a gesture moves
+ * the frame.
  */
 function stubLayout() {
   const frame = () => screen.queryByRole("dialog");
