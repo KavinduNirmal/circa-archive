@@ -186,13 +186,21 @@ describe("file browser", () => {
     expect(box).toHaveTextContent(`${counts.folders + counts.files} objects (${counts.folders} folders, ${counts.files} files)`);
   });
 
-  it("cannot empty the Recycle Bin ahead of the retention schedule", async () => {
+  it("offers Empty Recycle Bin only in the Recycle Bin, and still refuses it", async () => {
     const { user, root, names } = openExplorer("recycle");
     expect(names()).toEqual(expect.arrayContaining(["DRAFT-03_freight_car.txt", "SCRAP_NOTE.txt"]));
     await user.click(within(root).getByRole("button", { name: "Empty Recycle Bin" }));
     const box = await screen.findByRole("alertdialog");
     expect(within(box).getByText("Recycle Bin cannot be emptied")).toBeVisible();
     expect(box).toHaveTextContent("LN-POLICY-19");
+  });
+
+  it("does not offer the emptying tool in a folder that is not the bin", () => {
+    const { root } = openExplorer("records");
+    expect(within(root).queryByRole("button", { name: "Empty Recycle Bin" })).toBeNull();
+    // The refusal itself still lives in the File menu, so the operation has one
+    // route rather than a dead tool on every window.
+    expect(within(root).getByRole("menuitem", { name: "File" })).toBeVisible();
   });
 
   it("shows _EXPUNGED empty and reports the count instead of a listing", () => {

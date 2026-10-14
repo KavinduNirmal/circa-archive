@@ -171,12 +171,14 @@ export function FileMenu({ state, setState, canGoBack, canGoForward, canGoUp, ac
 }
 
 /** The icon toolbar: navigation, the five file operations, and the view switch. */
-export function FileToolbar({ state, setState, canGoBack, canGoForward, canGoUp, onEmptyBin, actions }: {
+export function FileToolbar({ state, setState, canGoBack, canGoForward, canGoUp, showEmptyBin, onEmptyBin, actions }: {
   state: FileViewState;
   setState: (next: Partial<FileViewState>) => void;
   canGoBack: boolean;
   canGoForward: boolean;
   canGoUp: boolean;
+  /** Only the Recycle Bin can be emptied, so only its window offers the tool. */
+  showEmptyBin: boolean;
   onEmptyBin: () => void;
   actions: FileActions;
 }) {
@@ -198,8 +200,12 @@ export function FileToolbar({ state, setState, canGoBack, canGoForward, canGoUp,
       <FileToolButton label="Undo" icon={Undo2} onClick={actions.policies.create} />
       <FileToolButton label="Delete" icon={Trash2} onClick={actions.policies.delete} />
       <span className="files-toolbar-divider" aria-hidden="true" />
-      <FileToolButton label="Empty Recycle Bin" icon={Trash2} onClick={onEmptyBin} />
-      <span className="files-toolbar-divider" aria-hidden="true" />
+      {showEmptyBin && (
+        <>
+          <FileToolButton label="Empty Recycle Bin" icon={Trash2} onClick={onEmptyBin} />
+          <span className="files-toolbar-divider" aria-hidden="true" />
+        </>
+      )}
       <div className="files-views" role="group" aria-label="View">
         <FileToolButton label="Large Icons" icon={LayoutGrid} pressed={state.view === "icons"} onClick={() => setState({ view: "icons" })} />
         <FileToolButton label="List" icon={List} pressed={state.view === "list"} onClick={() => setState({ view: "list" })} />

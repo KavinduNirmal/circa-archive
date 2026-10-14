@@ -212,7 +212,7 @@ export function FileExplorer({ scopeId, initialPath, initialView = "details", on
     <div className="files" data-scope={scope.id} data-view={state.view}>
       <FileMenu state={state} setState={update} canGoBack={canGoBack} canGoForward={canGoForward} canGoUp={canGoUp} actions={actions} />
       <FileToolbar state={state} setState={update} canGoBack={canGoBack} canGoForward={canGoForward} canGoUp={canGoUp}
-        onEmptyBin={actions.policies.empty} actions={actions} />
+        showEmptyBin={scope.id === "recycle"} onEmptyBin={actions.policies.empty} actions={actions} />
       <FileAddressBar address={addressOf(folder.id, FILE_TREE)} up={canGoUp} places={PLACES} current={place} actions={actions} />
       <div className="files-body">
         <FolderTree rootId="pc-root" currentId={folder.id} expanded={expanded}
