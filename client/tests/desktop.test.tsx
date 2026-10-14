@@ -112,7 +112,7 @@ describe("desktop navigation", () => {
     expect(screen.getByRole("dialog", { name: "My PC" })).toBeVisible();
   });
 
-  it("orders the taskbar as a task item, the tray, then the clock", () => {
+  it("keeps Settings pinned left of the tray and the clock", () => {
     render(<Home />);
     const taskbar = screen.getByRole("contentinfo", { name: "Taskbar" });
     const settings = screen.getByRole("button", { name: "Settings" });
@@ -120,9 +120,15 @@ describe("desktop navigation", () => {
     expect(settings).toHaveTextContent("Settings");
     const notifications = screen.getByRole("button", { name: "Notifications" });
     const clock = taskbar.querySelector("time.workstation-clock");
-    if (!clock) throw new Error("taskbar clock is missing");
-    expect(notifications.compareDocumentPosition(clock) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    expect(settings.compareDocumentPosition(notifications) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    const spacer = taskbar.querySelector(".taskbar-spacer");
+    if (!clock || !spacer) throw new Error("taskbar chrome is incomplete");
+    const follows = (first: Element, second: Element) =>
+      Boolean(first.compareDocumentPosition(second) & Node.DOCUMENT_POSITION_FOLLOWING);
+    // Settings sits with the pinned task items, before the flexible gap that
+    // pushes the tray and clock to the right edge.
+    expect(follows(settings, spacer)).toBe(true);
+    expect(follows(spacer, notifications)).toBe(true);
+    expect(follows(notifications, clock)).toBe(true);
   });
 
   it("opens taskbar notifications and changes the screen setting", async () => {

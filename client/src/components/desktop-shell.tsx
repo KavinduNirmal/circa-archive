@@ -62,26 +62,29 @@ function WorkstationStatus() {
   );
 }
 
-function TaskbarTray({ settingsOpen, onOpenSettings }: { settingsOpen: boolean; onOpenSettings: () => void }) {
+/** Pinned task item. The reference keeps window buttons directly beside Start, so this sits left-aligned. */
+function SettingsTaskItem({ open, onOpen }: { open: boolean; onOpen: () => void }) {
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <span className="taskbar-task-anchor">
+          <button className="taskbar-task" type="button" aria-label="Settings"
+            data-open={open ? "true" : undefined} onClick={onOpen}>
+            <SettingsIcon className="tray-glyph" />
+            <span>Settings</span>
+          </button>
+        </span>
+      </TooltipTrigger>
+      <TooltipContent className="circa-label" side="top">Workstation preferences</TooltipContent>
+    </Tooltip>
+  );
+}
+
+/** Right-hand tray, beside the clock. */
+function TaskbarTray() {
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   return (
     <>
-      {/* Settings reads as an open task item, matching the reference taskbar's wide window buttons.
-          The anchor carries the bevel so the tooltip trigger can wrap the button without
-          disturbing the taskbar's flex rhythm. */}
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <span className="taskbar-task-anchor">
-            <button className="taskbar-task" type="button" aria-label="Settings"
-              data-open={settingsOpen ? "true" : undefined} onClick={onOpenSettings}>
-              <SettingsIcon className="tray-glyph" />
-              <span>Settings</span>
-            </button>
-          </span>
-        </TooltipTrigger>
-        <TooltipContent className="circa-label" side="top">Workstation preferences</TooltipContent>
-      </Tooltip>
-      <div className="taskbar-spacer" />
       <div className="taskbar-tray">
         <Tooltip>
           <TooltipTrigger asChild>
@@ -304,9 +307,11 @@ export function DesktopShell() {
             </Popover.Portal>
           </Popover.Root>
           <div className="taskbar-divider" />
+          {/* Window buttons grow from the left, directly beside the pinned task item. */}
           <TaskbarWindows windows={windows} onSelect={focusWindow} />
+          <SettingsTaskItem open={settingsOpen} onOpen={() => setSettingsOpen(true)} />
           <div className="taskbar-spacer" />
-          <TaskbarTray settingsOpen={settingsOpen} onOpenSettings={() => setSettingsOpen(true)} />
+          <TaskbarTray />
         </footer>
         {screenFilter && <div className="desktop-screen-filter" aria-hidden="true" data-testid="screen-filter" />}
         <SettingsDialog open={settingsOpen} onOpenChange={setSettingsOpen} screenFilter={screenFilter} onToggleScreenFilter={setScreenFilter} />

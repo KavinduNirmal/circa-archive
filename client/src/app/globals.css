@@ -214,21 +214,22 @@
 }
 /* Reads as the reference's left shortcut rail: one left-aligned column, top to bottom. */
 /*
- * Two columns of five: nine shortcuts then read as one block that fits a
- * common laptop height without turning the rail into a scroller, while keeping
- * real separation between icon cells.
+ * One left rail whose rows share the desktop layer's height, so the shortcut
+ * block reaches the taskbar instead of leaving a dead zone underneath. The
+ * minimum row keeps icon cells separated when the layer is short, and only then
+ * does the rail scroll.
  */
 .desktop-navigation {
   display: grid;
-  grid-auto-flow: column;
-  grid-template-rows: repeat(5, 84px);
-  grid-auto-columns: 88px;
-  gap: 8px 12px;
+  grid-auto-flow: row;
+  grid-auto-rows: minmax(52px, 1fr);
+  grid-template-columns: 92px;
+  gap: 4px;
   width: max-content;
-  max-height: calc(100% - 28px);
+  max-height: 100%;
   overflow: auto;
   padding: 0 4px;
-  margin: 16px 20px;
+  margin: 10px 20px;
 }
 .desktop-shortcut {
   display: flex;
@@ -445,7 +446,7 @@
 .return-button { display: block; margin: 18px auto 0; padding: 10px 16px; cursor: pointer; }
 .desktop-screen-filter { position: fixed; z-index: 100; inset: 0; pointer-events: none; background: repeating-linear-gradient(0deg, rgb(0 0 0 / 10%) 0, rgb(0 0 0 / 10%) 1px, transparent 1px, transparent 3px); box-shadow: inset 0 0 100px rgb(0 0 0 / 24%); }
 @media (max-height: 700px) and (min-width: 601px) {
-  .desktop-navigation { grid-template-rows: repeat(5, 72px); gap: 4px 10px; margin: 10px 20px; }
+  .desktop-navigation { grid-auto-rows: minmax(44px, 1fr); gap: 2px; margin: 8px 20px; }
 }
 @media (max-width: 600px) {
   .desktop-topline { min-height: 46px; font-size: 9px; padding: 6px 10px; gap: 8px; }
@@ -453,7 +454,7 @@
   .topline-console, .topline-station .topline-separator:last-of-type, .status-separator, .status-item:nth-of-type(n + 4), .status-sim { display: none; }
   .workstation-status { gap: 6px; }
   .desktop-wallpaper { background-size: auto 100%; background-position: 55% center; }
-  .desktop-navigation { grid-template-rows: repeat(5, 80px); grid-auto-columns: 88px; gap: 6px 8px; margin: 12px 8px; max-height: calc(100% - 16px); }
+  .desktop-navigation { grid-auto-rows: minmax(48px, 1fr); grid-template-columns: 88px; gap: 2px; margin: 8px; max-height: 100%; }
   .desktop-taskbar { height: 52px; gap: 7px; }
   .taskbar-start { min-height: 44px; }
   .taskbar-task { min-width: 0; max-width: none; min-height: 44px; }
