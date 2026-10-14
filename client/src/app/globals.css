@@ -168,21 +168,50 @@
   z-index: -1;
   inset: 0;
   background: url('/Government_agency_emblem_seal_de…_2K_20261014194612.jpg') center / cover no-repeat;
+  filter: brightness(.78) contrast(1.06) saturate(1.12);
 }
 .desktop-topline {
-  height: 28px;
-  padding: 0 14px;
+  position: relative;
+  z-index: 30;
+  min-height: 40px;
+  padding: 6px 14px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: rgb(13 19 26 / 86%);
+  gap: 16px;
+  background: rgb(11 17 24 / 90%);
   border-bottom: 1px solid #4b5d6a;
   font-size: 10px;
   letter-spacing: .06em;
 }
-.desktop-topline strong { color: #d0dce5; }
-.topline-separator { padding: 0 12px; color: #8a9ca9; }
-.desktop-session { color: #b3c2cc; }
+.topline-station { display: flex; align-items: center; white-space: nowrap; }
+.topline-station strong { color: #d0dce5; }
+.topline-console { color: #cfe0ec; }
+.topline-separator { padding: 0 10px; color: #6f899d; }
+/* Fixed machine readout: status chips and monospaced values, marked as simulated copy. */
+.workstation-status { display: flex; align-items: center; gap: 8px; min-width: 0; overflow: hidden; white-space: nowrap; }
+.status-chip {
+  padding: 3px 8px;
+  border: 1px solid;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: .1em;
+  color: #a4c2e6;
+}
+.status-simulated { border-color: #526e94; background: #1b2c40; }
+.status-uplink { border-color: #4f7a5a; background: #16281d; color: #9ecfae; }
+.status-standby { border-color: #8a6a2b; background: #2a2113; color: #d9b26a; }
+.status-offline { border-color: #7a3232; background: #2a1416; color: #d99a9a; }
+.status-item { font-family: "IBM Plex Mono", monospace; font-size: 11px; color: #b3c2cc; }
+.status-separator { color: #526e94; }
+.status-sim {
+  padding: 3px 7px;
+  border: 1px dashed #6f899d;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  color: #edbd8d;
+}
 /* Reads as the reference's left shortcut rail: one left-aligned column, top to bottom. */
 .desktop-navigation {
   display: grid;
@@ -194,7 +223,7 @@
   max-height: calc(100% - 96px);
   overflow: auto;
   padding: 0 4px;
-  margin: 20px 20px;
+  margin: 22px 20px;
 }
 .desktop-shortcut {
   display: flex;
@@ -225,6 +254,7 @@
 .desktop-icon[data-shortcut] .desktop-icon-glyph { transform: translate(3px, -3px); }
 .desktop-taskbar {
   position: absolute;
+  z-index: 30;
   inset: auto 0 0;
   height: 40px;
   display: flex;
@@ -298,7 +328,7 @@
 .tray-panel { z-index: 30; width: 220px; padding: 5px; }
 .tray-heading { padding: 8px 10px; background: #111a25; font-weight: 700; font-size: 10px; letter-spacing: .06em; }
 .tray-note { padding: 12px 10px; color: #bacada; font-size: 10px; }
-.settings-backdrop { position: fixed; inset: 28px 0 40px; z-index: 50; background: rgb(8 17 25 / 24%); }
+.settings-backdrop { position: fixed; inset: 40px 0 40px; z-index: 50; background: rgb(8 17 25 / 24%); }
 .settings-window { position: fixed; z-index: 51; left: 50%; top: 46%; transform: translate(-50%, -50%); width: min(340px, calc(100vw - 24px)); padding: 3px; box-shadow: 6px 6px 0 rgb(8 17 25 / 38%); }
 .settings-titlebar { display: flex; align-items: center; justify-content: space-between; padding-left: 8px; background: #30445e; }
 .settings-titlebar h2 { font-size: 11px; font-weight: 600; text-transform: uppercase; }
@@ -328,32 +358,90 @@
 .start-navigation .desktop-icon { width: 32px; height: 32px; }
 .start-navigation .desktop-shortcut > span { background: none; text-shadow: none; }
 .start-note { border-top: 1px solid #526e94; padding: 10px; color: #bacada; font-size: 10px; }
-.folder-backdrop { position: fixed; inset: 28px 0 40px; z-index: 40; background: rgb(8 17 25 / 12%); }
-.folder-window { position: fixed; z-index: 41; left: 50%; top: 46%; transform: translate(-50%, -50%); width: min(480px, calc(100vw - 24px)); max-height: calc(100dvh - 100px); overflow: auto; padding: 3px; box-shadow: 6px 6px 0 rgb(8 17 25 / 38%); }
-.folder-titlebar { display: flex; justify-content: space-between; align-items: center; padding-left: 8px; background: #30445e; }
-.folder-titlebar h2 { font-size: 11px; text-transform: uppercase; font-weight: 600; }
-.folder-close { width: 32px; height: 30px; font-size: 20px; cursor: pointer; }
-.folder-address { margin-top: 3px; padding: 6px 8px; background: #151d27; font-size: 10px; }
-.folder-note { padding: 8px 10px 0; color: #bccbd9; }
-.folder-empty { padding: 24px 18px; text-align: center; background: #1b2636; }
-.folder-empty h2 { font-size: 16px; margin-bottom: 12px; }
-.folder-empty p { color: #bccbd9; }
-.folder-body { background: #1b2636; padding-bottom: 18px; }
-.folder-body .folder-empty { background: none; padding-bottom: 16px; }
-.folder-destination-icon { width: 48px; height: 48px; margin: 0 auto 14px; color: #cfe0ec; }
-.pc-contents { display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 6px; padding: 20px 14px 6px; }
-.pc-item { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 12px 4px; border: 1px solid transparent; background: transparent; color: #d4e0e9; cursor: pointer; }
-.pc-item:hover { background: #24334a; border-color: #6f899d; }
-.pc-item:focus-visible { outline: 1px dashed #c8d6e5; outline-offset: -2px; }
-.pc-item-icon { width: 40px; height: 40px; }
+/* Desktop layer: the drag/resize canvas, inset by the status strip and taskbar. */
+.desktop-area { position: relative; height: calc(100dvh - 40px - 40px); overflow: hidden; outline: none; }
+.window-layer { position: absolute; inset: 0; pointer-events: none; }
+.window-layer > * { pointer-events: auto; }
+/*
+ * Workstation windows: a beveled frame with the reference's titlebar, control
+ * cluster, address strip, and a client area that scrolls independently.
+ */
+.workstation-window {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 3px;
+  background: #1b2636;
+  box-shadow: 6px 6px 0 rgb(8 17 25 / 38%);
+  touch-action: none;
+}
+.workstation-window.is-inactive { filter: brightness(.9); }
+.workstation-window.is-active .window-titlebar { background: linear-gradient(90deg, #30445e, #24334a); }
+.window-titlebar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  height: 22px;
+  padding-left: 8px;
+  background: #24334a;
+  cursor: move;
+  user-select: none;
+}
+.window-title { overflow: hidden; font-size: 11px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; text-overflow: ellipsis; white-space: nowrap; }
+.window-controls { display: flex; flex: 0 0 auto; }
+.window-control {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 22px;
+  padding: 0;
+  border-radius: 0;
+  font-size: 11px;
+  line-height: 1;
+  cursor: pointer;
+}
+.window-control-close { font-size: 15px; }
+.window-address {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 3px;
+  padding: 5px 8px;
+  background: #151d27;
+  color: #8fa3b6;
+  font-size: 10px;
+  letter-spacing: .05em;
+}
+.window-body { flex: 1; min-height: 0; overflow: auto; background: #1b2636; }
+.window-pane { padding: 20px 18px; }
+.window-pane h2 { font-size: 15px; margin-bottom: 10px; text-transform: uppercase; letter-spacing: .04em; }
+.window-pane p { color: #bccbd9; }
+.window-note { margin-bottom: 6px; }
+.window-pane-empty { text-align: center; }
+.window-hint { margin-top: 16px; font-size: 10px; color: #7f97ab; }
+.workstation-window-resize {
+  position: absolute;
+  right: 1px;
+  bottom: 1px;
+  width: 14px;
+  height: 14px;
+  cursor: nwse-resize;
+  background:
+    linear-gradient(135deg, transparent 0 45%, #6f899d 45% 55%, transparent 55% 70%, #6f899d 70% 80%, transparent 80%);
+}
+.taskbar-window { min-width: 132px; }
+.taskbar-window-icon { width: 16px; height: 16px; filter: saturate(.4) brightness(.85); }
 .return-button { display: block; margin: 18px auto 0; padding: 10px 16px; cursor: pointer; }
 .desktop-screen-filter { position: fixed; z-index: 100; inset: 0; pointer-events: none; background: repeating-linear-gradient(0deg, rgb(0 0 0 / 10%) 0, rgb(0 0 0 / 10%) 1px, transparent 1px, transparent 3px); box-shadow: inset 0 0 100px rgb(0 0 0 / 24%); }
 @media (max-height: 700px) and (min-width: 601px) {
   .desktop-navigation { grid-auto-rows: 80px; margin-top: 14px; }
 }
 @media (max-width: 600px) {
-  .desktop-topline { font-size: 9px; padding: 0 10px; }
-  .desktop-session { display: none; }
+  .desktop-topline { min-height: 46px; font-size: 9px; padding: 6px 10px; gap: 8px; }
+  /* The readout collapses to link state and address; the rest is chrome that costs space. */
+  .topline-console, .topline-station .topline-separator:last-of-type, .status-separator, .status-item:nth-of-type(n + 4), .status-sim { display: none; }
+  .workstation-status { gap: 6px; }
   .desktop-wallpaper { background-size: auto 100%; background-position: 55% center; }
   .desktop-navigation { grid-auto-flow: column; grid-template-columns: none; grid-template-rows: repeat(5, 88px); grid-auto-columns: 92px; gap: 6px; margin: 18px 8px; max-height: calc(100% - 110px); }
   .desktop-taskbar { height: 52px; gap: 7px; }

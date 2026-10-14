@@ -10,6 +10,16 @@ function desktopIconIn(button: HTMLElement) {
 }
 
 describe("desktop navigation", () => {
+  it("shows the workstation status strip and marks its fiction", () => {
+    render(<Home />);
+    const header = screen.getByRole("banner", { name: "Workstation status" });
+    expect(within(header).getByText("SIMULATED LINK")).toHaveClass("status-chip", "status-simulated");
+    expect(within(header).getByText("10.42.0.19")).toBeVisible();
+    expect(within(header).getByText("7 terminals signed in")).toBeVisible();
+    expect(within(header).getByText("SIMULATED")).toHaveAttribute("title", expect.stringContaining("Placeholder"));
+    expect(within(header).getByText(/CONSOLE 04/)).toBeVisible();
+  });
+
   it("explains a desktop destination with the redesigned tooltip instead of a native title", async () => {
     const user = userEvent.setup();
     render(<Home />);

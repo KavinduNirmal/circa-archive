@@ -15,15 +15,21 @@ for (const viewport of [{ width: 1440, height: 900 }, { width: 390, height: 844 
     await expect(page).toHaveTitle("CIRCA Archive");
     await page.evaluate(() => document.fonts.ready);
     await expect(page.getByRole("main", { name: "CIRCA desktop" })).toBeVisible();
+    const header = page.getByRole("banner", { name: "Workstation status" });
+    await expect(header.getByText("SIMULATED LINK")).toBeVisible();
+    await expect(header.getByText("10.42.0.19")).toBeVisible();
+    expect((await header.boundingBox())?.height ?? 0).toBeGreaterThanOrEqual(40);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
     const navigation = page.getByRole("navigation", { name: "Desktop folders" });
     for (const folder of shortcuts) {
       const shortcut = navigation.getByRole("button", { name: folder, exact: true });
       await expect(shortcut).toBeVisible();
       await shortcut.click();
-      await expect(page.getByRole("dialog", { name: folder, exact: true })).toBeVisible();
+      const windowFrame = page.getByRole("dialog", { name: folder, exact: true });
+      await expect(windowFrame).toBeVisible();
+      // Escape closes the focused window; focus restoration is covered by the close-button test.
       await page.keyboard.press("Escape");
-      await expect(shortcut).toBeFocused();
+      await expect(windowFrame).toHaveCount(0);
     }
     expect(await navigation.locator('[data-icon="network"]').count()).toBe(1);
     expect(await navigation.locator('[data-icon="inbox"]').count()).toBe(1);
@@ -64,6 +70,49 @@ test("desktop shortcuts explain themselves with the beveled tooltip", async ({ p
   await expect(tooltip.locator(".tooltip-arrow-fill")).toBeVisible();
   await page.mouse.move(720, 500);
   await expect(tooltip).toBeHidden();
+});
+
+test("windows drag, resize, minimize, and maximize", async ({ page }) => {
+  await page.goto("/desktop");
+  const shortcut = page.getByRole("navigation", { name: "Desktop folders" }).getByRole("button", { name: "Archive", exact: true });
+  await shortcut.click();
+  const windowFrame = page.getByRole("dialog", { name: "Archive", exact: true });
+  await expect(windowFrame).toBeVisible();
+
+  const start = (await windowFrame.boundingBox())!;
+  const titlebar = page.getByTestId("window-titlebar-archive");
+  const bar = (await titlebar.boundingBox())!;
+  await page.mouse.move(bar.x + bar.width / 2, bar.y + bar.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(bar.x + bar.width / 2 + 120, bar.y + bar.height / 2 + 60, { steps: 8 });
+  await page.mouse.up();
+  const moved = (await windowFrame.boundingBox())!;
+  expect(Math.round(moved.x - start.x)).toBe(120);
+  expect(Math.round(moved.y - start.y)).toBe(60);
+
+  const resizeHandle = windowFrame.locator(".workstation-window-resize");
+  const handle = (await resizeHandle.boundingBox())!;
+  await page.mouse.move(handle.x + handle.width / 2, handle.y + handle.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(handle.x + handle.width / 2 + 90, handle.y + handle.height / 2 + 60, { steps: 8 });
+  await page.mouse.up();
+  const resized = (await windowFrame.boundingBox())!;
+  expect(Math.round(resized.width - moved.width)).toBe(90);
+  expect(Math.round(resized.height - moved.height)).toBe(60);
+
+  await page.getByRole("button", { name: "Maximize Archive", exact: true }).click();
+  await expect(windowFrame).toHaveAttribute("data-maximized", "true");
+  expect((await windowFrame.boundingBox())!.width).toBeGreaterThan(resized.width);
+  await page.getByRole("button", { name: "Restore Archive", exact: true }).click();
+  await expect(windowFrame).not.toHaveAttribute("data-maximized");
+  expect(Math.round((await windowFrame.boundingBox())!.width)).toBe(Math.round(resized.width));
+
+  await page.getByRole("button", { name: "Minimize Archive", exact: true }).click();
+  await expect(windowFrame).toHaveCount(0);
+  const taskEntry = page.getByRole("contentinfo", { name: "Taskbar" }).getByRole("button", { name: "Archive", exact: true });
+  await taskEntry.click();
+  await expect(page.getByRole("dialog", { name: "Archive", exact: true })).toBeVisible();
+  await expect(taskEntry).toHaveAttribute("aria-pressed", "false");
 });
 
 test("My PC contains System and back-tracks", async ({ page }) => {

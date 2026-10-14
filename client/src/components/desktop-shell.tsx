@@ -2,22 +2,34 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Dialog, Popover } from "radix-ui";
-import { DesktopIcon, notificationGlyph, settingsGlyph } from "./desktop-icons";
-import { desktopFolders, DesktopNavigation, myPcContents, type DesktopDestination, type DesktopFolder, type MyPcItem } from "./desktop-navigation";
+import { TaskbarWindows, WindowLayer, useWorkstationWindows } from "./window-manager";
+import { DesktopIcon, notificationGlyph, settingsGlyph, type DesktopIconSpec } from "./desktop-icons";
+import { desktopFolders, DesktopNavigation, myPcContents, type DesktopFolder } from "./desktop-navigation";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
 
 const NotificationIcon = notificationGlyph;
 const SettingsIcon = settingsGlyph;
 
+/** A destination opened as a window, plus the copy its own status strip shows. */
+type DestinationWindow = { id: string; title: string; status: string; icon: DesktopIconSpec; detail: string | null };
+
 /**
- * Which surface the workstation dialog is showing. `folder` is a desktop
- * destination; `system` is a nested My PC location with a back-track, matching
- * the shell's breadcrumb model for constrained terminals.
+ * Fixed workstation status shown in the header strip.
+ *
+ * Every network value is fiction. The shell has no backend, so the link state,
+ * address, latency, and the archive-wide terminal count are decorative copy
+ * that dresses the interface as a CIRCA terminal. The `simulated` flag renders
+ * the SIMULATED tag in the strip so nobody reads them as live telemetry; set it
+ * to false and replace the values when the backend exists.
  */
-type WorkstationView =
-  | { kind: "desktop" }
-  | { kind: "folder"; entry: DesktopDestination }
-  | { kind: "system"; parent: DesktopFolder };
+const WORKSTATION_STATUS = {
+  uplink: { state: "SIMULATED LINK", signal: "simulated" },
+  address: "10.42.0.19",
+  latency: "24ms",
+  terminals: "7 terminals signed in",
+  sync: "SYNCED 06:12",
+  simulated: true,
+} as const;
 
 function WorkstationClock() {
   const [now, setNow] = useState<Date | null>(null);
@@ -33,9 +45,25 @@ function WorkstationClock() {
   </time>;
 }
 
-function TaskbarTray({ screenFilter, onToggleScreenFilter }: { screenFilter: boolean; onToggleScreenFilter: (next: boolean) => void }) {
+function WorkstationStatus() {
+  const { uplink, address, latency, terminals, sync, simulated } = WORKSTATION_STATUS;
+  return (
+    <div className="workstation-status">
+      <span className={`status-chip status-${uplink.signal}`}>{uplink.state}</span>
+      <span className="status-item">{address}</span>
+      <span className="status-separator" aria-hidden="true">/</span>
+      <span className="status-item">{latency}</span>
+      <span className="status-separator" aria-hidden="true">/</span>
+      <span className="status-item">{terminals}</span>
+      <span className="status-separator" aria-hidden="true">/</span>
+      <span className="status-item">{sync}</span>
+      {simulated && <span className="status-sim" title="Placeholder values shown while the archive backend is unavailable">SIMULATED</span>}
+    </div>
+  );
+}
+
+function TaskbarTray({ settingsOpen, onOpenSettings }: { settingsOpen: boolean; onOpenSettings: () => void }) {
   const [notificationsOpen, setNotificationsOpen] = useState(false);
-  const [settingsOpen, setSettingsOpen] = useState(false);
   return (
     <>
       {/* Settings reads as an open task item, matching the reference taskbar's wide window buttons.
@@ -45,7 +73,7 @@ function TaskbarTray({ screenFilter, onToggleScreenFilter }: { screenFilter: boo
         <TooltipTrigger asChild>
           <span className="taskbar-task-anchor">
             <button className="taskbar-task" type="button" aria-label="Settings"
-              data-open={settingsOpen ? "true" : undefined} onClick={() => setSettingsOpen(true)}>
+              data-open={settingsOpen ? "true" : undefined} onClick={onOpenSettings}>
               <SettingsIcon className="tray-glyph" />
               <span>Settings</span>
             </button>
@@ -76,62 +104,188 @@ function TaskbarTray({ screenFilter, onToggleScreenFilter }: { screenFilter: boo
         </Tooltip>
       </div>
       <WorkstationClock />
-      <Dialog.Root open={settingsOpen} onOpenChange={setSettingsOpen}>
-        <Dialog.Portal>
-          <Dialog.Overlay className="settings-backdrop" />
-          <Dialog.Content className="settings-window circa-raised">
-            <div className="settings-titlebar">
-              <Dialog.Title>Settings</Dialog.Title>
-              <Dialog.Close className="settings-close circa-raised" aria-label="Close settings">×</Dialog.Close>
-            </div>
-            <Dialog.Description className="settings-intro">Workstation preferences. Only screen surface options respond in this preview.</Dialog.Description>
-            <label className="settings-option">
-              <input type="checkbox" className="settings-checkbox" checked={screenFilter}
-                onChange={(event) => onToggleScreenFilter(event.target.checked)} />
-              <span>CRT screen filter</span>
-            </label>
-            <p className="settings-note">Wallpaper, sound, and session preferences are not connected yet.</p>
-          </Dialog.Content>
-        </Dialog.Portal>
-      </Dialog.Root>
     </>
   );
 }
 
+/** Full-screen Settings stays a modal: it is workstation chrome, not a document window. */
+function SettingsDialog({ open, onOpenChange, screenFilter, onToggleScreenFilter }: {
+  open: boolean;
+  onOpenChange: (next: boolean) => void;
+  screenFilter: boolean;
+  onToggleScreenFilter: (next: boolean) => void;
+}) {
+  return (
+    <Dialog.Root open={open} onOpenChange={onOpenChange}>
+      <Dialog.Portal>
+        <Dialog.Overlay className="settings-backdrop" />
+        <Dialog.Content className="settings-window circa-raised">
+          <div className="settings-titlebar">
+            <Dialog.Title>Settings</Dialog.Title>
+            <Dialog.Close className="settings-close circa-raised" aria-label="Close settings">×</Dialog.Close>
+          </div>
+          <Dialog.Description className="settings-intro">Workstation preferences. Only screen surface options respond in this preview.</Dialog.Description>
+          <label className="settings-option">
+            <input type="checkbox" className="settings-checkbox" checked={screenFilter}
+              onChange={(event) => onToggleScreenFilter(event.target.checked)} />
+            <span>CRT screen filter</span>
+          </label>
+          <p className="settings-note">Wallpaper, sound, and session preferences are not connected yet.</p>
+        </Dialog.Content>
+      </Dialog.Portal>
+    </Dialog.Root>
+  );
+}
+
 export function DesktopShell() {
-  const [view, setView] = useState<WorkstationView>({ kind: "desktop" });
   const [startOpen, setStartOpen] = useState(false);
   const [screenFilter, setScreenFilter] = useState(true);
-  const lastTrigger = useRef<HTMLButtonElement | null>(null);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const { windows, lastFocused, open, close, focus, minimize, toggleMaximize, setGeometry } = useWorkstationWindows();
+  const shellRef = useRef<HTMLElement | null>(null);
+  const areaRef = useRef<HTMLDivElement | null>(null);
   const startTrigger = useRef<HTMLButtonElement | null>(null);
+  const launchTriggers = useRef<Record<string, HTMLButtonElement>>({});
+  const [area, setArea] = useState<{ width: number; height: number }>({ width: 0, height: 0 });
 
-  function openFolder(folder: DesktopFolder, trigger: HTMLButtonElement) {
-    lastTrigger.current = startOpen ? startTrigger.current : trigger;
+  // Windows live in a layer that already excludes the status strip and taskbar,
+  // so drag bounds and maximize only need the layer's own measurement.
+  useEffect(() => {
+    const layer = areaRef.current;
+    if (!layer) return;
+    const measure = () => setArea({ width: layer.clientWidth, height: layer.clientHeight });
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, []);
+
+  useEffect(() => {
+    if (!lastFocused) return;
+    areaRef.current?.focus({ preventScroll: true });
+  }, [lastFocused]);
+
+  /** Opens a desktop shortcut as a window, naming the entry for the titlebar and status strip. */
+  function openFolder(folder: DesktopFolder, trigger?: HTMLButtonElement) {
+    openWindow({
+      id: folder.id,
+      title: folder.label,
+      status: folder.id === "my-pc" ? "WORKSTATION" : folder.detail ?? "LOCATION",
+      icon: folder.icon,
+      detail: folder.detail,
+    }, trigger);
+  }
+
+  function openWindow(entry: DestinationWindow, trigger?: HTMLButtonElement) {
+    if (trigger) launchTriggers.current[entry.id] = trigger;
     setStartOpen(false);
-    setView({ kind: "folder", entry: folder });
+    open(
+      { id: entry.id, title: entry.title, status: entry.status, icon: entry.icon },
+      // The layer may not have been measured yet on the first click; fall back to the viewport.
+      area.width && area.height ? area : { width: window.innerWidth, height: Math.max(240, window.innerHeight - 80) },
+    );
   }
 
-  function openMyPcItem(entry: MyPcItem) {
-    if (entry.id === "system") setView({ kind: "system", parent: desktopFolders[0] });
+  function closeWindow(id: string) {
+    const trigger = launchTriggers.current[id];
+    delete launchTriggers.current[id];
+    close(id);
+    window.setTimeout(() => trigger?.focus(), 0);
   }
 
-  function closeView() {
-    setView({ kind: "desktop" });
+  function focusWindow(id: string) {
+    const target = windows.find((item) => item.id === id);
+    if (target?.minimized || lastFocused !== id) {
+      if (target?.minimized && target.maximized) setGeometry(id, target.geometry);
+      focus(id);
+    }
   }
 
-  const activeId = view.kind === "folder" ? view.entry.id : undefined;
-  const dialogTitle = view.kind === "system" ? "System" : view.kind === "folder" ? view.entry.label : "";
-  const dialogIcon = view.kind === "system" ? myPcContents[0].icon : view.kind === "folder" ? view.entry.icon : null;
+  const activeWindow = lastFocused ? windows.find((item) => item.id === lastFocused && !item.minimized) : undefined;
+  const topWindow = windows.filter((item) => !item.minimized).sort((a, b) => b.z - a.z)[0];
+
+  useEffect(() => {
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key !== "Escape" || !topWindow) return;
+      closeWindow(topWindow.id);
+    }
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  });
+
+  function windowContent(id: string) {
+    if (id === "system") {
+      return (
+        <div className="window-pane">
+          <h2>Workstation configuration</h2>
+          <p>System files and help are filed inside My PC.</p>
+          <button type="button" className="return-button circa-raised" onClick={() => openWindow({
+            id: myPcFolder.id, title: myPcFolder.label, status: "WORKSTATION", icon: myPcFolder.icon, detail: myPcFolder.detail,
+          })}>
+            Back to My PC
+          </button>
+        </div>
+      );
+    }
+    const folder = desktopFolders.find((item) => item.id === id);
+    if (folder?.id === "my-pc") {
+      return (
+        <div className="pc-contents" aria-label="My PC contents">
+          {myPcContents.map((entry) => (
+            <Tooltip key={entry.id}>
+              <TooltipTrigger asChild>
+                <button type="button" className="pc-item" aria-label={entry.label} onClick={() => openWindow({
+                  id: entry.id, title: entry.label, status: entry.detail ?? "LOCATION", icon: entry.icon, detail: entry.detail,
+                })}>
+                  <DesktopIcon icon={entry.icon} className="pc-item-icon" />
+                  <span>{entry.label}</span>
+                </button>
+              </TooltipTrigger>
+              <TooltipContent className="circa-label" side="top">{entry.detail}</TooltipContent>
+            </Tooltip>
+          ))}
+        </div>
+      );
+    }
+    const detail = windows.find((item) => item.id === id)?.status ?? null;
+    return (
+      <div className="window-pane window-pane-empty">
+        <h2>Coming soon</h2>
+        {/* TODO: Connect each destination when its application screen is implemented. */}
+        <p className="window-note">This folder is not connected yet.</p>
+        {detail && detail !== "LOCATION" && <p>{detail} will appear here.</p>}
+        <p className="window-hint">Drag the titlebar to move this window. Use the corner to resize it.</p>
+      </div>
+    );
+  }
+
+  const myPcFolder = desktopFolders[0];
 
   return (
-    <main className="desktop-shell" aria-label="CIRCA desktop">
+    <main className="desktop-shell" aria-label="CIRCA desktop" ref={shellRef}>
       <TooltipProvider>
         <div className="desktop-wallpaper" aria-hidden="true" />
-        <header className="desktop-topline">
-          <span><strong>CIRCA/OS</strong><span className="topline-separator">/</span> ARCHIVE WORKSTATION</span>
-          <span className="desktop-session">LOCAL PREVIEW</span>
+        <header className="desktop-topline" aria-label="Workstation status">
+          <span className="topline-station">
+            CIRCA/OS <span className="topline-separator" aria-hidden="true">/</span> ARCHIVE WORKSTATION
+            <span className="topline-separator" aria-hidden="true">/</span>
+            <span className="topline-console">CONSOLE 04</span>
+          </span>
+          <WorkstationStatus />
         </header>
-        <DesktopNavigation onOpen={openFolder} activeId={activeId} />
+        <div className="desktop-area" ref={areaRef} tabIndex={-1}>
+          <DesktopNavigation onOpen={openFolder} activeId={lastFocused ?? undefined} />
+          <WindowLayer
+            windows={windows}
+            area={area}
+            activeId={activeWindow?.id ?? null}
+            childrenFor={(item) => windowContent(item.id)}
+            onFocus={focusWindow}
+            onClose={closeWindow}
+            onMinimize={minimize}
+            onMaximize={toggleMaximize}
+            onGeometryChange={setGeometry}
+          />
+        </div>
         <footer className="desktop-taskbar" aria-label="Taskbar">
           <Popover.Root open={startOpen} onOpenChange={setStartOpen}>
             <Popover.Trigger ref={startTrigger} className="taskbar-start circa-raised" aria-label="Start">
@@ -139,70 +293,20 @@ export function DesktopShell() {
             </Popover.Trigger>
             <Popover.Portal>
               <Popover.Content className="start-panel circa-raised" side="top" align="start" sideOffset={8}
-                onCloseAutoFocus={(event) => { if (view.kind !== "desktop") event.preventDefault(); }}>
+                onCloseAutoFocus={(event) => { if (windows.length > 0) event.preventDefault(); }}>
                 <div className="start-heading">CIRCA/OS <span>APPLICATIONS</span></div>
-                <DesktopNavigation compact onOpen={openFolder} activeId={activeId} />
+                <DesktopNavigation compact onOpen={openFolder} activeId={lastFocused ?? undefined} />
                 <p className="start-note">Application contents coming soon.</p>
               </Popover.Content>
             </Popover.Portal>
           </Popover.Root>
           <div className="taskbar-divider" />
-          <TaskbarTray screenFilter={screenFilter} onToggleScreenFilter={setScreenFilter} />
+          <TaskbarWindows windows={windows} onSelect={focusWindow} />
+          <div className="taskbar-spacer" />
+          <TaskbarTray settingsOpen={settingsOpen} onOpenSettings={() => setSettingsOpen(true)} />
         </footer>
-        <Dialog.Root open={view.kind !== "desktop"} onOpenChange={(open) => { if (!open) closeView(); }}>
-          <Dialog.Portal>
-            <Dialog.Overlay className="folder-backdrop" />
-            <Dialog.Content className="folder-window circa-raised" onCloseAutoFocus={(event) => {
-              event.preventDefault();
-              lastTrigger.current?.focus();
-            }}>
-              <div className="folder-titlebar">
-                <Dialog.Title>{dialogTitle}</Dialog.Title>
-                <Dialog.Close className="folder-close circa-raised" aria-label="Close folder">×</Dialog.Close>
-              </div>
-              <div className="folder-address">
-                {view.kind === "system" ? <>DESKTOP / MY PC / SYSTEM</> : <>DESKTOP / {dialogTitle}</>}
-              </div>
-              <Dialog.Description className="folder-note">This folder is not connected yet.</Dialog.Description>
-              {view.kind === "system" ? (
-                <div className="folder-empty">
-                  <h2>Workstation configuration</h2>
-                  <p>System files and help move here from the desktop list.</p>
-                  <button type="button" className="return-button circa-raised" onClick={() => setView({ kind: "folder", entry: view.parent })}>
-                    Back to My PC
-                  </button>
-                </div>
-              ) : (
-                <div className="folder-body">
-                  {view.kind === "folder" && view.entry.id === "my-pc" ? (
-                    <div className="pc-contents" aria-label="My PC contents">
-                      {myPcContents.map((entry) => (
-                        <Tooltip key={entry.id}>
-                          <TooltipTrigger asChild>
-                            <button type="button" className="pc-item" aria-label={entry.label} onClick={() => openMyPcItem(entry)}>
-                              <DesktopIcon icon={entry.icon} className="pc-item-icon" />
-                              <span>{entry.label}</span>
-                            </button>
-                          </TooltipTrigger>
-                          <TooltipContent className="circa-label" side="top">{entry.detail}</TooltipContent>
-                        </Tooltip>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="folder-empty">
-                      {dialogIcon && <DesktopIcon icon={dialogIcon} className="folder-destination-icon" />}
-                      <h2>Coming soon</h2>
-                      {/* TODO: Connect each destination when its application screen is implemented. */}
-                      {view.kind === "folder" && view.entry.detail && <p>{view.entry.detail} will appear here.</p>}
-                    </div>
-                  )}
-                  <Dialog.Close className="return-button circa-raised">Return to desktop</Dialog.Close>
-                </div>
-              )}
-            </Dialog.Content>
-          </Dialog.Portal>
-        </Dialog.Root>
         {screenFilter && <div className="desktop-screen-filter" aria-hidden="true" data-testid="screen-filter" />}
+        <SettingsDialog open={settingsOpen} onOpenChange={setSettingsOpen} screenFilter={screenFilter} onToggleScreenFilter={setScreenFilter} />
       </TooltipProvider>
     </main>
   );

@@ -2,7 +2,7 @@
 
 ## Responsibility
 
-Next.js frontend with an initial CIRCA/OS desktop at `/` and `/desktop`: folder navigation, a Start launcher, taskbar, emblem wallpaper, and a switchable CRT overlay. Destinations currently open labeled placeholders; application contents and backend integration remain unimplemented.
+Next.js frontend with an initial CIRCA/OS desktop at `/` and `/desktop`: shortcut navigation, draggable and resizable destination windows, a Start launcher, taskbar, status strip, emblem wallpaper, and a switchable CRT overlay. Window contents are labeled placeholders; application screens and backend integration remain unimplemented.
 
 ## Structure and boundaries
 
@@ -13,7 +13,7 @@ Next.js frontend with an initial CIRCA/OS desktop at `/` and `/desktop`: folder 
 - `e2e/`: responsive Playwright desktop tests.
 - `public/`: supplied emblem wallpaper and the Windows 98 shortcut [icon set](public/icons/README.md).
 
-`react-rnd` remains installed for future window management. Domain rules and API authorization belong in `../backend/`.
+`react-rnd` provides the window frame and resize handles; the shell drives position, stacking, minimize, and maximize. Domain rules and API authorization belong in `../backend/`.
 
 ## Development and verification
 
