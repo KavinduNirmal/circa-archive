@@ -31,7 +31,7 @@ export const desktopFolders = [
   { id: "archive", label: "Archive", detail: "Incident files and filed records", ready: true, icon: { glyph: "archive", shortcut: true } },
   { id: "organizations", label: "Organizations", detail: "Organization dossiers and continuities", ready: true, icon: { glyph: "organizations" } },
   { id: "inbox", label: "Inbox", detail: "Correspondence and dead letters", ready: true, icon: { glyph: "inbox" } },
-  { id: "write", label: "CIRCA Word", detail: "Document editor", icon: { glyph: "circa-word" } },
+  { id: "write", label: "CIRCA Word", detail: "Document editor", ready: true, icon: { glyph: "circa-word" } },
   { id: "search", label: "Search", detail: "Search the internal archive index", ready: true, icon: { glyph: "search" } },
   { id: "expunged", label: "_EXPUNGED", detail: "The archive of removed things", ready: true, icon: { glyph: "expunged", shortcut: true } },
   { id: "recycle", label: "Recycle Bin", detail: "Deleted drafts and records", ready: true, icon: { glyph: "recycle" } },

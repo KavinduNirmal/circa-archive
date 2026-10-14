@@ -5,6 +5,8 @@ import { Dialog, Popover } from "radix-ui";
 import { ArchiveBrowser } from "./browser/browser-window";
 import { BROWSER_WINDOW_TITLE } from "./browser/browser-identity";
 import { FileExplorer } from "./files/file-explorer";
+import { WORD_WINDOW_TITLE } from "./word/word-identity";
+import { WordWindow } from "./word/word-window";
 import { explorerTitle } from "./files/files-identity";
 import { MAIL_WINDOW_TITLE } from "./mail/mail-identity";
 import { MailWindow } from "./mail/mail-window";
@@ -160,7 +162,11 @@ export function DesktopShell() {
   function openFolder(folder: DesktopDestination, trigger?: HTMLButtonElement) {
     // An application that names its own window and prints its own status bar
     // drops the frame's generic strip rather than stacking a second one on it.
-    const titles: Partial<Record<string, string>> = { search: BROWSER_WINDOW_TITLE, inbox: MAIL_WINDOW_TITLE };
+    const titles: Partial<Record<string, string>> = {
+      search: BROWSER_WINDOW_TITLE,
+      inbox: MAIL_WINDOW_TITLE,
+      write: WORD_WINDOW_TITLE,
+    };
     const route = EXPLORER_ROUTES[folder.id];
     const title = titles[folder.id] ?? route?.title;
     openWindow({
@@ -222,6 +228,10 @@ export function DesktopShell() {
     // Inbox is the mail client over the terminal's own correspondence store.
     if (id === "inbox") {
       return <MailWindow onCloseWindow={() => closeWindow(id)} />;
+    }
+    // CIRCA Word is the record editor: a Markdown format bar over one draft.
+    if (id === "write") {
+      return <WordWindow onCloseWindow={() => closeWindow(id)} />;
     }
     // Every folder destination is the file browser, rooted at that destination.
     const route = EXPLORER_ROUTES[id];

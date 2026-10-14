@@ -9,4 +9,4 @@
 
 ## Boundaries and verification
 
-Routes compose reusable components from `../components/`. Backend integration is not implemented; the application screens so far are the archive browser behind Search, the mail client behind Inbox, and the file browser behind every folder destination. Run client lint, typecheck, unit tests, and build after changes; browser tests exercise both routes.
+Routes compose reusable components from `../components/`. Backend integration is not implemented; the application screens so far are the archive browser behind Search, the mail client behind Inbox, the file browser behind every folder destination, and the record editor behind CIRCA Word. Run client lint, typecheck, unit tests, and build after changes; browser tests exercise both routes.
