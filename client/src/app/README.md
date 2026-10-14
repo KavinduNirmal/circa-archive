@@ -1,11 +1,12 @@
-# App Router foundation
+# App Router
 
 ## Responsibility and structure
 
 - `layout.tsx`: document structure, metadata, dark theme, and local fonts.
-- `page.tsx`: intentionally empty home route.
-- `globals.css`: Tailwind v4, shadcn semantic tokens, and CIRCA utilities.
+- `page.tsx`: mounts the desktop at the home route.
+- `desktop/`: desktop route and scoped design decisions.
+- `globals.css`: theme tokens, CIRCA utilities, workstation chrome, and screen overlay.
 
-## Boundaries
+## Boundaries and verification
 
-Keep route composition here; reusable components belong in `../components/`. Tokens use detailed DESIGN.md component colors where the specification conflicts. No windows, sample records, or screens are rendered. Run client build and typecheck commands after route changes.
+Routes compose reusable components from `../components/`. Backend integration and application contents are not implemented. Run client lint, typecheck, unit tests, and build after changes; browser tests exercise both routes.

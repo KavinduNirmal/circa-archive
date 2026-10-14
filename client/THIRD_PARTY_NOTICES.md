@@ -2,6 +2,8 @@
 
 The primitives in `src/components/ui/` are derived from [shadcn/ui](https://github.com/shadcn-ui/ui), generated through its registry and adapted for CIRCA. Its [MIT license](https://github.com/shadcn-ui/ui/blob/main/LICENSE.md) is reproduced below. Installed packages and bundled fonts retain their own license files in their distributions.
 
+The desktop shortcut bitmaps in `public/icons/` are the Windows 98 icon set, retrieved from the [Windows 98 Icon Viewer](https://win98icons.alexmeub.com/). They are Microsoft artwork used here as placeholder shell art for a fictional interface; replace or license them before any distribution. See [public/icons/README.md](public/icons/README.md) for the destination mapping.
+
 ```text
 MIT License
 

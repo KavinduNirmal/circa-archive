@@ -2,8 +2,8 @@
 
 ## Responsibility and structure
 
-Store assets that Next.js serves directly from the site root. This folder currently contains an emblem image supplied in the workspace. The empty scaffold does not display it.
+The supplied government-agency emblem JPG is the desktop wallpaper, served directly by Next.js. Its filename is preserved. `icons/` holds the Windows 98 shortcut bitmaps and their [mapping notes](icons/README.md).
 
 ## Boundaries and usage
 
-Keep executable components in `src/`. Reference future assets by their root URL rather than importing files from this folder. Record source attribution and verify distribution rights before publishing third-party assets. Preserve existing assets unless a task explicitly changes them.
+Reference assets by their root URL. Executable components belong in `../src/`. The desktop provides a solid navy fallback while the wallpaper loads, and the wallpaper renders at full strength with no dimming overlay. Preserve supplied assets unless the user requests changes.

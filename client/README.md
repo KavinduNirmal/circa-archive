@@ -1,24 +1,23 @@
-# CIRCA frontend scaffold
+# CIRCA frontend
 
 ## Responsibility
 
-Next.js App Router foundation for the public frontend. The home route intentionally renders no UI. No desktop shell, window manager, state store, or backend integration is implemented.
+Next.js frontend with an initial CIRCA/OS desktop at `/` and `/desktop`: folder navigation, a Start launcher, taskbar, emblem wallpaper, and a switchable CRT overlay. Destinations currently open labeled placeholders; application contents and backend integration remain unimplemented.
 
 ## Structure and boundaries
 
-- `src/app/`: route, root layout, and CIRCA theme.
-- `src/components/ui/`: shadcn/ui primitives; not mounted on a screen.
+- `src/app/`: routes, root layout, global theme, and [desktop design decisions](src/app/desktop/README.md).
+- `src/components/`: desktop shell, reusable navigation and icons, and shadcn/ui primitives.
 - `src/lib/`: shared class-composition helper.
-- `tests/`: Vitest setup and utility tests.
-- `e2e/`: Playwright scaffold smoke test.
-- `public/`: static assets, currently unused by the empty page.
-- `components.json`: shadcn registry and import aliases.
+- `tests/`: Vitest interaction and utility tests.
+- `e2e/`: responsive Playwright desktop tests.
+- `public/`: supplied emblem wallpaper and the Windows 98 shortcut [icon set](public/icons/README.md).
 
-`react-rnd` is installed for future client-side draggable/resizable windows. Domain rules and API authorization belong in `../backend/`.
+`react-rnd` remains installed for future window management. Domain rules and API authorization belong in `../backend/`.
 
-## Development
+## Development and verification
 
-Use Bun 1.3.14 and Node.js 20.9 or newer (required by Next.js tooling). From `client/`:
+Use Bun 1.3.14 and Node.js 20.9 or newer. From `client/`:
 
 ```sh
 bun install --frozen-lockfile
@@ -27,12 +26,13 @@ bun run lint
 bun run typecheck
 bun run test
 bun run build
+bun run test:e2e
 ```
 
-Development serves http://localhost:3000. `bun run start` serves a completed production build. To run the optional browser smoke test, install Playwright Chromium with `bunx playwright install chromium`, then run `bun run test:e2e`.
+Development serves http://localhost:3001. `bun run start` serves a production build. Browser tests require Chromium (`bunx playwright install chromium`) and use port 3001.
 
-## Theme and components
+## Theme
 
-The theme follows the detailed palette and component geometry in `../.agents/brain/DESIGN.md`: naval surfaces, steel-blue accents, hazard amber, hard rectangular corners, compact labels, and raised/sunken bevel utilities. The document has conflicting palette values; detailed component colors take precedence here. DM Sans and IBM Plex Mono are bundled locally; builds do not fetch Google Fonts. Scanlines are an opt-in utility, not a global overlay.
+Detailed component colors in `../.agents/brain/DESIGN.md` provide steel-blue surfaces, hard corners, and bevels. The supplied image controls desktop composition. DM Sans and IBM Plex Mono are bundled locally. The global screen overlay is pointer-transparent and can be disabled using CRT in the taskbar.
 
-Add primitives with `bunx --bun shadcn@latest add <component>` and keep CIRCA tokens and conventions. Application design and window behavior will be added separately. Every new authored folder needs its own README. See [third-party notices](THIRD_PARTY_NOTICES.md) for the copied component license.
+See [third-party notices](THIRD_PARTY_NOTICES.md) for copied component licensing. Every new authored folder needs a README.

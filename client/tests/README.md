@@ -3,8 +3,9 @@
 ## Responsibility and structure
 
 - `setup.ts`: DOM matchers and cleanup.
-- `utils.test.ts`: verifies conditional class composition and Tailwind conflict resolution.
+- `utils.test.ts`: class composition and Tailwind conflict resolution.
+- `desktop.test.tsx`: folder navigation, Escape dismissal, and Start launcher behavior.
 
 ## Usage and boundaries
 
-Run `bun run test` (Vitest with jsdom) or `bun run test:watch` from `client/`. Write failing behavioral tests before implementing future behavior. Browser smoke tests belong in `../e2e/`; root repository tooling tests remain separate.
+Run `bun run test` or `bun run test:watch` from `client/`. Browser interaction and responsive checks belong in `../e2e/`; repository tooling tests remain separate.
