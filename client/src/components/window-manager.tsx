@@ -75,8 +75,10 @@ export function useWorkstationWindows() {
         geometry: {
           x: 90 + step,
           y: 70 + step,
-          width: Math.max(WINDOW_MIN_SIZE.width, Math.min(520, area.width - 180 - step)),
-          height: Math.max(WINDOW_MIN_SIZE.height, Math.min(400, area.height - 140 - step)),
+          // Wide enough for the file browser's tree pane and a four-column
+          // details listing side by side, which is the widest default window.
+          width: Math.max(WINDOW_MIN_SIZE.width, Math.min(640, area.width - 180 - step)),
+          height: Math.max(WINDOW_MIN_SIZE.height, Math.min(460, area.height - 140 - step)),
         },
         maximized: false,
         minimized: false,

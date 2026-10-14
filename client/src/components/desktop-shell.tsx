@@ -4,11 +4,13 @@ import { useEffect, useRef, useState } from "react";
 import { Dialog, Popover } from "radix-ui";
 import { ArchiveBrowser } from "./browser/browser-window";
 import { BROWSER_WINDOW_TITLE } from "./browser/browser-identity";
+import { FileExplorer } from "./files/file-explorer";
+import { explorerTitle } from "./files/files-identity";
 import { MAIL_WINDOW_TITLE } from "./mail/mail-identity";
 import { MailWindow } from "./mail/mail-window";
 import { TaskbarWindows, WindowLayer, useWorkstationWindows } from "./window-manager";
-import { DesktopIcon, notificationGlyph, settingsGlyph, type DesktopIconSpec } from "./desktop-icons";
-import { desktopFolders, DesktopNavigation, myPcContents, type DesktopFolder } from "./desktop-navigation";
+import { notificationGlyph, settingsGlyph, type DesktopIconSpec } from "./desktop-icons";
+import { DesktopNavigation, type DesktopDestination } from "./desktop-navigation";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
 
 const NotificationIcon = notificationGlyph;
@@ -16,6 +18,24 @@ const SettingsIcon = settingsGlyph;
 
 /** A destination opened as a window, plus the copy its own status strip shows. */
 type DestinationWindow = { id: string; title: string; status: string | null; icon: DesktopIconSpec; detail: string | null };
+
+/**
+ * Destinations the file browser hosts, and the folder each one opens.
+ *
+ * One explorer serves all of them: `scope` picks the root, the mount its status
+ * bar claims, and the read-only reference it quotes. Everything the desktop
+ * offers is either a folder here or an application with its own window.
+ */
+const EXPLORER_ROUTES: Record<string, { scope: string; title: string; initialPath?: string }> = {
+  "my-pc": { scope: "my-pc", title: explorerTitle("My Computer") },
+  records: { scope: "records", title: explorerTitle("My Documents") },
+  "my-work": { scope: "my-work", title: explorerTitle("My Work") },
+  archive: { scope: "archive", title: explorerTitle("Archive") },
+  organizations: { scope: "organizations", title: explorerTitle("Organizations") },
+  expunged: { scope: "expunged", title: explorerTitle("_EXPUNGED") },
+  recycle: { scope: "recycle", title: explorerTitle("Recycle Bin") },
+  system: { scope: "system", title: explorerTitle("System Files") },
+};
 
 function WorkstationClock() {
   const [now, setNow] = useState<Date | null>(null);
@@ -137,15 +157,16 @@ export function DesktopShell() {
   }, [lastFocused]);
 
   /** Opens a desktop shortcut as a window, naming the entry for the titlebar and status strip. */
-  function openFolder(folder: DesktopFolder, trigger?: HTMLButtonElement) {
+  function openFolder(folder: DesktopDestination, trigger?: HTMLButtonElement) {
     // An application that names its own window and prints its own status bar
     // drops the frame's generic strip rather than stacking a second one on it.
     const titles: Partial<Record<string, string>> = { search: BROWSER_WINDOW_TITLE, inbox: MAIL_WINDOW_TITLE };
-    const title = titles[folder.id];
+    const route = EXPLORER_ROUTES[folder.id];
+    const title = titles[folder.id] ?? route?.title;
     openWindow({
       id: folder.id,
       title: title ?? folder.label,
-      status: title ? null : folder.id === "my-pc" ? "WORKSTATION" : folder.detail ?? "LOCATION",
+      status: title ? null : folder.detail ?? "LOCATION",
       icon: folder.icon,
       detail: folder.detail,
     }, trigger);
@@ -202,41 +223,10 @@ export function DesktopShell() {
     if (id === "inbox") {
       return <MailWindow onCloseWindow={() => closeWindow(id)} />;
     }
-    if (id === "system") {
-      return (
-        <div className="window-pane">
-          <h2>Workstation configuration</h2>
-          <div className="window-help">
-            <DesktopIcon icon={{ glyph: "help" }} className="window-help-icon" />
-            <p>System files and help are filed inside My PC.</p>
-          </div>
-          <button type="button" className="return-button circa-raised" onClick={() => openWindow({
-            id: myPcFolder.id, title: myPcFolder.label, status: "WORKSTATION", icon: myPcFolder.icon, detail: myPcFolder.detail,
-          })}>
-            Back to My PC
-          </button>
-        </div>
-      );
-    }
-    const folder = desktopFolders.find((item) => item.id === id);
-    if (folder?.id === "my-pc") {
-      return (
-        <div className="pc-contents" aria-label="My PC contents">
-          {myPcContents.map((entry) => (
-            <Tooltip key={entry.id}>
-              <TooltipTrigger asChild>
-                <button type="button" className="pc-item" aria-label={entry.label} onClick={() => openWindow({
-                  id: entry.id, title: entry.label, status: entry.detail ?? "LOCATION", icon: entry.icon, detail: entry.detail,
-                })}>
-                  <DesktopIcon icon={entry.icon} className="pc-item-icon" />
-                  <span>{entry.label}</span>
-                </button>
-              </TooltipTrigger>
-              <TooltipContent className="circa-label" side="top">{entry.detail}</TooltipContent>
-            </Tooltip>
-          ))}
-        </div>
-      );
+    // Every folder destination is the file browser, rooted at that destination.
+    const route = EXPLORER_ROUTES[id];
+    if (route) {
+      return <FileExplorer scopeId={route.scope} initialPath={route.initialPath} onCloseWindow={() => closeWindow(id)} />;
     }
     const detail = windows.find((item) => item.id === id)?.status ?? null;
     return (
@@ -249,8 +239,6 @@ export function DesktopShell() {
       </div>
     );
   }
-
-  const myPcFolder = desktopFolders[0];
 
   return (
     <main className="desktop-shell" aria-label="CIRCA desktop" ref={shellRef}>

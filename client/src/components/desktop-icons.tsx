@@ -9,7 +9,10 @@ import type { ComponentProps } from "react";
  * missing file is a content bug rather than a silent visual gap.
  *
  * Icons render at 32 CSS pixels with `image-rendering: pixelated`, keeping the
- * 32px assets 1:1 and the 48px assets crisply downsampled.
+ * 32px assets 1:1 and the 48px assets crisply downsampled. Only the app window
+ * chrome dulls them (`.window-*` and the folder rail); the file listings draw
+ * the same files in full colour, because file-type artwork is what tells a
+ * record from evidence once the names are off screen.
  */
 const ICON_SIZE = 32;
 
@@ -18,6 +21,8 @@ const icons = {
   archive: { asset: "/icons/directory_open_cabinet_fc-2.png", shortcut: true },
   organizations: { asset: "/icons/world-0.png" },
   records: { asset: "/icons/directory_closed-0.png" },
+  "records-work": { asset: "/icons/notepad-2.png" },
+  files: { asset: "/icons/directory_open_cool-0.png" },
   inbox: { asset: "/icons/outlook_express-1.png" },
   "circa-word": { asset: "/icons/write_file-1.png" },
   search: { asset: "/icons/search_web-0.png" },

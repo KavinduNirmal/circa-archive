@@ -17,27 +17,31 @@ export type DesktopEntry = {
 
 /**
  * Desktop shortcuts in reading order: workstation containers first, then the
- * editor, then the archive tools and disposal. My PC is the workstation
- * container; its contents (see `myPcContents`) nest System one level deep
- * instead of exposing every workstation location on the desktop.
+ * editor, then the archive tools and disposal.
+ *
+ * Every container here is a folder the file browser can open, so My PC is the
+ * workstation root and My Documents, Archive, Organizations, the Recycle Bin,
+ * and _EXPUNGED are folders inside it. System lives inside My PC rather than on
+ * the desktop, as the reference shell has it.
  */
 export const desktopFolders = [
-  { id: "my-pc", label: "My PC", detail: null, icon: { glyph: "my-pc" } },
-  { id: "records", label: "My Documents", detail: "Your drafts and filed records", icon: { glyph: "records" } },
-  { id: "archive", label: "Archive", detail: "Incident files and filed records", icon: { glyph: "archive", shortcut: true } },
-  { id: "organizations", label: "Organizations", detail: "Organization dossiers and continuities", icon: { glyph: "organizations" } },
-  { id: "inbox", label: "Inbox", detail: "Correspondence and dead letters", icon: { glyph: "inbox" } },
+  { id: "my-pc", label: "My PC", detail: "Workstation contents", ready: true, icon: { glyph: "my-pc" } },
+  { id: "records", label: "My Documents", detail: "Your drafts and filed records", ready: true, icon: { glyph: "records" } },
+  { id: "my-work", label: "My Work", detail: "Records and drafts under review", ready: true, icon: { glyph: "records-work" } },
+  { id: "archive", label: "Archive", detail: "Incident files and filed records", ready: true, icon: { glyph: "archive", shortcut: true } },
+  { id: "organizations", label: "Organizations", detail: "Organization dossiers and continuities", ready: true, icon: { glyph: "organizations" } },
+  { id: "inbox", label: "Inbox", detail: "Correspondence and dead letters", ready: true, icon: { glyph: "inbox" } },
   { id: "write", label: "CIRCA Word", detail: "Document editor", icon: { glyph: "circa-word" } },
   { id: "search", label: "Search", detail: "Search the internal archive index", ready: true, icon: { glyph: "search" } },
-  { id: "expunged", label: "_EXPUNGED", detail: "The archive of removed things", icon: { glyph: "expunged", shortcut: true } },
-  { id: "recycle", label: "Recycle Bin", detail: "Deleted drafts and records", icon: { glyph: "recycle" } },
+  { id: "expunged", label: "_EXPUNGED", detail: "The archive of removed things", ready: true, icon: { glyph: "expunged", shortcut: true } },
+  { id: "recycle", label: "Recycle Bin", detail: "Deleted drafts and records", ready: true, icon: { glyph: "recycle" } },
 ] as const satisfies readonly DesktopEntry[];
 
 export type DesktopFolder = (typeof desktopFolders)[number];
 
 /** Locations reachable only from inside My PC. */
 export const myPcContents = [
-  { id: "system", label: "System", detail: "Workstation files and help", icon: { glyph: "system" } },
+  { id: "system", label: "System", detail: "Workstation files and help", ready: true, icon: { glyph: "system" } },
 ] as const satisfies readonly DesktopEntry[];
 
 export type MyPcItem = (typeof myPcContents)[number];
@@ -52,7 +56,7 @@ function desktopHint(folder: DesktopFolder) {
 }
 
 export function DesktopNavigation({ onOpen, activeId, compact = false }: {
-  onOpen: (entry: DesktopFolder, trigger: HTMLButtonElement) => void;
+  onOpen: (entry: DesktopDestination, trigger: HTMLButtonElement) => void;
   activeId?: string;
   compact?: boolean;
 }) {

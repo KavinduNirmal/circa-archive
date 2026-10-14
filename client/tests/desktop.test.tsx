@@ -2,6 +2,12 @@ import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 import Home from "@/app/page";
+import { explorerTitle } from "@/components/files/files-identity";
+import { FILE_TREE, nodeById } from "@/components/files/files-index";
+
+/** The file browser is named for the folder it shows, so every folder window has its own title. */
+const ARCHIVE_WINDOW_TITLE = explorerTitle("Archive");
+const MY_PC_WINDOW_TITLE = explorerTitle("My Computer");
 
 function desktopIconIn(button: HTMLElement) {
   const icon = button.querySelector<HTMLElement>(".desktop-icon");
@@ -18,7 +24,7 @@ describe("desktop navigation", () => {
     expect(screen.queryByRole("tooltip")).not.toBeInTheDocument();
     await user.hover(organizations);
     const tooltip = await screen.findByRole("tooltip");
-    expect(tooltip).toHaveTextContent("Organization dossiers and continuities (coming soon)");
+    expect(tooltip).toHaveTextContent("Organization dossiers and continuities");
     expect(tooltip).toHaveClass("tooltip-content");
     expect(tooltip.querySelector(".tooltip-arrow")).not.toBeNull();
     // Pointer-leave tracking needs real pointer events, so dismissal is exercised with Escape.
@@ -40,6 +46,7 @@ describe("desktop navigation", () => {
     const navigation = screen.getByRole("navigation", { name: "Desktop folders" });
     const expected = {
       "My PC": { glyph: "my-pc", shortcut: false },
+      "My Work": { glyph: "records-work", shortcut: false },
       Archive: { glyph: "archive", shortcut: true },
       Organizations: { glyph: "organizations", shortcut: false },
       "My Documents": { glyph: "records", shortcut: false },
@@ -80,27 +87,51 @@ describe("desktop navigation", () => {
     expect(desktopIconIn(within(navigation).getByRole("button", { name: "Archive" })).querySelector("img.desktop-icon-shortcut"))
       .toHaveAttribute("src", "/icons/overlay_shortcut-2.png");
   });
-  it("shows the help glyph inside the System window", async () => {
-    const user = userEvent.setup();
-    render(<Home />);
-    await user.click(screen.getByRole("button", { name: "My PC" }));
-    await user.click(screen.getByRole("button", { name: "System" }));
-    const systemWindow = screen.getByRole("dialog", { name: "System" });
-    const icon = systemWindow.querySelector('[data-icon="help"] img');
-    expect(icon).toHaveAttribute("src", "/icons/help_question_mark-0.png");
-  });
-
-  it("moves System into My PC and renames the editor", async () => {
+  it("shows the workstation root in My PC and keeps System off the desktop", async () => {
     const user = userEvent.setup();
     render(<Home />);
     expect(screen.queryByRole("button", { name: "System" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "WRITE.exe" })).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "CIRCA Word" })).toBeVisible();
     await user.click(screen.getByRole("button", { name: "My PC" }));
-    await user.click(screen.getByRole("button", { name: "System" }));
-    expect(screen.getByRole("dialog", { name: "System" })).toBeVisible();
-    await user.click(screen.getByRole("button", { name: "Back to My PC" }));
-    expect(screen.getByRole("dialog", { name: "My PC" })).toBeVisible();
+    const myPc = screen.getByRole("dialog", { name: MY_PC_WINDOW_TITLE });
+    // My PC lists the drive, and the drive's folders, in the file browser.
+    // The drive and its folders are the listing, so the root reads like a disk.
+    expect(nodeById("pc-drive", FILE_TREE)).toBeDefined();
+    const tree = within(myPc).getByRole("tree", { name: "Folders" });
+    // The root is open on arrival, so the drive's row is on screen immediately.
+    expect(within(tree).getByText("C: [SYSTEM]")).toBeVisible();
+    // The listing is the drive's contents, so the folders are rows with counts.
+    // The name cell holds a focusable name control, so the listing is matched by
+    // its rows rather than by the cells' own accessible names. The address bar's
+    // place list also carries these labels, so the grid is the scope that matters.
+    const listing = within(myPc).getByRole("grid", { name: "Files" });
+    expect(within(listing).getByText("My Documents")).toBeVisible();
+    expect(within(listing).getByText("System Files")).toBeVisible();
+  });
+
+  it("opens System from the folder tree and lists the workstation files", async () => {
+    const user = userEvent.setup();
+    render(<Home />);
+    await user.click(screen.getByRole("button", { name: "My PC" }));
+    const myPc = screen.getByRole("dialog", { name: MY_PC_WINDOW_TITLE });
+    // System lives inside My PC, so it is one tree row down from the root.
+    const tree = within(myPc).getByRole("tree", { name: "Folders" });
+    // The volume is open on mount, so System Files is already a row in the pane;
+    // selecting it opens its own window at that folder.
+    expect(within(tree).getByRole("button", { name: /^System Files/ })).toBeVisible();
+    await user.click(within(tree).getByRole("button", { name: /^System Files/ }));
+    /*
+     * The window keeps the title it was opened with: the shell names a window
+     * once, so a browser-style retitle per folder would need a registry write on
+     * every navigation. The explorer still answers for where it now is, which is
+     * what the address field and the pane report.
+     */
+    const system = screen.getByRole("dialog", { name: MY_PC_WINDOW_TITLE });
+    expect(within(system).getByText("CIRCA_OS_MANUAL.pdf")).toBeVisible();
+    expect(within(system).getByRole("button", { name: "Up one level" })).toBeVisible();
+    expect((within(system).getByLabelText("Current path") as HTMLInputElement).value)
+      .toBe("My Computer\\C: [SYSTEM]\\System Files");
   });
 
   it("keeps Settings pinned left of the tray and the clock", () => {
@@ -138,8 +169,10 @@ describe("desktop navigation", () => {
     const navigation = screen.getByRole("navigation", { name: "Desktop folders" });
     expect(navigation).toBeVisible();
     await user.click(screen.getByRole("button", { name: "Archive" }));
-    expect(screen.getByRole("dialog", { name: "Archive" })).toBeVisible();
-    expect(screen.getByText("This folder is not connected yet.")).toBeVisible();
+    const archive = screen.getByRole("dialog", { name: ARCHIVE_WINDOW_TITLE });
+    expect(archive).toBeVisible();
+    // The eyebrow claim is honest: every desktop destination now opens a screen.
+    expect(within(archive).getByRole("grid", { name: "Files" })).toBeVisible();
     await user.keyboard("{Escape}");
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
@@ -148,13 +181,13 @@ describe("desktop navigation", () => {
     const user = userEvent.setup();
     render(<Home />);
     await user.click(screen.getByRole("button", { name: "Archive" }));
-    expect(screen.getByRole("dialog", { name: "Archive" })).toBeVisible();
+    expect(screen.getByRole("dialog", { name: ARCHIVE_WINDOW_TITLE })).toBeVisible();
     await user.click(screen.getByRole("button", { name: "Start" }));
     // The launcher handles this press, so the focused window must survive it.
     await user.keyboard("{Escape}");
-    expect(screen.getByRole("dialog", { name: "Archive" })).toBeVisible();
+    expect(screen.getByRole("dialog", { name: ARCHIVE_WINDOW_TITLE })).toBeVisible();
     await user.keyboard("{Escape}");
-    expect(screen.queryByRole("dialog", { name: "Archive" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("dialog", { name: ARCHIVE_WINDOW_TITLE })).not.toBeInTheDocument();
   });
 
   it("opens and closes the start launcher", async () => {

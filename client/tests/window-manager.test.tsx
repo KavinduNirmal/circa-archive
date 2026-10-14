@@ -4,7 +4,11 @@ import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 import Home from "@/app/page";
 import { BROWSER_WINDOW_TITLE } from "@/components/browser/browser-identity";
+import { explorerTitle } from "@/components/files/files-identity";
 import { MAIL_WINDOW_TITLE } from "@/components/mail/mail-identity";
+
+/** The file browser is named for the folder it shows, so Archive has its own titlebar text. */
+const ARCHIVE_WINDOW_TITLE = explorerTitle("Archive");
 
 /**
  * jsdom performs no layout, so these stubs give the desktop layer and window
@@ -52,7 +56,7 @@ async function openArchive() {
   const user = userEvent.setup();
   render(<Home />);
   await user.click(screen.getByRole("button", { name: "Archive" }));
-  const windowFrame = screen.getByRole("dialog", { name: "Archive" });
+  const windowFrame = screen.getByRole("dialog", { name: ARCHIVE_WINDOW_TITLE });
   return { user, windowFrame };
 }
 
@@ -89,7 +93,7 @@ describe("workstation windows", () => {
     const top = parseInt(windowFrame.style.top, 10);
     expect(Number.isFinite(left) ? left : 0).toBeGreaterThanOrEqual(0);
     expect(Number.isFinite(top) ? top : 0).toBeGreaterThanOrEqual(0);
-    await waitFor(() => expect(frameSize(windowFrame)).toEqual({ w: 520, h: 400 }));
+    await waitFor(() => expect(frameSize(windowFrame)).toEqual({ w: 640, h: 460 }));
   });
 
   it("moves a window by dragging its titlebar", async () => {
@@ -116,12 +120,12 @@ describe("workstation windows", () => {
   it("minimizes to the taskbar and restores from it", async () => {
     stubLayout();
     const { user } = await openArchive();
-    await user.click(screen.getByRole("button", { name: "Minimize Archive" }));
-    expect(screen.queryByRole("dialog", { name: "Archive" })).not.toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: `Minimize ${ARCHIVE_WINDOW_TITLE}` }));
+    expect(screen.queryByRole("dialog", { name: ARCHIVE_WINDOW_TITLE })).not.toBeInTheDocument();
     const taskbar = screen.getByRole("contentinfo", { name: "Taskbar" });
-    const taskEntry = within(taskbar).getByRole("button", { name: "Archive" });
+    const taskEntry = within(taskbar).getByRole("button", { name: ARCHIVE_WINDOW_TITLE });
     await user.click(taskEntry);
-    expect(screen.getByRole("dialog", { name: "Archive" })).toBeVisible();
+    expect(screen.getByRole("dialog", { name: ARCHIVE_WINDOW_TITLE })).toBeVisible();
     expect(taskEntry).toHaveAttribute("aria-pressed", "false");
   });
 
@@ -129,11 +133,11 @@ describe("workstation windows", () => {
     stubLayout();
     const { user, windowFrame } = await openArchive();
     const before = frameSize(windowFrame);
-    await user.click(screen.getByRole("button", { name: "Maximize Archive" }));
+    await user.click(screen.getByRole("button", { name: `Maximize ${ARCHIVE_WINDOW_TITLE}` }));
     await waitFor(() => expect(frameSize(windowFrame)).toEqual({ w: 1200, h: 700 }));
     expect(windowFrame).toHaveAttribute("data-maximized", "true");
     expect(windowFrame.querySelector(".workstation-window-resize")).toBeNull();
-    await user.click(screen.getByRole("button", { name: "Restore Archive" }));
+    await user.click(screen.getByRole("button", { name: `Restore ${ARCHIVE_WINDOW_TITLE}` }));
     await waitFor(() => expect(frameSize(windowFrame)).toEqual(before));
     expect(windowFrame).not.toHaveAttribute("data-maximized");
   });
@@ -144,7 +148,7 @@ describe("workstation windows", () => {
     render(<Home />);
     await user.click(screen.getByRole("button", { name: "Archive" }));
     await user.click(screen.getByRole("button", { name: "Inbox" }));
-    const archive = screen.getByRole("dialog", { name: "Archive" });
+    const archive = screen.getByRole("dialog", { name: ARCHIVE_WINDOW_TITLE });
     const inbox = screen.getByRole("dialog", { name: MAIL_WINDOW_TITLE });
     expect(Number(inbox.style.zIndex)).toBeGreaterThan(Number(archive.style.zIndex));
     fireEvent.pointerDown(archive);
@@ -157,10 +161,10 @@ describe("workstation windows", () => {
     render(<Home />);
     const taskbar = () => within(screen.getByRole("contentinfo", { name: "Taskbar" }));
     await user.click(screen.getByRole("button", { name: "Archive" }));
-    expect(taskbar().getByRole("button", { name: "Archive" })).toHaveAttribute("data-active", "true");
+    expect(taskbar().getByRole("button", { name: ARCHIVE_WINDOW_TITLE })).toHaveAttribute("data-active", "true");
 
     await user.click(screen.getByRole("button", { name: "Inbox" }));
-    const archiveEntry = taskbar().getByRole("button", { name: "Archive" });
+    const archiveEntry = taskbar().getByRole("button", { name: ARCHIVE_WINDOW_TITLE });
     expect(archiveEntry).not.toHaveAttribute("data-active");
     expect(taskbar().getByRole("button", { name: MAIL_WINDOW_TITLE })).toHaveAttribute("data-active", "true");
 
@@ -168,8 +172,8 @@ describe("workstation windows", () => {
     expect(archiveEntry).toHaveAttribute("data-active", "true");
     expect(taskbar().getByRole("button", { name: MAIL_WINDOW_TITLE })).not.toHaveAttribute("data-active");
 
-    await user.click(screen.getByRole("button", { name: "Minimize Archive" }));
-    expect(taskbar().getByRole("button", { name: "Archive" })).not.toHaveAttribute("data-active");
+    await user.click(screen.getByRole("button", { name: `Minimize ${ARCHIVE_WINDOW_TITLE}` }));
+    expect(taskbar().getByRole("button", { name: ARCHIVE_WINDOW_TITLE })).not.toHaveAttribute("data-active");
   });
 
   it("remembers which window is minimized or closed across many open windows", async () => {
@@ -179,12 +183,12 @@ describe("workstation windows", () => {
     const taskbar = () => within(screen.getByRole("contentinfo", { name: "Taskbar" }));
     for (const name of ["Archive", "Inbox", "Search"]) await user.click(screen.getByRole("button", { name }));
 
-    await user.click(screen.getByRole("button", { name: "Minimize Archive" }));
+    await user.click(screen.getByRole("button", { name: `Minimize ${ARCHIVE_WINDOW_TITLE}` }));
     await user.click(screen.getByRole("button", { name: `Minimize ${MAIL_WINDOW_TITLE}` }));
-    expect(taskbar().getByRole("button", { name: "Archive" })).toHaveAttribute("aria-pressed", "true");
+    expect(taskbar().getByRole("button", { name: ARCHIVE_WINDOW_TITLE })).toHaveAttribute("aria-pressed", "true");
     expect(taskbar().getByRole("button", { name: MAIL_WINDOW_TITLE })).toHaveAttribute("aria-pressed", "true");
     expect(taskbar().getByRole("button", { name: BROWSER_WINDOW_TITLE })).toHaveAttribute("aria-pressed", "false");
-    expect(screen.queryByRole("dialog", { name: "Archive" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("dialog", { name: ARCHIVE_WINDOW_TITLE })).not.toBeInTheDocument();
     expect(screen.queryByRole("dialog", { name: MAIL_WINDOW_TITLE })).not.toBeInTheDocument();
     expect(screen.getByRole("dialog", { name: BROWSER_WINDOW_TITLE })).toBeVisible();
 
@@ -192,7 +196,7 @@ describe("workstation windows", () => {
     await user.click(taskbar().getByRole("button", { name: MAIL_WINDOW_TITLE }));
     expect(screen.getByRole("dialog", { name: MAIL_WINDOW_TITLE })).toBeVisible();
     expect(taskbar().getByRole("button", { name: MAIL_WINDOW_TITLE })).toHaveAttribute("aria-pressed", "false");
-    expect(taskbar().getByRole("button", { name: "Archive" })).toHaveAttribute("aria-pressed", "true");
+    expect(taskbar().getByRole("button", { name: ARCHIVE_WINDOW_TITLE })).toHaveAttribute("aria-pressed", "true");
 
     // Closing the active window hands over to the next visible one, and closing
     // the last one leaves a clean desktop with no stale taskbar entries.
@@ -201,17 +205,17 @@ describe("workstation windows", () => {
     expect(screen.getByRole("dialog", { name: BROWSER_WINDOW_TITLE })).toBeVisible();
     await user.click(within(screen.getByRole("dialog", { name: BROWSER_WINDOW_TITLE })).getByRole("button", { name: "Close folder" }));
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
-    await user.click(taskbar().getByRole("button", { name: "Archive" }));
-    expect(screen.getByRole("dialog", { name: "Archive" })).toBeVisible();
-    expect(taskbar().getByRole("button", { name: "Archive" })).toHaveAttribute("aria-pressed", "false");
+    await user.click(taskbar().getByRole("button", { name: ARCHIVE_WINDOW_TITLE }));
+    expect(screen.getByRole("dialog", { name: ARCHIVE_WINDOW_TITLE })).toBeVisible();
+    expect(taskbar().getByRole("button", { name: ARCHIVE_WINDOW_TITLE })).toHaveAttribute("aria-pressed", "false");
   });
 
   it("focuses an existing window instead of opening a duplicate", async () => {
     stubLayout();
     const { user } = await openArchive();
-    await user.click(screen.getByRole("button", { name: "Minimize Archive" }));
-    await user.click(within(screen.getByRole("contentinfo", { name: "Taskbar" })).getByRole("button", { name: "Archive" }));
-    expect(screen.getAllByRole("dialog", { name: "Archive" })).toHaveLength(1);
+    await user.click(screen.getByRole("button", { name: `Minimize ${ARCHIVE_WINDOW_TITLE}` }));
+    await user.click(within(screen.getByRole("contentinfo", { name: "Taskbar" })).getByRole("button", { name: ARCHIVE_WINDOW_TITLE }));
+    expect(screen.getAllByRole("dialog", { name: ARCHIVE_WINDOW_TITLE })).toHaveLength(1);
   });
 
   it("places each window out of document flow so frames cannot stack", async () => {
@@ -219,7 +223,7 @@ describe("workstation windows", () => {
     const user = userEvent.setup();
     render(<Home />);
     for (const name of ["Archive", "Inbox"]) await user.click(screen.getByRole("button", { name }));
-    const archive = screen.getByRole("dialog", { name: "Archive" });
+    const archive = screen.getByRole("dialog", { name: ARCHIVE_WINDOW_TITLE });
     const inbox = screen.getByRole("dialog", { name: MAIL_WINDOW_TITLE });
     // absolute positioning comes from the stylesheet, which jsdom does not apply,
     // so assert the box the component writes plus the rules the frame depends on.
@@ -251,7 +255,7 @@ describe("workstation windows", () => {
     fireEvent.pointerUp(titlebar, { clientX: 130, clientY: 70, pointerId: 3 });
     // ...and the committed registry geometry matches the frame that was dragged.
     await waitFor(() => expect(frameOrigin(windowFrame)).toEqual({ x: start.x + 120, y: start.y + 60 }));
-    expect(frameSize(windowFrame)).toEqual({ w: 520, h: 400 });
+    expect(frameSize(windowFrame)).toEqual({ w: 640, h: 460 });
   });
 
   it("restores focus to the launching shortcut after closing", async () => {
@@ -260,8 +264,8 @@ describe("workstation windows", () => {
     render(<Home />);
     const shortcut = screen.getByRole("button", { name: "Archive" });
     await user.click(shortcut);
-    await user.click(within(screen.getByRole("dialog", { name: "Archive" })).getByRole("button", { name: "Close folder" }));
-    expect(screen.queryByRole("dialog", { name: "Archive" })).not.toBeInTheDocument();
+    await user.click(within(screen.getByRole("dialog", { name: ARCHIVE_WINDOW_TITLE })).getByRole("button", { name: "Close folder" }));
+    expect(screen.queryByRole("dialog", { name: ARCHIVE_WINDOW_TITLE })).not.toBeInTheDocument();
     expect(shortcut).toHaveFocus();
   });
 });
