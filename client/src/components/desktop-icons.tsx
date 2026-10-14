@@ -30,6 +30,8 @@ const icons = {
   system: { asset: "/icons/console_prompt-0.png" },
   help: { asset: "/icons/help_question_mark-0.png" },
   recycle: { asset: "/icons/recycle_bin_empty-4.png" },
+  // Worn by the Start menu's exit to the public landing page, which is not a folder.
+  public: { asset: "/icons/help_book_big-0.png" },
 } as const satisfies Record<string, { asset: string; shortcut?: boolean }>;
 
 export type IconGlyph = keyof typeof icons;

@@ -2,7 +2,8 @@ import { readFileSync } from "node:fs";
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
-import Home from "@/app/page";
+// The shell directly: the /desktop route now posts first, and these tests are about the shell.
+import { DesktopShell as Home } from "@/components/desktop-shell";
 import { BROWSER_WINDOW_TITLE } from "@/components/browser/browser-identity";
 import { explorerTitle } from "@/components/files/files-identity";
 import { MAIL_WINDOW_TITLE } from "@/components/mail/mail-identity";

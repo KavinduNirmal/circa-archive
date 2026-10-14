@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { Dialog, Popover } from "radix-ui";
 import { ArchiveBrowser } from "./browser/browser-window";
 import { BROWSER_WINDOW_TITLE } from "./browser/browser-identity";
@@ -11,7 +12,7 @@ import { explorerTitle } from "./files/files-identity";
 import { MAIL_WINDOW_TITLE } from "./mail/mail-identity";
 import { MailWindow } from "./mail/mail-window";
 import { TaskbarWindows, WindowLayer, useWorkstationWindows } from "./window-manager";
-import { notificationGlyph, settingsGlyph, type DesktopIconSpec } from "./desktop-icons";
+import { DesktopIcon, notificationGlyph, settingsGlyph, type DesktopIconSpec } from "./desktop-icons";
 import { DesktopNavigation, type DesktopDestination } from "./desktop-navigation";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
 
@@ -279,6 +280,18 @@ export function DesktopShell() {
                 <div className="start-heading">CIRCA/OS <span>APPLICATIONS</span></div>
                 <DesktopNavigation compact onOpen={openFolder} activeId={lastFocused ?? undefined} />
                 <p className="start-note">Application contents coming soon.</p>
+                {/*
+                  The one way out of the fiction. The workstation is reached from
+                  the public landing page, so leaving it has to be a real control
+                  rather than a browser back button nobody is told about.
+                */}
+                <Link className="start-public" href="/">
+                  <DesktopIcon icon={{ glyph: "public" }} />
+                  <span className="start-public-copy">
+                    <span className="start-public-title">Public archive site</span>
+                    <span className="start-public-note">Project record and contributing</span>
+                  </span>
+                </Link>
               </Popover.Content>
             </Popover.Portal>
           </Popover.Root>

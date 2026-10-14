@@ -57,6 +57,8 @@
   --circa-link: #1b3f66;
   --circa-link-visited: #55385f;
   --circa-stamp: #8a4a12;
+  /* The commission's seal, shared by the workstation wallpaper and the public docket. */
+  --circa-seal: url('/Government_agency_emblem_seal_de…_2K_20261014194612.jpg');
 }
 
 @theme inline {
@@ -182,7 +184,7 @@
   position: absolute;
   z-index: -1;
   inset: 0;
-  background: url('/Government_agency_emblem_seal_de…_2K_20261014194612.jpg') center / cover no-repeat;
+  background: var(--circa-seal) center / cover no-repeat;
   filter: brightness(.78) contrast(1.06) saturate(1.12);
 }
 /* Fixed machine readout: status chips and monospaced values, marked as simulated copy. */
@@ -355,6 +357,15 @@
 .start-navigation .desktop-icon { width: 32px; height: 32px; }
 .start-navigation .desktop-shortcut > span { background: none; text-shadow: none; }
 .start-note { border-top: 1px solid #526e94; padding: 10px; color: #bacada; font-size: 10px; }
+/* The Start menu's exit to the public landing page: a launcher row, not an application. */
+.start-public { display: flex; align-items: center; gap: 10px; padding: 7px 10px; border-top: 1px solid #22303d; color: #c8d6e5; text-decoration: none; }
+.start-public:hover { background: #22303d; color: #e6eef8; }
+.start-public:focus-visible { outline: 1px dashed #c8d6e5; outline-offset: -2px; }
+.start-public .desktop-icon { flex: 0 0 auto; width: 22px; height: 22px; }
+.start-public .desktop-icon-glyph { width: 22px; height: 22px; }
+.start-public-copy { display: grid; gap: 2px; min-width: 0; }
+.start-public-title { font-size: 11px; font-weight: 600; letter-spacing: .02em; }
+.start-public-note { color: #8296a9; font-size: 9px; letter-spacing: .06em; text-transform: uppercase; }
 /* Desktop layer: the drag/resize canvas, inset by the status strip and taskbar. */
 .desktop-area { position: relative; height: calc(100dvh - var(--circa-taskbar-height)); overflow: hidden; outline: none; }
 .window-layer { position: absolute; inset: 0; pointer-events: none; }
@@ -1310,6 +1321,432 @@
   .word-ruler { display: none; }
   .word-status-cell:nth-child(3) { display: none; }
   .word-status-cell:nth-child(4) { display: none; }
+}
+
+/*
+ * Public landing page.
+ *
+ * The one screen outside the fiction, so it is built the same way as the
+ * workstation: steel chrome, hard bevels, dense labels in uppercase, and the
+ * seal as the single decorative element. Two surfaces carry meaning here rather
+ * than decoration. Steel is machine data (the docket, the stack table, the
+ * commands); paper is a document (the specimen record), which is exactly how the
+ * archive browser and the mail client already separate the two.
+ *
+ * The page scrolls, unlike the shell, so it takes a reading measure and its own
+ * vertical rhythm instead of the workstation's fixed grid.
+ */
+.landing {
+  position: relative;
+  min-height: 100dvh;
+  padding-bottom: 1px;
+  background:
+    radial-gradient(120% 58% at 50% -8%, rgb(82 110 148 / 22%), transparent 62%),
+    #0d131a;
+  color: #c8d6e5;
+}
+/* The CRT filter sits over the whole page, chrome included, the way a monitor does. */
+.landing-scanlines { position: fixed; z-index: 40; inset: 0; opacity: .55; }
+.landing-skip { position: absolute; left: -9999px; }
+.landing-skip:focus {
+  position: fixed;
+  z-index: 50;
+  top: 6px;
+  left: 6px;
+  padding: 6px 10px;
+  background: var(--circa-hazard);
+  color: #1b1206;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+.landing-bar {
+  position: sticky;
+  z-index: 30;
+  top: 0;
+  background: linear-gradient(#1b2636, #16202c);
+  border-bottom: 1px solid var(--circa-bevel-shadow);
+  box-shadow: inset 0 1px 0 #3a4f6d;
+}
+.landing-bar-inner,
+.landing-main,
+.landing-footer-inner {
+  width: min(100% - 48px, 1080px);
+  margin-inline: auto;
+}
+.landing-bar-inner { display: flex; align-items: center; gap: 14px; height: 40px; }
+.landing-sys { display: inline-flex; align-items: center; gap: 7px; white-space: nowrap; }
+.landing-sys-mark { color: var(--primary); font-size: 13px; line-height: 1; }
+.landing-sys-name { color: #dbe6f2; font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+.landing-sys-note { padding-left: 8px; border-left: 1px solid var(--border); color: #7f93a8; }
+/* The section rail keeps its own scroll rather than wrapping or disappearing. */
+.landing-nav { display: flex; flex: 1; align-items: center; gap: 2px; overflow-x: auto; scrollbar-width: none; }
+.landing-nav::-webkit-scrollbar { display: none; }
+.landing-nav a {
+  padding: 4px 9px;
+  border: 1px solid transparent;
+  color: #a9bacd;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.landing-nav a:hover { background: #22303d; border-color: var(--border); color: #e2ecf7; }
+.landing-nav a:focus-visible { outline: 1px dashed #c8d6e5; outline-offset: -2px; }
+.landing-bar-status {
+  flex: 0 0 auto;
+  padding: 3px 8px;
+  border: 1px solid var(--circa-hazard);
+  color: #e8a86a;
+  letter-spacing: .14em;
+}
+.landing-main { padding-bottom: 8px; }
+
+/* Masthead: the claim on the left, the docket on the right, one seal behind both. */
+.landing-docket { position: relative; display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(292px, .85fr); gap: 30px; align-items: start; padding: 44px 0 26px; }
+.landing-docket::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: -40px -40px 0;
+  background: var(--circa-seal) center 34% / 520px auto no-repeat;
+  opacity: .07;
+  -webkit-mask-image: radial-gradient(58% 68% at 32% 42%, #000, transparent 74%);
+  mask-image: radial-gradient(58% 68% at 32% 42%, #000, transparent 74%);
+  pointer-events: none;
+}
+.landing-overline { color: #8fa3b6; }
+.landing-wordmark {
+  margin: 8px 0 0;
+  color: #e6eef8;
+  font-size: clamp(34px, 6.2vw, 58px);
+  font-weight: 700;
+  line-height: .98;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  text-shadow: 0 0 22px rgb(130 161 199 / 22%);
+}
+.landing-thesis { max-width: 62ch; margin: 14px 0 0; color: #b3c3d4; font-size: 13px; line-height: 20px; }
+.landing-actions { display: flex; flex-wrap: wrap; align-items: stretch; gap: 10px; margin-top: 22px; }
+/* The one filled control on the page: the way into the machine. */
+.landing-enter {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 14px;
+  border: 1px solid;
+  border-color: #5a7ea0 #101c29 #101c29 #5a7ea0;
+  background: #24425f;
+  color: #eaf1f8;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+.landing-enter:hover { background: #2c5075; }
+.landing-enter:active { border-color: #101c29 #5a7ea0 #5a7ea0 #101c29; background: #1d3854; }
+.landing-enter:focus-visible { outline: 2px solid #a4c2e6; outline-offset: 2px; }
+.landing-enter-path { color: #a9c6e4; font-size: 10px; letter-spacing: .04em; text-transform: none; }
+.landing-secondary {
+  display: inline-flex;
+  align-items: center;
+  padding: 9px 14px;
+  border: 1px solid;
+  border-color: var(--circa-bevel-light) var(--circa-bevel-shadow) var(--circa-bevel-shadow) var(--circa-bevel-light);
+  background: var(--secondary);
+  color: #cbdaeb;
+  font-size: 12px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+.landing-secondary:hover { background: #304155; color: #e6eef8; }
+.landing-doctrine {
+  max-width: 58ch;
+  margin: 24px 0 0;
+  padding: 10px 12px;
+  border: 1px solid;
+  border-color: var(--circa-bevel-shadow) var(--border) var(--border) var(--circa-bevel-shadow);
+  border-left: 3px solid var(--circa-hazard);
+  background: #111b24;
+}
+.landing-doctrine p { margin: 0; color: #d3e0ee; font-family: var(--font-mono); font-size: 12px; line-height: 18px; }
+.landing-doctrine cite { display: block; margin-top: 6px; color: #8296a9; font-size: 9px; font-style: normal; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+.landing-plate { padding: 0 0 12px; }
+.landing-plate-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 6px 9px; background: linear-gradient(#2b3b51, #22303f); border-bottom: 1px solid var(--circa-bevel-shadow); }
+.landing-plate-title { margin: 0; color: #dbe6f2; font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+.landing-plate-code { color: #8fa3b6; font-size: 10px; }
+.landing-figures { margin: 0; }
+.landing-figure { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; padding: 5px 9px; border-bottom: 1px dotted var(--border); }
+.landing-figure:last-child { border-bottom: 0; }
+.landing-figure dt { color: #8296a9; }
+.landing-figure dd { margin: 0; color: #cfdcea; font-size: 11px; }
+/* The stamp is the one rotated element in the project, and it is rotated because it is stamped. */
+.landing-stamp {
+  margin: 12px 9px 0;
+  padding: 5px 10px;
+  border: 2px solid var(--circa-hazard);
+  color: #e8a86a;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .22em;
+  text-align: center;
+  text-transform: uppercase;
+  transform: rotate(-1.6deg);
+}
+.landing-plate-note { margin: 12px 9px 0; color: #9db0c4; font-size: 11px; line-height: 16px; }
+
+/* The shipped stack, as one dense readout under the masthead. */
+.landing-ledger {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1px;
+  margin: 8px 0 0;
+  padding: 0;
+  border: 1px solid #22303d;
+  background: var(--circa-bevel-shadow);
+  list-style: none;
+}
+.landing-ledger-row { display: flex; flex-direction: column; gap: 3px; padding: 8px 10px; background: #101a24; }
+.landing-ledger-key { color: #7f93a8; }
+.landing-ledger-value { color: #c2d3e4; font-size: 11px; }
+
+.landing-section { margin-top: 30px; padding: 34px 0 6px; border-top: 1px solid #22303d; scroll-margin-top: 56px; }
+.landing-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 12px; margin-bottom: 16px; }
+.landing-index { color: var(--circa-hazard); font-size: 12px; letter-spacing: .12em; }
+.landing-title { margin: 0; color: #e2ecf7; font-size: 20px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.landing-standfirst { max-width: 44ch; margin: 0 0 0 auto; color: #8296a9; font-size: 12px; }
+.landing-subtitle { margin: 0 0 10px; color: #dbe6f2; font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+
+.landing-lede { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; margin-bottom: 18px; }
+.landing-lede p { margin: 0; color: #b3c3d4; font-size: 13px; line-height: 20px; }
+.landing-roles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 0; padding: 0; list-style: none; }
+.landing-role { position: relative; padding: 12px 12px 10px; }
+.landing-role-index { position: absolute; top: 10px; right: 11px; color: #5c6f83; font-size: 11px; }
+.landing-role-title { margin: 0; color: #dbe6f2; font-size: 13px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.landing-role-discipline { margin: 4px 0 8px; color: var(--circa-hazard); }
+.landing-role-work { margin: 0 0 10px; color: #a9bacd; font-size: 12px; line-height: 17px; }
+.landing-role-path { margin: 0; padding-top: 8px; border-top: 1px dotted var(--border); color: var(--primary); font-size: 11px; }
+
+.landing-record { display: grid; grid-template-columns: minmax(0, 1fr) minmax(310px, .9fr); gap: 26px; align-items: start; }
+.landing-record-copy p { margin: 0 0 12px; color: #b3c3d4; font-size: 13px; line-height: 20px; }
+.landing-notes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 18px; margin: 16px 0 0; }
+.landing-note { padding-left: 10px; border-left: 2px solid var(--accent); }
+.landing-note dt { color: #8296a9; }
+.landing-note dd { margin: 4px 0 0; color: #a9bacd; font-size: 12px; line-height: 17px; }
+/* The specimen is paper, because a record is a document and not machine data. */
+.landing-specimen { margin: 0; }
+.landing-specimen figcaption { margin-bottom: 6px; color: #8296a9; }
+.landing-specimen-sheet { padding: 16px 18px 14px; background: var(--circa-paper); color: var(--circa-ink); box-shadow: 3px 3px 0 rgb(8 17 25 / 50%); }
+.landing-specimen-head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding-bottom: 8px; border-bottom: 1px solid var(--circa-rule); }
+.landing-specimen-code { font-size: 12px; font-weight: 700; letter-spacing: .06em; }
+.landing-specimen-tag { padding: 2px 6px; border: 1px solid var(--circa-ink-soft); color: var(--circa-ink-soft); }
+.landing-specimen-tag[data-status="sealed"],
+.landing-specimen-tag[data-status="restricted"] { border-color: #8a2b2b; color: #7a2222; }
+.landing-specimen-title { margin: 12px 0 6px; font-size: 16px; line-height: 21px; }
+.landing-specimen-meta { margin: 0 0 10px; color: var(--circa-ink-soft); font-size: 10px; letter-spacing: .04em; }
+.landing-specimen-abstract { margin: 0; font-size: 12px; line-height: 18px; }
+.landing-specimen-foot { margin: 14px 0 0; padding-top: 8px; border-top: 1px dotted var(--circa-rule); color: var(--circa-ink-soft); }
+
+.landing-project { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(258px, .85fr); gap: 26px; align-items: start; }
+.landing-table { width: 100%; border: 1px solid #22303d; border-collapse: collapse; background: #101a24; font-size: 12px; }
+.landing-table caption { padding: 6px 9px; border-bottom: 1px solid #22303d; background: #16202c; color: #8296a9; text-align: left; }
+.landing-table thead th { padding: 5px 9px; border-bottom: 1px solid var(--circa-bevel-shadow); background: var(--secondary); color: #cbdaeb; font-size: 10px; font-weight: 700; letter-spacing: .08em; text-align: left; text-transform: uppercase; }
+.landing-table tbody th { width: 24%; padding: 6px 9px; border-bottom: 1px dotted #2b3b51; color: #8296a9; font-size: 10px; font-weight: 700; letter-spacing: .08em; text-align: left; text-transform: uppercase; vertical-align: top; }
+.landing-table td { padding: 6px 9px; border-bottom: 1px dotted #2b3b51; vertical-align: top; }
+.landing-table tbody tr:last-child th,
+.landing-table tbody tr:last-child td { border-bottom: 0; }
+.landing-value { color: #cfdcea; }
+/* State is a word as well as a colour, so the two are never confused. */
+.landing-state { display: inline-block; padding: 2px 6px; font-size: 9px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+.landing-state[data-state="shipped"] { border: 1px solid #4d7a5c; color: #9fd3b1; }
+.landing-state[data-state="planned"] { border: 1px solid var(--circa-hazard); color: #e8a86a; }
+.landing-table-lead .landing-value { color: #e8a86a; }
+.landing-serve { margin-top: 12px; padding: 10px 12px; }
+.landing-serve-note { margin: 0 0 8px; color: #a9bacd; font-size: 12px; line-height: 17px; }
+.landing-tree { margin: 0; padding: 0; border-top: 1px solid #22303d; list-style: none; }
+.landing-tree-row { display: grid; grid-template-columns: minmax(0, 130px) minmax(0, 1fr); gap: 12px; padding: 6px 0; border-bottom: 1px dotted #2b3b51; }
+.landing-tree-path { color: var(--primary); font-size: 11px; }
+.landing-tree-purpose { color: #9db0c4; font-size: 11px; line-height: 16px; }
+
+.landing-contribute { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(258px, .8fr); gap: 26px; align-items: start; }
+.landing-steps { margin: 0; padding: 0; list-style: none; }
+.landing-step { display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 12px; padding: 14px 0; border-bottom: 1px dotted #2b3b51; }
+.landing-step:first-child { padding-top: 0; }
+.landing-step:last-child { border-bottom: 0; }
+.landing-step-index { color: var(--circa-hazard); font-size: 12px; letter-spacing: .1em; }
+.landing-step-title { margin: 0; color: #dbe6f2; font-size: 14px; font-weight: 700; letter-spacing: .04em; }
+.landing-step-note { margin: 6px 0 0; color: #a9bacd; font-size: 12px; line-height: 18px; }
+.landing-commands { display: grid; gap: 6px; margin: 10px 0 0; padding: 0; list-style: none; }
+/* Commands read as a sunken console line, the only place on the page that does. */
+.landing-command {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 5px 8px;
+  border: 1px solid;
+  border-color: var(--circa-bevel-shadow) #22303d #22303d var(--circa-bevel-shadow);
+  background: #0b131b;
+}
+.landing-command-cwd { padding-right: 8px; border-right: 1px solid #22303d; color: #6f8598; font-size: 10px; }
+.landing-command-text { color: #cfe0f0; font-size: 12px; }
+.landing-command-note { color: #7f93a8; font-size: 10px; }
+.landing-copy { display: inline-flex; align-items: center; gap: 6px; }
+.landing-copy-button {
+  padding: 2px 7px;
+  border: 1px solid;
+  border-color: #3d4c5e #131b24 #131b24 #3d4c5e;
+  background: #1e2836;
+  color: #9db0c4;
+  font: inherit;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.landing-copy-button:hover { background: #2b3b51; color: #e2ecf7; }
+.landing-copy-button[data-state="copied"] { border-color: #4d7a5c; color: #9fd3b1; }
+.landing-copy-button[data-state="blocked"] { border-color: #8a2b2b; color: #e0a3a3; }
+.landing-copy-button:focus-visible { outline: 1px dashed #c8d6e5; outline-offset: 1px; }
+.landing-copy-state { color: #9fd3b1; }
+.landing-copy-state:empty { display: none; }
+.landing-rules { padding: 12px; }
+.landing-rule-list { display: grid; gap: 9px; margin: 0; padding: 0; list-style: none; }
+.landing-rule { display: grid; gap: 2px; padding-left: 9px; border-left: 2px solid var(--accent); }
+.landing-rule-title { color: #dbe6f2; font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.landing-rule-note { color: #9db0c4; font-size: 11px; line-height: 16px; }
+.landing-rules-foot { margin: 12px 0 0; padding-top: 9px; border-top: 1px dotted var(--border); color: #8296a9; font-size: 10px; line-height: 15px; }
+
+.landing-lede-note { max-width: 78ch; margin: 0 0 14px; color: #8296a9; font-size: 12px; line-height: 18px; }
+.landing-documents { margin: 0; padding: 0; border-top: 1px solid #22303d; list-style: none; }
+.landing-document { display: grid; grid-template-columns: minmax(0, 240px) minmax(0, 1fr) auto; align-items: baseline; gap: 14px; padding: 8px 0; border-bottom: 1px dotted #2b3b51; }
+.landing-document-path { color: #cfe0f0; font-size: 12px; }
+.landing-document-decides { color: #9db0c4; font-size: 12px; }
+
+.landing-footer { margin-top: 40px; border-top: 1px solid #22303d; background: #0b131b; }
+.landing-footer-inner { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: 20px; align-items: start; padding: 22px 0 30px; }
+.landing-footer-name { margin: 0; color: #dbe6f2; font-size: 12px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+.landing-footer-commission { margin: 4px 0 0; color: #7f93a8; font-size: 10px; }
+.landing-footer-nav { display: flex; flex-wrap: wrap; gap: 4px 14px; }
+.landing-footer-nav a { color: #a9bacd; font-size: 10px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; text-decoration: none; }
+.landing-footer-nav a:hover { color: #e2ecf7; text-decoration: underline; }
+.landing-footer-legal { margin: 0; color: #7f93a8; font-size: 10px; line-height: 15px; text-align: right; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .landing { scroll-behavior: smooth; }
+}
+@media (max-width: 960px) {
+  .landing-docket,
+  .landing-record,
+  .landing-project,
+  .landing-contribute { grid-template-columns: minmax(0, 1fr); }
+  .landing-roles,
+  .landing-ledger { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .landing-footer-inner { grid-template-columns: minmax(0, 1fr); }
+  .landing-footer-legal { text-align: left; }
+}
+@media (max-width: 720px) {
+  .landing-sys-note { display: none; }
+  /* A cut-off item with no edge fade reads as a bug rather than as a rail that scrolls. */
+  .landing-nav { -webkit-mask-image: linear-gradient(90deg, #000 84%, transparent); mask-image: linear-gradient(90deg, #000 84%, transparent); }
+  .landing-lede,
+  .landing-notes { grid-template-columns: minmax(0, 1fr); }
+  .landing-roles { grid-template-columns: minmax(0, 1fr); }
+  .landing-standfirst { margin-left: 0; }
+  .landing-bar-inner,
+  .landing-main,
+  .landing-footer-inner { width: min(100% - 28px, 1080px); }
+}
+@media (max-width: 560px) {
+  .landing-document { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+  .landing-step { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+  .landing-bar-status { display: none; }
+}
+
+/*
+ * The workstation post screen.
+ *
+ * A fixed plate over a dark field, with the seal watermark behind it: the
+ * desktop is already mounted underneath, so the handover is a reveal and never a
+ * blank page. The lines fill in as the checks resolve, and the progress bar is
+ * the only moving part.
+ */
+.boot { position: fixed; z-index: 60; inset: 0; display: grid; place-items: center; padding: 24px; background: radial-gradient(110% 70% at 50% 0%, #0c1721, #04070a 74%); }
+.boot::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--circa-seal) center / 620px auto no-repeat;
+  opacity: .06;
+  pointer-events: none;
+}
+/* The post screen wears the same CRT filter as the desktop it is about to reveal. */
+.boot::after {
+  content: "";
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  background-image: repeating-linear-gradient(0deg, rgb(0 0 0 / 18%) 0px, rgb(0 0 0 / 18%) 1px, transparent 1px, transparent 2px);
+  pointer-events: none;
+}
+.boot-panel { position: relative; z-index: 1; width: min(100%, 560px); background: #0d131a; box-shadow: 4px 4px 0 rgb(0 0 0 / 60%), inset 0 0 70px rgb(82 110 148 / 14%); }
+.boot-head { display: flex; align-items: center; gap: 10px; padding: 12px 14px; background: linear-gradient(#1b2636, #131d27); border-bottom: 1px solid #22303d; }
+.boot-seal { flex: 0 0 auto; width: 32px; height: 32px; }
+.boot-seal .desktop-icon-glyph { filter: saturate(.5) brightness(1.1); opacity: .95; }
+.boot-headline { min-width: 0; }
+.boot-title { margin: 0; color: #dce9f5; font-family: var(--font-mono); font-size: 13px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+.boot-sub { margin: 3px 0 0; color: #7f93a8; font-size: 9px; letter-spacing: .06em; text-transform: uppercase; }
+.boot-badge { margin-left: auto; padding: 2px 7px; border: 1px solid var(--circa-hazard); color: #e8a86a; font-size: 9px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; }
+.boot-lines { display: grid; gap: 3px; min-height: 150px; margin: 0; padding: 14px 14px 10px; list-style: none; }
+.boot-line { display: grid; grid-template-columns: 106px minmax(0, 1fr) 20px; gap: 10px; align-items: baseline; font-size: 11px; }
+.boot-label { color: var(--primary); letter-spacing: .06em; }
+.boot-detail { color: #b9cadb; }
+.boot-mark { color: #9fd3b1; text-align: right; }
+/* A pending check shows its name only: the result arrives when it resolves. */
+.boot-line[data-revealed="false"] .boot-label { color: #4a5d70; }
+.boot-line[data-revealed="false"] .boot-detail,
+.boot-line[data-revealed="false"] .boot-mark { visibility: hidden; }
+.boot-progress { display: grid; grid-template-columns: repeat(44, minmax(0, 1fr)); gap: 1px; margin: 0 14px; padding: 3px; background: #070d13; border: 1px solid; border-color: var(--circa-bevel-shadow) #22303d #22303d var(--circa-bevel-shadow); }
+.boot-cell { height: 7px; background: #16202c; }
+.boot-cell[data-on="true"] { background: var(--primary); box-shadow: 0 0 4px rgb(130 161 199 / 50%); }
+.boot-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 14px 4px; }
+.boot-state { color: #9db0c4; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; }
+.boot-skip {
+  padding: 3px 9px;
+  border: 1px solid;
+  border-color: #3d4c5e #131b24 #131b24 #3d4c5e;
+  background: #1e2836;
+  color: #9db0c4;
+  font: inherit;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.boot-skip:hover { background: #2b3b51; color: #e2ecf7; }
+.boot-skip:focus-visible { outline: 1px dashed #c8d6e5; outline-offset: 1px; }
+.boot-hint { margin: 0; padding: 4px 14px 12px; color: #5f7387; font-size: 9px; letter-spacing: .06em; text-transform: uppercase; }
+@media (prefers-reduced-motion: no-preference) {
+  .boot { animation: circa-boot-in 140ms steps(3, end); }
+  .boot-state::after { content: " ▌"; animation: circa-boot-blink 1s steps(2, end) infinite; }
+  @keyframes circa-boot-in {
+    from { opacity: 0; }
+  }
+  @keyframes circa-boot-blink {
+    50% { opacity: 0; }
+  }
+}
+@media (max-width: 460px) {
+  .boot-line { grid-template-columns: 84px minmax(0, 1fr) 18px; font-size: 10px; }
+  .boot-progress { grid-template-columns: repeat(30, minmax(0, 1fr)); }
 }
 
 /*

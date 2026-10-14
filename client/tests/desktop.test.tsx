@@ -1,7 +1,8 @@
 import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
-import Home from "@/app/page";
+// The shell directly: the /desktop route now posts first, and these tests are about the shell.
+import { DesktopShell as Home } from "@/components/desktop-shell";
 import { explorerTitle } from "@/components/files/files-identity";
 import { FILE_TREE, nodeById } from "@/components/files/files-index";
 
@@ -197,5 +198,15 @@ describe("desktop navigation", () => {
     expect(screen.getByRole("navigation", { name: "Start applications" })).toBeVisible();
     await user.click(screen.getByRole("button", { name: "Start" }));
     expect(screen.queryByRole("navigation", { name: "Start applications" })).not.toBeInTheDocument();
+  });
+
+  it("keeps a way back out of the fiction from the start launcher", async () => {
+    const user = userEvent.setup();
+    render(<Home />);
+    await user.click(screen.getByRole("button", { name: "Start" }));
+    // The landing page is how anyone arrives, so leaving the workstation is a control and not a guess.
+    const leave = screen.getByRole("link", { name: /public archive site/i });
+    expect(leave).toHaveAttribute("href", "/");
+    expect(leave).toHaveClass("start-public");
   });
 });

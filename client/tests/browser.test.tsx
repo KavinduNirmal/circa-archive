@@ -1,7 +1,8 @@
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
-import Home from "@/app/page";
+// The shell directly: the /desktop route now posts first, and these tests are about the shell.
+import { DesktopShell as Home } from "@/components/desktop-shell";
 import { ARCHIVE_INDEX } from "@/components/browser/archive-index";
 
 /** The browser names its own window, so the frame and its taskbar entry read as the browser. */

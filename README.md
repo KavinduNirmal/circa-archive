@@ -4,7 +4,7 @@ A collaborative ghost-story archive presented as a fictional desktop workstation
 
 ## Project status
 
-**Pre-production.** This repository contains product specifications, contributor tooling, and a Next.js frontend scaffold. The frontend serves an intentionally empty themed page; no application screens, backend, supported release, or deployment exist yet. Technical choices in [ARCHITECTURE.md](ARCHITECTURE.md) remain drafts.
+**Pre-production.** This repository contains product specifications, contributor tooling, and a Next.js frontend. The frontend serves a public landing page and a CIRCA/OS workstation preview over illustrative fixtures: the archive browser, the mail client, the file browser, and the record editor all work, and none of them is connected to a service. No backend, supported release, or deployment exists yet, so the technical choices in [ARCHITECTURE.md](ARCHITECTURE.md) remain drafts.
 
 The planned stack is Next.js and React for the public interface, .NET 10 Minimal APIs with EF Core for the backend, PostgreSQL for persistence, SignalR for live updates, and S3-compatible storage for evidence.
 
@@ -12,7 +12,7 @@ The planned stack is Next.js and React for the public interface, .NET 10 Minimal
 
 | Path | Purpose |
 | --- | --- |
-| [client/](client/README.md) | Next.js, shadcn/ui, and react-rnd scaffold |
+| [client/](client/README.md) | Next.js, React, and Tailwind interface: the public site and the CIRCA/OS workstation |
 | `backend/` | Reserved for API and persistence services |
 | `admin/` | Reserved for administration tooling |
 | `docs/lore/` | Reserved for setting documentation |

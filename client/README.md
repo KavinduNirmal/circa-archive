@@ -2,12 +2,12 @@
 
 ## Responsibility
 
-Next.js frontend with an initial CIRCA/OS desktop at `/` and `/desktop`: shortcut navigation, draggable and resizable destination windows, a Start launcher, taskbar, emblem wallpaper, and a switchable CRT overlay. Two destinations open real applications over illustrative preview data: Search opens the archive browser, a single-tab in-world browser over the internal index, and Inbox opens the mail client, a three-pane Outlook-era reader with a composer that queues into an Outbox with no transport. Every other window is still a labeled placeholder, and backend integration remains unimplemented.
+Next.js frontend with a public landing page at `/` and the CIRCA/OS workstation at `/desktop`. The landing page states the project's real status, stack, commands, and documents and links into the machine; the workstation answers that arrival with a post screen, then runs shortcut navigation, draggable and resizable destination windows, a Start launcher, taskbar, emblem wallpaper, and a switchable CRT overlay. Every desktop destination opens a real screen over illustrative preview data: Search the archive browser, Inbox the mail client, each folder the file browser, and CIRCA Word the Markdown record editor. Backend integration remains unimplemented, so every screen reads from its own index rather than a service.
 
 ## Structure and boundaries
 
 - `src/app/`: routes, root layout, global theme, and [desktop design decisions](src/app/desktop/README.md).
-- `src/components/`: desktop shell, the archive [browser](src/components/browser/README.md), the [mail client](src/components/mail/README.md), reusable navigation and icons, and shadcn/ui primitives.
+- `src/components/`: desktop shell, the public [site](src/components/site/README.md) and post screen, the archive [browser](src/components/browser/README.md), the [mail client](src/components/mail/README.md), the [file browser](src/components/files/README.md), the record [editor](src/components/word/README.md), reusable navigation and icons, and shadcn/ui primitives.
 - `src/lib/`: shared class-composition helper.
 - `tests/`: Vitest interaction and utility tests.
 - `e2e/`: responsive Playwright desktop tests.

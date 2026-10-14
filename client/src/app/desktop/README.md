@@ -2,7 +2,7 @@
 
 ## Responsibility and structure
 
-`page.tsx` mounts the initial CIRCA/OS desktop at `/desktop`. The home route mounts the same shell. Reusable navigation, icons, and shell presentation live in `../../components/`.
+`page.tsx` mounts the CIRCA/OS workstation at `/desktop`, wrapped in the `WorkstationBoot` post screen. The home route is the public landing page, which links here. Reusable navigation, icons, and shell presentation live in `../../components/`.
 
 ## Scope and design decisions
 
@@ -20,6 +20,12 @@ Navigation and icon decisions from the redesign request:
 - **Search opens the browser and Inbox opens the mail client, and each names its own window.** The shortcuts keep their labels and their bitmaps, but the frames are titled `Titan Browser - CIRCA Archive` and `Titan Mail - CIRCA Correspondence`, and their taskbar entries match. Because both applications print their own status bars, those frames omit the generic destination strip (`WorkstationWindow` renders that strip only for a non-null status), so the chrome is not stacked twice.
 - One class of bug is worth naming because neither the unit suite nor the type checker could see it: a CSS class name reused for two different elements. `archive-fields` and `mail-body` were each used twice, and in both cases a rule written for a table or a paragraph silently resized a layout container. The mail client's panes only filled the frame after the collision was found by measuring the rendered box, so class names in this stylesheet are treated as a namespace: check for an existing name before adding one.
 - The taskbar follows the reference arrangement: Start, a beveled divider with 8px breathing room, then **Settings** as a wide task-button item, with the notification bell sitting in the tray directly beside the UTC clock. The reference build's activation notice was dropped rather than imitated. Settings presses into its sunken state while its dialog is open. Notifications open an honest unconnected panel; **Settings** hosts the CRT screen filter, which replaced the old taskbar CRT button. The screen filter remains on by default.
+
+## Landing page and the post screen
+
+The home route is now the public landing page, so the workstation is reached rather than opened directly, and `/desktop` answers that arrival by powering the machine on. `WorkstationBoot` ([README](../../components/site/README.md)) mounts the shell and covers it with the post screen; the shell stays `aria-hidden` and `inert` until the last check resolves, so the handover is a reveal instead of a page load. The lines report what the shell actually mounted. Any key, or the Skip post button, hands the screen over at once, and an operator whose system asks for reduced motion never sees the post screen at all.
+
+The fiction needs one door out, since the landing page is how everyone arrives. The Start launcher's last row is **Public archive site**, a real link to `/`, labelled with the archive's book mark and left outside the application list so it does not read as another destination.
 
 ## Verification
 
