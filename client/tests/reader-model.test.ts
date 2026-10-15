@@ -1,7 +1,10 @@
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 import {
   ASSESSMENT_SCALE,
   FOLLOW_UP_PREVIEW_LIMIT,
+  READER_MATCH_HIGHLIGHT,
   SCALE_DEFAULT,
   SCALE_MAX,
   SCALE_MIN,
@@ -124,5 +127,15 @@ describe("reader search readout", () => {
 
   it("says so plainly when the term is not on the sheet", () => {
     expect(describeMatches(0, "quay")).toBe("No matches for quay.");
+  });
+});
+
+describe("reader search highlight", () => {
+  it("styles the highlight it registers, because an unstyled one is painted as nothing", () => {
+    // The count is written by hand and would read correctly either way, so this
+    // is the only thing standing between a working search and a silent no-op.
+    const stylesheet = readFileSync(resolve(process.cwd(), "src/app/globals.css"), "utf8");
+    expect(READER_MATCH_HIGHLIGHT).toBe("reader-match");
+    expect(stylesheet).toContain(`::highlight(${READER_MATCH_HIGHLIGHT})`);
   });
 });

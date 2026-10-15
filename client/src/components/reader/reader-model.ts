@@ -59,6 +59,62 @@ export function formatScale(scale: number): string {
   return `${scale}%`;
 }
 
+/** A scale from the Text menu, held at the reader's own limits. */
+export function clampScale(value: number): number {
+  return Math.min(SCALE_MAX, Math.max(SCALE_MIN, value));
+}
+
+/* ------------------------------------------------------------------------- */
+/* Document text                                                              */
+/* ------------------------------------------------------------------------- */
+
+/**
+ * How the record is set, as the reader's own preference.
+ *
+ * The archive types its filings, so Courier is what a record is set in unless
+ * the reader says otherwise; the other three are the faces someone reading for
+ * a living would ask for — a screen face, a printed face, and the terminal's
+ * own. This is a reading preference rather than a property of the record, so it
+ * belongs to the reader and not to the document: switching records keeps it.
+ */
+export type ReaderFont = "courier" | "sans" | "serif" | "mono";
+
+export const READER_FONTS: readonly ReaderFont[] = ["courier", "sans", "serif", "mono"];
+
+const FONT_LABELS: Record<ReaderFont, string> = {
+  courier: "Courier",
+  sans: "Sans serif",
+  serif: "Serif",
+  mono: "Monospaced",
+};
+
+export function fontLabel(font: ReaderFont): string {
+  return FONT_LABELS[font];
+}
+
+/**
+ * The stack each choice resolves to. Every one of them ends in a generic
+ * family, because the first three name faces this workstation cannot ship.
+ */
+export const FONT_STACKS: Record<ReaderFont, string> = {
+  courier: '"Courier New", Courier, "Nimbus Mono PS", "Liberation Mono", ui-monospace, monospace',
+  sans: 'var(--font-sans), "DejaVu Sans", Verdana, sans-serif',
+  serif: 'Georgia, "Times New Roman", "Liberation Serif", serif',
+  mono: 'var(--font-mono), ui-monospace, monospace',
+};
+
+/**
+ * The sizes the Text menu offers. They are presets over the same value the
+ * toolbar's scale buttons step through, rather than a second size of their own:
+ * one number, two ways to reach it.
+ */
+export const DOCUMENT_SIZES: readonly { scale: number; label: string }[] = [
+  { scale: 80, label: "Small" },
+  { scale: 100, label: "Regular" },
+  { scale: 120, label: "Large" },
+  { scale: 140, label: "Extra large" },
+];
+
 /* ------------------------------------------------------------------------- */
 /* Reviewer assessment                                                        */
 /* ------------------------------------------------------------------------- */
@@ -143,6 +199,16 @@ export function sectionAnchor(id: string): string {
 /* ------------------------------------------------------------------------- */
 
 export type TextMatch = { start: number; end: number };
+
+/**
+ * The name the reader registers its search highlight under.
+ *
+ * The paint and the stylesheet have to agree on this string: a highlight that
+ * is registered but never styled is painted as nothing at all, which is a
+ * silent failure — the count would read correctly and no word would be marked.
+ * It lives here so the two halves can be held together by a test.
+ */
+export const READER_MATCH_HIGHLIGHT = "reader-match";
 
 /**
  * Every place the query appears, as offsets into the text it was found in.

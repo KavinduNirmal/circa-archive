@@ -19,9 +19,9 @@
 - `markdown-pipeline.test.ts`: frontmatter as data, the six redactions, the three figures, header/body disagreement, and unmatched delimiters.
 - `markdown-text.test.ts`: the plain-text export — padded tables, `[REDACTED]`, the printed metadata header, and the eighty-column measure.
 - `record-markdown.test.tsx`: the viewer — the repaired table, figure alignment, labelled and revealable redactions, and inert raw HTML.
-- `reader-correspondence.test.ts`: note anchoring against the sections that exist, one-level replies, and both directions of the citation web.
+- `reader-correspondence.test.ts`: note anchoring against the sections that exist, one-level replies, both directions of the citation web, and the user code the margin files each correspondent under.
 - `reader-references.test.tsx`: the strip's ten-per-direction cap, the box that explains it, the collapse to a head row, and the two empty states.
-- `reader.test.tsx`: the frame's empty slot, the three silent controls, the arrangements, the search count, the session gate, the two engagement signals, the trail, both rails, the corpus record rendered through the frame — its four sections, its table, its figures, and a redaction opened on the sheet — and the status the sheet's stamp carries.
+- `reader.test.tsx`: the frame's empty slot, the three silent controls, the arrangements, the font and type-size controls, the search count, the session gate, the assessment score and its filled blocks, the two verdict tones, the trail, both rails, the corpus record rendered through the frame — its four sections, its table, its figures, and a redaction opened on the sheet — the note that folds to its head and takes its replies with it, the paragraph breaks a writer typed, and the status the sheet's stamp carries.
 
 ## Usage and boundaries
 

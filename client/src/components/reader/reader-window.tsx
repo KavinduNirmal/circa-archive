@@ -5,7 +5,7 @@ import { CLASS_LABELS, STATUS_LABELS, type ArchiveStatus } from "../browser/arch
 import { ReaderCredentials, ReaderToolbar, type ReaderActions } from "./reader-chrome";
 import { followUpsFor } from "./reader-correspondence";
 import { READER_VOCABULARY } from "./reader-identity";
-import { SCALE_DEFAULT, describeMatches, formatScale, matchRanges, sectionAnchor, stepScale, viewLabel, type ReaderSection, type ReaderView } from "./reader-model";
+import { FONT_STACKS, READER_MATCH_HIGHLIGHT, SCALE_DEFAULT, clampScale, describeMatches, formatScale, matchRanges, sectionAnchor, stepScale, viewLabel, type ReaderFont, type ReaderSection, type ReaderView } from "./reader-model";
 import { AnnotationRail, SectionRail, type RailState } from "./reader-rails";
 import { FollowUpStrip } from "./reader-references";
 import { isReviewer, sessionNotes, type ReaderSession, type ReaderVerdict } from "./reader-session";
@@ -104,10 +104,10 @@ function paintMatches(ranges: readonly Range[]): void {
   const Constructor = (globalThis as unknown as HighlightGlobals).Highlight;
   if (!registry) return;
   if (ranges.length === 0 || typeof Constructor !== "function") {
-    registry.delete("reader-match");
+    registry.delete(READER_MATCH_HIGHLIGHT);
     return;
   }
-  registry.set("reader-match", new Constructor(...ranges));
+  registry.set(READER_MATCH_HIGHLIGHT, new Constructor(...ranges));
 }
 
 export function RecordReader({ trail, session, onOpenRecord, onTravel, onCloseWindow, renderSection }: {
@@ -122,6 +122,8 @@ export function RecordReader({ trail, session, onOpenRecord, onTravel, onCloseWi
 }) {
   const [view, setView] = useState<ReaderView>("continuous");
   const [scale, setScale] = useState(SCALE_DEFAULT);
+  // How the reader likes to be read to, which is theirs and not the record's.
+  const [font, setFont] = useState<ReaderFont>("courier");
   const [fit, setFit] = useState(false);
   const [leftRail, setLeftRail] = useState<RailState>("auto");
   const [rightRail, setRightRail] = useState<RailState>("auto");
@@ -203,6 +205,8 @@ export function RecordReader({ trail, session, onOpenRecord, onTravel, onCloseWi
     zoomOut: () => setScale((current) => stepScale(current, -1)),
     zoomIn: () => setScale((current) => stepScale(current, 1)),
     resetScale: () => setScale(SCALE_DEFAULT),
+    setScale: (next) => setScale(clampScale(next)),
+    setFont,
     toggleFit: () => setFit((current) => !current),
     toggleSearch: () => setSearchOpen((current) => !current),
     comment: () => {
@@ -248,7 +252,7 @@ export function RecordReader({ trail, session, onOpenRecord, onTravel, onCloseWi
 
   return (
     <div className="reader">
-      <ReaderToolbar code={code} view={view} scale={scale} fit={fit} matchRef={matchRef}
+      <ReaderToolbar code={code} view={view} scale={scale} font={font} fit={fit} matchRef={matchRef}
         canGoBack={trail.at > 0} canGoForward={trail.at < trail.codes.length - 1}
         assessment={code ? session.assessments[code] : undefined}
         verdict={code ? session.verdicts[code] ?? null : null}
@@ -260,63 +264,81 @@ export function RecordReader({ trail, session, onOpenRecord, onTravel, onCloseWi
 
         <div className="reader-sheetwrap">
           <div className="reader-sheet" id="reader-content" data-testid="reader-sheet" ref={sheetRef}
-            data-view={view} data-fit={fit ? "margin" : "measured"} tabIndex={0}
-            style={{ "--reader-scale": String(scale / 100) } as CSSProperties}
+            data-view={view} data-fit={fit ? "margin" : "measured"} data-font={font} tabIndex={0}
+            style={{ "--reader-scale": String(scale / 100), "--reader-document-font": FONT_STACKS[font] } as CSSProperties}
             onScroll={onSheetScroll}>
-            {record ? (
-              <>
-                <header className="reader-leaf">
-                  <div className="reader-leaf-text">
-                    <p className="reader-leaf-code circa-mono">{record.code}</p>
-                    <h1 className="reader-leaf-title">
-                      {record.designation ?? <span className="reader-redaction" role="img" aria-label="Designation withheld" />}
-                    </h1>
-                    <p className="reader-leaf-line">
-                      <span>{CLASS_LABELS[record.klass]}</span>
-                      <span className="reader-leaf-sep" aria-hidden="true" />
-                      <span className="circa-mono">Filed {record.filed}</span>
-                      <span className="reader-leaf-sep" aria-hidden="true" />
-                      <span>{STATUS_LABELS[record.status]}</span>
-                      <span className="reader-leaf-sep" aria-hidden="true" />
-                      <span className="circa-mono">{record.organization}</span>
-                      <span className="reader-leaf-sep" aria-hidden="true" />
-                      <span>{record.clearance}</span>
-                    </p>
+            {/* Everything on the sheet shares one measure, set here rather than
+                on each child: `ch` resolves against the font of the element that
+                uses it, so a heading set smaller would otherwise measure itself
+                into a narrower column than the prose it belongs to. */}
+            <div className="reader-measure">
+              {record ? (
+                <>
+                  {/* The running head: whose filing this is, on every sheet of it. */}
+                  <p className="reader-running-head">
+                    <span>{record.organization}</span>
+                    <span>{record.code}</span>
+                  </p>
+
+                  <header className="reader-leaf">
+                    <div className="reader-leaf-text">
+                      <p className="reader-leaf-code circa-mono">{record.code}</p>
+                      <h1 className="reader-leaf-title">
+                        {record.designation ?? <span className="reader-redaction" role="img" aria-label="Designation withheld" />}
+                      </h1>
+                      <p className="reader-leaf-line">
+                        <span>{CLASS_LABELS[record.klass]}</span>
+                        <span className="reader-leaf-sep" aria-hidden="true" />
+                        <span className="circa-mono">Filed {record.filed}</span>
+                        <span className="reader-leaf-sep" aria-hidden="true" />
+                        <span>{STATUS_LABELS[record.status]}</span>
+                        <span className="reader-leaf-sep" aria-hidden="true" />
+                        <span className="circa-mono">{record.organization}</span>
+                        <span className="reader-leaf-sep" aria-hidden="true" />
+                        <span>{record.clearance}</span>
+                      </p>
+                    </div>
+                    {STATUS_STAMPS[record.status] && (
+                      // The status is on the stamp as data, so the sheet can give a state
+                      // its own treatment without the frame styling it here.
+                      <span className="reader-stamp" data-status={record.status}>{STATUS_STAMPS[record.status]}</span>
+                    )}
+                  </header>
+
+                  <div className="reader-sections">
+                    {shown.map((section) => (
+                      <section className="reader-section" key={section.id} id={sectionAnchor(section.id)}
+                        aria-label={section.heading}
+                        data-active={section.id === active ? "true" : undefined}
+                        data-withheld={section.withheld ? "true" : undefined}>
+                        {/* The slot. The frame renders nothing here but the host's bytes. */}
+                        {renderSection?.(section)}
+                      </section>
+                    ))}
                   </div>
-                  {STATUS_STAMPS[record.status] && (
-                    // The status is on the stamp as data, so the sheet can give a state
-                    // its own treatment without the frame styling it here.
-                    <span className="reader-stamp" data-status={record.status}>{STATUS_STAMPS[record.status]}</span>
-                  )}
-                </header>
 
-                <div className="reader-sections">
-                  {shown.map((section) => (
-                    <section className="reader-section" key={section.id} id={sectionAnchor(section.id)}
-                      aria-label={section.heading}
-                      data-active={section.id === active ? "true" : undefined}
-                      data-withheld={section.withheld ? "true" : undefined}>
-                      {/* The slot. The frame renders nothing here but the host's bytes. */}
-                      {renderSection?.(section)}
-                    </section>
-                  ))}
+                  {/* The running foot: the same lens, with what the sheet is and who may read it. */}
+                  <p className="reader-running-foot">
+                    <span>{record.organization}</span>
+                    <span>{CLASS_LABELS[record.klass]} · {record.clearance}</span>
+                  </p>
+
+                  <p className="reader-fixture">
+                    {READER_VOCABULARY.fixture}: the filing on this sheet is illustrative sample content, not canon.
+                  </p>
+                </>
+              ) : (
+                <div className="reader-empty">
+                  <h1 className="reader-empty-title">{code ? "No entry carries this code" : "No record is open"}</h1>
+                  {code && <p className="reader-empty-code circa-mono">{code}</p>}
+                  <p className="reader-empty-note">
+                    {code
+                      ? "The code is well formed and the index does not list it. It may have been withdrawn after the index was rebuilt."
+                      : "Choose a record in the archive index, or a follow-up filed against another record, to open it here."}
+                  </p>
                 </div>
-
-                <p className="reader-fixture">
-                  {READER_VOCABULARY.fixture}: the filing on this sheet is illustrative sample content, not canon.
-                </p>
-              </>
-            ) : (
-              <div className="reader-empty">
-                <h1 className="reader-empty-title">{code ? "No entry carries this code" : "No record is open"}</h1>
-                {code && <p className="reader-empty-code circa-mono">{code}</p>}
-                <p className="reader-empty-note">
-                  {code
-                    ? "The code is well formed and the index does not list it. It may have been withdrawn after the index was rebuilt."
-                    : "Choose a record in the archive index, or a follow-up filed against another record, to open it here."}
-                </p>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </div>
 

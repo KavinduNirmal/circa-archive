@@ -127,7 +127,8 @@ The palette is anchored in naval steel, chilled slates, and faded phosphor blue,
 - **Bevels & Elevation (`#24334a`, `#3a4f6d`):** Architectural boundary lines. Active bevel light sources, panel borders, and segmented grid guides.
 - **Cool Phosphor Accents (`#526e94`, `#82a1c7`, `#a4c2e6`):** Primary reading contrast. Used for focused window title bars, active tab text, critical telemetry readouts, and primary interactives.
 - **Hazard Amber (`#d97736`, `#b85d19`):** Containment breaches, advisory notices, unresolved corrective actions, and system overrides.
-- **Redacted Crimson (`#8a2b2b`, `#5c1d1d`):** Incident Level 4/5 clearances, quarantine locks, kill-switch triggers, and censored document blocks.
+- **Redacted Crimson (`#8a2b2b`, `#5c1d1d`):** Incident Level 4/5 clearances, quarantine locks, kill-switch triggers, censored document blocks, and a contested verdict.
+- **Corroboration Green (`#3f7a56`, `#24503a`):** A corroborated verdict, and nothing else. The palette is otherwise complete without a green, and this one exists because agreement and contest are two readings of one record that have to be told apart at a glance; it is only ever the fill of a pressed control, never a signal in its own right.
 
 ### Contrast Application
 - Never use pure `#ffffff`. All high-visibility text maxes out at `#a4c2e6` or pale zinc `#c8d6e5` to preserve the worn phosphor aesthetic.
@@ -144,7 +145,7 @@ The typography is strictly sans-serif, utilitarian, and engineered for high-dens
 - **Line Heights:** Tightly constrained line heights prevent unnecessary vertical drift, supporting dense layouts typical of Unix incident desks.
 
 ### Exception: the record sheet
-The record reader's paper sheet is set in a typewriter face (`"Courier New"`, with metric-compatible clones behind it) rather than the sans stack. A sheet is a document and not interface chrome, so the archive types its filings and typesets its software; the frame around the sheet — toolbar, section rail, margin, status bar — stays sans-serif, and the value fields and inline code on the sheet keep the terminal mono. The record's code is set in Redacted Crimson as the one identifying mark on the leaf, and the sheet carries a faint `CLASSIFIED` watermark as a CSS background, which keeps it out of the content, the accessibility tree, and every export. This is the only sanctioned departure from the rule above.
+The record reader's paper sheet is set in a typewriter face (`"Courier New"`, with metric-compatible clones behind it) rather than the sans stack. A sheet is a document and not interface chrome, so the archive types its filings and typesets its software; the frame around the sheet — toolbar, section rail, margin, status bar — stays sans-serif, and the value fields and inline code on the sheet keep the terminal mono. The record's code is set in Redacted Crimson as the one identifying mark on the leaf. The sheet is drawn as continuous stationery — round tractor-feed holes and a perforation down each edge, with the filing lens running as a head and a foot — and that edge is a CSS background, which keeps it out of the content, the accessibility tree, and every export. This is the only sanctioned departure from the rule above.
 
 ## Layout & Spacing
 

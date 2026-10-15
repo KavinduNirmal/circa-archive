@@ -1,8 +1,8 @@
 "use client";
 
-import { PanelLeft, PanelRight } from "lucide-react";
-import type { RefObject } from "react";
-import { READER_VOCABULARY } from "./reader-identity";
+import { ChevronDown, ChevronRight, PanelLeft, PanelRight } from "lucide-react";
+import { useId, useState, type RefObject } from "react";
+import { READER_VOCABULARY, userCodeFor } from "./reader-identity";
 import type { ReaderAnnotation } from "./reader-correspondence";
 import type { ReaderSection } from "./reader-model";
 
@@ -154,42 +154,106 @@ export function AnnotationRail({ notes, sections, activeHeading, rail, collapsed
   );
 }
 
-/** One note, with its replies below it. A reply carries no reply affordance of its own. */
+/**
+ * One note, with its replies below it. A reply carries no reply affordance of
+ * its own.
+ *
+ * A note folds to its head, which is the whole point of a margin with a dozen
+ * of them in it: the head still names the writer, their number, and the day, so
+ * a folded note is still a note you can find. Folding is structural rather than
+ * a style — the body, its actions, and its replies are `hidden` — so a folded
+ * margin keeps nothing in the accessibility tree or the layout that the reader
+ * cannot see. The nodes stay in the document, which is what lets the fold
+ * control keep naming the region it folds.
+ */
 function NoteBlock({ note, onEndorse, onReply }: {
   note: ReaderAnnotation;
   onEndorse: (id: string) => void;
   onReply: (noteId: string | null) => void;
 }) {
+  const [folded, setFolded] = useState(false);
+  const bodyId = useId();
   return (
-    <article className="reader-note">
-      <header className="reader-note-head">
-        <span className="reader-note-author">{note.author}</span>
-        <span className="reader-note-when circa-mono">{note.when}</span>
-      </header>
-      <p className="reader-note-body">{note.body}</p>
-      <div className="reader-note-actions">
-        <EndorseButton id={note.id} count={note.noted} onEndorse={onEndorse} />
-        <button type="button" className="reader-note-reply" onClick={() => onReply(note.id)}>Reply</button>
+    <article className="reader-note" data-folded={folded ? "true" : undefined}>
+      <NoteHead author={note.author} when={note.when}
+        fold={{ folded, controls: bodyId, onToggle: () => setFolded((current) => !current) }} />
+      <div className="reader-note-rest" id={bodyId} hidden={folded}>
+        <NoteBody body={note.body} />
+        <div className="reader-note-actions">
+          <EndorseButton id={note.id} count={note.noted} onEndorse={onEndorse} />
+          <button type="button" className="reader-note-reply" onClick={() => onReply(note.id)}>Reply</button>
+        </div>
+        {note.replies.length > 0 && (
+          <ul className="reader-replies">
+            {note.replies.map((reply) => (
+              <li key={reply.id}>
+                <article className="reader-note reader-note-answer">
+                  <NoteHead author={reply.author} when={reply.when} />
+                  <NoteBody body={reply.body} />
+                  <div className="reader-note-actions">
+                    <EndorseButton id={reply.id} count={reply.noted} onEndorse={onEndorse} />
+                  </div>
+                </article>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
-      {note.replies.length > 0 && (
-        <ul className="reader-replies">
-          {note.replies.map((reply) => (
-            <li key={reply.id}>
-              <article className="reader-note reader-note-answer">
-                <header className="reader-note-head">
-                  <span className="reader-note-author">{reply.author}</span>
-                  <span className="reader-note-when circa-mono">{reply.when}</span>
-                </header>
-                <p className="reader-note-body">{reply.body}</p>
-                <div className="reader-note-actions">
-                  <EndorseButton id={reply.id} count={reply.noted} onEndorse={onEndorse} />
-                </div>
-              </article>
-            </li>
-          ))}
-        </ul>
-      )}
     </article>
+  );
+}
+
+/**
+ * Who wrote it, what they are numbered, and when it was filed.
+ *
+ * A reply shares the head with the note it answers, so the code sits under the
+ * display name in both places. `fold` is present on a note and absent on a
+ * reply: a reply is folded by the note above it, and giving it a control of its
+ * own would suggest it can be put away on its own.
+ */
+function NoteHead({ author, when, fold }: {
+  author: string;
+  when: string;
+  fold?: { folded: boolean; controls: string; onToggle: () => void };
+}) {
+  const code = userCodeFor(author);
+  return (
+    <header className="reader-note-head">
+      {fold && (
+        <button type="button" className="reader-note-fold" aria-expanded={!fold.folded} aria-controls={fold.controls} onClick={fold.onToggle}>
+          {fold.folded
+            ? <ChevronRight className="reader-note-caret" aria-hidden="true" />
+            : <ChevronDown className="reader-note-caret" aria-hidden="true" />}
+          <span className="sr-only">{fold.folded ? `Show the note from ${author}` : `Hide the note from ${author}`}</span>
+        </button>
+      )}
+      <span className="reader-note-who">
+        <span className="reader-note-author">{author}</span>
+        {code && <span className="reader-note-code circa-mono">{code}</span>}
+      </span>
+      <span className="reader-note-when circa-mono">{when}</span>
+    </header>
+  );
+}
+
+/**
+ * What the writer typed, with the paragraph breaks they typed it with.
+ *
+ * A note is written in a plain textarea, so a blank line is a paragraph and a
+ * single line break is a new line. Rendering the body as one run of text threw
+ * both away and joined a long note into a single block, which is the one thing
+ * a margin note cannot survive. The text keeps its newlines and the stylesheet
+ * sets `pre-line`, so a line break stays a line break without preserving the
+ * indentation of a pasted block.
+ */
+function NoteBody({ body }: { body: string }) {
+  const paragraphs = body.split(/\n{2,}/).map((paragraph) => paragraph.trim()).filter(Boolean);
+  return (
+    <>
+      {paragraphs.map((paragraph, position) => (
+        <p className="reader-note-body" key={`${position}-${paragraph.length}`}>{paragraph}</p>
+      ))}
+    </>
   );
 }
 

@@ -7,6 +7,7 @@ import {
   notesFor,
 } from "@/components/reader/reader-correspondence";
 import { recordDocument } from "@/components/reader/record-filings";
+import { userCodeFor } from "@/components/reader/reader-identity";
 
 const codes = new Set(ARCHIVE_INDEX.map((entry) => entry.code));
 
@@ -104,5 +105,27 @@ describe("follow-up records", () => {
 
   it("has no follow-ups at all for a code the index does not carry", () => {
     expect(followUpsFor("INC-99999")).toEqual({ inbound: [], outbound: [] });
+  });
+});
+
+describe("correspondent user codes", () => {
+  it("issues a six-digit code to every writer the margin can name", () => {
+    const writers = [
+      ...ANNOTATIONS.map((note) => note.author),
+      ...ANNOTATIONS.flatMap((note) => note.replies.map((reply) => reply.author)),
+    ];
+    for (const writer of writers) {
+      if (writer === "Unattributed") continue;
+      expect(userCodeFor(writer), writer).toMatch(/^\d{6}$/);
+    }
+    // Distinct, so the margin never shows two correspondents with one number.
+    const codes = writers.filter((writer) => writer !== "Unattributed").map((writer) => userCodeFor(writer));
+    expect(new Set(codes).size).toBe(codes.length);
+  });
+
+  it("issues nothing to a note with no writer, rather than inventing a number", () => {
+    expect(userCodeFor("Unattributed")).toBeNull();
+    expect(userCodeFor("")).toBeNull();
+    expect(userCodeFor("Someone Not In The Directory")).toBeNull();
   });
 });

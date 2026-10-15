@@ -13,13 +13,14 @@ import {
   Printer,
   RotateCw,
   TextSearch,
+  Type,
   X,
   ZoomIn,
   ZoomOut,
 } from "lucide-react";
 import { useId, type RefObject } from "react";
 import { READER_NAME, READER_VOCABULARY } from "./reader-identity";
-import { ASSESSMENT_SCALE, READER_VIEWS, formatScale, scaleLimit, viewLabel, type ReaderView } from "./reader-model";
+import { ASSESSMENT_SCALE, DOCUMENT_SIZES, READER_FONTS, READER_VIEWS, fontLabel, formatScale, scaleLimit, viewLabel, type ReaderFont, type ReaderView } from "./reader-model";
 import type { ReaderVerdict } from "./reader-session";
 
 /**
@@ -48,6 +49,9 @@ export type ReaderActions = {
   zoomOut: () => void;
   zoomIn: () => void;
   resetScale: () => void;
+  /** A size chosen from the Text menu rather than stepped to. */
+  setScale: (scale: number) => void;
+  setFont: (font: ReaderFont) => void;
   toggleFit: () => void;
   toggleSearch: () => void;
   comment: () => void;
@@ -59,10 +63,12 @@ export type ReaderActions = {
   closeWindow: () => void;
 };
 
-export function ReaderToolbar({ code, view, scale, fit, matchRef, canGoBack, canGoForward, assessment, verdict, searchOpen, query, onQueryChange, actions }: {
+export function ReaderToolbar({ code, view, scale, font, fit, matchRef, canGoBack, canGoForward, assessment, verdict, searchOpen, query, onQueryChange, actions }: {
   code: string | null;
   view: ReaderView;
   scale: number;
+  /** How the reader has asked for the record to be set. */
+  font: ReaderFont;
   fit: boolean;
   /** Written by the viewer's search effect, which is the only thing that can see the sheet. */
   matchRef: RefObject<HTMLSpanElement | null>;
@@ -87,6 +93,7 @@ export function ReaderToolbar({ code, view, scale, fit, matchRef, canGoBack, can
 
       <div className="reader-toolgroup">
         <ViewMenu view={view} onChange={actions.setView} />
+        <TextMenu font={font} scale={scale} onFont={actions.setFont} onScale={actions.setScale} />
         <ReaderAction label="Scale down" short="" icon={ZoomOut} disabled={scaleLimit(scale, -1)} title="The reader stops at 80 percent" onClick={actions.zoomOut} />
         <button type="button" className="reader-scale circa-sunken" title="Reset to 100 percent" onClick={actions.resetScale}>
           {/* The one flicker on open: a single frame of a scale that is not set. */}
@@ -130,7 +137,11 @@ export function ReaderToolbar({ code, view, scale, fit, matchRef, canGoBack, can
           <span className="reader-assessment-label circa-label" id={assessmentLabelId}>{READER_VOCABULARY.assessment}</span>
           <span className="reader-points">
             {ASSESSMENT_SCALE.map((label, value) => (
-              <label className="reader-point" key={label} data-checked={assessment === value ? "true" : undefined}>
+              // The blocks fill up to the grade reached, so the row reads as one
+              // scale rather than as five unrelated buttons. The dash is the
+              // absence of a judgement, so it is never part of the fill.
+              <label className="reader-point" key={label} data-checked={assessment === value ? "true" : undefined}
+                data-lit={value > 0 && assessment !== undefined && value <= assessment ? "true" : undefined}>
                 {/* A real radio, so the scale keeps its arrow keys and its roving tab stop. */}
                 <input className="reader-point-input" type="radio" name={`reader-assessment-${code ?? "none"}`}
                   value={value} checked={assessment === value} onChange={() => actions.assess(value)} />
@@ -138,9 +149,10 @@ export function ReaderToolbar({ code, view, scale, fit, matchRef, canGoBack, can
               </label>
             ))}
           </span>
+          <span className="reader-assessment-score circa-mono" data-testid="reader-assessment-score">{assessment ?? 0}/5</span>
         </div>
-        <ReaderAction label={READER_VOCABULARY.corroborate} icon={Check} pressed={verdict === "corroborate"} onClick={actions.corroborate} />
-        <ReaderAction label={READER_VOCABULARY.contest} icon={X} pressed={verdict === "contest"} onClick={actions.contest} />
+        <ReaderAction label={READER_VOCABULARY.corroborate} icon={Check} tone="affirm" pressed={verdict === "corroborate"} onClick={actions.corroborate} />
+        <ReaderAction label={READER_VOCABULARY.contest} icon={X} tone="deny" pressed={verdict === "contest"} onClick={actions.contest} />
       </div>
 
       <span className="reader-divider" aria-hidden="true" />
@@ -179,15 +191,62 @@ function ViewMenu({ view, onChange }: { view: ReaderView; onChange: (next: Reade
 }
 
 /**
+ * How the record is set. The reader's preference, not the record's: the archive
+ * types its filings, so Courier is what a document is unless someone reading for
+ * a living asks for something easier on the eyes.
+ *
+ * Size is a set of presets over the same value the toolbar's scale buttons step
+ * through, so the current size is printed on the group rather than implied by a
+ * checked item that a stepped-to value would not match.
+ */
+function TextMenu({ font, scale, onFont, onScale }: {
+  font: ReaderFont;
+  scale: number;
+  onFont: (next: ReaderFont) => void;
+  onScale: (next: number) => void;
+}) {
+  return (
+    <DropdownMenu.Root>
+      <DropdownMenu.Trigger className="reader-action">
+        <Type className="reader-action-glyph" aria-hidden="true" />
+        <span className="reader-action-label">Text</span>
+      </DropdownMenu.Trigger>
+      <DropdownMenu.Portal>
+        <DropdownMenu.Content className="circa-menu" align="start" sideOffset={2}>
+          <DropdownMenu.Label className="circa-menulabel">Type size — {formatScale(scale)}</DropdownMenu.Label>
+          {DOCUMENT_SIZES.map((size) => (
+            <DropdownMenu.Item key={size.scale} className="circa-menuitem" onSelect={() => onScale(size.scale)}>
+              {size.label}
+              <span className="circa-menuvalue">{formatScale(size.scale)}</span>
+            </DropdownMenu.Item>
+          ))}
+          <DropdownMenu.Separator className="circa-menuseparator" />
+          <DropdownMenu.Label className="circa-menulabel">Typeface</DropdownMenu.Label>
+          <DropdownMenu.RadioGroup value={font} onValueChange={(next) => onFont(next as ReaderFont)}>
+            {READER_FONTS.map((choice) => (
+              <DropdownMenu.RadioItem key={choice} className="circa-menuitem" value={choice}>
+                {fontLabel(choice)}
+              </DropdownMenu.RadioItem>
+            ))}
+          </DropdownMenu.RadioGroup>
+        </DropdownMenu.Content>
+      </DropdownMenu.Portal>
+    </DropdownMenu.Root>
+  );
+}
+
+/**
  * One tool. The label is the accessible name and `short` is what the bar
  * prints; an empty `short` leaves a glyph on its own, which is what the tools
  * whose icons already say the word get.
  */
-function ReaderAction({ label, short, icon: Icon, pressed, disabled, title, onClick }: {
+function ReaderAction({ label, short, icon: Icon, pressed, tone, disabled, title, onClick }: {
   label: string;
   short?: string;
   icon: typeof ArrowLeft;
   pressed?: boolean;
+  /** Which way a verdict reads, for the two controls that fill on press. */
+  tone?: "affirm" | "deny";
   disabled?: boolean;
   title?: string;
   onClick: () => void;
@@ -195,6 +254,7 @@ function ReaderAction({ label, short, icon: Icon, pressed, disabled, title, onCl
   const printed = short ?? label;
   return (
     <button type="button" className="reader-action" data-pressed={pressed ? "true" : undefined}
+      data-tone={tone}
       aria-label={label} aria-pressed={pressed === undefined ? undefined : pressed}
       disabled={disabled} title={title} onClick={onClick}>
       <Icon className="reader-action-glyph" aria-hidden="true" />

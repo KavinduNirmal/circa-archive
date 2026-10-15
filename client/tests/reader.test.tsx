@@ -69,8 +69,10 @@ describe("record reader frame", () => {
     const { reader, sheet } = mount("INC-00042", false);
     // The record's identity belongs to the frame, because that copy is the catalogue's.
     expect(within(sheet()).getByRole("heading", { level: 1 })).toHaveTextContent("Stairwell interval, repeated landing");
-    expect(within(sheet()).getByText("INC-00042")).toBeVisible();
-    expect(within(sheet()).getByText(/LEVEL 4/)).toBeVisible();
+    // The code and the clearance are printed twice on purpose: a sheet of a
+    // filing carries them in its running head and foot as well as on the leaf.
+    expect(within(sheet()).getAllByText("INC-00042")).toHaveLength(2);
+    expect(within(sheet()).getAllByText(/LEVEL 4/)).toHaveLength(2);
     const sections = sheet().querySelectorAll("section.reader-section");
     expect(sections).toHaveLength(4);
     expect(sections[0]).toHaveAttribute("id", "reader-section-brief");
@@ -201,6 +203,46 @@ describe("record reader toolbar", () => {
   });
 });
 
+describe("record reader text controls", () => {
+  it("sets the document in Courier unless the reader says otherwise", () => {
+    const { sheet } = mount("INC-00042");
+    expect(sheet()).toHaveAttribute("data-font", "courier");
+    expect(sheet()!.style.getPropertyValue("--reader-document-font")).toContain("Courier New");
+  });
+
+  it("changes the typeface from the Text menu and keeps the machine values monospaced", async () => {
+    const user = userEvent.setup();
+    const { reader, sheet } = mount("INC-00042");
+    await user.click(within(reader).getByRole("button", { name: "Text" }));
+    await user.click(await screen.findByRole("menuitemradio", { name: "Serif" }));
+    expect(sheet()).toHaveAttribute("data-font", "serif");
+    expect(sheet()!.style.getPropertyValue("--reader-document-font")).toContain("Georgia");
+    // The code on the leaf is a machine value, and keeps the terminal's own face.
+    expect(sheet()!.querySelector(".reader-leaf-code")).toHaveClass("circa-mono");
+  });
+
+  it("changes the type size from the Text menu, and the readout agrees", async () => {
+    const user = userEvent.setup();
+    const { reader, sheet } = mount("INC-00042");
+    expect(sheet()!.style.getPropertyValue("--reader-scale")).toBe("1");
+    await user.click(within(reader).getByRole("button", { name: "Text" }));
+    await user.click(await screen.findByRole("menuitem", { name: /^Large/ }));
+    expect(sheet()!.style.getPropertyValue("--reader-scale")).toBe("1.2");
+    // One size, two affordances: the toolbar readout is the same value.
+    expect(within(reader).getByRole("button", { name: "120%" })).toBeVisible();
+  });
+
+  it("keeps the reader's own typeface when the record changes", async () => {
+    const user = userEvent.setup();
+    const { reader, sheet } = mount("INC-00042");
+    await user.click(within(reader).getByRole("button", { name: "Text" }));
+    await user.click(await screen.findByRole("menuitemradio", { name: "Sans serif" }));
+    expect(sheet()).toHaveAttribute("data-font", "sans");
+    await user.click(within(reader).getByRole("button", { name: "Next record" }));
+    expect(sheet()).toHaveAttribute("data-font", "sans");
+  });
+});
+
 describe("record reader sections rail", () => {
   it("previews every section with its printed number and its heading", () => {
     const { reader } = mount("INC-00042");
@@ -299,6 +341,26 @@ describe("record reader annotations rail", () => {
     expect(within(rail).getByText("H. Kim")).toBeVisible();
   });
 
+  it("keeps the paragraph breaks the writer put in a note", async () => {
+    const user = userEvent.setup();
+    const { reader } = mount("INC-00014");
+    const rail = notes(reader);
+    await user.type(
+      within(rail).getByLabelText("File a note."),
+      "The wagon list is short by one.{enter}A twelfth number was struck through.{enter}{enter}The tare weights still sum, which is the part I cannot close.",
+    );
+    await user.click(within(rail).getByRole("button", { name: "File note" }));
+    await verify(user);
+    const written = within(rail).getByText(/The wagon list is short by one\./).closest(".reader-note");
+    expect(written).not.toBeNull();
+    // A blank line is a paragraph; a single line break stays inside its own.
+    const paragraphs = [...(written as HTMLElement).querySelectorAll(".reader-note-body")];
+    expect(paragraphs.map((paragraph) => paragraph.textContent)).toEqual([
+      "The wagon list is short by one.\nA twelfth number was struck through.",
+      "The tare weights still sum, which is the part I cannot close.",
+    ]);
+  });
+
   it("shows the correspondence already filed against a record, replies and all", () => {
     const { reader } = mount("INC-00042");
     const rail = notes(reader);
@@ -337,6 +399,52 @@ describe("record reader annotations rail", () => {
     expect(rail).not.toHaveAttribute("data-collapsed");
     expect(within(rail).getByLabelText("File a note.")).toHaveFocus();
   });
+
+  it("collapses one note to its head, and opens it again without touching the others", async () => {
+    const user = userEvent.setup();
+    const { reader } = mount("INC-00042");
+    const rail = notes(reader);
+    const toggles = within(rail).getAllByRole("button", { name: /^Hide the note from/ });
+    expect(toggles).toHaveLength(2);
+    expect(within(rail).getByText(/the second one this year/i)).toBeVisible();
+    await user.click(toggles[1]);
+    // Folding is structural: the body leaves the accessibility tree and the layout.
+    expect(within(rail).getByText(/the second one this year/i)).not.toBeVisible();
+    expect(within(rail).getByRole("button", { name: /^Show the note from/ })).toHaveAttribute("aria-expanded", "false");
+    // The note above it is untouched.
+    expect(within(rail).getByText(/Two of the three climbs/i)).toBeVisible();
+    await user.click(within(rail).getByRole("button", { name: /^Show the note from/ }));
+    expect(within(rail).getByText(/the second one this year/i)).toBeVisible();
+  });
+
+  it("takes a note's replies down with it when the note is collapsed", async () => {
+    const user = userEvent.setup();
+    const { reader } = mount("INC-00042");
+    const rail = notes(reader);
+    expect(within(rail).getByText(/reported the difference/i)).toBeVisible();
+    expect(within(rail).getAllByRole("button", { name: "Reply" })).toHaveLength(2);
+    await user.click(within(rail).getAllByRole("button", { name: /^Hide the note from/ })[1]);
+    expect(within(rail).getByText(/reported the difference/i)).not.toBeVisible();
+    expect(within(rail).getAllByRole("button", { name: "Reply" })).toHaveLength(1);
+  });
+
+  it("prints a user code under a correspondent's display name", () => {
+    const { reader } = mount("INC-00042");
+    const rail = notes(reader);
+    const writer = within(rail).getByText("M. Okafor").closest(".reader-note-head");
+    expect(writer).toHaveTextContent("481920");
+    // A reply's writer is a correspondent too, and carries their own code.
+    const replier = within(rail).getByText("H. Kim").closest(".reader-note-head");
+    expect(replier).toHaveTextContent("590412");
+  });
+
+  it("prints no user code for correspondence that has no writer", () => {
+    const { reader } = mount("ORG-C-005102");
+    const rail = notes(reader);
+    const head = within(rail).getByText("Unattributed").closest(".reader-note-head");
+    expect(head).not.toBeNull();
+    expect(head?.querySelector(".reader-note-code")).toBeNull();
+  });
 });
 
 describe("record reader engagement", () => {
@@ -366,6 +474,35 @@ describe("record reader engagement", () => {
     await user.click(within(reader).getByRole("button", { name: "Corroborate" }));
     expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument();
     expect(within(reader).getByRole("button", { name: "Corroborate" })).toHaveAttribute("aria-pressed", "true");
+  });
+
+  it("scores the assessment out of five and lights the blocks up to the grade", async () => {
+    const user = userEvent.setup();
+    const { reader } = mount("INC-00042");
+    const score = () => within(reader).getByTestId("reader-assessment-score").textContent;
+    const lit = () => [...reader.querySelectorAll(".reader-point")].map((plate) => plate.getAttribute("data-lit") === "true");
+    expect(score()).toBe("0/5");
+    expect(lit()).toEqual([false, false, false, false, false]);
+    await user.click(within(reader).getByRole("radio", { name: "Sound" }));
+    await verify(user);
+    expect(score()).toBe("3/5");
+    // The dash is the absence of a judgement, so it is never part of the fill.
+    expect(lit()).toEqual([false, true, true, true, false]);
+    await user.click(within(reader).getByRole("radio", { name: "—" }));
+    expect(score()).toBe("0/5");
+    expect(lit()).toEqual([false, false, false, false, false]);
+  });
+
+  it("marks a verdict with its tone, so the bar can fill one green and one red", async () => {
+    const user = userEvent.setup();
+    const { reader } = mount("INC-00042");
+    await user.click(within(reader).getByRole("button", { name: "Corroborate" }));
+    await verify(user);
+    expect(within(reader).getByRole("button", { name: "Corroborate" })).toHaveAttribute("data-tone", "affirm");
+    await user.click(within(reader).getByRole("button", { name: "Contest" }));
+    expect(within(reader).getByRole("button", { name: "Contest" })).toHaveAttribute("data-tone", "deny");
+    // The tone is on the control at rest too, so the fill is a press state and not a new control.
+    expect(within(reader).getByRole("button", { name: "Contest" })).toHaveAttribute("aria-pressed", "true");
   });
 });
 
@@ -489,5 +626,22 @@ describe("record reader renders the filed Markdown", () => {
 
   it("does not stamp an ordinary filing, so there is nothing to fill", () => {
     expect(mount("INC-00014").sheet().querySelector(".reader-stamp")).toBeNull();
+  });
+
+  it("names whose filing it is in a running head and a running foot", () => {
+    const sheet = mount("CIRCA-S-03007").sheet();
+    const head = sheet.querySelector(".reader-running-head");
+    const foot = sheet.querySelector(".reader-running-foot");
+    expect(head).not.toBeNull();
+    expect(foot).not.toBeNull();
+    // Both carry the filing lens the index entry holds, not a second copy of it.
+    expect(head).toHaveTextContent("Qterw-7-3");
+    expect(head).toHaveTextContent("CIRCA-S-03007");
+    expect(foot).toHaveTextContent("Qterw-7-3");
+    expect(foot).toHaveTextContent("LEVEL 3");
+    // The head sits above the leaf and the foot below the sections it closes.
+    const leaf = sheet.querySelector(".reader-leaf");
+    expect(head!.compareDocumentPosition(leaf!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(sheet.querySelector(".reader-sections")!.compareDocumentPosition(foot!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 });

@@ -38,6 +38,13 @@
   --sidebar-ring: #82a1c7;
   --circa-hazard: #d97736;
   --circa-hazard-dark: #b85d19;
+  /*
+   * Corroboration. The palette had no green, and a verdict needs one: this is
+   * the muted institutional green of a passed inspection rather than a signal,
+   * and it is only ever used to fill a pressed control.
+   */
+  --circa-affirm: #3f7a56;
+  --circa-affirm-deep: #24503a;
   --circa-bevel-light: #526e94;
   --circa-bevel-shadow: #0d131a;
   --circa-title-active: #24334a;
@@ -59,6 +66,30 @@
   --circa-stamp: #8a4a12;
   /* The commission's seal, shared by the workstation wallpaper and the public docket. */
   --circa-seal: url('/Government_agency_emblem_seal_de…_2K_20261014194612.jpg');
+  /* Native form controls, which would otherwise paint themselves system blue. */
+  accent-color: var(--primary);
+}
+
+/*
+ * The two surfaces the browser owns. A drag-select and a native control both
+ * default to the system blue, which is the one colour in this interface that
+ * belongs to somebody else's system; both are pulled into the phosphor pair.
+ */
+::selection { background: var(--primary); color: var(--primary-foreground); }
+
+/*
+ * The reader's search highlight, painted by the custom highlight API rather
+ * than by wrapping the renderer's nodes. It needs this rule to exist at all: a
+ * registered highlight with no matching style is painted as nothing, so the
+ * match count would read correctly while no word was marked. The underline
+ * carries the same state as the fill, so the mark is never colour alone. The
+ * name is shared with the frame through `READER_MATCH_HIGHLIGHT`.
+ */
+::highlight(reader-match) {
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
 }
 
 @theme inline {
@@ -567,6 +598,8 @@
   background: linear-gradient(var(--ring), var(--ring)) center / 4px 4px no-repeat;
 }
 .circa-menukey { color: #8fa3b6; font-size: 10px; letter-spacing: .04em; }
+/* The value a menu item would set, on the right of the item's own name. */
+.circa-menuvalue { color: #8fa3b6; font-family: var(--font-mono); font-size: 9px; letter-spacing: .04em; }
 .circa-menuseparator { height: 1px; margin: 3px 4px; background: var(--border); }
 .circa-menulabel { padding: 4px 8px 2px 18px; color: #8fa3b6; font-size: 9px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
 .browser-toolbar { display: flex; flex: 0 0 auto; flex-wrap: wrap; align-items: center; gap: 6px; padding: 4px 6px; background: #1b2636; border-bottom: 1px solid #0d131a; }
@@ -1744,11 +1777,16 @@
   /* The stamp's own colour on paper, at 22%: a contested record carries a fill. */
   --reader-stamp-fill: rgb(138 74 18 / 22%);
   /*
-   * The classification watermark, drawn once as an SVG tile and repeated under
-   * the paper's grain. It is a CSS background, so it is invisible to the
-   * accessibility tree and cannot be selected, printed, or read as content.
+   * The printed edge. Records were carried on a tractor feed, so the sheet
+   * wears a column of round sprocket holes down each side with the perforation
+   * the strip tore along. It is all drawn with backgrounds, so the edge is the
+   * paper rather than anything the renderer produced.
    */
-  --reader-classified: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='680' height='420'%3E%3Ctext x='340' y='210' text-anchor='middle' dominant-baseline='middle' transform='rotate(-30 340 210)' font-family='Courier New, monospace' font-size='52' font-weight='700' letter-spacing='14' fill='%238a2b2b' fill-opacity='0.10'%3ECLASSIFIED%3C/text%3E%3C/svg%3E");
+  --reader-perf-step: 26px;
+  --reader-perf-x: 15px;
+  --reader-perf-r: 3.4px;
+  --reader-perf-hole: #0d131a;
+  --reader-perf-line: rgb(22 32 43 / 18%);
   background: var(--background);
   color: var(--foreground);
 }
@@ -1787,6 +1825,14 @@
 .reader-action:active:not(:disabled) { border-color: var(--circa-bevel-shadow) var(--circa-bevel-light) var(--circa-bevel-light) var(--circa-bevel-shadow); }
 /* A pressed tool is a hole in the bar, the way a held button always read. */
 .reader-action[data-pressed="true"] { border-color: var(--circa-bevel-shadow) var(--circa-bevel-light) var(--circa-bevel-light) var(--circa-bevel-shadow); background: #22304a; color: #e8f1fc; }
+/*
+ * A verdict is not a neutral press. Corroboration fills green and contest fills
+ * red at the same weight, because they are two readings of one record and
+ * neither is the resting state; the red is the documented hazard fill, and its
+ * border stays the crimson the rest of the system already uses.
+ */
+.reader-action[data-pressed="true"][data-tone="affirm"] { border-color: var(--circa-affirm); background: var(--circa-affirm-deep); color: #dff0e4; }
+.reader-action[data-pressed="true"][data-tone="deny"] { border-color: #8a2b2b; background: #5c1d1d; color: #f0dcdc; }
 .reader-action:disabled { color: #5d7085; cursor: default; }
 .reader-action-glyph { width: 14px; height: 14px; }
 .reader-action-label { font-size: 8px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
@@ -1852,7 +1898,11 @@
   cursor: pointer;
 }
 .reader-point:hover { color: #dbe7f5; border-color: #7f9cbe; }
+/* The scale fills up to the grade reached; the chosen block is the loudest. */
+.reader-point[data-lit="true"] { background: #26364f; color: #cfe0f2; }
 .reader-point[data-checked="true"] { border-color: var(--circa-stamp); background: #2c2416; color: var(--circa-hazard); }
+/* How many of the five points the record has been given. */
+.reader-assessment-score { align-self: flex-end; min-width: 26px; color: #8fa3b6; font-size: 9px; letter-spacing: .06em; text-align: right; }
 /* A real radio, so the scale keeps its arrow keys and one tab stop. */
 .reader-point-input { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
 .reader-point-input:focus-visible + .reader-point-word { outline: 2px solid var(--ring); outline-offset: 3px; }
@@ -1870,26 +1920,49 @@
   border-inline: 1px solid rgb(13 19 26 / 28%);
   background-color: var(--reader-sheet);
   /*
-   * Two layers over the paper, and the order matters. The classification
-   * watermark sits under the grain, and being a background it is anchored to
-   * the sheet rather than to the text: a reader scrolls the document, never
-   * past the mark. The grain is a grain and not a grid, so the sheet reads as
-   * paper without drawing lines the text would then have to sit on.
+   * Five layers over the paper, and the order matters. Down each side run the
+   * sprocket holes and the perforation the tractor feed tore along, punched
+   * through to the dark desk the sheet is lying on. Under them is the grain,
+   * which is a grain and not a grid, so the sheet reads as paper without
+   * drawing lines the text would then have to sit on.
    */
-  background-image: var(--reader-classified), repeating-linear-gradient(0deg, rgb(22 32 43 / 1.4%) 0 1px, transparent 1px 3px);
-  background-repeat: repeat, repeat;
+  background-image:
+    radial-gradient(circle at var(--reader-perf-x) calc(var(--reader-perf-step) / 2), var(--reader-perf-hole) 0 var(--reader-perf-r), transparent calc(var(--reader-perf-r) + .5px)),
+    radial-gradient(circle at calc(100% - var(--reader-perf-x)) calc(var(--reader-perf-step) / 2), var(--reader-perf-hole) 0 var(--reader-perf-r), transparent calc(var(--reader-perf-r) + .5px)),
+    repeating-linear-gradient(180deg, var(--reader-perf-line) 0 1.5px, transparent 1.5px 7px),
+    repeating-linear-gradient(180deg, var(--reader-perf-line) 0 1.5px, transparent 1.5px 7px),
+    repeating-linear-gradient(0deg, rgb(22 32 43 / 1.4%) 0 1px, transparent 1px 3px);
+  background-size: 100% var(--reader-perf-step), 100% var(--reader-perf-step), 1px 7px, 1px 7px, auto;
+  background-position: 0 0, 0 0, left calc(var(--reader-perf-x) + 9px) top, right calc(var(--reader-perf-x) + 9px) top, 0 0;
+  background-repeat: repeat-y, repeat-y, repeat-y, repeat-y, repeat;
   color: var(--reader-sheet-ink);
   font-family: var(--reader-document-font);
   font-size: calc(15px * var(--reader-scale));
   line-height: 1.6;
   outline: none;
 }
-/* One measure for the whole document, in characters, so it survives the scale. */
-.reader-leaf, .reader-sections, .reader-fixture, .reader-empty { width: 100%; max-width: 68ch; margin-inline: auto; }
-.reader-sheet[data-fit="margin"] .reader-leaf,
-.reader-sheet[data-fit="margin"] .reader-sections,
-.reader-sheet[data-fit="margin"] .reader-fixture,
-.reader-sheet[data-fit="margin"] .reader-empty { max-width: none; }
+/*
+ * One measure for the whole document, in characters, so it survives the scale.
+ *
+ * It is set once, on a wrapper, because `ch` resolves against the font size of
+ * the element that uses it. The same `68ch` on the running head resolves to a
+ * narrower column than the body, which is how the head came to stop short of
+ * the text it belongs to; on a wrapper it is the document's own measure and
+ * every child inside it shares that one width.
+ */
+.reader-measure { width: 100%; max-width: 68ch; margin-inline: auto; }
+.reader-sheet[data-fit="margin"] .reader-measure,
+.reader-sheet[data-view="two-up"] .reader-measure { max-width: none; }
+
+/*
+ * The running head and foot. Both carry the filing lens, because a sheet that
+ * leaves the desk should still say whose filing it is: the head pairs it with
+ * the record's code, the foot with what the sheet is and who may read it.
+ */
+.reader-running-head, .reader-running-foot { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 14px; color: var(--reader-sheet-soft); font-size: .66em; letter-spacing: .16em; text-transform: uppercase; }
+/* The measure wrapper does the centring, so these carry only their own spacing. */
+.reader-running-head { margin: 0 0 20px; padding-bottom: 7px; border-bottom: 1px solid var(--reader-sheet-edge); }
+.reader-running-foot { margin: 30px 0 0; padding-top: 7px; border-top: 1px solid var(--reader-sheet-edge); }
 
 /* --- The leaf: the record's identity, in the catalogue's own words --- */
 .reader-leaf { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 10px 18px; padding-bottom: 13px; border-bottom: 2px solid var(--reader-sheet-ink); margin-bottom: 26px; }
@@ -1978,6 +2051,10 @@
 .reader-redaction-inline[data-revealed="true"] { background: #f2e4c4; color: #22303c; box-shadow: inset 0 -1px 0 var(--circa-stamp); }
 .reader-redaction-inline[data-empty="true"] { padding: 0 4px; color: var(--reader-sheet); cursor: default; font-size: .82em; letter-spacing: .1em; }
 .reader-redaction-inline:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+/* The redaction outranks the selection colour: without this, dragging across a
+   hidden mark would print the withheld words in the selected-text colour. */
+.reader-redaction-inline[data-revealed="false"]::selection,
+.reader-redaction-inline[data-revealed="false"] *::selection { background: var(--reader-redact); color: transparent; }
 .reader-fields { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 3px 18px; margin: 0 0 18px; padding: 12px 0; border-top: 1px solid var(--reader-sheet-edge); border-bottom: 1px solid var(--reader-sheet-edge); font-size: .86em; }
 .reader-field { display: contents; }
 .reader-field dt { color: var(--reader-sheet-soft); font-size: .84em; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
@@ -2088,6 +2165,10 @@
 .reader-note-group-heading { margin-bottom: 7px; padding-bottom: 3px; border-bottom: 1px solid #cdbb92; color: #7a6a45; font-size: 9px; letter-spacing: .13em; }
 .reader-note-thread, .reader-replies { margin: 0; padding: 0; list-style: none; }
 .reader-note {
+  /* The width of the fold control and its gap. Everything the note says lines
+     up on this inset, so the body sits under the name rather than under the
+     caret; without it a folded thread reads as two columns that do not agree. */
+  --reader-note-indent: 20px;
   position: relative;
   margin: 0 0 11px;
   padding: 8px 10px 7px 11px;
@@ -2095,12 +2176,40 @@
   border: 1px solid #cbb98a;
   box-shadow: 1px 1px 0 rgb(52 42 18 / 16%);
 }
-/* The punched hole that says this slip was filed in a ring binder. */
-.reader-note::before { content: ""; position: absolute; left: -8px; top: 10px; width: 6px; height: 6px; border-radius: 50%; background: #b9a97c; box-shadow: inset 0 1px 0 rgb(0 0 0 / 30%); }
-.reader-note-head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin-bottom: 4px; }
+/* The punched hole that says this slip was filed in a ring binder. It sits in
+   the rail's own gutter, clear of the slip it belongs to. */
+.reader-note::before { content: ""; position: absolute; left: -15px; top: 9px; width: 8px; height: 8px; border-radius: 50%; background: #b9a97c; box-shadow: inset 0 1px 0 rgb(0 0 0 / 30%); }
+/* The body, its actions, and its replies all start where the name does. */
+.reader-note-rest { padding-left: var(--reader-note-indent); }
+/* The fold control, the writer's name, and the number the archive files them
+   under. A folded note keeps this line, which is what makes folding useful. */
+.reader-note-head { display: flex; align-items: flex-start; gap: 6px; margin-bottom: 4px; }
+.reader-note-fold {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  margin-top: -1px;
+  padding: 0;
+  border: 1px solid transparent;
+  background: none;
+  color: #7a6a45;
+  cursor: pointer;
+}
+.reader-note-fold:hover { border-color: #c3b085; background: #efe2bc; color: #3b2f14; }
+.reader-note-fold:focus-visible { outline: 2px solid var(--ring); outline-offset: 1px; }
+.reader-note-caret { width: 11px; height: 11px; }
+.reader-note-who { display: flex; flex: 1 1 auto; flex-direction: column; gap: 1px; min-width: 0; }
 .reader-note-author { color: #3b2f14; font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
-.reader-note-when { color: #7a6a45; font-size: 9px; }
-.reader-note-body { margin: 0 0 7px; color: var(--reader-note-ink); font-size: 11.5px; line-height: 1.55; }
+.reader-note-code { color: #8a7a52; font-size: 9px; letter-spacing: .1em; }
+.reader-note-when { flex: 0 0 auto; color: #7a6a45; font-size: 9px; }
+/* Folded, the head is the whole slip: it loses the gap the body had needed. */
+.reader-note[data-folded="true"] { padding-bottom: 8px; }
+.reader-note[data-folded="true"] .reader-note-head { margin-bottom: 0; }
+/* `pre-line` keeps the writer's line breaks; the blank lines became elements. */
+.reader-note-body { margin: 0 0 7px; color: var(--reader-note-ink); font-size: 11.5px; line-height: 1.55; white-space: pre-line; overflow-wrap: anywhere; }
 .reader-note-actions { display: flex; align-items: center; gap: 6px; }
 .reader-note-noted, .reader-note-reply {
   padding: 2px 6px;
@@ -2233,8 +2342,10 @@
 
 /* --- Responsive: the sheet is never squeezed below a readable width --- */
 @container (max-width: 1100px) {
-  /* Two columns of prose need the width; below it the second column folds under. */
-  .reader-sheet[data-view="two-up"] .reader-sections { grid-template-columns: minmax(0, 1fr); max-width: 68ch; }
+  /* Two columns of prose need the width; below it the second column folds under,
+     and the sheet takes its measure back. */
+  .reader-sheet[data-view="two-up"] .reader-sections { grid-template-columns: minmax(0, 1fr); }
+  .reader-sheet[data-view="two-up"] .reader-measure { max-width: 68ch; }
 }
 @container (max-width: 1023px) {
   /* Both rails start as strips, which is what keeps the measure readable here. */
@@ -2262,8 +2373,9 @@
   .reader-card { width: 100%; }
 }
 @container (max-width: 560px) {
-  /* The sheet loses its padding before it loses its measure. */
-  .reader-sheet { padding: 22px 14px 34px; }
+  /* The sheet loses its padding before it loses its measure, and the printed
+     edge pulls in with it so a hole never lands on the text. */
+  .reader-sheet { padding: 22px 20px 34px; --reader-perf-x: 9px; --reader-perf-r: 2.6px; }
   .reader-leaf-title { font-size: 1.4em; }
   .reader-stamp { margin-left: 0; }
   .reader-assessment { border: 0; }
