@@ -3,6 +3,7 @@
 import { ArrowLeft, ArrowRight, Home, Lock, Plus, RotateCw, Square } from "lucide-react";
 import { Menubar } from "radix-ui";
 import { TEXT_SIZE_LABELS, type ArchiveTextSize } from "./archive-page";
+import "../ui/menubar.css";
 
 /** Every chrome action the browser owns, passed to the menu and the toolbar together. */
 export type BrowserActions = {

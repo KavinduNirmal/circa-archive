@@ -19,6 +19,7 @@ import { TaskbarWindows, WindowLayer, useWorkstationWindows } from "./window-man
 import { DesktopIcon, notificationGlyph, settingsGlyph, type DesktopIconSpec } from "./desktop-icons";
 import { DesktopNavigation, type DesktopDestination } from "./desktop-navigation";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
+import "./workstation.css";
 
 const NotificationIcon = notificationGlyph;
 const SettingsIcon = settingsGlyph;

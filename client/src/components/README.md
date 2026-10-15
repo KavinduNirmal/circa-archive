@@ -6,6 +6,7 @@
 - `desktop-navigation.tsx`: shared shortcut definitions, the My PC contents list, and the desktop/Start navigation.
 - `window-manager.tsx`: the open-window registry (`useWorkstationWindows`), the draggable and resizable `WorkstationWindow`, the `WindowLayer` canvas, and `TaskbarWindows` entries.
 - `desktop-shell.tsx`: wallpaper, taskbar, real UTC clock, Start launcher, notification popover, Settings modal, and the desktop layer that hosts windows.
+- `workstation.css`: the chrome those four shell files render — desktop rail, taskbar and tray, Settings, Start, the window frames, and the CRT screen filter. Imported once, by `desktop-shell.tsx`.
 - `browser/`: the in-world archive browser behind the Search destination; see its [README](browser/README.md).
 - `mail/`: the Outlook-era mail client behind the Inbox destination; see its [README](mail/README.md).
 - `files/`: the CIRCA Explorer file browser behind every folder destination; see its [README](files/README.md).

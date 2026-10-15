@@ -1,0 +1,77 @@
+/*
+ * The shared in-world menu bar: Radix `Menubar` chrome that every application
+ * wears. The items belong to the application; these rules are the plate,
+ * gutter, key column, and restriction marker they all share.
+ */
+.circa-menubar { display: flex; flex: 0 0 auto; align-items: stretch; background: #24334a; border-bottom: 1px solid #0d131a; }
+.circa-menutitle {
+  padding: 3px 9px;
+  border: 0;
+  background: none;
+  color: #a4c2e6;
+  font: inherit;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.circa-menutitle:hover, .circa-menutitle[data-state="open"] { background: #3a4f6d; color: #dce9f5; }
+.circa-menutitle:focus-visible { outline: 1px dashed #c8d6e5; outline-offset: -2px; }
+.circa-menu {
+  z-index: 60;
+  min-width: 190px;
+  padding: 2px;
+  border: 1px solid;
+  border-color: var(--circa-bevel-light) var(--circa-bevel-shadow) var(--circa-bevel-shadow) var(--circa-bevel-light);
+  background: var(--popover);
+  box-shadow: 3px 3px 0 rgb(8 17 25 / 45%);
+}
+.circa-menuitem {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 3px 8px 3px 18px;
+  color: #c8d6e5;
+  font-size: 11px;
+  cursor: pointer;
+  user-select: none;
+  outline: none;
+}
+.circa-menuitem[data-highlighted] { background: var(--accent); color: #eaf2fa; }
+.circa-menuitem[data-disabled] { color: #6b7f92; cursor: default; }
+/*
+ * The current page and a checked text size share one gutter, so the menu reads
+ * as a column. Hazard amber marks "you are here"; the text size uses a real
+ * radio, which per the design system is a square enclosing a solid core.
+ */
+.circa-menuitem[data-current]::before {
+  content: "";
+  position: absolute;
+  left: 7px;
+  top: 50%;
+  width: 6px;
+  height: 6px;
+  margin-top: -3px;
+  background: var(--circa-hazard);
+}
+.circa-menuitem[data-state="checked"]::after {
+  content: "";
+  position: absolute;
+  left: 5px;
+  top: 50%;
+  width: 9px;
+  height: 9px;
+  margin-top: -4px;
+  border: 1px solid var(--ring);
+  background: linear-gradient(var(--ring), var(--ring)) center / 4px 4px no-repeat;
+}
+.circa-menukey { color: #8fa3b6; font-size: 10px; letter-spacing: .04em; }
+/* The value a menu item would set, on the right of the item's own name. */
+.circa-menuvalue { color: #8fa3b6; font-family: var(--font-mono); font-size: 9px; letter-spacing: .04em; }
+.circa-menuseparator { height: 1px; margin: 3px 4px; background: var(--border); }
+.circa-menulabel { padding: 4px 8px 2px 18px; color: #8fa3b6; font-size: 9px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+/* The menu's restriction marker, used where an item acts by refusing. */
+.circa-menurestricted { margin-left: auto; padding-left: 12px; color: #d97736; font-size: 9px; letter-spacing: .06em; text-transform: uppercase; }

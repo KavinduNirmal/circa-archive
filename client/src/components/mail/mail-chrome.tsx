@@ -4,6 +4,7 @@ import { Forward, MailPlus, RefreshCw, Reply, ReplyAll, Search, Trash2 } from "l
 import { Menubar } from "radix-ui";
 import { MAIL_FOLDERS, type MailFolderId } from "./mailbox-index";
 import { MAIL_NAME } from "./mail-identity";
+import "../ui/menubar.css";
 
 /** `unread` is a filter over the current folder, not a folder of its own. */
 export type MailView = "all" | "unread";

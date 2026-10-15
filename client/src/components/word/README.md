@@ -14,6 +14,7 @@ The scope is deliberately the markdown-specific tools, which is what the format 
 - `word-window.tsx`: the text area and event wiring. This is the only file that touches the DOM.
 - `word-notice.tsx`: the refused filing and the About box, as classic message boxes.
 - `word-identity.ts`: the in-world product name, the window title, and the text sizes.
+- `word.css`: the format bar, the drawn ruler, the sheet on its desk, and the status bar. Imported by `word-window.tsx`.
 
 ## The tools
 

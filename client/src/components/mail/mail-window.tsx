@@ -24,6 +24,7 @@ import { MailFindBar, MailFolders, MailMenu, MailStatus, MailToolbar, type MailA
 import { MessageList } from "./message-list";
 import { ComposePane, ReadingEmpty, ReadingPane, draftFrom, type ComposeDraft, type ComposeKind } from "./message-view";
 import { MailNotice, type MailNoticeKind } from "./mail-notice";
+import "./mail.css";
 
 const SORTABLE_TITLES: Record<MailSortColumn, string> = {
   importance: "importance",

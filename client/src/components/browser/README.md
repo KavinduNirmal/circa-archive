@@ -27,6 +27,7 @@ The fiction drives the interaction model. The local network permits one address 
 - `browser-window.tsx`: the document stack, the search form state, the action set, and the composition of chrome plus page.
 - `browser-notice.tsx`: the refusals and the About box, as classic message boxes.
 - `browser-identity.ts`: the in-world product name and window title, in their own module so the notices and the chrome do not import each other in a cycle.
+- `browser.css`: the browser's own chrome and the archive document it frames, including the container queries that reflow both. Imported by `browser-window.tsx`.
 
 ## Visual contract
 

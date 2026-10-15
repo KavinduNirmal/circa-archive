@@ -5,6 +5,7 @@ import { ARCHIVE_INDEX } from "../browser/archive-index";
 import { DesktopIcon } from "../desktop-icons";
 import { FILE_TREE } from "../files/files-index";
 import { MAILBOX_FIXTURE, folderMessages } from "../mail/mailbox-index";
+import "./boot.css";
 
 /**
  * The power-on screen between the public landing page and the workstation.

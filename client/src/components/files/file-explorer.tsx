@@ -23,6 +23,7 @@ import {
   type FileSortKey,
   type FileView,
 } from "./files-index";
+import "./files.css";
 
 /** The favourites the Go menu and the address bar's place list both offer. */
 const PLACES: readonly { id: string; label: string }[] = [

@@ -7,6 +7,7 @@ The public agency portal at `/` and the workstation's boot sequence.
 - `landing-page.tsx`: server-rendered public notices, audience procedures, directory, revision register, and archive entry.
 - `landing-page.module.css`: scoped portal layout, steel and paper palette, responsive rules, and rare decorative movement.
 - `boot-sequence.tsx`: the existing `/desktop` power-on screen and `WorkstationBoot` wrapper.
+- `boot.css`: the post screen's plate, seals, progress cells, and its blink and settle animation. Imported by `boot-sequence.tsx`.
 
 ## Design decision — 2026-10-15
 

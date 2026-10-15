@@ -28,6 +28,7 @@ The fiction decides the interaction model, the same way it does in the archive b
 - `mail-notice.tsx`: the retention refusal and the About box, over the shared [message box](../ui/message-box.tsx).
 - `mail-window.tsx`: the store, the view over it, and the action set.
 - `mail-identity.ts`: the in-world product name and window title, in their own module so the chrome and the notices do not import each other in a cycle.
+- `mail.css`: the Outlook Bar, find bar, grid, reading pane, composer, and status bar, with the white viewer override scoped to `.mail-view`. Imported by `mail-window.tsx`.
 
 ## Visual contract
 

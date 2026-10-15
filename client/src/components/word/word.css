@@ -1,0 +1,154 @@
+/*
+ * Record editor (the CIRCA Word destination).
+ *
+ * A 1999 word processor: menu bar, format bar, ruler, a sheet on a grey desk,
+ * and a status bar of cells. The chrome is workstation steel and the sheet is
+ * paper, the same split the browser, the mailbox, and the file browser use, so
+ * the document reads as the archive's content rather than one more steel panel.
+ *
+ * The format bar carries the markdown tools and nothing else. Each button is the
+ * same fixed width, because a wide label like `{ }` would otherwise stagger a row
+ * whose whole value is that it can be read at a glance.
+ */
+.word { container-type: inline-size; display: flex; flex-direction: column; height: 100%; min-height: 0; }
+.word-formatbar { display: flex; flex: 0 0 auto; flex-wrap: wrap; align-items: center; gap: 3px; padding: 4px 6px; row-gap: 4px; background: var(--card); border-bottom: 1px solid var(--circa-bevel-shadow); }
+.word-formatgroup { display: flex; align-items: center; gap: 3px; }
+.word-formatgroup + .word-formatgroup { margin-left: 2px; }
+.word-formatlegend { padding-right: 2px; color: #8fa3b6; font-size: 8px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+.word-formatdivider { align-self: stretch; width: 0; margin: 1px 4px; border-left: 1px solid var(--circa-bevel-shadow); border-right: 1px solid #4b5d6a; }
+.word-stylelabel { color: #8fa3b6; font-size: 9px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.word-style {
+  width: 108px;
+  height: 21px;
+  padding: 0 16px 0 4px;
+  border: 1px solid;
+  border-color: var(--circa-bevel-shadow) var(--circa-bevel-light) var(--circa-bevel-light) var(--circa-bevel-shadow);
+  appearance: none;
+  background-color: #0d131a;
+  /* A drawn caret, because the native one ignores the palette. */
+  background-image: linear-gradient(45deg, transparent 50%, #82a1c7 50%), linear-gradient(135deg, #82a1c7 50%, transparent 50%);
+  background-position: calc(100% - 10px) 9px, calc(100% - 6px) 9px;
+  background-repeat: no-repeat;
+  background-size: 4px 4px, 4px 4px;
+  color: #c8d6e5;
+  font: inherit;
+  font-size: 10px;
+}
+.word-style:focus-visible { outline: 1px dashed #c8d6e5; outline-offset: 1px; }
+.word-tool {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 24px;
+  height: 21px;
+  padding: 0;
+  border: 1px solid transparent;
+  background: none;
+  color: #dce9f5;
+  font: inherit;
+  cursor: pointer;
+}
+.word-tool-wide { width: auto; padding: 0 7px; }
+.word-tool:hover:not(:disabled) { border-color: var(--circa-bevel-light); background: #22303f; }
+.word-tool:active:not(:disabled),
+.word-tool[aria-pressed="true"] {
+  border-color: var(--circa-bevel-shadow) var(--circa-bevel-light) var(--circa-bevel-light) var(--circa-bevel-shadow);
+  background: #151d27;
+}
+.word-tool:disabled { color: #5c6b79; cursor: default; }
+.word-tool:focus-visible { outline: 1px dashed #c8d6e5; outline-offset: -3px; }
+.word-toollabel { font-family: var(--font-mono); font-size: 11px; font-weight: 700; line-height: 1; letter-spacing: .02em; }
+.word-addressbar { display: flex; flex: 0 0 auto; align-items: center; gap: 6px; padding: 3px 6px; background: var(--card); border-bottom: 1px solid var(--circa-bevel-shadow); }
+.word-addresslabel { color: #8fa3b6; font-size: 9px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.word-addressinput {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 20px;
+  padding: 0 5px;
+  border: 1px solid;
+  border-color: var(--circa-bevel-shadow) var(--circa-bevel-light) var(--circa-bevel-light) var(--circa-bevel-shadow);
+  background: #0d131a;
+  color: #a4c2e6;
+  font-size: 11px;
+  outline: none;
+}
+.word-addressinput:focus-visible { border-color: var(--ring); }
+.word-addressbutton {
+  flex: 0 0 auto;
+  height: 20px;
+  padding: 0 10px;
+  border: 1px solid;
+  border-color: var(--circa-bevel-light) var(--circa-bevel-shadow) var(--circa-bevel-shadow) var(--circa-bevel-light);
+  background: #1b2636;
+  color: #c8d6e5;
+  font: inherit;
+  font-size: 10px;
+  cursor: pointer;
+}
+.word-addressbutton:hover { background: #304155; }
+.word-addressbutton:focus-visible { outline: 1px dashed #c8d6e5; outline-offset: 1px; }
+/* The ruler is drawn rather than measured: margins in steel, an inch scale between them. */
+.word-ruler {
+  flex: 0 0 auto;
+  height: 15px;
+  border-bottom: 1px solid var(--circa-bevel-shadow);
+  /* One dim scale with a stronger mark each inch, under the page's own margins. */
+  background:
+    repeating-linear-gradient(90deg, #8d9aa6 0 1px, transparent 1px 8px),
+    repeating-linear-gradient(90deg, #33445a 0 1px, transparent 1px 32px),
+    #cfd8e2;
+  background-position: 0 8px, 0 4px, 0 0;
+  background-repeat: repeat-x, repeat-x, repeat;
+}
+.word-desk { flex: 1; min-height: 0; overflow: auto; padding: 10px; background: #7f8b96; }
+.word-page {
+  position: relative;
+  margin: 0 auto;
+  padding: 26px 30px 34px;
+  background: #ffffff;
+  box-shadow: 3px 3px 0 rgb(8 17 25 / 34%);
+  border: 1px solid #5d6a76;
+}
+.word-document {
+  display: block;
+  width: 100%;
+  min-height: 320px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #10161d;
+  font-size: 13px;
+  line-height: 19px;
+  resize: none;
+  outline: none;
+  overflow: hidden;
+}
+.word[data-size="small"] .word-document { font-size: 11px; line-height: 17px; }
+.word[data-size="large"] .word-document { font-size: 16px; line-height: 23px; }
+.word-page-stamp {
+  position: absolute;
+  right: 12px;
+  bottom: 10px;
+  padding: 1px 6px;
+  border: 1px solid var(--circa-stamp);
+  color: var(--circa-stamp);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .14em;
+  transform: rotate(-3deg);
+}
+.word-statusbar { display: flex; flex: 0 0 auto; align-items: stretch; background: var(--card); border-top: 1px solid var(--circa-bevel-shadow); font-size: 9px; letter-spacing: .05em; text-transform: uppercase; }
+.word-status-report { flex: 1; min-width: 0; padding: 4px 8px; color: #a4c2e6; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.word-status-cell { padding: 4px 8px; border-left: 1px solid var(--circa-bevel-shadow); color: #8fa3b6; white-space: nowrap; }
+
+@container (max-width: 620px) {
+  .word-formatlegend { display: none; }
+  .word-style { width: 84px; }
+  .word-page { padding: 18px 18px 28px; }
+}
+@container (max-width: 460px) {
+  /* Below this the ruler is more chrome than tool, so the sheet keeps the room. */
+  .word-ruler { display: none; }
+  .word-status-cell:nth-child(3) { display: none; }
+  .word-status-cell:nth-child(4) { display: none; }
+}

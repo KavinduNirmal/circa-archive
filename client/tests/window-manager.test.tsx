@@ -228,7 +228,7 @@ describe("workstation windows", () => {
     const inbox = screen.getByRole("dialog", { name: MAIL_WINDOW_TITLE });
     // absolute positioning comes from the stylesheet, which jsdom does not apply,
     // so assert the box the component writes plus the rules the frame depends on.
-    const sheet = readFileSync("src/app/globals.css", "utf8");
+    const sheet = readFileSync("src/components/workstation.css", "utf8");
     expect(sheet).toMatch(/\.workstation-window \{[^}]*position: absolute;/);
     expect(sheet).toMatch(/\.window-layer \{[^}]*position: absolute;/);
     for (const frame of [archive, inbox]) {

@@ -13,6 +13,7 @@ import {
 import { ArchivePage, type ArchiveDocument, type ArchiveTextSize } from "./archive-page";
 import { BrowserMenu, BrowserStatus, BrowserTabs, BrowserToolbar, type BrowserActions } from "./browser-chrome";
 import { BrowserNotice, type BrowserNoticeKind } from "./browser-notice";
+import "./browser.css";
 
 const EMPTY_QUERY: ArchiveQuery = { text: "", klass: "all", period: "any" };
 

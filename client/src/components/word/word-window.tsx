@@ -6,6 +6,7 @@ import { WORD_NAME, WORD_WINDOW_TITLE } from "./word-identity";
 import { WordMenu, WordRuler, WordStatus, WordToolbar, type WordActions } from "./word-chrome";
 import { WordNotice, type WordNoticeKind } from "./word-notice";
 import { cursorPosition, editorReducer, editorStats, initialState } from "./editor-state";
+import "./word.css";
 
 /** The body a new document starts with, so the tools have something to act on. */
 const STARTER = [

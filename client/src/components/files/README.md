@@ -15,6 +15,7 @@ It exists so a folder can be used twice. The archive index is a browsable tree a
 - `file-list.tsx`: the three layouts. One column spec drives both the details header row and its body rows.
 - `files-notice.tsx`: the refusals, the folder Properties sheet, and the About box as classic message boxes.
 - `files-identity.ts`: the in-world product name and the per-folder window title helper.
+- `files.css`: the Explorer chrome, the tree pane, the three listing layouts, and their container queries. Imported by `file-explorer.tsx`.
 
 ## The read-only fiction
 

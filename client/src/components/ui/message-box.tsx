@@ -2,6 +2,7 @@
 
 import { AlertDialog } from "radix-ui";
 import { AlertTriangle, Info } from "lucide-react";
+import "./message-box.css";
 
 export type MessageBoxProps = {
   open: boolean;

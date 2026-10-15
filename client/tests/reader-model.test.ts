@@ -134,7 +134,7 @@ describe("reader search highlight", () => {
   it("styles the highlight it registers, because an unstyled one is painted as nothing", () => {
     // The count is written by hand and would read correctly either way, so this
     // is the only thing standing between a working search and a silent no-op.
-    const stylesheet = readFileSync(resolve(process.cwd(), "src/app/globals.css"), "utf8");
+    const stylesheet = readFileSync(resolve(process.cwd(), "src/components/reader/reader.css"), "utf8");
     expect(READER_MATCH_HIGHLIGHT).toBe("reader-match");
     expect(stylesheet).toContain(`::highlight(${READER_MATCH_HIGHLIGHT})`);
   });

@@ -4,6 +4,7 @@ import { Menubar } from "radix-ui";
 import { WORD_NAME, TEXT_SIZE_LABELS, type TextSize } from "./word-identity";
 import { MARKDOWN_TOOLS, findTool, type MarkdownTool, type MarkdownToolId } from "./document-model";
 import { canRedo, canUndo, type EditorState } from "./editor-state";
+import "../ui/menubar.css";
 
 /** Every action the editor's chrome can take. */
 export type WordActions = {

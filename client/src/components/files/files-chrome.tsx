@@ -7,6 +7,7 @@ import {
 import { Menubar } from "radix-ui";
 import { EXPLORER_NAME } from "./files-identity";
 import { SORT_KEYS, sortKeyLabel, type FileSortKey, type FileView, type SortDirection } from "./files-index";
+import "../ui/menubar.css";
 
 /** Every chrome action the explorer owns, handed to the menu and the toolbar together. */
 export type FileActions = {

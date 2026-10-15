@@ -1,0 +1,43 @@
+/*
+ * The in-world message box rendered by `message-box.tsx`. Radix portals it to
+ * the body, so it is positioned against the viewport rather than against the
+ * application that opened it.
+ */
+.message-box-backdrop { position: fixed; z-index: 70; inset: 0 0 var(--circa-taskbar-height); background: rgb(8 17 25 / 34%); }
+.message-box {
+  position: fixed;
+  z-index: 71;
+  left: 50%;
+  top: 42%;
+  transform: translate(-50%, -50%);
+  width: min(380px, calc(100vw - 24px));
+  padding: 3px;
+  background: var(--popover);
+  box-shadow: 6px 6px 0 rgb(8 17 25 / 42%);
+}
+.message-box-titlebar { display: flex; align-items: center; padding-left: 8px; background: linear-gradient(90deg, #30445e, #24334a); }
+.message-box-title { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.message-box-body { display: flex; gap: 10px; padding: 12px 10px 8px; }
+.message-box-glyph { flex: 0 0 auto; }
+.message-box-icon { width: 24px; height: 24px; color: var(--circa-hazard); }
+.message-box-text { display: block; color: #c8d6e5; font-size: 11px; line-height: 16px; }
+.message-box-heading { display: block; margin-bottom: 4px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+.message-box-detail { padding: 6px 10px 0; color: var(--circa-hazard); font-size: 10px; overflow-wrap: anywhere; }
+.message-box-reference { padding: 4px 10px 0; color: #8fa3b6; font-size: 9px; letter-spacing: .06em; }
+.message-box-actions { display: flex; justify-content: flex-end; padding: 10px; }
+.message-box-ok {
+  min-width: 74px;
+  padding: 4px 10px;
+  border: 1px solid;
+  border-color: var(--circa-bevel-light) var(--circa-bevel-shadow) var(--circa-bevel-shadow) var(--circa-bevel-light);
+  background: var(--secondary);
+  color: #dce9f5;
+  font: inherit;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.message-box-ok:hover { background: #304155; }
+.message-box-ok:focus-visible { outline: 1px dashed #c8d6e5; outline-offset: 2px; }

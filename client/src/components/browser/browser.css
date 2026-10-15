@@ -1,0 +1,300 @@
+/*
+ * Archive browser (the Search destination).
+ *
+ * The chrome is workstation furniture, so it keeps the steel palette and the
+ * bevels. The document inside the single tab is the archive's own page and
+ * switches to the paper surface the records render on: this window is a frame
+ * around someone else's document, and that contrast is what makes it read as a
+ * browser rather than one more steel panel.
+ *
+ * The browser is its own size container. A workstation window is resized
+ * independently of the viewport, so the reflow rules below key off the frame's
+ * inline size, not the screen. Document type is in `em` and driven by
+ * `data-text-size`, so the View menu scales the page without touching chrome.
+ */
+.browser {
+  container-type: inline-size;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+.browser-toolbar { display: flex; flex: 0 0 auto; flex-wrap: wrap; align-items: center; gap: 6px; padding: 4px 6px; background: #1b2636; border-bottom: 1px solid #0d131a; }
+.browser-nav { display: flex; flex: 0 0 auto; gap: 3px; }
+.browser-tool {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 7px;
+  border: 1px solid;
+  border-color: var(--circa-bevel-light) var(--circa-bevel-shadow) var(--circa-bevel-shadow) var(--circa-bevel-light);
+  background: var(--secondary);
+  color: #a4c2e6;
+  font: inherit;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.browser-tool:hover:not(:disabled) { background: #304155; color: #dce9f5; }
+.browser-tool:active:not(:disabled) { border-color: var(--circa-bevel-shadow) var(--circa-bevel-light) var(--circa-bevel-light) var(--circa-bevel-shadow); background: var(--card); }
+.browser-tool:disabled { border-color: #3d4c5e #131b24 #131b24 #3d4c5e; background: #1e2836; color: #64757f; cursor: default; }
+.browser-tool:focus-visible { outline: 1px dashed #c8d6e5; outline-offset: -3px; }
+.browser-tool-glyph { width: 13px; height: 13px; }
+.browser-address { display: flex; flex: 1 1 220px; align-items: center; gap: 6px; min-width: 0; }
+.browser-address-label { color: #8fa3b6; font-size: 9px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.browser-address-field {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 5px;
+  height: 22px;
+  min-width: 0;
+  padding: 0 5px;
+  border: 1px solid;
+  border-color: var(--circa-bevel-shadow) var(--border) var(--border) var(--circa-bevel-shadow);
+  background: var(--background);
+}
+/* The trough owns the focus ring: the bare input has no border of its own to light up. */
+.browser-address-field:focus-within { border-color: var(--ring); }
+.browser-address-lock { flex: 0 0 auto; width: 11px; height: 11px; color: var(--circa-hazard); }
+.browser-address-input { flex: 1; min-width: 0; border: 0; background: none; color: #a4c2e6; font-size: 11px; outline: none; }
+.browser-go {
+  height: 22px;
+  padding: 0 10px;
+  border: 1px solid;
+  border-color: var(--circa-bevel-light) var(--circa-bevel-shadow) var(--circa-bevel-shadow) var(--circa-bevel-light);
+  background: var(--secondary);
+  color: #a4c2e6;
+  font: inherit;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.browser-go:hover { background: #304155; color: #dce9f5; }
+.browser-go:focus-visible { outline: 1px dashed #c8d6e5; outline-offset: 2px; }
+.browser-tabstrip { display: flex; flex: 0 0 auto; align-items: flex-end; gap: 3px; padding: 4px 6px 0; background: #151d27; }
+.browser-tablist { display: flex; align-items: flex-end; min-width: 0; }
+/*
+ * The one permanent tab wears the document's own paper and drops its bottom
+ * edge, so it merges into the page underneath instead of floating above it.
+ */
+.browser-tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 240px;
+  padding: 4px 10px;
+  border-top: 1px solid var(--circa-bevel-light);
+  border-right: 1px solid var(--circa-bevel-shadow);
+  border-bottom: 0;
+  border-left: 1px solid var(--circa-bevel-light);
+  background: var(--circa-paper);
+  color: var(--circa-ink);
+  font: inherit;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.browser-tab > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.browser-tab:focus-visible { outline: 2px solid var(--circa-ink); outline-offset: -2px; }
+.browser-tab-icon { flex: 0 0 auto; width: 14px; height: 14px; image-rendering: pixelated; }
+.browser-tab-lock { flex: 0 0 auto; width: 10px; height: 10px; color: #5a6a7a; }
+.browser-newtab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 20px;
+  margin-bottom: 1px;
+  border: 1px solid;
+  border-color: var(--circa-bevel-light) var(--circa-bevel-shadow) var(--circa-bevel-shadow) var(--circa-bevel-light);
+  background: var(--secondary);
+  color: #a4c2e6;
+  cursor: pointer;
+}
+.browser-newtab:hover { background: #304155; color: #dce9f5; }
+.browser-newtab:active { border-color: var(--circa-bevel-shadow) var(--circa-bevel-light) var(--circa-bevel-light) var(--circa-bevel-shadow); background: var(--card); }
+.browser-newtab:focus-visible { outline: 1px dashed #c8d6e5; outline-offset: 2px; }
+.browser-newtab-glyph { width: 12px; height: 12px; }
+.browser-page { flex: 1; min-height: 0; overflow: auto; background: var(--circa-paper); }
+.browser-statusbar { display: flex; flex: 0 0 auto; align-items: stretch; background: #1b2636; border-top: 1px solid #0d131a; font-size: 9px; letter-spacing: .05em; text-transform: uppercase; }
+.browser-status-text { flex: 1; min-width: 0; padding: 4px 8px; color: #a4c2e6; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.browser-status-cell { display: flex; align-items: center; gap: 5px; padding: 4px 8px; border-left: 1px solid #0d131a; color: #8fa3b6; white-space: nowrap; }
+.browser-status-glyph { width: 10px; height: 10px; color: var(--circa-hazard); }
+
+/*
+ * The archive's own document, written the way a 1999 internal index was:
+ * masthead over a double rule, a boxed search block, and a bordered table.
+ * Chrome labels and table headers stay uppercase; prose stays sentence case,
+ * because document copy set in caps is harder to read for no institutional gain.
+ */
+.archive-page { padding: 14px 16px 20px; color: var(--circa-ink); font-size: 12px; line-height: 17px; }
+.archive-page[data-text-size="small"] { font-size: 11px; line-height: 16px; }
+.archive-page[data-text-size="large"] { font-size: 14px; line-height: 20px; }
+.archive-masthead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+  padding-bottom: 10px;
+  border-bottom: 3px double var(--circa-rule);
+}
+/* One flex item, so a narrow frame wraps the stamp away instead of orphaning the seal. */
+.archive-masthead-id { display: flex; flex: 1 1 18em; align-items: center; gap: 12px; min-width: 0; }
+.archive-seal { flex: 0 0 auto; width: 56px; height: 56px; object-fit: cover; border: 1px solid var(--circa-rule); }
+.archive-kicker { color: var(--circa-ink-soft); font-size: .75em; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; }
+.archive-title { font-size: 1.8em; font-weight: 700; line-height: 1.15; }
+.archive-subtitle { color: var(--circa-ink-soft); font-size: .92em; }
+.archive-clearance {
+  flex: 0 0 auto;
+  align-self: flex-start;
+  padding: 2px 6px;
+  border: 1px solid var(--circa-stamp);
+  color: var(--circa-stamp);
+  font-size: .75em;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+.archive-sections { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 8px; margin: 8px 0 12px; font-size: .85em; }
+.archive-tablink { padding: 0; border: 0; background: none; color: var(--circa-link); font: inherit; text-decoration: underline; cursor: pointer; }
+.archive-tablink:hover { color: #0e2a47; text-decoration: none; }
+.archive-tablink[aria-current] { color: var(--circa-ink); font-weight: 700; text-decoration: none; }
+.archive-tablink:focus-visible { outline: 2px solid var(--circa-link); outline-offset: 1px; }
+.archive-separator { color: var(--circa-rule); }
+.archive-search { margin: 0 0 14px; }
+.archive-fieldset { margin: 0; padding: 8px 10px 10px; border: 1px solid var(--circa-rule); background: var(--circa-paper-raised); }
+.archive-legend { padding: 0 6px; color: var(--circa-ink-soft); font-size: .78em; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+.archive-search-fields { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 8px; }
+.archive-field { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.archive-field-query { flex: 1 1 12em; }
+.archive-field label { color: var(--circa-ink-soft); font-size: .72em; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+/*
+ * Fields are the one place the paper surface needs a strong bevel: a browser's
+ * native select chrome brought its own dark border and ignored the palette, so
+ * appearance is cleared and the caret is drawn, which lets the input and the
+ * select share one sunken well.
+ */
+.archive-input, .archive-select {
+  height: 22px;
+  padding: 0 4px;
+  border: 1px solid;
+  border-color: #5f6e7d #f4f8fb #f4f8fb #5f6e7d;
+  background-color: var(--circa-paper-sunken);
+  color: var(--circa-ink);
+  /*
+   * Type comes from the base control reset and is not restated here. A field
+   * carrying `.circa-mono` has to let that unlayered rule win, and a local
+   * `font-family` would out-rank it by source order. See `globals.css`.
+   */
+  font-size: .92em;
+  appearance: none;
+}
+.archive-input { width: 100%; min-width: 0; }
+.archive-select {
+  min-width: 9em;
+  padding-right: 20px;
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--circa-ink) 50%),
+    linear-gradient(135deg, var(--circa-ink) 50%, transparent 50%);
+  background-position: right 9px center, right 4px center;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+}
+.archive-input:focus-visible, .archive-select:focus-visible { outline: 2px solid var(--circa-link); outline-offset: 0; }
+.archive-actions { display: flex; gap: 6px; }
+.archive-button {
+  height: 24px;
+  padding: 0 10px;
+  border: 1px solid;
+  border-color: #e8eef4 #6f7f90 #6f7f90 #e8eef4;
+  background: var(--circa-paper-raised);
+  color: var(--circa-ink);
+  font: inherit;
+  font-size: .8em;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.archive-button:hover { background: #e4eaf0; }
+.archive-button:active { border-color: #6f7f90 #e8eef4 #e8eef4 #6f7f90; }
+.archive-button:focus-visible { outline: 2px solid var(--circa-link); outline-offset: 1px; }
+/* One primary action per page: the search submit is the only filled control. */
+.archive-search .archive-actions button[type="submit"] { border-color: #5a7ea0 #101c29 #101c29 #5a7ea0; background: #24425f; color: #e8eef5; }
+.archive-search .archive-actions button[type="submit"]:hover { background: #2c5075; }
+/* Secondary weight: the same block outlined instead of filled, so the record
+   below it leads and the search block still reads as a finished control. */
+.archive-search[data-variant="compact"] { margin-bottom: 12px; }
+.archive-search[data-variant="compact"] .archive-fieldset {
+  padding: 8px 10px 10px;
+  border: 1px solid var(--circa-rule);
+  background: none;
+}
+.archive-search[data-variant="compact"] .archive-field-query { flex: 1 1 10em; }
+.archive-search[data-variant="compact"] .archive-select { min-width: 7.5em; }
+.archive-search[data-variant="compact"] .archive-button { height: 22px; }
+.archive-heading { margin: 0 0 6px; padding-bottom: 3px; border-bottom: 1px solid var(--circa-rule); font-size: 1.08em; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.archive-page h3.archive-heading { font-size: .95em; }
+.archive-lede { max-width: 60ch; margin: 0 0 10px; color: var(--circa-ink-soft); }
+.archive-query-line { margin: 0 0 8px; color: var(--circa-ink-soft); font-size: .85em; }
+.archive-hint, .archive-note, .archive-fixture { color: var(--circa-ink-soft); font-size: .82em; }
+.archive-table-scroll { overflow-x: auto; }
+.archive-table { width: 100%; border-collapse: collapse; font-size: .92em; }
+.archive-table th, .archive-table td { padding: 3px 6px; border: 1px solid var(--circa-rule); text-align: left; vertical-align: top; }
+.archive-table thead th { background: #a3b2c0; color: #101a24; font-size: .78em; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.archive-table tbody tr:nth-child(even) { background: #bac6d2; }
+.archive-table tbody tr:hover { background: var(--circa-paper-raised); }
+.archive-chip { display: inline-block; padding: 0 4px; border: 1px solid var(--circa-rule); color: #3d4d5e; font-size: .78em; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.archive-chip[data-status="contested"] { border-color: #a3620f; color: #7f4a08; }
+.archive-chip[data-status="sealed"], .archive-chip[data-status="restricted"] { border-color: #8a2b2b; color: #7c2222; }
+.archive-chip[data-status="erased"] { border-color: #5b6672; color: #5b6672; text-decoration: line-through; }
+.archive-redacted { display: inline-block; width: 7em; height: .85em; background: var(--circa-ink); vertical-align: middle; }
+.archive-recent { margin: 0 0 10px; padding: 0; list-style: none; }
+.archive-recent li { display: flex; align-items: baseline; gap: 10px; padding: 3px 0; border-bottom: 1px dotted var(--circa-rule); }
+.archive-recent-designation { flex: 1; min-width: 0; }
+.archive-recent-date { color: var(--circa-ink-soft); }
+/* `font-family` is left to the base control reset so `.circa-mono` can win. */
+.archive-link { padding: 0; border: 0; background: none; color: var(--circa-link); font-size: inherit; font-weight: inherit; text-align: left; text-decoration: underline; cursor: pointer; }
+.archive-link:hover { color: #0e2a47; text-decoration: none; }
+.archive-link:focus-visible { outline: 2px solid var(--circa-link); outline-offset: 1px; }
+/* Visited codes keep a dotted rule as well as the second colour, so the state is not colour alone. */
+.archive-link[data-visited] { color: var(--circa-link-visited); text-decoration-style: dotted; }
+.archive-record-code { margin: 0 0 4px; color: var(--circa-ink-soft); font-size: .85em; letter-spacing: .12em; text-transform: uppercase; }
+.archive-record h2 { margin: 0 0 10px; font-size: 1.4em; font-weight: 700; line-height: 1.25; }
+.archive-fields { margin: 10px 0; border-collapse: collapse; }
+.archive-fields th { padding: 2px 14px 2px 0; border: 0; text-align: left; vertical-align: top; color: var(--circa-ink-soft); font-size: .78em; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.archive-fields td { padding: 2px 0; border: 0; vertical-align: top; }
+.archive-abstract { max-width: 64ch; margin: 12px 0; }
+.archive-empty { max-width: 58ch; }
+.archive-empty p { margin: 0 0 8px; }
+.archive-hints { margin: 0 0 12px; padding-left: 18px; }
+.archive-hints li { margin-bottom: 4px; }
+.archive-empty .archive-button { margin-right: 6px; }
+.archive-footer { margin-top: 18px; padding-top: 8px; border-top: 3px double var(--circa-rule); color: var(--circa-ink-soft); font-size: .82em; }
+.archive-footer p { margin: 0 0 3px; }
+.archive-fixture { color: #5a6a7a; font-style: italic; }
+
+@container (max-width: 560px) {
+  /* Icon-only tools: the accessible name lives on aria-label, so nothing is lost. */
+  .browser-tool-label { display: none; }
+  .browser-tool { padding: 4px 6px; }
+}
+@container (max-width: 480px) {
+  /* The address keeps a usable width by taking the row under the tool cluster. */
+  .browser-address { flex: 1 1 100%; }
+}
+@container (max-width: 430px) {
+  .browser-status-cell:last-child { display: none; }
+  .archive-seal { width: 44px; height: 44px; }
+  .archive-field, .archive-field-query, .archive-actions { flex: 1 1 100%; }
+  .archive-search-fields { align-items: stretch; }
+  .archive-search[data-variant="compact"] .archive-field-query { flex: 1 1 100%; }
+}

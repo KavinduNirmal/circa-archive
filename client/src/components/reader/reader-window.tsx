@@ -10,6 +10,7 @@ import { AnnotationRail, SectionRail, type RailState } from "./reader-rails";
 import { FollowUpStrip } from "./reader-references";
 import { isReviewer, sessionNotes, type ReaderSession, type ReaderVerdict } from "./reader-session";
 import { recordDocument } from "./record-filings";
+import "./reader.css";
 
 /**
  * The record reader: the window that opens when a record is opened.

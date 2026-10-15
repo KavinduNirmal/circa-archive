@@ -5,7 +5,7 @@
 - `layout.tsx`: document structure, metadata and its title template, dark theme, and local fonts.
 - `page.tsx`: the public landing page at `/`, with its own absolute title and social metadata.
 - `desktop/`: the workstation route at `/desktop` and scoped design decisions.
-- `globals.css`: theme tokens, CIRCA utilities, workstation chrome, the boot screen, and the screen overlay.
+- `globals.css`: the design tokens, the Tailwind theme bridge, base rules, and only the shared CIRCA utilities. Every component-specific stylesheet lives beside the component that owns it, under `../components/`.
 
 ## Boundaries and verification
 

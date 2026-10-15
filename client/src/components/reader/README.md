@@ -23,6 +23,7 @@ That split is enforced, not just described. `RecordReader` renders each section 
 - `reader-rails.tsx`: the left rail of section previews and the right rail of marginalia, with its composer.
 - `reader-references.tsx`: the follow-up strip.
 - `reader-window.tsx`: the composition, the view and scale state, the search pass, and the body slot.
+- `reader.css`: the frame's chrome, the sheet and its drawn printed edge, both rails, the follow-up strip, and the reader's one-shot motion. It also carries the registered `reader-match` search highlight, which cannot be scoped because the custom highlight API paints it by name. Imported by `reader-window.tsx`.
 
 ## The reader as a window
 

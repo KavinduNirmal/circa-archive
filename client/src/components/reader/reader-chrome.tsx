@@ -22,6 +22,7 @@ import { useId, type RefObject } from "react";
 import { READER_NAME, READER_VOCABULARY } from "./reader-identity";
 import { ASSESSMENT_SCALE, DOCUMENT_SIZES, READER_FONTS, READER_VIEWS, fontLabel, formatScale, scaleLimit, viewLabel, type ReaderFont, type ReaderView } from "./reader-model";
 import type { ReaderVerdict } from "./reader-session";
+import "../ui/menubar.css";
 
 /**
  * The reader's furniture: the toolbar that spans the top and the credentials
