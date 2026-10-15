@@ -15,6 +15,7 @@
 - `reader-model.test.ts`: the scale steps and limits, the vocabulary, section numbering and anchors, and literal search.
 - `record-filings.test.ts`: the sectioned document for every index entry, the metadata the sheet borrows rather than restates, and the withheld body.
 - `reader-correspondence.test.ts`: note anchoring against the sections that exist, one-level replies, and both directions of the citation web.
+- `reader-references.test.tsx`: the strip's ten-per-direction cap, the box that explains it, the collapse to a head row, and the two empty states.
 - `reader.test.tsx`: the frame's empty slot, the three silent controls, the arrangements, the search count, the session gate, the two engagement signals, the trail, and both rails.
 
 ## Usage and boundaries

@@ -399,6 +399,21 @@ describe("record reader follow-ups", () => {
     expect(within(sheet()).getByRole("heading", { level: 1 })).toHaveTextContent("Unlogged freight car, northbound");
   });
 
+  it("puts the whole filing tray away when the reader would rather have the sheet", async () => {
+    const user = userEvent.setup();
+    const { reader, sheet } = mount("INC-00042");
+    const strip = within(reader).getByRole("region", { name: "Subsequent Records" });
+    expect(within(strip).getAllByRole("list")).toHaveLength(2);
+    await user.click(within(strip).getByRole("button", { name: "Hide subsequent records" }));
+    expect(strip).toHaveAttribute("data-collapsed", "true");
+    expect(within(strip).queryByRole("list")).not.toBeInTheDocument();
+    // The sheet is untouched, and the tray is one press away.
+    expect(sheet()).toBeVisible();
+    expect(within(strip).getByText("3 on file")).toBeVisible();
+    await user.click(within(strip).getByRole("button", { name: "Show subsequent records" }));
+    expect(within(strip).getAllByRole("list")).toHaveLength(2);
+  });
+
   it("says so plainly when nothing has been filed against a record", () => {
     const { reader } = mount("CIRCA-M-0077");
     const strip = within(reader).getByRole("region", { name: "Subsequent Records" });

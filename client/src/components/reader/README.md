@@ -36,6 +36,7 @@ The record trail lives in the shell, because the shell is what opens a record. A
 | What is the sheet? | One continuous paper surface with a `68ch` measure, capped so a long line never arrives. No page borders and no per-page shadows. |
 | What does the scale change? | Type size, in tens from 80% to 160%, with a unitless line height so the leading follows. The measure is in `ch`, so the line stays the same length in characters at every scale. |
 | Where is the search read from? | The sheet's own DOM, not the document model. The host's renderer may emit anything, so matches are found by walking what was rendered and painted with the custom highlight API, which never rewrites the renderer's output. The count is written into its own node by that effect rather than held in React state, because React cannot know it either. |
+| How many follow-ups does the strip list? | Ten per direction, and it says how many it is holding back. A record can be cited hundreds of times and a reading surface is the wrong place to work through a hundred of anything, so the remainder are named in a message box and go no further. It is not a navigation: a hundred records belong in a file browser, and this screen is not one. |
 
 ## Three controls that do nothing
 
@@ -55,6 +56,12 @@ All of it needs a reviewer session. A guest sees the controls, hovers them, and 
 
 A citation card is the citing record's own index entry, not a second description of it. A note that names a section the record does not have is dropped rather than pinned to the wrong one. The follow-up types are exhaustive over the index, so a new record cannot silently default to being a discovery. The sheet carries the preview's honesty marker in its footer and the status bar repeats it.
 
+## The filing tray
+
+Both rails can be put away, and so can the strip along the bottom, which is what a reader wants when the tray is longer than the document. Collapsing is structural rather than a style: the lists leave the DOM with the pixels, so nothing hidden is left in the accessibility tree, and the head still reports what is on file. The strip is `126px` open and one head row closed.
+
+Each direction lists the ten most recently filed. Past that the group's head carries a control reading `N not shown`, and pressing it opens the in-world message box, which names the true count and says plainly that the remainder are on file but not listed here. That is the whole of it: no second window, no folder, no listing. The cap is the answer, not a limitation of it.
+
 ## Visual contract
 
 Three materials, and the split is the argument of the screen. The chrome is the workstation's steel. The sheet is the brightest paper in the system, because it is the document itself rather than a page about one. The margin is cream, ruled, and dark-inked, with a red margin rule and a punched hole on each slip: it is the only warm surface in CIRCA/OS, and it is warm because marginalia is written on paper made for writing on.
@@ -63,7 +70,7 @@ Three materials, and the split is the argument of the screen. The chrome is the 
 - **Toolbar.** Document actions left, engagement right, separated by engraved dividers. Tools are a glyph over an 8px label, or a glyph alone where the icon already says the word. The scale readout is a control, not a readout.
 - **Hierarchy.** The leaf is the loudest thing on the sheet: code, designation at 1.8em, then one metadata line separated by hairlines rather than a table, because a table is what the record view this replaced used and a reader should read as a document header.
 - **The withheld body.** Drawn as three redaction bars under a stamp, matching how the index draws a withheld name; the rail's preview for that section turns from paper to hazard.
-- **States.** A record at every status; a withheld body; a designation withheld; a code the index does not carry; no record open; an unannotated record; no follow-ups. Every one of them is reachable, and none of them is a dead end.
+- **States.** A record at every status; a withheld body; a designation withheld; a code the index does not carry; no record open; an unannotated record; no follow-ups; a direction with nothing in it; a direction holding more than the strip will list; the tray put away. Every one of them is reachable, and none of them is a dead end.
 - **Reflow.** Below 1024px both rails are strips by default and open as overlays rather than pushing the sheet; below 1100px two-up folds to one column; below 768px the follow-up groups stack and their cards stop pretending to be a filmstrip. The rail's collapse is the one place where the same breakpoint is declared twice, once in the container query that produces the default before hydration and once in the hook that decides what the first click means.
 
 ## Motion
@@ -80,6 +87,6 @@ The preview rail shows a section that is not in the record and then corrects its
 
 Reading, and only the record in front of it. Notes, endorsements, and votes are session state: they are not persisted, not authorized, and not sent anywhere, and the reviewer credential is a fixed handle rather than an authentication. There is no filing, no rating aggregate, and no backend.
 
-Run `bun run test` for the model, the filings, the correspondence, the frame's slot, the three silent controls, the scale limits, the arrangements, the search count, the session gate, the two engagement signals, and the trail; `bun run lint` and `bun run typecheck` for the rest.
+Run `bun run test` for the model, the filings, the correspondence, the frame's slot, the three silent controls, the scale limits, the arrangements, the search count, the session gate, the two engagement signals, the trail, the strip's cap and collapse, and the box that explains the cap; `bun run lint` and `bun run typecheck` for the rest.
 
-The layout was verified in headless Firefox at 1440, 1280, 1180, 1024, and 700 pixels wide, across a filed record, a sealed one, a held one, an organization with a withheld designation, the two-up arrangement, and the empty margin. The two on-open glitches are shorter than the capture fires, so the scale blip and the margin nudge were photographed with their animations stretched and their delays removed; the stretch was scaffolding and is not in the tree.
+The layout was verified in headless Firefox at 1440, 1280, 1180, 1024, and 700 pixels wide, across a filed record, a sealed one, a held one, an organization with a withheld designation, the two-up arrangement, and the empty margin. The two on-open glitches are shorter than the capture fires, so the scale blip and the margin nudge were photographed with their animations stretched and their delays removed; the stretch was scaffolding and is not in the tree. The message box that explains the cap is verified by test rather than by capture: it is a portalled Radix surface, and the capture pipeline fires before hydration, so no dialog has ever appeared in one of these photographs.

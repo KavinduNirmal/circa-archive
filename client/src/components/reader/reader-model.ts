@@ -70,6 +70,15 @@ export function formatScale(scale: number): string {
  */
 export const ASSESSMENT_SCALE: readonly string[] = ["—", "Marginal", "Adequate", "Sound", "Exemplary"];
 
+/**
+ * How many of a record's follow-ups the strip will list in one direction.
+ *
+ * A record can be cited by hundreds of filings, and a reading surface is the
+ * wrong place to page through them, so the strip shows the ten most recent and
+ * says how many it is holding back. See `reader-references.tsx`.
+ */
+export const FOLLOW_UP_PREVIEW_LIMIT = 10;
+
 /* ------------------------------------------------------------------------- */
 /* Content                                                                    */
 /* ------------------------------------------------------------------------- */

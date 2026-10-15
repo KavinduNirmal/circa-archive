@@ -2069,14 +2069,36 @@
 
 /* --- The follow-up strip: how one record reaches another --- */
 .reader-followups { display: flex; flex: 0 0 auto; flex-direction: column; height: 126px; min-height: 0; background: #18222e; border-top: 1px solid var(--circa-bevel-shadow); }
+/* Put away, the strip is its own head: the lists are gone, not hidden. */
+.reader-followups[data-collapsed="true"] { height: auto; }
+.reader-followups-body { display: flex; flex: 1; flex-direction: column; min-height: 0; }
 .reader-followups-head { display: flex; flex: 0 0 auto; align-items: center; gap: 10px; padding: 5px 10px; background: #24334a; border-bottom: 1px solid var(--circa-bevel-shadow); }
 .reader-followups-title { color: #cfe0f2; }
 .reader-followups-count { margin-left: auto; color: #8fa3b6; font-size: 9px; }
+.reader-followups-toggle { display: flex; flex: 0 0 auto; align-items: center; justify-content: center; width: 18px; height: 16px; border: 1px solid transparent; background: none; color: #8fa3b6; cursor: pointer; }
+.reader-followups-toggle:hover { border-color: var(--circa-bevel-light); background: var(--secondary); color: #dbe7f5; }
+.reader-followups-toggle-glyph { width: 12px; height: 12px; }
 .reader-followups-empty { align-self: center; margin: auto; color: #6d8199; font-size: 10px; font-style: italic; }
 .reader-followups-groups { display: grid; flex: 1; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); min-height: 0; }
 .reader-followup-group { display: flex; flex-direction: column; min-width: 0; min-height: 0; padding: 5px 10px 6px; }
 .reader-followup-group + .reader-followup-group { border-left: 1px solid #0d131a; }
-.reader-followup-label { display: flex; flex: 0 0 auto; align-items: center; gap: 6px; margin-bottom: 4px; color: #9fb4c9; }
+.reader-followup-head { display: flex; flex: 0 0 auto; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 4px; }
+.reader-followup-label { display: flex; align-items: center; gap: 6px; color: #9fb4c9; }
+/* The one place the panel admits it is holding something back. */
+.reader-followup-more {
+  flex: 0 0 auto;
+  padding: 1px 5px;
+  border: 1px solid #3d5064;
+  background: none;
+  color: #9fb4c9;
+  font: inherit;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.reader-followup-more:hover { border-color: var(--circa-hazard); color: #dbe7f5; }
 .reader-followup-tally { padding: 0 4px; border: 1px solid #3d5064; color: #7f97ab; font-size: 8px; }
 .reader-followup-none { color: #6d8199; font-size: 10px; font-style: italic; }
 .reader-cards { display: flex; flex: 1; gap: 8px; min-height: 0; margin: 0; padding: 0 0 4px; overflow-x: auto; overflow-y: hidden; list-style: none; }
@@ -2159,7 +2181,7 @@
 }
 @container (max-width: 767px) {
   /* The follow-ups stack, and their cards stop pretending to be a filmstrip. */
-  .reader-followups { height: auto; max-height: 40%; }
+  .reader-followups:not([data-collapsed="true"]) { height: auto; max-height: 40%; }
   .reader-followups-groups { grid-template-columns: minmax(0, 1fr); overflow-y: auto; }
   .reader-followup-group + .reader-followup-group { border-left: 0; border-top: 1px solid #0d131a; }
   .reader-followup-group .reader-cards { flex-direction: column; overflow-x: hidden; overflow-y: visible; }

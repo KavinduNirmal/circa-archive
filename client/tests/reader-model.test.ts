@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   ASSESSMENT_SCALE,
+  FOLLOW_UP_PREVIEW_LIMIT,
   SCALE_DEFAULT,
   SCALE_MAX,
   SCALE_MIN,
@@ -69,6 +70,13 @@ describe("reader sections", () => {
 
   it("anchors a section by id, so the rail and the sheet agree on one name", () => {
     expect(sectionAnchor("field-account")).toBe("reader-section-field-account");
+  });
+});
+
+describe("reader framing", () => {
+  it("holds the follow-up strip to ten in each direction", () => {
+    // A reading surface is the wrong place to work through a hundred filings.
+    expect(FOLLOW_UP_PREVIEW_LIMIT).toBe(10);
   });
 });
 

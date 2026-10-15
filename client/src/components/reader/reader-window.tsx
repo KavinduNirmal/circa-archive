@@ -129,6 +129,7 @@ export function RecordReader({ trail, session, onOpenRecord, onTravel, onCloseWi
   // simply stops matching one instead of needing to be cleaned up.
   const [selected, setSelected] = useState<{ code: string; sectionId: string } | null>(null);
   const [reply, setReply] = useState<{ code: string; noteId: string } | null>(null);
+  const [followUpsCollapsed, setFollowUpsCollapsed] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [draft, setDraft] = useState("");
@@ -325,7 +326,8 @@ export function RecordReader({ trail, session, onOpenRecord, onTravel, onCloseWi
           onToggle={() => setRightRail(rightRail === "closed" || (rightRail === "auto" && narrow) ? "open" : "closed")} />
       </div>
 
-      <FollowUpStrip inbound={followUps.inbound} outbound={followUps.outbound} onOpen={onOpenRecord} />
+      <FollowUpStrip code={code} inbound={followUps.inbound} outbound={followUps.outbound}
+        collapsed={followUpsCollapsed} onToggle={() => setFollowUpsCollapsed((current) => !current)} onOpen={onOpenRecord} />
 
       <div className="reader-statusbar">
         <span className="reader-status-text" role="status">{status}</span>
