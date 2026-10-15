@@ -32,6 +32,8 @@ const icons = {
   recycle: { asset: "/icons/recycle_bin_empty-4.png" },
   // Worn by the Start menu's exit to the public landing page, which is not a folder.
   public: { asset: "/icons/help_book_big-0.png" },
+  // The record reader's own window, which no shortcut opens: a record opens it.
+  reader: { asset: "/icons/file_lines-0.png" },
 } as const satisfies Record<string, { asset: string; shortcut?: boolean }>;
 
 export type IconGlyph = keyof typeof icons;

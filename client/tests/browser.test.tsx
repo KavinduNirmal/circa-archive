@@ -72,33 +72,32 @@ describe("archive browser", () => {
     expect(within(frame).getByRole("table", { name: "Search results" })).toHaveTextContent("INC-00014");
   });
 
-  it("opens a record, then walks back to the same result set with Back", async () => {
+  it("hands a record to the reader and leaves the result set behind it", async () => {
     const user = userEvent.setup();
     const { frame } = await openBrowser(user);
     await submitQuery(user, frame, "freight");
     await user.click(within(frame).getByRole("button", { name: "INC-00014" }));
-    const record = within(frame).getByRole("article");
-    expect(within(record).getByRole("heading", { name: "Unlogged freight car, northbound" })).toBeVisible();
-    expect(within(record).getByText(/LEVEL 4/)).toBeVisible();
-    await user.click(within(frame).getByRole("button", { name: "Back" }));
+    // The record opens in the reader, which is the screen that reads one.
+    const reader = screen.getByRole("dialog", { name: "Record Viewer" });
+    expect(within(reader).getByRole("heading", { level: 1 })).toHaveTextContent("Unlogged freight car, northbound");
+    // The reader's own leaf carries the catalogue's line, clearance included.
+    expect(reader.querySelector(".reader-leaf-line")).toHaveTextContent("LEVEL 4");
+    expect(reader.querySelector(".reader-leaf-line")).toHaveTextContent("Incident");
+    // The browser is still standing on the list the code came from.
     expect(within(frame).getByRole("table", { name: "Search results" })).toHaveTextContent("INC-00014");
     expect(within(frame).getByLabelText("Search records")).toHaveValue("freight");
     // The browser marks the code it has already opened, the way a visited link works.
     expect(within(frame).getByRole("button", { name: "INC-00014" })).toHaveAttribute("data-visited", "true");
   });
 
-  it("names the document a record returns to", async () => {
+  it("leaves the index page to the index: a code never renders a record body here", async () => {
     const user = userEvent.setup();
     const { frame } = await openBrowser(user);
-    // Opened from the index's own recently-filed list, so Back leads to the index.
+    // Opened from the index's own recently-filed list.
     await user.click(within(frame).getByRole("button", { name: "INC-00907" }));
-    expect(within(frame).getByRole("button", { name: "Return to the index" })).toBeVisible();
-    await user.click(within(frame).getByRole("button", { name: "Return to the index" }));
+    expect(within(frame).queryByRole("article")).not.toBeInTheDocument();
     expect(within(frame).getByRole("heading", { name: "Archive index" })).toBeVisible();
-    // Opened from a result list, so Back leads to those results.
-    await submitQuery(user, frame, "freight");
-    await user.click(within(frame).getByRole("button", { name: "INC-00014" }));
-    expect(within(frame).getByRole("button", { name: "Return to results" })).toBeVisible();
+    expect(screen.getByRole("dialog", { name: "Record Viewer" })).toBeVisible();
   });
 
   it("gates Back and Forward on history and explains the idle Stop control", async () => {

@@ -3,7 +3,6 @@
 import { Fragment } from "react";
 import {
   ARCHIVE_CLASSES,
-  ARCHIVE_INDEX,
   ARCHIVE_PERIODS,
   CLASS_LABELS,
   PERIOD_LABELS,
@@ -17,11 +16,18 @@ import {
   type ArchiveQuery,
 } from "./archive-index";
 
-/** Which document the single tab is currently showing. */
+/**
+ * Which document the single tab is currently showing.
+ *
+ * There is no record document. A record is read in the reader, which is the
+ * screen built for reading one; an index page that also rendered records was
+ * two readers to keep in step, and the second one had no margins, no scale, and
+ * no follow-ups. Clicking a code hands it to the reader and leaves the index on
+ * the screen behind it.
+ */
 export type ArchiveDocument =
   | { kind: "home" }
-  | { kind: "results"; query: ArchiveQuery }
-  | { kind: "record"; code: string };
+  | { kind: "results"; query: ArchiveQuery };
 
 export type ArchiveTextSize = "small" | "normal" | "large";
 
@@ -46,12 +52,10 @@ export type ArchivePageProps = {
   onDraftChange: (next: ArchiveQuery) => void;
   onSearch: () => void;
   onClear: () => void;
+  /** Hands a code to the record reader, which is where a record is read. */
   onOpenRecord: (code: string) => void;
   onIndexLink: (klass: ArchiveClass) => void;
   onWidenPeriod: () => void;
-  onReturn: () => void;
-  /** Where Back goes from a record, so the button names the document it returns to. */
-  returnLabel: string;
 };
 
 /**
@@ -65,7 +69,7 @@ export type ArchivePageProps = {
  * one more steel panel.
  */
 export function ArchivePage(props: ArchivePageProps) {
-  const { document, draft, results, visited, textSize, onDraftChange, onSearch, onClear, onOpenRecord, onIndexLink, onWidenPeriod, onReturn, returnLabel } = props;
+  const { document, draft, results, visited, textSize, onDraftChange, onSearch, onClear, onOpenRecord, onIndexLink, onWidenPeriod } = props;
 
   return (
     <div className="archive-page" data-testid="archive-page" data-text-size={textSize}>
@@ -106,7 +110,6 @@ export function ArchivePage(props: ArchivePageProps) {
       {document.kind === "results" && (results.length > 0
         ? <ResultsBody query={document.query} results={results} visited={visited} onOpenRecord={onOpenRecord} />
         : <NoMatchBody query={document.query} onWidenPeriod={onWidenPeriod} onClear={onClear} />)}
-      {document.kind === "record" && <RecordBody code={document.code} onReturn={onReturn} returnLabel={returnLabel} />}
 
       <footer className="archive-footer">
         <p>Internal index. Not for public networks. Filing is a Level 3 infraction.</p>
@@ -263,40 +266,6 @@ function NoMatchBody({ query, onWidenPeriod, onClear }: {
       )}
       <button type="button" className="archive-button" onClick={onClear}>Clear filters</button>
     </section>
-  );
-}
-
-function RecordBody({ code, onReturn, returnLabel }: { code: string; onReturn: () => void; returnLabel: string }) {
-  const item = ARCHIVE_INDEX.find((candidate) => candidate.code === code);
-  if (!item) {
-    return (
-      <section className="archive-empty">
-        <h2 className="archive-heading">Entry not in the index</h2>
-        <p className="circa-mono">{code}</p>
-        <p>The code is well formed but no entry carries it. It may have been withdrawn after the index was rebuilt.</p>
-        <button type="button" className="archive-button" onClick={onReturn}>Return to the index</button>
-      </section>
-    );
-  }
-  return (
-    <article className="archive-record" aria-labelledby="archive-record-title">
-      <p className="archive-record-code circa-mono">{item.code}</p>
-      <h2 id="archive-record-title">{item.designation ?? <Redacted label="Designation withheld at Level 5" />}</h2>
-      <table className="archive-fields">
-        <tbody>
-          <tr><th scope="row">Class</th><td>{CLASS_LABELS[item.klass]}</td></tr>
-          <tr><th scope="row">Filed</th><td className="circa-mono">{item.filed}</td></tr>
-          <tr><th scope="row">Status</th><td>{STATUS_LABELS[item.status]}</td></tr>
-          <tr><th scope="row">Filed by</th><td className="circa-mono">{item.organization}</td></tr>
-          <tr><th scope="row">Clearance</th><td>{item.clearance}</td></tr>
-        </tbody>
-      </table>
-      <p className="archive-abstract">{item.abstract}</p>
-      <p className="archive-note">
-        Metadata only. The record body is rendered as a page of the archive once the record service is connected.
-      </p>
-      <button type="button" className="archive-button" onClick={onReturn}>{returnLabel}</button>
-    </article>
   );
 }
 

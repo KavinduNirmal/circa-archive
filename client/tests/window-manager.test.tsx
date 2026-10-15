@@ -201,10 +201,10 @@ describe("workstation windows", () => {
 
     // Closing the active window hands over to the next visible one, and closing
     // the last one leaves a clean desktop with no stale taskbar entries.
-    await user.click(within(screen.getByRole("dialog", { name: MAIL_WINDOW_TITLE })).getByRole("button", { name: "Close folder" }));
+    await user.click(within(screen.getByRole("dialog", { name: MAIL_WINDOW_TITLE })).getByRole("button", { name: `Close ${MAIL_WINDOW_TITLE}` }));
     expect(screen.queryByRole("dialog", { name: MAIL_WINDOW_TITLE })).not.toBeInTheDocument();
     expect(screen.getByRole("dialog", { name: BROWSER_WINDOW_TITLE })).toBeVisible();
-    await user.click(within(screen.getByRole("dialog", { name: BROWSER_WINDOW_TITLE })).getByRole("button", { name: "Close folder" }));
+    await user.click(within(screen.getByRole("dialog", { name: BROWSER_WINDOW_TITLE })).getByRole("button", { name: `Close ${BROWSER_WINDOW_TITLE}` }));
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     await user.click(taskbar().getByRole("button", { name: ARCHIVE_WINDOW_TITLE }));
     expect(screen.getByRole("dialog", { name: ARCHIVE_WINDOW_TITLE })).toBeVisible();
@@ -265,7 +265,7 @@ describe("workstation windows", () => {
     render(<Home />);
     const shortcut = screen.getByRole("button", { name: "Archive" });
     await user.click(shortcut);
-    await user.click(within(screen.getByRole("dialog", { name: ARCHIVE_WINDOW_TITLE })).getByRole("button", { name: "Close folder" }));
+    await user.click(within(screen.getByRole("dialog", { name: ARCHIVE_WINDOW_TITLE })).getByRole("button", { name: `Close ${ARCHIVE_WINDOW_TITLE}` }));
     expect(screen.queryByRole("dialog", { name: ARCHIVE_WINDOW_TITLE })).not.toBeInTheDocument();
     expect(shortcut).toHaveFocus();
   });

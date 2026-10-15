@@ -22,9 +22,7 @@ function draftFor(document: ArchiveDocument): ArchiveQuery {
 }
 
 function describe(document: ArchiveDocument): string {
-  if (document.kind === "home") return "the index";
-  if (document.kind === "record") return document.code;
-  return "the result list";
+  return document.kind === "home" ? "the index" : "the result list";
 }
 
 /**
@@ -36,8 +34,15 @@ function describe(document: ArchiveDocument): string {
  * into the search form. Nothing here reaches outside the terminal, which is the
  * point of the fiction: the model is that the local network permits exactly one
  * document, and every other browser affordance is refused with a reason.
+ *
+ * A record is the one thing this window does not open. A code is handed to the
+ * reader, which is the screen built for reading one, and the index stays where
+ * it was so Back is still the way to the list you found the code on.
  */
-export function ArchiveBrowser({ onCloseWindow }: { onCloseWindow: () => void }) {
+export function ArchiveBrowser({ onCloseWindow, onOpenRecord }: {
+  onCloseWindow: () => void;
+  onOpenRecord: (code: string) => void;
+}) {
   const [history, setHistory] = useState<ArchiveDocument[]>([{ kind: "home" }]);
   const [cursor, setCursor] = useState(0);
   const [draft, setDraft] = useState<ArchiveQuery>(EMPTY_QUERY);
@@ -51,10 +56,6 @@ export function ArchiveBrowser({ onCloseWindow }: { onCloseWindow: () => void })
   const results = document.kind === "results" ? searchArchive(document.query) : [];
   const canGoBack = cursor > 0;
   const canGoForward = cursor < history.length - 1;
-  // Back leads wherever the record was opened from, so the button says so rather
-  // than promising a result list that may not be behind it.
-  const returnLabel = history[cursor - 1]?.kind === "results" ? "Return to results" : "Return to the index";
-
   /** Pushes a document, which is what every deliberate navigation does. */
   function go(next: ArchiveDocument) {
     setHistory((current) => [...current.slice(0, cursor + 1), next]);
@@ -101,10 +102,11 @@ export function ArchiveBrowser({ onCloseWindow }: { onCloseWindow: () => void })
     report(query);
   }
 
-  function openRecord(code: string) {
-    go({ kind: "record", code });
+  /** Hands the code to the reader and stays where it is, so the index is not lost. */
+  function handOff(code: string) {
+    onOpenRecord(code);
     setVisited((current) => (current.includes(code) ? current : [...current, code]));
-    setStatus(`Opened ${code}.`);
+    setStatus(`Opened ${code} in the reader.`);
   }
 
   function openHome() {
@@ -120,8 +122,7 @@ export function ArchiveBrowser({ onCloseWindow }: { onCloseWindow: () => void })
 
   function refresh() {
     if (document.kind === "home") setStatus("Archive index reloaded.");
-    else if (document.kind === "results") setStatus("Search reloaded. The result set is unchanged.");
-    else setStatus(`${document.code} reloaded.`);
+    else setStatus("Search reloaded. The result set is unchanged.");
   }
 
   function attemptNewTab() {
@@ -159,8 +160,8 @@ export function ArchiveBrowser({ onCloseWindow }: { onCloseWindow: () => void })
       <BrowserTabs onOpenHome={openHome} onNewTab={attemptNewTab} />
       <div className="browser-page" id="browser-page" role="tabpanel" aria-labelledby="browser-tab-archive">
         <ArchivePage document={document} draft={draft} results={results} visited={visited} textSize={textSize}
-          onDraftChange={setDraft} onSearch={runSearch} onClear={clearAll} onOpenRecord={openRecord}
-          onIndexLink={openIndexLink} onWidenPeriod={widenPeriod} onReturn={() => travel(-1)} returnLabel={returnLabel} />
+          onDraftChange={setDraft} onSearch={runSearch} onClear={clearAll} onOpenRecord={handOff}
+          onIndexLink={openIndexLink} onWidenPeriod={widenPeriod} />
       </div>
       <BrowserStatus status={status} />
       <BrowserNotice kind={notice} attempted={address} onClose={() => setNotice(null)} />

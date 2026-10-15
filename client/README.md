@@ -2,12 +2,12 @@
 
 ## Responsibility
 
-Next.js frontend with a public landing page at `/` and the CIRCA/OS workstation at `/desktop`. The landing page is a dense institutional portal: public notices, filing procedures, organization particulars, credential status, and a prominent archive entry. Its copy and metadata remain in the Commission's voice. The workstation answers the arrival with a post screen, then runs shortcut navigation, draggable and resizable destination windows, a Start launcher, taskbar, emblem wallpaper, and a switchable CRT overlay. Every desktop destination opens a real screen over illustrative preview data: Search the archive browser, Inbox the mail client, each folder the file browser, and CIRCA Word the Markdown record editor. Backend integration remains unimplemented, so every screen reads from its own index rather than a service.
+Next.js frontend with a public landing page at `/` and the CIRCA/OS workstation at `/desktop`. The landing page is a dense institutional portal: public notices, filing procedures, organization particulars, credential status, and a prominent archive entry. Its copy and metadata remain in the Commission's voice. The workstation answers the arrival with a post screen, then runs shortcut navigation, draggable and resizable destination windows, a Start launcher, taskbar, emblem wallpaper, and a switchable CRT overlay. Every desktop destination opens a real screen over illustrative preview data: Search the archive browser, Inbox the mail client, each folder the file browser, CIRCA Word the Markdown record editor, and a record the record [reader](src/components/reader/README.md). Backend integration remains unimplemented, so every screen reads from its own index rather than a service.
 
 ## Structure and boundaries
 
 - `src/app/`: routes, root layout, global theme, and [desktop design decisions](src/app/desktop/README.md).
-- `src/components/`: desktop shell, the public [site](src/components/site/README.md) and post screen, the archive [browser](src/components/browser/README.md), the [mail client](src/components/mail/README.md), the [file browser](src/components/files/README.md), the record [editor](src/components/word/README.md), reusable navigation and icons, and shadcn/ui primitives.
+- `src/components/`: desktop shell, the public [site](src/components/site/README.md) and post screen, the archive [browser](src/components/browser/README.md), the [mail client](src/components/mail/README.md), the [file browser](src/components/files/README.md), the record [editor](src/components/word/README.md) and [reader](src/components/reader/README.md), reusable navigation and icons, and shadcn/ui primitives.
 - `src/lib/`: shared class-composition helper.
 - `tests/`: Vitest interaction and utility tests.
 - `e2e/`: responsive Playwright desktop tests.

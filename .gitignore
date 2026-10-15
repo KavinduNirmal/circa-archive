@@ -31,6 +31,8 @@ Thumbs.db
 # Machine-specific agent/cloud configuration
 .codex/
 .aws/
+# Agent scratch space: probe scripts and captures, never authored source
+.dsh-scratch/
 
 # Husky-generated support files
 .husky/_/

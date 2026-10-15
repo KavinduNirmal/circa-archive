@@ -11,6 +11,10 @@ import { WordWindow } from "./word/word-window";
 import { explorerTitle } from "./files/files-identity";
 import { MAIL_WINDOW_TITLE } from "./mail/mail-identity";
 import { MailWindow } from "./mail/mail-window";
+import { READER_WINDOW_TITLE } from "./reader/reader-identity";
+import { useReaderSession } from "./reader/reader-session";
+import { RecordReader, type RecordTrail } from "./reader/reader-window";
+import { RecordFilingBody } from "./reader/record-filings";
 import { TaskbarWindows, WindowLayer, useWorkstationWindows } from "./window-manager";
 import { DesktopIcon, notificationGlyph, settingsGlyph, type DesktopIconSpec } from "./desktop-icons";
 import { DesktopNavigation, type DesktopDestination } from "./desktop-navigation";
@@ -136,6 +140,11 @@ export function DesktopShell() {
   const [startOpen, setStartOpen] = useState(false);
   const [screenFilter, setScreenFilter] = useState(true);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  // The records open in the reader, and where in that stack it is standing. The
+  // shell owns this because the shell is what opens a record: a code clicked in
+  // the archive and a code clicked in a follow-up strip are the same event.
+  const [readerTrail, setReaderTrail] = useState<RecordTrail>({ codes: [], at: 0 });
+  const readerSession = useReaderSession();
   const { windows, lastFocused, open, close, focus, minimize, toggleMaximize, setGeometry } = useWorkstationWindows();
   const shellRef = useRef<HTMLElement | null>(null);
   const areaRef = useRef<HTMLDivElement | null>(null);
@@ -179,14 +188,39 @@ export function DesktopShell() {
     }, trigger);
   }
 
-  function openWindow(entry: DestinationWindow, trigger?: HTMLButtonElement) {
+  function openWindow(entry: DestinationWindow, trigger?: HTMLButtonElement, maximized = false) {
     if (trigger) launchTriggers.current[entry.id] = trigger;
     setStartOpen(false);
     open(
       { id: entry.id, title: entry.title, status: entry.status, icon: entry.icon },
       // The layer may not have been measured yet on the first click; fall back to the viewport.
       area.width && area.height ? area : { width: window.innerWidth, height: Math.max(240, window.innerHeight - 80) },
+      maximized,
     );
+  }
+
+  /**
+   * Opens a record in the reader, which is the only screen that reads one.
+   *
+   * The viewer always comes up maximized: a record is the thing you are doing,
+   * not a window beside the thing you are doing. The taskbar stays, so the
+   * desktop is still underneath and the frame still minimizes and closes.
+   */
+  function openRecord(code: string) {
+    setReaderTrail((current) => {
+      if (current.codes[current.at] === code) return current;
+      const codes = [...current.codes.slice(0, current.at + 1), code];
+      return { codes, at: codes.length - 1 };
+    });
+    openWindow({ id: "reader", title: READER_WINDOW_TITLE, status: null, icon: { glyph: "reader" }, detail: null }, undefined, true);
+  }
+
+  /** Reads along the trail the viewer already has. */
+  function travelRecord(delta: 1 | -1) {
+    setReaderTrail((current) => {
+      const at = current.at + delta;
+      return at < 0 || at >= current.codes.length ? current : { ...current, at };
+    });
   }
 
   function closeWindow(id: string) {
@@ -224,7 +258,20 @@ export function DesktopShell() {
   function windowContent(id: string) {
     // Search is the archive browser: one permanent tab onto the internal index.
     if (id === "search") {
-      return <ArchiveBrowser onCloseWindow={() => closeWindow(id)} />;
+      return <ArchiveBrowser onCloseWindow={() => closeWindow(id)} onOpenRecord={openRecord} />;
+    }
+    // The reader is opened by a record rather than by a shortcut, and reads it.
+    if (id === "reader") {
+      return (
+        <RecordReader
+          trail={readerTrail}
+          session={readerSession}
+          onOpenRecord={openRecord}
+          onTravel={travelRecord}
+          onCloseWindow={() => closeWindow(id)}
+          renderSection={(section) => <RecordFilingBody section={section} />}
+        />
+      );
     }
     // Inbox is the mail client over the terminal's own correspondence store.
     if (id === "inbox") {

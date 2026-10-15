@@ -60,12 +60,16 @@ export function useWorkstationWindows() {
     });
   }, []);
 
-  const open = useCallback((entry: { id: string; title: string; status: string | null; icon: DesktopIconSpec }, area: DesktopArea) => {
+  const open = useCallback((entry: { id: string; title: string; status: string | null; icon: DesktopIconSpec }, area: DesktopArea, maximized = false) => {
     setLastFocused(entry.id);
     setWindows((current) => {
       const existing = current.find((item) => item.id === entry.id);
       const top = current.reduce((max, item) => Math.max(max, item.z), 0);
-      if (existing) return current.map((item) => (item.id === entry.id ? { ...item, z: top + 1, minimized: false } : item));
+      if (existing) {
+        // A window that opens full screen still does on a second request, but a
+        // frame the operator restored by hand is not overridden by another open.
+        return current.map((item) => (item.id === entry.id ? { ...item, z: top + 1, minimized: false, maximized: item.maximized || maximized } : item));
+      }
       const step = (current.length % CASCADE_WRAP) * CASCADE_STEP;
       return [...current, {
         id: entry.id,
@@ -80,7 +84,7 @@ export function useWorkstationWindows() {
           width: Math.max(WINDOW_MIN_SIZE.width, Math.min(640, area.width - 180 - step)),
           height: Math.max(WINDOW_MIN_SIZE.height, Math.min(460, area.height - 140 - step)),
         },
-        maximized: false,
+        maximized,
         minimized: false,
         z: top + 1,
       }];
@@ -223,6 +227,9 @@ export function WorkstationWindow({ window: item, area, active, children, onFocu
       role="dialog"
       aria-label={item.title}
       data-maximized={maximized ? "true" : undefined}
+      data-minimized={item.minimized ? "true" : undefined}
+      /* Hidden rather than unmounted, so the window keeps what it was holding. */
+      hidden={item.minimized}
       style={{ zIndex: item.z, left: geometry.x, top: geometry.y, width: geometry.width, height: geometry.height }}
       onPointerDown={onFocus}
     >
@@ -236,7 +243,7 @@ export function WorkstationWindow({ window: item, area, active, children, onFocu
           <button type="button" className="window-control circa-raised" aria-label={`${maximized ? "Restore" : "Maximize"} ${item.title}`} onClick={onMaximize}>
             <span aria-hidden="true">{maximized ? "❐" : "□"}</span>
           </button>
-          <button type="button" className="window-control window-control-close circa-raised" aria-label="Close folder" onClick={onClose}>
+          <button type="button" className="window-control window-control-close circa-raised" aria-label={`Close ${item.title}`} onClick={onClose}>
             <span aria-hidden="true">×</span>
           </button>
         </div>
@@ -258,7 +265,16 @@ export function WorkstationWindow({ window: item, area, active, children, onFocu
   );
 }
 
-/** Renders every open, non-minimized window in bottom-to-top paint order. */
+/**
+ * Renders every open window in bottom-to-top paint order.
+ *
+ * A minimized frame stays mounted and is hidden instead of being dropped. It
+ * costs one hidden element and buys back everything a window was holding: the
+ * browser's history, the editor's undo stack, and the reader's place in a
+ * record all survive a trip to the taskbar. The `hidden` attribute is what does
+ * the hiding, so assistive technology stops seeing the window at the same
+ * moment the screen does.
+ */
 export function WindowLayer({ windows, area, activeId, childrenFor, ...handlers }: {
   windows: WorkstationWindowState[];
   area: DesktopArea;
@@ -272,7 +288,7 @@ export function WindowLayer({ windows, area, activeId, childrenFor, ...handlers 
 }) {
   return (
     <div className="window-layer">
-      {[...windows].filter((item) => !item.minimized).sort((a, b) => a.z - b.z).map((item) => (
+      {[...windows].sort((a, b) => a.z - b.z).map((item) => (
         <WorkstationWindow key={item.id} window={item} area={area} active={item.id === activeId}
           onFocus={() => handlers.onFocus(item.id)}
           onClose={() => handlers.onClose(item.id)}

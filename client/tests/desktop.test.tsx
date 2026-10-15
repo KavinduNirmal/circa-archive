@@ -210,3 +210,64 @@ describe("desktop navigation", () => {
     expect(leave).toHaveClass("start-public");
   });
 });
+
+describe("the record reader as a workstation window", () => {
+  /** Opens the archive, then a record from the index's recently-filed list. */
+  async function openRecord(user: ReturnType<typeof userEvent.setup>) {
+    render(<Home />);
+    await user.click(screen.getByRole("button", { name: "Search" }));
+    const browser = screen.getByRole("dialog", { name: "Titan Browser - CIRCA Archive" });
+    await user.click(within(browser).getByRole("button", { name: "INC-00907" }));
+    return screen.getByRole("dialog", { name: "Record Viewer" });
+  }
+
+  it("opens a record full screen, with the taskbar still underneath it", async () => {
+    const user = userEvent.setup();
+    const reader = await openRecord(user);
+    expect(reader).toHaveAttribute("data-maximized", "true");
+    expect(within(reader).getByRole("heading", { level: 1 })).toHaveTextContent("Tide gauge disagreement, two stations");
+    // Full screen means maximized, not true fullscreen: the desktop metaphor survives.
+    const taskbar = screen.getByRole("contentinfo", { name: "Taskbar" });
+    expect(taskbar).toBeVisible();
+    expect(within(taskbar).getByRole("button", { name: "Record Viewer" })).toHaveAttribute("data-active", "true");
+    // The browser that found the record is still open, one taskbar click away.
+    expect(within(taskbar).getByRole("button", { name: "Titan Browser - CIRCA Archive" })).toBeVisible();
+    // The frame drops its generic strip because the reader prints its own status bar.
+    expect(reader.querySelector(".window-address")).toBeNull();
+  });
+
+  it("stays maximized and keeps its record when it is minimized and brought back", async () => {
+    const user = userEvent.setup();
+    const reader = await openRecord(user);
+    // Read a follow-up in place, so the viewer is standing somewhere other than where it opened.
+    // INC-00027 is filed against this record and is cited by it, so the inbound list names it.
+    const strip = within(reader).getByRole("region", { name: "Subsequent Records" });
+    const inbound = within(strip).getByRole("list", { name: "Filed against this record" });
+    await user.click(within(inbound).getByRole("button", { name: /INC-00027/ }));
+    expect(within(reader).getByRole("heading", { level: 1 })).toHaveTextContent("Signal repeat interval");
+
+    await user.click(within(reader).getByRole("button", { name: "Minimize Record Viewer" }));
+    expect(screen.queryByRole("dialog", { name: "Record Viewer" })).not.toBeInTheDocument();
+    const taskbar = screen.getByRole("contentinfo", { name: "Taskbar" });
+    await user.click(within(taskbar).getByRole("button", { name: "Record Viewer" }));
+
+    const restored = screen.getByRole("dialog", { name: "Record Viewer" });
+    expect(restored).toHaveAttribute("data-maximized", "true");
+    // Minimizing is a trip to the taskbar, not a reset: the reader is where it was left.
+    expect(within(restored).getByRole("heading", { level: 1 })).toHaveTextContent("Signal repeat interval");
+    expect(within(restored).getByRole("button", { name: "Previous record" })).toBeEnabled();
+  });
+
+  it("closes the reader from its own control and from the frame", async () => {
+    const user = userEvent.setup();
+    const reader = await openRecord(user);
+    await user.click(within(reader).getByRole("button", { name: "Close reader" }));
+    expect(screen.queryByRole("dialog", { name: "Record Viewer" })).not.toBeInTheDocument();
+    // Reopening from the archive brings up a viewer again, and the frame can close it too.
+    const browser = screen.getByRole("dialog", { name: "Titan Browser - CIRCA Archive" });
+    await user.click(within(browser).getByRole("button", { name: "INC-00907" }));
+    const reopened = screen.getByRole("dialog", { name: "Record Viewer" });
+    await user.click(within(reopened).getByRole("button", { name: "Close Record Viewer" }));
+    expect(screen.queryByRole("dialog", { name: "Record Viewer" })).not.toBeInTheDocument();
+  });
+});

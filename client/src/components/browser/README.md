@@ -4,6 +4,8 @@
 
 The in-world web browser, opened from the **Search** desktop shortcut. It shows exactly one document: the CIRCA internal archive index, presented the way a 1999 institutional intranet page was presented. It is the first destination with a real application screen instead of a placeholder.
 
+A record is the one thing this window does not open. Reading a record is the [reader](../reader/README.md)'s job, and a second, worse record view here would be two readers to keep in step; the shell hands the code over and the browser marks it visited.
+
 The fiction drives the interaction model. The local network permits one address and one tab, so every other browser affordance is present, correct, and refused with an in-world reason rather than hidden:
 
 | Affordance | Behaviour |
@@ -13,14 +15,14 @@ The fiction drives the interaction model. The local network permits one address 
 | Address bar | Editable, but only the archive address resolves. Any other host is refused and the field is taken back. |
 | Bookmarking | Disabled, with the reason on the item. |
 | **Stop** | Permanently disabled and labelled `No transfer in progress`: this browser never has a transfer to abort. |
-| Back / Forward | Real. A document stack with a cursor drives them, and they are disabled at the ends of that stack. |
+| Back / Forward | Real. A document stack with a cursor drives them, and they are disabled at the ends of that stack. A record is not a document in that stack: opening one leaves the index on screen. |
 | Refresh / Home | Real; both report what they did in the status bar. |
 | View → Text size | Real; scales the document through `data-text-size` without touching chrome. |
 
 ## Structure
 
 - `archive-index.ts`: the entry vocabulary, the preview fixture, and the pure query function. No React, no presentation.
-- `archive-page.tsx`: the document the browser displays (index, results, no-match, record) and nothing else.
+- `archive-page.tsx`: the document the browser displays (index, results, no-match) and nothing else. It renders no record: a code is handed to the reader and the index stays where it was, so Back is still the way to the list the code came from.
 - `browser-chrome.tsx`: the browser's own furniture: menu bar, toolbar and address bar, the permanent tab strip, and the status bar.
 - `browser-window.tsx`: the document stack, the search form state, the action set, and the composition of chrome plus page.
 - `browser-notice.tsx`: the refusals and the About box, as classic message boxes.
@@ -47,4 +49,4 @@ Nothing here reaches the network. There is no request to fail, so no loading or 
 
 Search only. Filing, records, votes, authorization, and every other destination belong to the backend and later screens. The window carries no generic destination status strip: the browser prints its own status bar, and `WorkstationWindow` now omits that strip when a destination passes a null status.
 
-Run `bun run test` for the query rules, the single tab, the refusal, the document stack, and the return labels; `bun run lint` and `bun run typecheck` for the rest.
+Run `bun run test` for the query rules, the single tab, the refusal, the document stack, the visited marker, and the handoff to the reader; `bun run lint` and `bun run typecheck` for the rest.
