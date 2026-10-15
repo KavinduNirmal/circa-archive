@@ -1,24 +1,14 @@
 import type { Metadata } from "next";
 import { LandingPage } from "@/components/site/landing-page";
 
+const title = "Public Registry | Commission for Incident Review and Corrective Action";
+const description = "Public access statements, filing procedures, administrative notices, and the released incident registry.";
+
 export const metadata: Metadata = {
-  // Absolute: the landing page is the project's own name, not a subpage of it.
-  title: { absolute: "CIRCA Archive: a collaborative ghost-story archive" },
-  description:
-    "An open source collaborative fiction archive presented as a fictional 1999 workstation. Read the project record, meet the community, and contribute records or interface code.",
-  openGraph: {
-    type: "website",
-    siteName: "CIRCA Archive",
-    title: "CIRCA Archive",
-    description:
-      "A collaborative ghost-story archive presented as a fictional desktop workstation. Incidents, exploration records, and organization dossiers in one shared universe.",
-    locale: "en_GB",
-  },
-  twitter: {
-    card: "summary",
-    title: "CIRCA Archive",
-    description: "A collaborative ghost-story archive presented as a fictional desktop workstation.",
-  },
+  title: { absolute: title },
+  description,
+  openGraph: { type: "website", siteName: "Office of the Permanent Registry", title, description, locale: "en_GB" },
+  twitter: { card: "summary", title, description },
 };
 
 export default function HomePage() {

@@ -135,7 +135,8 @@ test("My PC contains System and back-tracks", async ({ page }) => {
   await expect(page.getByRole("dialog", { name: "My PC", exact: true })).toBeVisible();
 });
 
-test("home mounts the same desktop", async ({ page }) => {
+test("home leads to the desktop", async ({ page }) => {
   await page.goto("/");
+  await page.getByRole("link", { name: "Enter the archive", exact: true }).click();
   await expect(page.getByRole("navigation", { name: "Desktop folders" })).toBeVisible();
 });

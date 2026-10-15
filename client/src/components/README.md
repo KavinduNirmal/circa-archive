@@ -10,7 +10,7 @@
 - `mail/`: the Outlook-era mail client behind the Inbox destination; see its [README](mail/README.md).
 - `files/`: the CIRCA Explorer file browser behind every folder destination; see its [README](files/README.md).
 - `word/`: the Markdown record editor behind CIRCA Word; see its [README](word/README.md).
-- `site/`: the public landing page and the workstation post screen, the project's two out-of-fiction surfaces; see its [README](site/README.md).
+- `site/`: the diegetic public agency portal and the workstation post screen; see its [README](site/README.md).
 - `ui/`: shadcn/ui primitives with CIRCA styling, including the in-world [message box](ui/message-box.tsx) both applications share.
 
 ## Structure of the navigation model

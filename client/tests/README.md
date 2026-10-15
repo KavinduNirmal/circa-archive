@@ -2,6 +2,7 @@
 
 ## Responsibility and structure
 
+- `landing.test.tsx`: archive entry, audience procedures, local link integrity, service limitations, and diegetic route metadata.
 - `setup.ts`: DOM matchers and cleanup.
 - `utils.test.ts`: class composition and Tailwind conflict resolution.
 - `desktop.test.tsx`: folder navigation, Escape dismissal, and Start launcher behavior.

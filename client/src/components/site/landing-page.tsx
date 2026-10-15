@@ -1,526 +1,208 @@
 import Link from "next/link";
-import { CopyCommand } from "./copy-command";
-import { TERMINAL } from "./terminal-copy";
-import {
-  BRIEF,
-  BUILDER_STEPS,
-  DOCUMENTS,
-  FILINGS,
-  HINGE,
-  LAYOUT,
-  ORGANIZATIONS,
-  PROJECT,
-  SPECIMEN,
-  STACK,
-  TRACKS,
-  WRITER_FILINGS,
-  WRITER_RULES,
-  WRITER_STEPS,
-  classLabel,
-  commandById,
-  statusLabel,
-  type Track,
-} from "./site-meta";
+import styles from "./landing-page.module.css";
 
-/**
- * The public landing page, in two movements.
- *
- * The first movement is the archive itself, written in the institution's voice
- * over its own index: a masthead, the three duties, the entries on file, one
- * filing set as paper, and the bodies the archive files under. The second is
- * the project, on paper, divided into the two kinds of contributor it needs.
- * A hinge names the change out loud, because a page that slips from fiction to
- * recruitment without saying so is the one thing worse than either half.
- *
- * Composition is deliberate rather than even: the masthead owns a viewport of
- * quiet, a constant label rail anchors every scene, dense ledgers alternate
- * with airy clauses, and the two full-bleed bands (hinge, closing) mark the
- * movements the way a document's sections break.
- */
+const directory = [
+  ["01", "Public access", "public-access"],
+  ["02", "Submission procedure", "submissions"],
+  ["03", "Organization filings", "organizations"],
+  ["04", "Credential verification", "credentials"],
+] as const;
 
-/** A scene: a rail carrying the § number and one word, then the body. */
-function Scene({ id, index, rail, heading, note, children, className }: {
-  id: string;
-  index: string;
-  rail: string;
-  heading: string;
-  note?: string;
-  children: React.ReactNode;
-  className?: string;
+function Procedure({ id, number, title, children }: {
+  id: string; number: string; title: string; children: React.ReactNode;
 }) {
   return (
-    <section className={["scene", className].filter(Boolean).join(" ")} id={id} aria-labelledby={`${id}-title`}>
-      <p className="scene-rail">
-        <span className="scene-index circa-mono">{index}</span>
-        <span className="scene-word">{rail}</span>
-      </p>
-      <div className="scene-body">
-        <h2 className="scene-title" id={`${id}-title`}>
-          {heading}
-        </h2>
-        {note && <p className="scene-note">{note}</p>}
-        {children}
-      </div>
+    <section id={id} aria-labelledby={`${id}-title`} className={styles.procedure}>
+      <h2 id={`${id}-title`}><span>{number}</span> {title}</h2>
+      {children}
     </section>
-  );
-}
-
-function TerminalBar() {
-  return (
-    <header className="terminal-bar">
-      <span className="terminal-sys">
-        <span className="terminal-sys-mark" aria-hidden="true">
-          ▦
-        </span>
-        {TERMINAL.system}
-      </span>
-      <span className="terminal-node">{TERMINAL.node}</span>
-      <span className="terminal-spacer" />
-      <span className="terminal-clearance">{TERMINAL.clearance}</span>
-      <a className="terminal-jump" href="#brief">
-        The project behind the archive
-      </a>
-    </header>
-  );
-}
-
-function TerminalMasthead() {
-  return (
-    <div className="terminal-masthead">
-      <span className="terminal-seal" aria-hidden="true" />
-      <div className="terminal-identity">
-        <h1 className="terminal-wordmark" id="terminal-title">
-          {TERMINAL.wordmark}
-        </h1>
-        <p className="terminal-commission">{PROJECT.commission}</p>
-        <p className="terminal-line">
-          <span className="terminal-address circa-mono">{TERMINAL.address}</span>
-          <span className="terminal-line-note">
-            {TERMINAL.system} · {TERMINAL.node}
-          </span>
-        </p>
-      </div>
-      <aside className="terminal-notice">
-        <p className="terminal-notice-label circa-label">{TERMINAL.notice.label}</p>
-        <p className="terminal-notice-body">{TERMINAL.notice.body}</p>
-        <p className="terminal-doctrine">{PROJECT.doctrine}</p>
-        <p className="terminal-monitoring circa-mono">{TERMINAL.monitoring}</p>
-      </aside>
-    </div>
-  );
-}
-
-function ClauseScene() {
-  const scene = TERMINAL.scenes.clauses;
-  return (
-    <Scene id="clauses" index={scene.index} rail={scene.rail} heading={scene.heading} note={scene.note}>
-      <ol className="clause-list">
-        {TERMINAL.clauses.map((clause) => (
-          <li className="clause" key={clause.index}>
-            <p className="clause-index circa-mono">{clause.index}</p>
-            <h3 className="clause-title">{clause.title}</h3>
-            <p className="clause-body">{clause.body}</p>
-          </li>
-        ))}
-      </ol>
-    </Scene>
-  );
-}
-
-function LedgerScene() {
-  const scene = TERMINAL.scenes.ledger;
-  return (
-    <Scene id="ledger" index={scene.index} rail={scene.rail} heading={scene.heading} note={scene.note}>
-      <div className="table-scroll">
-        <table className="ledger" aria-label={TERMINAL.ledger.label}>
-          <thead>
-            <tr>
-              <th scope="col">{TERMINAL.ledger.columns.code}</th>
-              <th scope="col">{TERMINAL.ledger.columns.designation}</th>
-              <th scope="col">{TERMINAL.ledger.columns.klass}</th>
-              <th scope="col">{TERMINAL.ledger.columns.filed}</th>
-              <th scope="col">{TERMINAL.ledger.columns.status}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {FILINGS.map((filing) => (
-              <tr key={filing.code}>
-                <td className="ledger-code circa-mono">{filing.code}</td>
-                <td className="ledger-designation">
-                  {filing.designation ?? <span className="ledger-withheld">{TERMINAL.ledger.withheld}</span>}
-                </td>
-                <td className="ledger-class">{classLabel(filing)}</td>
-                <td className="ledger-filed circa-mono">{filing.filed}</td>
-                <td className="ledger-status" data-status={filing.status}>
-                  {statusLabel(filing)}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </Scene>
-  );
-}
-
-function FilingScene() {
-  const scene = TERMINAL.scenes.filing;
-  return (
-    <Scene id="filing" index={scene.index} rail={scene.rail} heading={scene.heading} note={scene.note} className="scene-filing">
-      <div className="filing-grid terminal-filing">
-        <figure className="filing-sheet">
-          <div className="filing-sheet-head">
-            <span className="filing-code circa-mono">{SPECIMEN.code}</span>
-            <span className="filing-tag" data-status={SPECIMEN.status}>
-              {statusLabel(SPECIMEN)}
-            </span>
-            <span className="filing-tag">{classLabel(SPECIMEN)}</span>
-          </div>
-          <h3 className="filing-title">{SPECIMEN.designation}</h3>
-          <p className="filing-meta circa-mono">
-            Filed {SPECIMEN.filed} by {SPECIMEN.organization} at {SPECIMEN.clearance}
-          </p>
-          <p className="filing-abstract">{SPECIMEN.abstract}</p>
-          <figcaption className="filing-foot">Entry rendered from Markdown</figcaption>
-        </figure>
-        <dl className="field-list">
-          {TERMINAL.filing.fields.map((field) => (
-            <div className="field-row" key={field.key}>
-              <dt className="field-key">{field.key}</dt>
-              <dd className="field-note">{field.note}</dd>
-            </div>
-          ))}
-        </dl>
-      </div>
-    </Scene>
-  );
-}
-
-function OrganizationScene() {
-  const scene = TERMINAL.scenes.organizations;
-  return (
-    <Scene id="organizations" index={scene.index} rail={scene.rail} heading={scene.heading} note={scene.note} className="scene-organizations">
-      <div className="table-scroll">
-        <table className="ledger ledger-bodies" aria-label={TERMINAL.organizations.label}>
-          <thead>
-            <tr>
-              <th scope="col">{TERMINAL.organizations.columns.code}</th>
-              <th scope="col">{TERMINAL.organizations.columns.designation}</th>
-              <th scope="col">{TERMINAL.organizations.columns.filed}</th>
-              <th scope="col">{TERMINAL.organizations.vocabularyLabel}</th>
-              <th scope="col">{TERMINAL.organizations.columns.status}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {ORGANIZATIONS.map((organization) => (
-              <tr key={organization.code}>
-                <td className="ledger-code circa-mono">{organization.code}</td>
-                <td className="ledger-designation">
-                  {organization.designation ?? <span className="ledger-withheld">{TERMINAL.ledger.withheld}</span>}
-                </td>
-                <td className="ledger-filed circa-mono">{organization.filed}</td>
-                <td className="ledger-vocabulary">{TERMINAL.organizations.vocabulary[organization.code]}</td>
-                <td className="ledger-status" data-status={organization.status}>
-                  {statusLabel(organization)}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </Scene>
-  );
-}
-
-function EntryBand() {
-  return (
-    <section className="terminal-entry" aria-labelledby="entry-title">
-      <div className="site-frame">
-        <div>
-          <p className="entry-label circa-label">{TERMINAL.entry.label}</p>
-          <h2 className="entry-title" id="entry-title">
-            {TERMINAL.entry.heading}
-          </h2>
-          <p className="entry-note">{TERMINAL.entry.note}</p>
-        </div>
-        <div className="entry-action">
-          <Link className="terminal-enter" href="/desktop">
-            <span>{TERMINAL.entry.cta}</span>
-            <span className="terminal-enter-path circa-mono">{TERMINAL.entry.path}</span>
-          </Link>
-          <p className="entry-cue circa-mono">
-            {TERMINAL.system} · {TERMINAL.clearance}
-          </p>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function Hinge() {
-  return (
-    <section className="hinge" aria-labelledby="hinge-label">
-      <div className="site-frame">
-        <p className="hinge-label circa-mono" id="hinge-label">
-          {HINGE.label}
-        </p>
-        <p className="hinge-line">{HINGE.line}</p>
-      </div>
-    </section>
-  );
-}
-
-function BriefLetterhead() {
-  return (
-    <>
-      <header className="brief-letterhead">
-        <div className="brief-identity">
-          <p className="brief-owner">{PROJECT.name}</p>
-          <h2 className="brief-title" id="brief-title">
-            {BRIEF.title}
-          </h2>
-          <p className="brief-status circa-mono">
-            {PROJECT.status} · {PROJECT.license} licensed · no release yet
-          </p>
-        </div>
-        <nav className="brief-contents" aria-label={BRIEF.contentsLabel}>
-          {TRACKS.map((track) => (
-            <a className="brief-track" href={`#${track.id}`} key={track.id}>
-              <span className="brief-track-index circa-mono">{track.index}</span>
-              <span className="brief-track-name">{track.title}</span>
-              <span className="brief-track-kicker">{track.kicker}</span>
-            </a>
-          ))}
-        </nav>
-      </header>
-      <p className="brief-lead">{BRIEF.lead}</p>
-    </>
-  );
-}
-
-function TrackShell({ track, children }: { track: Track; children: React.ReactNode }) {
-  return (
-    <section className="track" id={track.id} aria-labelledby={`${track.id}-title`}>
-      <p className="track-rail">
-        <span className="track-index circa-mono" aria-hidden="true">
-          {track.index}
-        </span>
-        <span className="track-kicker">{track.kicker}</span>
-      </p>
-      <div className="track-body">
-        <h3 className="track-title" id={`${track.id}-title`}>
-          {track.title}
-        </h3>
-        <p className="track-lead">{track.lead}</p>
-        {children}
-      </div>
-    </section>
-  );
-}
-
-function WritersTrack({ track }: { track: Track }) {
-  return (
-    <TrackShell track={track}>
-      <ol className="filing-types">
-        {WRITER_FILINGS.map((filing) => (
-          <li className="filing-type" key={filing.id}>
-            <p className="filing-type-code circa-mono">{filing.code}</p>
-            <h4 className="filing-type-title">{filing.title}</h4>
-            <p className="filing-type-note">{filing.note}</p>
-          </li>
-        ))}
-      </ol>
-      <div className="track-columns">
-        <div>
-          <p className="sub-label">What the canon holds</p>
-          <ul className="rule-list">
-            {WRITER_RULES.map((rule) => (
-              <li className="rule" key={rule.id}>
-                <p className="rule-title">{rule.title}</p>
-                <p className="rule-note">{rule.note}</p>
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div>
-          <p className="sub-label">How to start</p>
-          <ol className="step-list">
-            {WRITER_STEPS.map((step) => (
-              <li className="step" key={step.index}>
-                <span className="step-index circa-mono" aria-hidden="true">
-                  {step.index}
-                </span>
-                <span className="step-copy">
-                  <span className="rule-title">{step.title}</span>
-                  <span className="rule-note">{step.note}</span>
-                </span>
-              </li>
-            ))}
-          </ol>
-          <p className="track-landing">
-            The setting and its canon live in <span className="circa-mono">docs/lore/</span> and in the context
-            document. Records themselves are written at the workstation.
-          </p>
-        </div>
-      </div>
-    </TrackShell>
-  );
-}
-
-function DevelopersTrack({ track }: { track: Track }) {
-  return (
-    <TrackShell track={track}>
-      <div className="track-columns">
-        <div>
-          <p className="sub-label">{BRIEF.stackLabel}</p>
-          <table className="stack" aria-label={BRIEF.stackLabel}>
-            <thead>
-              <tr>
-                <th scope="col">Piece</th>
-                <th scope="col">What it is</th>
-                <th scope="col">State</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr data-state="shipped">
-                <th scope="row">Status</th>
-                <td className="stack-value">{PROJECT.status}</td>
-                <td className="stack-state">Current</td>
-              </tr>
-              {STACK.map((row) => (
-                <tr key={row.key} data-state={row.state}>
-                  <th scope="row">{row.key}</th>
-                  <td className="stack-value">{row.value}</td>
-                  <td className="stack-state">{row.state === "planned" ? "Planned" : "Shipped"}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        <div>
-          <p className="sub-label">{BRIEF.layoutLabel}</p>
-          <ul className="layout-list">
-            {LAYOUT.map((row) => (
-              <li className="layout-row" key={row.path}>
-                <span className="layout-path circa-mono">{row.path}</span>
-                <span className="layout-purpose">{row.purpose}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-      <div className="builder-block">
-        <p className="sub-label">{BRIEF.loopLabel}</p>
-        <ol className="builder-list">
-          {BUILDER_STEPS.map((step, position) => (
-            <li className="builder-step" key={step.id}>
-              <span className="builder-index circa-mono" aria-hidden="true">
-                {String(position + 1).padStart(2, "0")}
-              </span>
-              <div>
-                <p className="rule-title">{step.title}</p>
-                <p className="rule-note">{step.note}</p>
-                {step.commands.map((id) => {
-                  const command = commandById(id);
-                  if (!command) return null;
-                  return (
-                    <p className="command-row" key={id}>
-                      {command.cwd && <span className="command-cwd circa-mono">in {command.cwd}</span>}
-                      <span className="command-text circa-mono">{command.text}</span>
-                      <CopyCommand text={command.text} />
-                      <span className="command-note">{command.note}</span>
-                    </p>
-                  );
-                })}
-              </div>
-            </li>
-          ))}
-        </ol>
-      </div>
-    </TrackShell>
-  );
-}
-
-function Colophon() {
-  return (
-    <section className="colophon" aria-labelledby="colophon-title">
-      <p className="sub-label" id="colophon-title">
-        {BRIEF.documentsLabel}
-      </p>
-      <p className="colophon-note">
-        No remote is configured yet, so these are paths in the checkout rather than links. Copy one and open it in your
-        editor, or read it on the repository host once the project is published.
-      </p>
-      <ul className="document-list">
-        {DOCUMENTS.map((document) => (
-          <li className="document-row" key={document.id}>
-            <span className="document-copy">
-              <span className="document-path circa-mono">{document.path}</span>
-              <span className="document-decides">{document.decides}</span>
-            </span>
-            <CopyCommand text={document.path} label={`Copy path ${document.path}`} />
-          </li>
-        ))}
-      </ul>
-    </section>
-  );
-}
-
-function Closing() {
-  return (
-    <footer className="closing">
-      <div className="site-frame">
-        <div className="closing-action">
-          <p className="closing-label circa-label">The archive is the other half of this page</p>
-          <Link className="closing-link" href="/desktop">
-            <span>Open the workstation</span>
-            <span className="closing-link-path circa-mono">/desktop</span>
-          </Link>
-        </div>
-        <div className="closing-terms">
-          <p className="closing-legal">
-            {PROJECT.license} licensed code and documentation. Contributions are accepted under the terms in
-            CONTRIBUTING.md, and the code of conduct applies to every conversation about the archive.
-          </p>
-          <p className="closing-terminal circa-mono">{TERMINAL.footer}</p>
-        </div>
-      </div>
-    </footer>
   );
 }
 
 export function LandingPage() {
-  const [writers, developers] = TRACKS;
   return (
-    <div className="landing">
-      <a className="landing-skip" href="#brief">
-        Skip to the project brief
-      </a>
-      <section className="terminal" id="terminal" aria-labelledby="terminal-title">
-        <div className="terminal-scanlines circa-scanlines" aria-hidden="true" />
-        <div className="site-frame">
-          <TerminalBar />
-          <TerminalMasthead />
-          <p className="terminal-cue">
-            <a href="#clauses">{TERMINAL.cue}</a>
-          </p>
+    <div className={styles.portal} id="top">
+      <a className={styles.skip} href="#public-access">Skip to public access</a>
+      <div className={styles.site}>
+        <div className={styles.utility}>
+          <span>PUBLIC INFORMATION SERVICE</span>
+          <span>Text edition · <a href="#accessibility">Access assistance</a></span>
         </div>
-        <ClauseScene />
-        <LedgerScene />
-        <FilingScene />
-        <OrganizationScene />
-        <EntryBand />
-      </section>
-      <Hinge />
-      <section className="brief" id="brief" aria-labelledby="brief-title">
-        <div className="site-frame">
-          <BriefLetterhead />
-          <WritersTrack track={writers} />
-          <DevelopersTrack track={developers} />
-          <Colophon />
+        <header className={styles.masthead}>
+          <div className={styles.seal} aria-hidden="true"> <span>IR / CA</span> </div>
+          <div>
+            <p className={styles.eyebrow}>Office of the Permanent Registry</p>
+            <h1>Commission for Incident Review<br />and Corrective Action</h1>
+            <p className={styles.motto}>Continuity of record. Continuity of administration.</p>
+          </div>
+          <div className={styles.mastheadRef}>
+            <span>PUBLIC CIRCULAR</span><strong>No. 04 / 1998</strong><span>ISSUE STILL IN FORCE</span>
+          </div>
+        </header>
+        <nav className={styles.topnav} aria-label="Agency navigation">
+          <a href="#public-access" aria-current="page">Home</a>
+          <a href="#about">About the Commission</a>
+          <a href="#documents">Forms &amp; circulars</a>
+          <a href="#contacts">Contact directory</a>
+          <a href="#credentials">Personnel access <span aria-hidden="true">→</span></a>
+        </nav>
+        <div className={styles.breadcrumb}>
+          <span>Registry / Public information / <strong>Index</strong></span>
+          <span>Document status: <b>CURRENT</b></span>
         </div>
-      </section>
-      <Closing />
+
+        <div className={styles.layout}>
+
+
+          <main id="public-access" tabIndex={-1} aria-labelledby="public-access-title" className={styles.main}>
+            <div className={styles.documentHead}><span>PA–01 / GENERAL CIRCULATION</span><span>Retain for reference</span></div>
+            <h2 id="public-access-title" className={styles.pageTitle}>Public access to the registry</h2>
+            <p className={styles.intro}>The Commission maintains records of reported incidents, subsequent reviews, and actions entered against them.</p>
+            <p>Correspondents may consult released records without an appointment. The presence of a record confirms its receipt. It does not confirm the events described.</p>
+            <div className={styles.entry}>
+              <div><Link href="/desktop" className={styles.enter}>Enter the archive <span aria-hidden="true">→</span></Link><p>No credentials required for public inspection.</p></div>
+              <span className={styles.entryCode}>ACCESS POINT 01<br />READING ROOM</span>
+            </div>
+            <p className={styles.firstVisit}><strong>First consultation?</strong> Open <b>Archive</b> at the workstation to browse records, or <b>Search</b> to find a title or reference number. Begin with an incident, then consult the records filed against it.</p>
+            <nav className={styles.mobileDirectory} aria-label="Procedure shortcuts">
+              <a href="#submissions">Submission procedure</a>
+              <a href="#organizations">Organization filings</a>
+              <a href="#credentials">Credential verification</a>
+            </nav>
+            <div className={styles.notice}>
+              <strong>NOTICE TO CORRESPONDENTS</strong>
+              <p>If a record names you in error, retain the reference number. Do not submit a second name.</p>
+              <span>Administrative instruction 6(b). Reissued without amendment.</span>
+            </div>
+
+            <Procedure id="submissions" number="02" title="Submission procedure">
+              <p>File an account of an incident, a discovery report, or a subsequent exploration. Separate what was observed from what was supplied by another correspondent.</p>
+              <ol className={styles.steps}>
+                <li>Consult existing records. Cite the incident reference where one exists.</li>
+                <li>Record the location, sequence of events, and source of each observation. Preserve contradictory accounts as separate continuities.</li>
+                <li>Open the record editor at the workstation to prepare a draft. Retain author credit and the lineage of any record you extend.</li>
+              </ol>
+              <p className={styles.serviceNote}><strong>Transmission notice:</strong> Drafts remain in this browser only while the editor is open. Retain a separate copy before closing or reloading. Saving, publication, and remote filing are not connected.</p>
+              <details className={styles.disclosure}>
+                <summary>Read the rules for submitted material · SP–02</summary>
+                <div><p>Submit original material or material you have permission to use. Preserve citations and author credit. Do not include personal details, threats, or targeted harassment of real persons.</p><p>Disagreement between accounts may be filed. Misconduct toward a correspondent may not. Records removed from public discovery are retained as tombstones under the applicable review procedure.</p></div>
+              </details>
+            </Procedure>
+            <Procedure id="organizations" number="03" title="Organization filings">
+              <p>To identify an organization, prepare the following particulars. An organization is an entry in the directory; it is not a personnel account.</p>
+              <dl className={styles.particulars}>
+                <div><dt>A. BRIEF</dt><dd>Name, remit, and terms used to classify incidents.</dd></div>
+                <div><dt>B. VOICE</dt><dd>A short sample record in the organization’s own language.</dd></div>
+                <div><dt>C. SEED</dt><dd>An initial incident establishing the basis for a file.</dd></div>
+              </dl>
+              <p>Review considers interest and coherence. Advisory votes do not confer recognition. Recognition by an existing body requires a separate record and approval from both parties.</p>
+              <p className={styles.serviceNote}>Organization submissions are not being transmitted from this terminal. Existing dossiers may be consulted through <b>Organizations</b> at the workstation.</p>
+            </Procedure>
+            <Procedure id="credentials" number="04" title="Credential verification">
+              <p>Returning reviewers may resume public inspection at the workstation. Credential verification is not connected; no password or personnel number is required or collected here.</p>
+              <Link href="/desktop">Continue to the public workstation <span aria-hidden="true">»</span></Link>
+              <p className={styles.small}>A previous appointment does not imply a present vacancy.</p>
+            </Procedure>
+
+            <section id="about" className={styles.about} aria-labelledby="about-title">
+              <h2 id="about-title">Concerning the Commission</h2>
+              <p>The Commission receives incident reports, preserves their supporting records, and maintains the register of organizations and continuities. Its jurisdiction is limited to the material on file.</p>
+              <p className={styles.doctrine}>The archive does not decide truth. It decides what is on file.</p>
+              <p className={styles.small}>Authority: continuing administrative arrangement, date of commencement not transferred.</p>
+            </section>
+          </main>
+
+          <aside className={styles.sidebar}>
+            <nav aria-label="Public directory">
+              <h2 className={styles.barTitle}>Public directory</h2>
+              {directory.map(([number, title, id]) => (
+                <a className={styles.directoryLink} href={`#${id}`} key={id}><span>{number}</span>{title}</a>
+              ))}
+              <a className={styles.directoryLink} href="#notices"><span>05</span>Notices &amp; revisions</a>
+            </nav>
+            <section className={styles.sideSection} aria-labelledby="hours-title">
+              <h2 id="hours-title">Registry hours</h2>
+              <p>Monday–Friday<br />09:00–17:00</p>
+              <p className={styles.small}>Correspondence received outside these hours will be dated the preceding working day.</p>
+            </section>
+            <section className={styles.sideSection} aria-labelledby="clearance-title">
+              <h2 id="clearance-title">Access classification</h2>
+              <dl className={styles.clearance}>
+                <div><dt>PUBLIC</dt><dd>Released index</dd></div>
+                <div><dt>REVIEWER</dt><dd>Assigned records</dd></div>
+                <div><dt>RESTRICTED</dt><dd>By reference only</dd></div>
+              </dl>
+              <p className={styles.small}>Classification describes the record, not the correspondent.</p>
+            </section>
+            <div className={styles.displaced} aria-label="Administrative stamp: continuation sheet 2 of 1">
+              CONTINUATION SHEET<br /><strong>2 OF 1</strong><br />RETAIN WITH ORIGINAL
+            </div>
+            <p className={styles.sidebarFoot}>Index maintained by<br />the Office of <span className={styles.redaction} aria-label="name withheld">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><br />Room 014 · Registry annex</p>
+          </aside>
+
+          <aside className={styles.bulletins} aria-label="Circulars and registry notices">
+            <section id="notices" aria-labelledby="news-title">
+              <h2 className={styles.barTitle} id="news-title">What’s new</h2>
+              <p className={styles.newsUpdated}>Last updated: 14 November 2003</p>
+              <article className={styles.newsItem}><time dateTime="2003-11-14">14.11.2003</time><h3><a href="#documents">Revised public access circular</a></h3><p>The previous circular remains in force until this revision has been withdrawn.</p></article>
+              <article className={styles.newsItem}><time dateTime="2001-06-08">08.06.2001</time><h3><a href="#contacts">Directory correction</a></h3><p>Room 014 has been removed from the floor plan. Correspondence should continue to be addressed there.</p></article>
+              <article className={styles.newsItem}><time dateTime="1999-01-01">01.01.1999</time><h3>Calendar conversion complete</h3><p>No interruption to the previous year is anticipated.</p></article>
+              <p className={styles.newsEnd}>No further notices have been received.</p>
+            </section>
+            <section id="documents" aria-labelledby="documents-title" className={styles.sideSection}>
+              <h2 id="documents-title">Forms &amp; circulars</h2>
+              <ul className={styles.documentList}>
+                <li><a href="#public-access">PA–01 · Public access statement</a><span>Current issue · 1 page</span></li>
+                <li><a href="#submissions">SP–02 · Preparation of records</a><span>Revision 3 · 2 pages</span></li>
+                <li><a href="#organizations">OF–03 · Organization particulars</a><span>Unnumbered attachment</span></li>
+                <li><a href="#withdrawn">AC–09 · Closure of a file</a><span>Copy unavailable</span></li>
+              </ul>
+            </section>
+            <section id="withdrawn" className={styles.withdrawn} aria-labelledby="withdrawn-title">
+              <h2 id="withdrawn-title">Document not supplied</h2>
+              <p>AC–09 is listed for completeness. No public copy is held. The instruction to remove this reference was filed under AC–09.</p>
+            </section>
+            <div className={styles.registerMark} aria-hidden="true">REGISTRY COPY<br />CHECKED &nbsp; / &nbsp; 04</div>
+          </aside>
+        </div>
+
+        <div className={styles.registers}>
+          <section id="contacts" aria-labelledby="contacts-title">
+            <h2 id="contacts-title">06 / Contact directory</h2>
+            <table aria-label="Contact directory">
+              <thead><tr><th scope="col">Enquiries concerning</th><th scope="col">Refer to</th><th scope="col">Room</th></tr></thead>
+              <tbody>
+                <tr><th scope="row">Public inspection</th><td><a href="#public-access">Access desk</a></td><td>001</td></tr>
+                <tr><th scope="row">New records / amendments</th><td><a href="#submissions">Filing clerk</a></td><td>014</td></tr>
+                <tr><th scope="row">Missing correspondence</th><td><a href="#withdrawn">Records retention</a></td><td>014</td></tr>
+              </tbody>
+            </table>
+            <p>Routing references only. Direct correspondence is not available from this terminal.</p>
+          </section>
+          <section aria-labelledby="revision-title">
+            <h2 id="revision-title">07 / Revision register</h2>
+            <table aria-label="Revision register">
+              <thead><tr><th scope="col">Issue</th><th scope="col">Date entered</th><th scope="col">Amendment</th></tr></thead>
+              <tbody>
+                <tr><th scope="row">04.2</th><td>14.11.2003</td><td>Public directory corrected.</td></tr>
+                <tr><th scope="row">04.1</th><td>08.06.2001</td><td>Previous signatory removed.</td></tr>
+                <tr><th scope="row">04.1</th><td>08.06.2001</td><td>No previous signatory recorded.</td></tr>
+              </tbody>
+            </table>
+            <p>Entries reproduced as received. Numbering discrepancies are retained.</p>
+          </section>
+        </div>
+        <div className={styles.policies}>
+          <details id="accessibility"><summary>Accessibility statement</summary><p>This index supports keyboard navigation, text enlargement, and reduced motion. All public instructions are supplied as text. Reading order takes precedence over the order in which material was received.</p></details>
+          <details id="privacy"><summary>Privacy &amp; retention</summary><p>This page contains no credential or correspondence form. Draft records prepared at the workstation are temporary. Closing the editor or reloading discards them; retain a separate copy. A name withheld from a public copy is not an empty field.</p></details>
+          <details id="terms"><summary>Conditions of consultation</summary><p>Released records may contain incomplete, contradictory, or withdrawn accounts. A reference is evidence of filing, not verification. Retain attribution when extending a record. The Commission assumes no authority over events not yet entered.</p></details>
+        </div>
+        <footer className={styles.footer}>
+          <p>Office of the Permanent Registry <span>·</span> Public information service</p>
+          <a href="#top">Return to top ↑</a>
+          <p className={styles.footerEnd}><span>Page 1 of 1 · Approved for general circulation</span><span>End of available document.</span></p>
+        </footer>
+      </div>
     </div>
   );
 }
