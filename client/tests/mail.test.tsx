@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 // The shell directly: the /desktop route now posts first, and these tests are about the shell.
 import { DesktopShell as Home } from "@/components/desktop-shell";
 import { MAIL_WINDOW_TITLE } from "@/components/mail/mail-identity";
-import { MAILBOX_FIXTURE, folderMessages, readIds, unreadCount } from "@/components/mail/mailbox-index";
+import { MAILBOX_FIXTURE, DEFAULT_SORT, folderMessages, readIds, sortMessages, unreadCount } from "@/components/mail/mailbox-index";
 
 const read = readIds(MAILBOX_FIXTURE);
 const INBOX = folderMessages(MAILBOX_FIXTURE, "inbox");
@@ -12,6 +12,8 @@ const DELETED = folderMessages(MAILBOX_FIXTURE, "deleted");
 const OUTBOX = folderMessages(MAILBOX_FIXTURE, "outbox");
 const DEAD = folderMessages(MAILBOX_FIXTURE, "dead");
 const INBOX_UNREAD = unreadCount(INBOX, read);
+/** The grid opens on the store's default sort, so its first row is the newest message, not the fixture's first. */
+const FIRST_LISTED = sortMessages(INBOX, DEFAULT_SORT)[0];
 
 /** Opens the Inbox destination, which hosts the mail client. */
 async function openMail(user: ReturnType<typeof userEvent.setup>) {
@@ -52,9 +54,9 @@ describe("mail client", () => {
     const { frame, counts, rows } = await openMail(user);
     await user.click(rows()[0]);
     const pane = within(frame).getByRole("region", { name: "Message" });
-    expect(within(pane).getByRole("heading", { name: INBOX[0].subject })).toBeVisible();
-    expect(pane).toHaveTextContent(INBOX[0].from.name);
-    expect(pane).toHaveTextContent(INBOX[0].body[0]);
+    expect(within(pane).getByRole("heading", { name: FIRST_LISTED.subject })).toBeVisible();
+    expect(pane).toHaveTextContent(FIRST_LISTED.from.name);
+    expect(pane).toHaveTextContent(FIRST_LISTED.body[0]);
     expect(counts()).toBe(`${INBOX.length} items, ${INBOX_UNREAD - 1} unread`);
   });
 
@@ -76,7 +78,9 @@ describe("mail client", () => {
     const { frame, counts, rows } = await openMail(user);
     await user.click(within(frame).getByRole("button", { name: "Find" }));
     const findBar = within(frame).getByRole("search", { name: "Find messages" });
-    await user.type(within(findBar).getByLabelText("Look for"), "shelf");
+    // A term only the night desk's slip carries, so one row matches. "shelf" alone
+    // would also hit the orientation message, which mentions the shelf you keep.
+    await user.type(within(findBar).getByLabelText("Look for"), "shelf nine");
     expect(rows()).toHaveLength(1);
     expect(counts()).toBe("1 item, 1 unread");
     await user.click(within(findBar).getByRole("button", { name: "Clear" }));
@@ -160,8 +164,8 @@ describe("mail client", () => {
     await user.click(rows()[0]);
     await user.click(within(frame).getByRole("button", { name: "Reply" }));
     const compose = within(frame).getByRole("form", { name: "Reply" });
-    expect(within(compose).getByLabelText("To")).toHaveValue(INBOX[0].from.address);
-    expect(within(compose).getByLabelText("Subject")).toHaveValue(`RE: ${INBOX[0].subject}`);
+    expect(within(compose).getByLabelText("To")).toHaveValue(FIRST_LISTED.from.address);
+    expect(within(compose).getByLabelText("Subject")).toHaveValue(`RE: ${FIRST_LISTED.subject}`);
     expect((within(compose).getByLabelText("Message") as HTMLTextAreaElement).value)
       .toMatch(/original message/i);
   });

@@ -46,7 +46,9 @@ The same formula as the browser: steel furniture around a document surface. The 
 
 ## Data and honesty
 
-The fixture is twenty-two messages across the six folders, and it is illustrative preview content rather than canon. Senders are **offices, never people**: `PROJECT_CONTEXT.md` is explicit that organizations are entities and that no user is a mailbox correspondent, so every message comes from a desk, a records office, a clearance board, a retention office, a postmaster, or a courier service. Incident and organization codes match the archive's own index, so the two applications describe one world.
+The fixture is twenty-three messages across the six folders, and it is illustrative preview content rather than canon. Senders are **offices, never people**: `PROJECT_CONTEXT.md` is explicit that organizations are entities and that no user is a mailbox correspondent, so every message comes from a desk, a records office, a clearance board, a retention office, a postmaster, or a courier service. Incident and organization codes match the archive's own index, so the two applications describe one world.
+
+`MSG-0000`, the Front Desk's orientation message, is the one message the fiction keeps forever. It declares `pinned` and `permanent` on `MailMessage`; neither is honoured yet, so the list sorts it by its date like any other message and `Delete` will move it. Until the store implements the two, the flags state the intent rather than the behaviour.
 
 Nothing here reaches the network. There is no transfer to fail, so no loading or transport-error state exists; `Send and receive` reports the truth about a transport that is not connected, and queued mail keeps its place in the Outbox. A message queued now is stamped one minute after the newest message in the store (`nextStamp`), because the store's clock is the archive's, not the wall clock.
 
