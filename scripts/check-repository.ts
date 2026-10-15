@@ -27,12 +27,25 @@ export function findMissingReadmes(paths: string[]): string[] {
   });
 }
 
-export function repositoryPaths(staged: boolean, cwd = process.cwd()): string[] {
+/**
+ * The paths git reports for the repository at `cwd`.
+ *
+ * `env` is the environment git reads the index with. The command line inherits
+ * its own, so a hook validating a partial commit sees that commit's index; a
+ * caller building a scratch repository passes an environment with git's own
+ * variables removed, so the scratch repository cannot be pointed at the index of
+ * the repository under commit.
+ */
+export function repositoryPaths(
+  staged: boolean,
+  cwd = process.cwd(),
+  env: NodeJS.ProcessEnv = process.env,
+): string[] {
   // The index is the complete next-commit snapshot, including staged deletions.
   const args = staged
     ? ["ls-files", "--cached", "-z"]
     : ["ls-files", "--cached", "--others", "--exclude-standard", "-z"];
-  return execFileSync("git", args, { cwd, encoding: "utf8" }).split("\0").filter(Boolean);
+  return execFileSync("git", args, { cwd, env, encoding: "utf8" }).split("\0").filter(Boolean);
 }
 
 if (import.meta.main) {

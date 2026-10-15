@@ -2,7 +2,7 @@
 
 ## Responsibility and structure
 
-`check-repository.test.ts` covers folder README requirements, generated-folder exclusions, deduplication, and the distinction between working-tree documentation and staged documentation. Git-index tests use disposable temporary repositories and do not stage files in CIRCA.
+`check-repository.test.ts` covers folder README requirements, generated-folder exclusions, deduplication, and the distinction between working-tree documentation and staged documentation. Git-index tests use disposable temporary repositories and do not stage files in CIRCA. They spawn git with its own variables removed: a partial commit exports an absolute `GIT_INDEX_FILE` to its hooks, and a scratch repository that inherited it would stage its fixtures into CIRCA's index, against blobs its own object store is about to lose.
 
 ## Usage and boundaries
 
