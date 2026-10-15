@@ -139,7 +139,7 @@ CLEARANCE:       RESTRICTED
 
 *Filed under CIRCA-S-03007. This record is part of the public archive and may be cited without permission. The Commission does not confirm the events described.*
 
-<!-- 
+<!--
 SYNTAX LEGEND (for your renderer):
   ![left|caption](path)   → left-aligned image, text wraps right
   ![right|caption](path)  → right-aligned image, text wraps left

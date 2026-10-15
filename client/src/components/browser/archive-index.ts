@@ -83,9 +83,14 @@ const entry = (
 ): ArchiveEntry => ({ code, designation, klass, filed, status, organization, clearance, abstract });
 
 /**
- * Seventeen preview entries spread across four classes and three centuries, so
+ * Eighteen preview entries spread across four classes and three centuries, so
  * every filter, the no-match recovery, and the record view have something real
  * to work with instead of a decorative empty table.
+ *
+ * `CIRCA-S-03007` is the Markdown renderer's test corpus, filed here so that
+ * the widest exercise of that renderer — frontmatter, a table with redactions
+ * in a cell, image alignment directives, a code block — is reachable in the
+ * record reader rather than only from a unit test.
  */
 export const ARCHIVE_INDEX: readonly ArchiveEntry[] = [
   entry("INC-00014", "Unlogged freight car, northbound", "incident", "1998-06-02", "on-file", "CIRCA", "LEVEL 4",
@@ -104,6 +109,8 @@ export const ARCHIVE_INDEX: readonly ArchiveEntry[] = [
     "The audit counted one box more than the shelf manifest and one box less than the room register."),
   entry("INC-00907", "Tide gauge disagreement, two stations", "incident", "2007-05-16", "contested", "ORG-C-005102", "LEVEL 3",
     "Two stations on the same estuary recorded the same tide eleven minutes apart. Both instruments calibrate."),
+  entry("CIRCA-S-03007", "The Unwalled Door", "incident", "2004-09-12", "on-file", "Qterw-7-3", "LEVEL 3",
+    "A free-standing door in a pasture in Gangwon Province, and eleven people whose records disagree with themselves."),
   entry("ORG-U-000011", "Temple registry, predecessor body", "organization", "1000-04-01", "on-file", "CIRCA", "LEVEL 4",
     "The earliest body the archive still files under a continuous code. Unrated at promotion."),
   entry("ORG-A-020748", "Standing commission of review", "organization", "1961-03-12", "on-file", "CIRCA", "LEVEL 4",

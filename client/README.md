@@ -8,7 +8,7 @@ Next.js frontend with a public landing page at `/` and the CIRCA/OS workstation 
 
 - `src/app/`: routes, root layout, global theme, and [desktop design decisions](src/app/desktop/README.md).
 - `src/components/`: desktop shell, the public [site](src/components/site/README.md) and post screen, the archive [browser](src/components/browser/README.md), the [mail client](src/components/mail/README.md), the [file browser](src/components/files/README.md), the record [editor](src/components/word/README.md) and [reader](src/components/reader/README.md), reusable navigation and icons, and shadcn/ui primitives.
-- `src/lib/`: shared class-composition helper.
+- `src/lib/`: shared class-composition helper and the record [Markdown renderer](src/lib/markdown/README.md) the reader and the `.txt` export share.
 - `tests/`: Vitest interaction and utility tests.
 - `e2e/`: responsive Playwright desktop tests.
 - `public/`: supplied emblem wallpaper and the Windows 98 shortcut [icon set](public/icons/README.md).

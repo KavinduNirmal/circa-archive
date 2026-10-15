@@ -433,3 +433,61 @@ describe("record reader follow-ups", () => {
     expect(within(reader).getByRole("button", { name: "Next record" })).toBeEnabled();
   });
 });
+
+describe("record reader renders the filed Markdown", () => {
+  it("draws the corpus's repaired table, three figures, and six redactions on the sheet", () => {
+    const { sheet } = mount("CIRCA-S-03007");
+    expect(within(sheet()).getByRole("heading", { level: 2, name: "Brief" })).toBeVisible();
+    const table = within(sheet()).getByRole("table");
+    expect(within(table).getAllByRole("row")).toHaveLength(7);
+    expect([...sheet().querySelectorAll("figure[data-align]")].map((figure) => figure.getAttribute("data-align")))
+      .toEqual(["right", "full", "left"]);
+    expect(sheet().querySelectorAll("mark.reader-redaction-inline")).toHaveLength(6);
+    // The record's header is metadata; it is never body copy on the sheet.
+    expect(sheet()).not.toHaveTextContent("circa_code");
+    expect(sheet()).not.toHaveTextContent("SYNTAX LEGEND");
+  });
+
+  it("navigates the corpus as four sections, the way the source wrote them", () => {
+    const { reader, sheet } = mount("CIRCA-S-03007");
+    const rail = within(reader).getByRole("navigation", { name: "Sections" });
+    expect([...rail.querySelectorAll(".reader-preview")].map((item) => item.getAttribute("aria-label"))).toEqual([
+      "01 Brief",
+      "02 Field Account",
+      "03 Cross-Reference",
+      "04 Addendum",
+    ]);
+    expect(sheet().querySelectorAll("section.reader-section")).toHaveLength(4);
+    expect(sheet().querySelector("#reader-section-brief")).not.toBeNull();
+  });
+
+  it("opens a redaction on the sheet, and holds it closed until then", async () => {
+    const user = userEvent.setup();
+    const { sheet } = mount("CIRCA-S-03007");
+    const mark = [...sheet().querySelectorAll<HTMLElement>("mark.reader-redaction-inline")]
+      .find((candidate) => candidate.textContent === "not to be approached");
+    expect(mark).toBeDefined();
+    expect(mark).toHaveAttribute("data-revealed", "false");
+    await user.click(mark as HTMLElement);
+    expect(mark).toHaveAttribute("data-revealed", "true");
+  });
+
+  it("still counts its matches by walking the renderer's own output", async () => {
+    const user = userEvent.setup();
+    const { reader } = mount("CIRCA-S-03007");
+    await user.click(within(reader).getByRole("button", { name: "Search" }));
+    await user.type(within(reader).getByLabelText("Search this record"), "containment breach");
+    // The match is inside a redaction, which is exactly what the DOM walk is for.
+    expect(within(reader).getByTestId("reader-match-count")).toHaveTextContent("1 match for containment breach.");
+  });
+
+  it("puts the status on the stamp as data, so the sheet can fill a contested one", () => {
+    const stamp = mount("INC-00907").sheet().querySelector(".reader-stamp");
+    expect(stamp).toHaveAttribute("data-status", "contested");
+    expect(stamp).toHaveTextContent("Contested");
+  });
+
+  it("does not stamp an ordinary filing, so there is nothing to fill", () => {
+    expect(mount("INC-00014").sheet().querySelector(".reader-stamp")).toBeNull();
+  });
+});

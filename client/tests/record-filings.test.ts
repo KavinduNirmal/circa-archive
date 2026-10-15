@@ -3,7 +3,7 @@ import { ARCHIVE_INDEX, CLASS_LABELS, STATUS_LABELS } from "@/components/browser
 import { READER_HELD_LABEL, recordDocument } from "@/components/reader/record-filings";
 
 /** The records the preview actually files a body for, rather than an entry alone. */
-const FILED = ["INC-00014", "INC-00042", "INC-00907", "ORG-C-005102"] as const;
+const FILED = ["INC-00014", "INC-00042", "INC-00907", "ORG-C-005102", "CIRCA-S-03007"] as const;
 
 describe("record filings", () => {
   it("builds a sectioned document for every entry in the index", () => {
@@ -50,7 +50,28 @@ describe("record filings", () => {
     }
     const sections = recordDocument("INC-00042")?.sections ?? [];
     expect(sections.map((section) => section.heading)).toContain("Field account");
-    expect(sections.flatMap((section) => section.blocks).some((block) => block.kind === "paragraph")).toBe(true);
+    // The prose is Markdown the renderer owns, not a block the model re-describes.
+    expect(sections.some((section) => section.source?.includes("Three surveyors climbed"))).toBe(true);
+  });
+
+  it("files the renderer's corpus, so every feature it carries is reachable in the reader", () => {
+    const document = recordDocument("CIRCA-S-03007");
+    expect(document?.source).toBe("filed");
+    expect(document?.designation).toBe("The Unwalled Door");
+    expect(document?.sections.map((section) => section.heading)).toEqual([
+      "Brief",
+      "Field Account",
+      "Cross-Reference",
+      "Addendum",
+    ]);
+    for (const section of document?.sections ?? []) {
+      expect(section.source?.length ?? 0, section.heading).toBeGreaterThan(20);
+    }
+    // The table, the redactions, and the alignment directives are in the source.
+    const source = document?.sections.map((section) => section.source).join("\n") ?? "";
+    expect(source).toContain("||not to be approached||");
+    expect(source).toContain("![right|Figure 1.");
+    expect(source).toContain("| S-01 |");
   });
 
   it("opens each filed record with its index entry, so the sheet never restates the catalogue", () => {
@@ -78,13 +99,16 @@ describe("record filings", () => {
     const document = recordDocument("CIRCA-M-0002");
     const opening = document?.sections[0];
     expect(opening?.withheld).toBeFalsy();
-    expect(opening?.blocks.some((block) => block.kind === "paragraph")).toBe(true);
+    // The entry's abstract is the released body, and it renders as Markdown.
+    expect(opening?.source).toBeTruthy();
     expect(opening?.blocks.some((block) => block.kind === "fields")).toBe(true);
   });
 
   it("withholds one section of a sealed record whose body is otherwise released", () => {
     const sections = recordDocument("INC-00042")?.sections ?? [];
     expect(sections.at(-1)?.withheld).toBe(true);
+    // A held section contributes no prose at all, not even to the bundle.
+    expect(sections.at(-1)?.source).toBeUndefined();
     expect(sections[0].withheld).toBeFalsy();
   });
 

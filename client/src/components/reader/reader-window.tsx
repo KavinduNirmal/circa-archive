@@ -284,7 +284,9 @@ export function RecordReader({ trail, session, onOpenRecord, onTravel, onCloseWi
                     </p>
                   </div>
                   {STATUS_STAMPS[record.status] && (
-                    <span className="reader-stamp">{STATUS_STAMPS[record.status]}</span>
+                    // The status is on the stamp as data, so the sheet can give a state
+                    // its own treatment without the frame styling it here.
+                    <span className="reader-stamp" data-status={record.status}>{STATUS_STAMPS[record.status]}</span>
                   )}
                 </header>
 

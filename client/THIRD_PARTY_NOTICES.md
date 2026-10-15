@@ -4,6 +4,10 @@ The primitives in `src/components/ui/` are derived from [shadcn/ui](https://gith
 
 The desktop shortcut bitmaps in `public/icons/` are the Windows 98 icon set, retrieved from the [Windows 98 Icon Viewer](https://win98icons.alexmeub.com/). They are Microsoft artwork used here as placeholder shell art for a fictional interface; replace or license them before any distribution. See [public/icons/README.md](public/icons/README.md) for the destination mapping.
 
+The record Markdown renderer in `src/lib/markdown/` and `src/components/reader/` builds on [react-markdown](https://github.com/remarkjs/react-markdown), [remark](https://github.com/remarkjs/remark) (`remark-parse`, `remark-gfm`, `remark-frontmatter`), [mdast-util-to-hast](https://github.com/syntax-tree/mdast-util-to-hast), [unist-util-visit](https://github.com/syntax-tree/unist-util-visit), and [vfile](https://github.com/vfile/vfile), all MIT-licensed, and on [yaml](https://github.com/eemeli/yaml), which is ISC-licensed. Their license files are retained in their distributions.
+
+`public/Ghost_story.md` is authored preview content for the fictional archive, carried into `src/components/reader/ghost-story.ts` as a bundled string because a browser cannot read it from disk. A test holds the two copies identical.
+
 ```text
 MIT License
 

@@ -1732,6 +1732,23 @@
   --reader-note-rule: rgb(38 58 96 / 7%);
   --reader-margin-rule: rgb(150 66 60 / 30%);
   --reader-redact: #26333f;
+  /*
+   * The record is a typed document, not interface chrome, so the sheet is set
+   * in one typewriter face while the frame around it stays in the workstation's
+   * sans. Courier New is a system face and will not be present everywhere, so
+   * the stack falls back to the metric-compatible clones before plain mono.
+   */
+  --reader-document-font: "Courier New", Courier, "Nimbus Mono PS", "Liberation Mono", ui-monospace, monospace;
+  /* Redacted Crimson. The code that names the record is the one red mark on the leaf. */
+  --reader-ident: #8a2b2b;
+  /* The stamp's own colour on paper, at 22%: a contested record carries a fill. */
+  --reader-stamp-fill: rgb(138 74 18 / 22%);
+  /*
+   * The classification watermark, drawn once as an SVG tile and repeated under
+   * the paper's grain. It is a CSS background, so it is invisible to the
+   * accessibility tree and cannot be selected, printed, or read as content.
+   */
+  --reader-classified: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='680' height='420'%3E%3Ctext x='340' y='210' text-anchor='middle' dominant-baseline='middle' transform='rotate(-30 340 210)' font-family='Courier New, monospace' font-size='52' font-weight='700' letter-spacing='14' fill='%238a2b2b' fill-opacity='0.10'%3ECLASSIFIED%3C/text%3E%3C/svg%3E");
   background: var(--background);
   color: var(--foreground);
 }
@@ -1852,10 +1869,17 @@
   padding: 34px clamp(18px, 4cqw, 54px) 46px;
   border-inline: 1px solid rgb(13 19 26 / 28%);
   background-color: var(--reader-sheet);
-  /* A grain, not a grid: the sheet reads as paper without drawing lines the
-     text would then have to sit on. */
-  background-image: repeating-linear-gradient(0deg, rgb(22 32 43 / 1.4%) 0 1px, transparent 1px 3px);
+  /*
+   * Two layers over the paper, and the order matters. The classification
+   * watermark sits under the grain, and being a background it is anchored to
+   * the sheet rather than to the text: a reader scrolls the document, never
+   * past the mark. The grain is a grain and not a grid, so the sheet reads as
+   * paper without drawing lines the text would then have to sit on.
+   */
+  background-image: var(--reader-classified), repeating-linear-gradient(0deg, rgb(22 32 43 / 1.4%) 0 1px, transparent 1px 3px);
+  background-repeat: repeat, repeat;
   color: var(--reader-sheet-ink);
+  font-family: var(--reader-document-font);
   font-size: calc(15px * var(--reader-scale));
   line-height: 1.6;
   outline: none;
@@ -1870,8 +1894,10 @@
 /* --- The leaf: the record's identity, in the catalogue's own words --- */
 .reader-leaf { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 10px 18px; padding-bottom: 13px; border-bottom: 2px solid var(--reader-sheet-ink); margin-bottom: 26px; }
 .reader-leaf-text { flex: 1 1 auto; min-width: 0; }
-.reader-leaf-code { color: var(--reader-sheet-soft); font-size: 10px; letter-spacing: .2em; text-transform: uppercase; }
-.reader-leaf-title { margin: 5px 0 9px; max-width: 52ch; font-size: 1.8em; font-weight: 700; line-height: 1.16; letter-spacing: -.004em; }
+.reader-leaf-code { color: var(--reader-ident); font-size: 1.05em; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; }
+/* Headings are set in caps the way an institutional filing sets them, and in
+   the markup's own casing, so the accessible name and any copy keep their case. */
+.reader-leaf-title { margin: 5px 0 9px; max-width: 52ch; font-size: 1.8em; font-weight: 700; line-height: 1.16; letter-spacing: .01em; text-transform: uppercase; }
 .reader-leaf-line { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 9px; color: var(--reader-sheet-soft); font-size: 10px; letter-spacing: .05em; text-transform: uppercase; }
 .reader-leaf-sep { width: 1px; height: 9px; background: var(--circa-rule); }
 /* The status stamp, on the exceptional states only. An ordinary filing is not stamped. */
@@ -1888,22 +1914,70 @@
   transform: rotate(-2.5deg);
   opacity: .8;
 }
+/* A contested record's stamp carries a fill, so the state reads at a glance and
+   not only from a two-pixel border. The fill is light enough to stay a stamp. */
+.reader-stamp[data-status="contested"] { background: var(--reader-stamp-fill); }
 /* A withheld value is drawn as the design system draws one, at any scale. */
-.reader-redaction { display: inline-block; width: 16ch; max-width: 100%; height: .74em; background: var(--reader-redact); vertical-align: baseline; }
+.reader-redaction { display: inline-block; width: 16ch; max-width: 100%; height: 1em; background: var(--reader-redact); vertical-align: baseline; }
 
 /* --- The sheet's own contents. The slot decides what is inside a section. --- */
 .reader-sections { display: grid; gap: 30px; }
 .reader-section { position: relative; }
 .reader-sheet[data-view="two-up"] .reader-sections { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 30px 40px; max-width: none; }
 .reader-section[data-withheld="true"] { color: var(--reader-sheet-soft); }
-.reader-section-heading { margin: 0 0 12px; font-size: 1.16em; font-weight: 700; letter-spacing: .002em; }
-.reader-paragraph { margin: 0 0 14px; }
-.reader-lede { margin: 0 0 16px; font-size: 1.06em; color: #22303c; }
-.reader-quote { margin: 0 0 16px; padding: 3px 0 3px 16px; border-left: 3px solid var(--circa-rule); color: #26323d; }
-.reader-quote p { margin: 0 0 5px; font-style: italic; }
-.reader-quote-source { display: block; color: var(--reader-sheet-soft); font-size: .76em; font-style: normal; letter-spacing: .06em; text-transform: uppercase; }
-.reader-list { margin: 0 0 16px; padding-left: 20px; }
-.reader-list li { margin-bottom: 5px; }
+.reader-section-heading { margin: 0 0 12px; font-size: 1.16em; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; }
+/* --- The body slot: whatever Markdown the host renders, set on the sheet --- */
+.reader-markdown { font-size: 1em; }
+/* A floated figure is cleared at the end of its own section, never the next one. */
+.reader-markdown::after { content: ""; display: block; clear: both; }
+.reader-markdown p { margin: 0 0 14px; }
+/* The opening line of a section carries it, the way a filing's first line does. */
+.reader-markdown > p:first-child { font-size: 1.04em; color: #22303c; }
+.reader-markdown > :first-child { margin-top: 0; }
+.reader-markdown h1, .reader-markdown h2, .reader-markdown h3, .reader-markdown h4 { margin: 22px 0 10px; font-weight: 700; line-height: 1.25; letter-spacing: .04em; text-transform: uppercase; }
+.reader-markdown h1 { font-size: 1.5em; }
+.reader-markdown h2 { font-size: 1.24em; }
+.reader-markdown h3 { font-size: 1.06em; }
+/*
+ * The prose rules have to restate what Tailwind's preflight resets: it strips
+ * list markers and makes an anchor inherit its parent's decoration, which is
+ * right for chrome and wrong for a document that is meant to be read.
+ */
+.reader-markdown ul, .reader-markdown ol { margin: 0 0 14px; padding-left: 22px; }
+.reader-markdown ul { list-style: disc; }
+.reader-markdown ol { list-style: decimal; }
+.reader-markdown ul ul { list-style: circle; }
+.reader-markdown ul ul ul { list-style: square; }
+.reader-markdown li { margin-bottom: 5px; }
+.reader-markdown li > p { margin: 0 0 6px; }
+.reader-markdown blockquote { margin: 0 0 16px; padding: 3px 0 3px 16px; border-left: 3px solid var(--circa-rule); color: #26323d; }
+.reader-markdown blockquote p { margin: 0 0 6px; font-style: italic; }
+.reader-markdown blockquote p:last-child { margin-bottom: 0; }
+.reader-markdown a { color: inherit; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 2px; }
+.reader-markdown code { padding: 0 3px; background: rgb(22 32 43 / 7%); font-family: var(--font-mono); font-size: .88em; }
+.reader-markdown pre { margin: 0 0 16px; padding: 10px 12px; overflow-x: auto; background: rgb(22 32 43 / 5%); border: 1px solid var(--reader-sheet-edge); }
+.reader-markdown pre code { padding: 0; background: none; font-size: .84em; line-height: 1.5; }
+.reader-markdown hr { height: 1px; margin: 22px 0; border: 0; background: var(--reader-sheet-edge); }
+/* A filing's table is part of the record, so it is ruled the way the sheet is. */
+.reader-markdown table { width: 100%; margin: 0 0 18px; border-collapse: collapse; font-size: .82em; }
+.reader-markdown th, .reader-markdown td { padding: 4px 7px; border: 1px solid var(--reader-sheet-edge); text-align: left; vertical-align: top; }
+.reader-markdown th { background: rgb(22 32 43 / 5%); font-weight: 700; letter-spacing: .04em; }
+.reader-markdown tbody tr:nth-child(even) { background: rgb(22 32 43 / 3%); }
+/* Images: three alignments, and a plate shaped like a photograph when the file
+   is not on the desk. The alt text is the caption, which the figcaption prints
+   below, so it must not also be set at body size inside the frame. */
+.reader-figure { margin: 0 0 16px; padding: 0; }
+.reader-figure img { display: block; width: 100%; height: auto; aspect-ratio: auto 4 / 3; object-fit: cover; background: var(--reader-sheet-edge); border: 1px solid var(--reader-sheet-edge); color: transparent; }
+.reader-figure figcaption { margin-top: 5px; color: var(--reader-sheet-soft); font-size: .74em; line-height: 1.45; }
+.reader-figure-right { float: right; width: min(42%, 240px); margin: 4px 0 14px 20px; }
+.reader-figure-left { float: left; width: min(42%, 240px); margin: 4px 20px 14px 0; }
+.reader-figure-full { width: 100%; }
+/* A redaction: held behind paper until the reader opens it, and labelled either way. */
+.reader-redaction-inline { padding: 0 2px; border: 0; background: var(--reader-redact); color: transparent; font: inherit; cursor: pointer; }
+.reader-redaction-inline[data-revealed="false"] { user-select: none; }
+.reader-redaction-inline[data-revealed="true"] { background: #f2e4c4; color: #22303c; box-shadow: inset 0 -1px 0 var(--circa-stamp); }
+.reader-redaction-inline[data-empty="true"] { padding: 0 4px; color: var(--reader-sheet); cursor: default; font-size: .82em; letter-spacing: .1em; }
+.reader-redaction-inline:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
 .reader-fields { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 3px 18px; margin: 0 0 18px; padding: 12px 0; border-top: 1px solid var(--reader-sheet-edge); border-bottom: 1px solid var(--reader-sheet-edge); font-size: .86em; }
 .reader-field { display: contents; }
 .reader-field dt { color: var(--reader-sheet-soft); font-size: .84em; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
@@ -1911,7 +1985,7 @@
 .reader-withheld { margin: 0 0 14px; }
 .reader-withheld-stamp { display: inline-block; margin-bottom: 9px; padding: 2px 7px; border: 1px solid var(--circa-stamp); color: var(--circa-stamp); font-size: 9px; letter-spacing: .16em; }
 .reader-withheld-bars { display: grid; gap: 6px; margin: 0 0 10px; }
-.reader-withheld-bars > span { height: .7em; background: var(--reader-redact); }
+.reader-withheld-bars > span { height: 1em; background: var(--reader-redact); }
 .reader-withheld-bars > span:nth-child(1) { width: 100%; }
 .reader-withheld-bars > span:nth-child(2) { width: 91%; }
 .reader-withheld-bars > span:nth-child(3) { width: 56%; }

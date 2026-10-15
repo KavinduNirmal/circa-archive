@@ -6,10 +6,10 @@
  * pure measurements it makes of whatever the renderer puts on the sheet. There
  * is no React and no DOM here, so the framing of a record is testable on its own.
  *
- * The content types are deliberately data rather than markup. `reader-window`
- * renders each section through a slot the host supplies, so this module never
- * decides what a paragraph looks like, and the Markdown renderer that will
- * eventually fill the sheet replaces the fitting source rather than the frame.
+ * A section's body is Markdown, and that is deliberately not this module's
+ * business. `reader-window` renders each section through a slot the host
+ * supplies, so the frame never decides what a paragraph looks like; the
+ * Markdown renderer fills the slot and the frame is unchanged by it.
  */
 
 import type { ArchiveClass, ArchiveStatus } from "../browser/archive-index";
@@ -83,12 +83,8 @@ export const FOLLOW_UP_PREVIEW_LIMIT = 10;
 /* Content                                                                    */
 /* ------------------------------------------------------------------------- */
 
-/** A run of filed prose, a labelled value, or a body the archive has not released. */
+/** A labelled value the sheet borrows from the catalogue, or a body the archive holds. */
 export type ReaderBlock =
-  | { kind: "paragraph"; text: string }
-  | { kind: "lede"; text: string }
-  | { kind: "quote"; text: string; attribution?: string }
-  | { kind: "list"; items: readonly string[] }
   | { kind: "fields"; rows: readonly { label: string; value: string; mono?: boolean }[] }
   | { kind: "withheld"; label: string; note: string };
 
@@ -103,6 +99,13 @@ export type ReaderSection = {
   /** The printed page number, `01` upward. */
   index: string;
   heading: string;
+  /**
+   * The section's Markdown body, without its heading. The frame prints the
+   * heading itself, because the heading is the section's name rather than its
+   * content. Absent when the body is held, and in `blocks` then instead.
+   */
+  source?: string;
+  /** The structural blocks: the borrowed fields, and the withheld state. */
   blocks: readonly ReaderBlock[];
   /** Set when the archive holds this section's body; the rail marks it. */
   withheld?: boolean;

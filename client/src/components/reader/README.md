@@ -6,12 +6,17 @@ The window that opens when a record is opened, from the archive index or from a 
 
 **It never renders a PDF.** There is no parser, no canvas, and no pagination. The window is a container: it frames a record and provides one slot for a body. Everything around the slot is the frame's; everything inside it belongs to whoever mounts a renderer.
 
-That split is enforced, not just described. `RecordReader` renders each section as a named, empty anchor unless the host passes `renderSection`, and a test holds it to that. The desktop supplies `RecordFilingBody` from `record-filings.tsx`, which is the stand-in for the Markdown renderer described in `MARKDOWN_RENDERER_PLAN.md`. When that renderer lands it replaces one prop at one call site in `desktop-shell.tsx`.
+That split is enforced, not just described. `RecordReader` renders each section as a named, empty anchor unless the host passes `renderSection`, and a test holds it to that. The desktop supplies `RecordFilingBody` from `record-filings.tsx`, which renders each section's Markdown through `record-markdown.tsx` and the shared pipeline in [`../../lib/markdown/`](../../lib/markdown/README.md). The renderer **filled the slot rather than replacing it**: `reader-window.tsx` was not touched by this work, and the prop at the one call site in `desktop-shell.tsx` is the same one it always was.
 
 ## Structure
 
-- `reader-model.ts`: the vocabulary, the scale steps, the printed section numbers and anchors, and the pure text measurement. No React, no DOM.
-- `record-filings.tsx`: the record service, stood in for. Builds a sectioned `RecordDocument` out of an index entry, and renders one section's blocks as the body the frame is handed. This is the seam the real renderer replaces.
+- `reader-model.ts`: the vocabulary, the scale steps, the printed section numbers and anchors, and the pure text measurement. No React, no DOM. A section's body is Markdown, so the model holds only the structural blocks: the fields borrowed from the catalogue, and the withheld state.
+- `record-sources.ts`: the filed bodies, as the CMS would hand them over — one Markdown document per record, plus `recordSections`, which splits a document at `##` alone.
+- `ghost-story.ts`: the plan's test corpus, `CIRCA-S-03007`, bundled as a string. `public/Ghost_story.md` is the published copy and a test holds the two byte-identical.
+- `record-filings.tsx`: the record service, stood in for. Builds a sectioned `RecordDocument` out of an index entry and its Markdown, and renders one section as the body the frame is handed.
+- `record-markdown.tsx`: the viewer. The same remark plugin list the exports use, handed to `react-markdown`, plus the two handlers that turn a `redaction` and a `figure` into elements instead of the default `<div>`.
+- `paper-redaction.tsx`: the redaction, held behind paper and opened on request, labelled either way.
+- `paper-figure.tsx`: a figure with the alignment its directive asked for.
 - `reader-correspondence.ts`: the annotations filed against a record and the citations between records, both read from the archive index rather than restated.
 - `reader-session.ts`: the reviewer's session. Who is at the terminal, notes filed, endorsements, assessments, and votes, plus the merge that folds all of it into the margin for one record.
 - `reader-chrome.tsx`: the toolbar and its two zones, the page-arrangement menu, and the credentials prompt.
@@ -52,9 +57,17 @@ All of it needs a reviewer session. A guest sees the controls, hovers them, and 
 
 ## Content, and how honest it is
 
-`record-filings.tsx` follows two rules. A record's metadata is never restated: class, dates, holder, status, and clearance are read from the index entry, so the sheet cannot disagree with the catalogue. And a body is authored only for a record the preview has released; everything else renders the withheld shape, which is a real state of this screen. Four records carry a filed body and seventeen are reachable, so both states are one click apart.
+`record-filings.tsx` follows two rules. A record's metadata is never restated: class, dates, holder, status, and clearance are read from the index entry, so the sheet cannot disagree with the catalogue. And a body is authored only for a record the preview has released; everything else renders the withheld shape, which is a real state of this screen. Five records carry a filed Markdown body and eighteen are reachable, so both states are one click apart.
+
+The prose itself is Markdown, stored in `record-sources.ts` the way a CMS would store it, and rendered by the shared pipeline rather than by a second renderer kept in step by hand. The section heading belongs to the frame; the section's body is the renderer's. `CIRCA-S-03007` is `MARKDOWN_RENDERER_PLAN.md`'s own corpus, filed here so that the widest exercise of the renderer — a YAML header, a GFM table with redactions inside a cell, all three image alignments, a blockquote, a code block — is reachable by clicking rather than only by test. It is the one record whose body disagrees with its own header (`status: FILED` against the printed `Status: OPEN`), which is left standing: the record is about records that contradict themselves, and silently reconciling it would destroy the point.
 
 A citation card is the citing record's own index entry, not a second description of it. A note that names a section the record does not have is dropped rather than pinned to the wrong one. The follow-up types are exhaustive over the index, so a new record cannot silently default to being a discovery. The sheet carries the preview's honesty marker in its footer and the status bar repeats it.
+
+## Redactions on the sheet
+
+A redaction is a reader's affordance, not a secret. The withheld words are in the DOM so they can be opened, and are held behind the paper colour until the reader asks; `PaperRedaction` carries an accessible label and keeps the text `aria-hidden` until it is revealed, so a screen reader is told there is something to open rather than read the words aloud. Colour is never the only signal.
+
+None of that reaches an export. `redactionMode` is owned by the pipeline, and `renderText` pins it to `hidden`, where the node has no children at all: a `.txt` record prints `[REDACTED]` and the withheld words are not in the string.
 
 ## The filing tray
 
@@ -69,7 +82,12 @@ Three materials, and the split is the argument of the screen. The chrome is the 
 - **Composition.** Toolbar across the top; section rail, sheet, and margin across the middle; follow-ups along the bottom; status bar last. The sheet loses width before it loses its measure.
 - **Toolbar.** Document actions left, engagement right, separated by engraved dividers. Tools are a glyph over an 8px label, or a glyph alone where the icon already says the word. The scale readout is a control, not a readout.
 - **Hierarchy.** The leaf is the loudest thing on the sheet: code, designation at 1.8em, then one metadata line separated by hairlines rather than a table, because a table is what the record view this replaced used and a reader should read as a document header.
-- **The withheld body.** Drawn as three redaction bars under a stamp, matching how the index draws a withheld name; the rail's preview for that section turns from paper to hazard.
+- **The withheld body.** Drawn as three redaction bars under a stamp, matching how the index draws a withheld name; the rail's preview for that section turns from paper to hazard. A redaction inside filed prose is the same idea at word scale: a bar, opened on request, never colour alone.
+- **The rendered body.** Markdown is set as the sheet's own typography rather than as a web page: one measure, a section-opening line slightly larger than the rest, ruled tables, a hairline rule where the document has one, and figures that float at the alignment their directive asked for. Nothing here is a component the renderer chooses; it is the paper the renderer writes on.
+- **The classified sheet.** The sheet is one typewritten document: the record's own text is set in `Courier New` (with metric-compatible clones behind it), while the frame around it and the machine values inside it keep the workstation's sans and mono. Headings are set in caps from the markup's own casing, so an accessible name and a copied line keep the case they were written in. The code that names the record is the one red mark on the leaf, set in Redacted Crimson and larger than a label. A contested record's stamp carries a light fill; an ordinary filing is not stamped at all, and a sealed one keeps its bare border.
+- **Drawn redactions.** Every drawn redaction is the same block at the same height: the three bars of a withheld body, the bar standing in for a withheld designation, and the inline mark. A figure whose evidence file is not on the desk keeps its plate and its caption and drops the alt text, which is that caption again — the evidence images are S3 objects and are not in this preview.
+- **Prose rules.** The body's rules restate what Tailwind's preflight resets. A reset written for chrome strips list markers and anchor decoration from a document that is meant to be read, so nested lists, link underlines, table rules, and code blocks are declared here rather than assumed, and a test holds the renderer to emitting the elements they style.
+- **The watermark.** `CLASSIFIED` is tiled across the sheet in faint crimson, under the paper's grain and anchored to the sheet rather than to the text, so a reader scrolls the document and never past the mark. It is a CSS background and nothing more: invisible to the accessibility tree, unselectable, not part of any string the renderer produced, and absent from every export.
 - **States.** A record at every status; a withheld body; a designation withheld; a code the index does not carry; no record open; an unannotated record; no follow-ups; a direction with nothing in it; a direction holding more than the strip will list; the tray put away. Every one of them is reachable, and none of them is a dead end.
 - **Reflow.** Below 1024px both rails are strips by default and open as overlays rather than pushing the sheet; below 1100px two-up folds to one column; below 768px the follow-up groups stack and their cards stop pretending to be a filmstrip. The rail's collapse is the one place where the same breakpoint is declared twice, once in the container query that produces the default before hydration and once in the hook that decides what the first click means.
 
@@ -87,6 +105,8 @@ The preview rail shows a section that is not in the record and then corrects its
 
 Reading, and only the record in front of it. Notes, endorsements, and votes are session state: they are not persisted, not authorized, and not sent anywhere, and the reviewer credential is a fixed handle rather than an authentication. There is no filing, no rating aggregate, and no backend.
 
-Run `bun run test` for the model, the filings, the correspondence, the frame's slot, the three silent controls, the scale limits, the arrangements, the search count, the session gate, the two engagement signals, the trail, the strip's cap and collapse, and the box that explains the cap; `bun run lint` and `bun run typecheck` for the rest.
+Run `bun run test` for the model, the filings, the record sources, the correspondence, the frame's slot, the three silent controls, the scale limits, the arrangements, the search count, the session gate, the two engagement signals, the trail, the strip's cap and collapse, the box that explains the cap, and the rendered sheet — the repaired table, the three figure alignments, the labelled and openable redactions, and raw HTML left inert; `bun run lint` and `bun run typecheck` for the rest.
+
+The Markdown renderer's own contract is held in [`../../lib/markdown/README.md`](../../lib/markdown/README.md) and the `markdown-*.test.*` files: the corpus's table must parse to seven rows of four cells, its six redactions must resolve in document order, and no target may print a withheld word.
 
 The layout was verified in headless Firefox at 1440, 1280, 1180, 1024, and 700 pixels wide, across a filed record, a sealed one, a held one, an organization with a withheld designation, the two-up arrangement, and the empty margin. The two on-open glitches are shorter than the capture fires, so the scale blip and the margin nudge were photographed with their animations stretched and their delays removed; the stretch was scaffolding and is not in the tree. The message box that explains the cap is verified by test rather than by capture: it is a portalled Radix surface, and the capture pipeline fires before hydration, so no dialog has ever appeared in one of these photographs.

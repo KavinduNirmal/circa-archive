@@ -143,6 +143,9 @@ The typography is strictly sans-serif, utilitarian, and engineered for high-dens
 - **Tracking:** Micro-labels (`label-sm`, `label-md`) must feature expanded letter-spacing (`0.06em` to `0.1em`) to mimic early mechanical vector rendering and bitmap screen printers.
 - **Line Heights:** Tightly constrained line heights prevent unnecessary vertical drift, supporting dense layouts typical of Unix incident desks.
 
+### Exception: the record sheet
+The record reader's paper sheet is set in a typewriter face (`"Courier New"`, with metric-compatible clones behind it) rather than the sans stack. A sheet is a document and not interface chrome, so the archive types its filings and typesets its software; the frame around the sheet — toolbar, section rail, margin, status bar — stays sans-serif, and the value fields and inline code on the sheet keep the terminal mono. The record's code is set in Redacted Crimson as the one identifying mark on the leaf, and the sheet carries a faint `CLASSIFIED` watermark as a CSS background, which keeps it out of the content, the accessibility tree, and every export. This is the only sanctioned departure from the rule above.
+
 ## Layout & Spacing
 
 The layout philosophy mirrors an authenticated multi-window workstation operating under an X-Window System root canvas.

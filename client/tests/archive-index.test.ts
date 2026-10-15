@@ -60,7 +60,8 @@ describe("archive index search", () => {
 
   it("ships a fixture whose codes follow the documented archive formats", () => {
     for (const entry of ARCHIVE_INDEX) {
-      expect(entry.code, entry.code).toMatch(/^(INC-\d{5}|ORG-[USABCD]-\d{6}(\/C\d)?|CIRCA-[MR]-\d{4}|CIRCA-ID-\d{4})$/);
+      // A record code is `CIRCA-{Type}-{Number}`, so the type letter is open.
+      expect(entry.code, entry.code).toMatch(/^(INC-\d{5}|ORG-[USABCD]-\d{6}(\/C\d)?|CIRCA-[A-Z]-\d{4,5}|CIRCA-ID-\d{4})$/);
       expect(entry.filed).toMatch(/^\d{4}-\d{2}-\d{2}$/);
       expect(entry.abstract.length).toBeGreaterThan(20);
     }
