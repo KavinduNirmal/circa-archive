@@ -2,9 +2,12 @@
 
 ## Responsibility and structure
 
-- `OPEN_SOURCE_CHECKLIST.md`: owner-managed publishing and repository setup tasks.
+- [GITFLOW.md](GITFLOW.md): branch model, protection rules, release checklist, and hotfix procedure.
+- [OPEN_SOURCE_CHECKLIST.md](OPEN_SOURCE_CHECKLIST.md): verified repository settings and remaining owner actions.
+- `portal.webp`: preview of the public archive portal used by the root README.
+- `workstation.webp`: preview of the CIRCA/OS workstation used by the root README.
 - `lore/`: reserved for original fictional setting documentation.
 
 ## Boundaries and verification
 
-Keep public contributor references and supporting documents here. Product context lives in `.agents/brain/`; draft contracts live in root `ARCHITECTURE.md`; executable code belongs in application directories. Check relative links and consistency when editing. Run root `bun run check` for folder README coverage.
+Keep public contributor references and supporting documents here. Draft technical contracts live in the root [ARCHITECTURE.md](../ARCHITECTURE.md); executable code belongs in the application directories, and each folder documents itself in its own `README.md`. Check relative links and rendering when editing, and run `bun run check` for folder README coverage.

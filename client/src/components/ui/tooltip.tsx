@@ -20,8 +20,23 @@ function TooltipProvider({
   )
 }
 
-function Tooltip(props: React.ComponentProps<typeof TooltipPrimitive.Root>) {
-  return <TooltipPrimitive.Root data-slot="tooltip" {...props} />
+function Tooltip({
+  disableHoverableContent = true,
+  ...props
+}: React.ComponentProps<typeof TooltipPrimitive.Root>) {
+  /*
+   * A desktop label is not interactive, so it should close as soon as the
+   * pointer leaves the shortcut. Radix's hoverable-content grace area can keep
+   * a tooltip open when the pointer crosses it on the way to another control,
+   * which reads as a stuck label on a screen whose controls sit close together.
+   */
+  return (
+    <TooltipPrimitive.Root
+      data-slot="tooltip"
+      disableHoverableContent={disableHoverableContent}
+      {...props}
+    />
+  )
 }
 
 function TooltipTrigger(props: React.ComponentProps<typeof TooltipPrimitive.Trigger>) {

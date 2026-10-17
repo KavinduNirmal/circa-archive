@@ -53,9 +53,8 @@ and the plain-text export are testable on their own. Presentation lives in
   legend is inert and a `<script>` in a record is text. Enabling it would make
   the legend live markup and turn its unescaped `\|\|` into redactions.
 - **No PDF, and no email body, yet.** `ARCHITECTURE.md` states that no PDF is
-  generated and that `.pdf` is a diegetic lie; a real export is a decision the
-  plan records as belonging to the product owner (`MARKDOWN_RENDERER_PLAN.md`
-  §10 Q1/Q5), together with the Chromium deployment risk (§9 R1). The parse
+  generated and that `.pdf` is a diegetic lie; a real export remains a product
+  decision, with the Chromium deployment risk to settle before adding one. The parse
   layer and the emitters are arranged so both can be added without touching the
   viewer: an emitter takes the same `ParsedRecord` this module already returns.
 - The renderer never reads the archive index or the record service. It is handed

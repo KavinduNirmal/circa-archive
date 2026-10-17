@@ -5,7 +5,7 @@
 - `bug_report.yml`: reproduction and expected/actual results.
 - `feature_request.yml`: proposed behavior, tradeoffs, and acceptance criteria.
 - `documentation.yml`: documentation location, gap, and suggested improvement.
-- `config.yml`: permits blank issues for questions and other reports.
+- `config.yml`: permits blank issues and links the contribution, support, and private security routes.
 
 ## Boundaries and verification
 

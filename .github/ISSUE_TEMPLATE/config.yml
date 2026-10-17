@@ -1,1 +1,11 @@
 blank_issues_enabled: true
+contact_links:
+  - name: Contribution and branch workflow
+    url: https://github.com/KavinduNirmal/circa-archive/blob/develop/docs/GITFLOW.md
+    about: Read the branch model, pull request rules, and release process before starting.
+  - name: Support and contact routes
+    url: https://github.com/KavinduNirmal/circa-archive/blob/develop/SUPPORT.md
+    about: Find the right channel for questions, bugs, documentation, and conduct reports.
+  - name: Report a security vulnerability privately
+    url: https://github.com/KavinduNirmal/circa-archive/security/advisories/new
+    about: Do not disclose vulnerabilities in a public issue. Follow SECURITY.md.
