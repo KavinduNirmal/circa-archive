@@ -154,7 +154,7 @@ A record's own prose is not that voice. It is a typed document, so the sheet at 
 
 Class is the one taxonomy the edition colours: incident crimson, organization steel, continuity teal, memo ochre, carried by the code in an index, the class tag, and the class doors on the front page. Status keeps its own chip — neutral on file, crimson contested, amber sealed and restricted, struck erased.
 
-These, the reading face and the record sheet, are the only sanctioned departures from the rule above.
+These, the reading face and the record sheet, are the only sanctioned departures from the rule above inside the fiction. The project page, which is not fiction, has a system of its own; see [the project page](#the-project-page-outside-the-fiction).
 
 ### Korean: the rules that do not carry over
 
@@ -165,6 +165,61 @@ The interface ships in English and Korean, and three rules above are Latin conve
 - **No Korean webfont is bundled.** `@fontsource/dm-sans` and `@fontsource/ibm-plex-mono` carry no Hangul, so Korean falls back to the reader's own Korean face; `:lang(ko)` in `globals.css` names the three platform faces to fall back to so Windows, macOS, and Android at least agree with each other. Bundling `IBM Plex Sans KR` — the same superfamily as the bundled mono, and the obvious candidate for keeping the institutional voice — is an open question with a real cost, since Korean webfonts are large and would need subsetting and a third-party notice.
 
 The staged display faces (`Georgia`, `Arial`, `'Courier New'`) in the portal's stylesheet name generic `serif`, `sans-serif`, and `monospace` fallbacks, so Korean already degrades to a platform serif or monospace there rather than to a Latin face with no glyphs. That is acceptable as a fallback and is not a decision about Korean display typography.
+
+## The project layer (outside the fiction)
+
+`/{lang}/meta`, `/{lang}/meta/about`, and `/{lang}/meta/documentation` are the
+surfaces that are not the Commission speaking. The first makes the argument, the
+second holds the receipts, and the third documents the code. They may be — and
+are — a different system.
+
+- **Surface.** Near-black canvas (`#0a0b0d`, footer `#07080a`), bone text
+  (`#f2eee5`), muted mist (`#a2a6ac`, `#7e848c`), one accent: the stamp colour,
+  warmed (`#c9762f`). Paper appears exactly three times, as the specimen record,
+  the workstation edition cell, and the closing band, so that the fiction's
+  material is a contrast rather than a texture.
+- **Type.** Instrument Serif carries the argument — the display headline, section
+  titles, the pull quote, licence names — and Noto Serif KR carries it in Korean.
+  DM Sans carries reading copy at 16–17px, and IBM Plex Mono carries every label,
+  index, caption, and command. This is the reverse allocation of the archive,
+  where sans is the instrument and the serif is reserved for statements; on the
+  project surface the statement is the whole point.
+- **Composition: a framed ledger.** One continuous 1280px measure with side
+  hairlines, rows separated by rules, and folio numbers in a left rail. Borders
+  connect information rather than wrapping it: the hero and its plate share the
+  frame, the stats are one ruled strip of five cells, the two editions share a
+  division, the manual is one bordered spread with its index and terminal, and
+  the build rows are a single ledger. The landing's opening bands run the index
+  (`01`–`06`) against a section title and its lede.
+- **One field, one plate.** The only background texture is the hero plate's dot
+  screen, masked around the plotted seal, with edge rulers, corner crosses, and
+  the grid inside the plate. There is no page-wide grid and no repeating dot
+  wash; the frame's rules do the structural work.
+- **The manual.** The landing's documentation section is not three feature cards:
+  it is an index of all nine topics, numbered and grouped, beside a terminal
+  plate holding the quickstart and the three group ranges. It is the project's
+  most specific object and the clearest door into the docs.
+- **Dossier.** `/meta/about` opens with a two-column register: the argument and
+  its keys on the left, and a ruled fact table plus the nine-section index on the
+  right. Sections below use a four/eight split with a continuous vertical rule,
+  so the title and the evidence read as one row.
+- **Documentation.** `/meta/documentation` is a three-column manual: a filterable
+  numbered index, the article, and an on-page contents rail, divided by vertical
+  rules. Section headings carry anchors; code blocks carry a labelled copy key
+  with a visible failure state; the pager follows the registry's reading order.
+- **Navigation.** A restyled shadcn NavigationMenu on desktop, with a solid
+  documentation panel; a shadcn Sheet on mobile, portalled to `<body>` and
+  carrying its own token block. Mono labels, slash prefixes, one outlined
+  archive key. The drawer traps focus, closes on Escape, and returns focus.
+- **Motion.** One 700ms arrival on the hero copy, plate, and stat rail, and a
+  240ms drawer slide. No section is hidden behind a scroll reveal, so a print, a
+  capture, and a reduced-motion reader all receive the whole page.
+
+The project surface keeps the archive's rules where they still apply: no pure
+white, no shadows except the specimen's cast, no rounded corners beyond a 2px
+edge on controls, and no colour that carries meaning on its own. It is not bound
+by the workstation's bevels, density, or 12px type; the archive never inherits
+these styles because the whole system is scoped to `.meta-page`.
 
 ## Layout & Spacing
 

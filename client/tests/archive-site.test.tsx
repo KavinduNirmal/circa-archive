@@ -7,6 +7,7 @@ import { ArchiveOrganizations } from "@/components/archive-site/archive-organiza
 import { ArchiveRecord } from "@/components/archive-site/archive-record";
 import { ArchiveRecords } from "@/components/archive-site/archive-records";
 import { MetaAbout } from "@/components/meta/meta-about";
+import { ISSUES, LICENCES } from "@/components/meta/meta-links";
 import { RecordProse } from "@/components/archive-site/record-prose";
 import { mostConsulted, randomRecordCode } from "@/components/archive-site/archive-data";
 import { ARCHIVE_INDEX, recentFilings } from "@/components/browser/archive-index";
@@ -491,16 +492,124 @@ describe("the record's tools and notes", () => {
 });
 
 describe("the project page", () => {
-  it("describes the fiction and the two editions, and links back into the site", () => {
-    const meta = catalogFor("en").meta;
+  const meta = english.meta;
+
+  it("opens on the dossier premise and offers the docs and the archive", () => {
     renderWithIntl(<MetaAbout />);
-    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(meta.title);
+
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
+      `${meta.aboutPageTitleA} ${meta.aboutPageTitleB}`,
+    );
     expect(screen.getByText(meta.outside)).toBeVisible();
-    expect(screen.getByText(meta.honestyBody)).toBeVisible();
-    expect(screen.getAllByRole("link", { name: new RegExp(meta.backArchive) })[0]).toHaveAttribute("href", "/en/site");
-    expect(screen.getByRole("link", { name: new RegExp(meta.backWorkstation) })).toHaveAttribute("href", "/en/desktop");
-    for (const heading of [meta.whatTitle, meta.fictionTitle, meta.editionsTitle, meta.builtTitle, meta.honestyTitle]) {
+    expect(screen.getByText(meta.aboutPageLede)).toBeVisible();
+    expect(screen.getByRole("link", { name: new RegExp(meta.heroPrimary) })).toHaveAttribute(
+      "href",
+      "/en/meta/documentation",
+    );
+    expect(screen.getByRole("link", { name: new RegExp(meta.heroSecondary) })).toHaveAttribute("href", "/en/site");
+  });
+
+  it("shows a real record as evidence, not as a claim", () => {
+    renderWithIntl(<MetaAbout />);
+
+    expect(screen.getByText(meta.specimenCode)).toBeVisible();
+    expect(screen.getByRole("heading", { name: meta.specimenTitle })).toBeVisible();
+    expect(screen.getByRole("link", { name: new RegExp(meta.specimenLink) })).toHaveAttribute(
+      "href",
+      `/en/site/records/${meta.specimenCode}`,
+    );
+  });
+
+  it("describes the editions, the build, contributing, and support", () => {
+    renderWithIntl(<MetaAbout />);
+
+    for (const heading of [
+      meta.premiseTitle,
+      meta.editionsTitle,
+      meta.builtTitle,
+      meta.contributeTitle,
+      meta.contributorsTitle,
+      meta.supportTitle,
+      meta.faqTitle,
+      meta.contactTitle,
+      meta.licenceTitle,
+    ]) {
       expect(screen.getByRole("heading", { name: heading })).toBeVisible();
     }
+    expect(screen.getByText(meta.quote)).toBeVisible();
+    expect(screen.getByText(meta.supportPromise)).toBeVisible();
+  });
+
+  it("credits the maintainer and leaves the next place open", () => {
+    renderWithIntl(<MetaAbout />);
+
+    const roster = screen.getByRole("table");
+    expect(within(roster).getByRole("rowheader", { name: meta.contributorsOpenName })).toBeVisible();
+    expect(within(roster).getByRole("rowheader", { name: /KavinduNirmal/ })).toBeVisible();
+    expect(within(roster).getByText(meta.contributorsMaintainerRole)).toBeVisible();
+  });
+
+  it("separates the code licence from the fiction's licence", () => {
+    renderWithIntl(<MetaAbout />);
+
+    expect(screen.getByRole("link", { name: /MIT/ })).toHaveAttribute("href", LICENCES.code.href);
+    expect(screen.getByRole("link", { name: new RegExp(LICENCES.content.name) })).toHaveAttribute(
+      "href",
+      LICENCES.content.href,
+    );
+    for (const term of [meta.licenceFiction, meta.licenceAccounts, meta.licenceCookie, meta.licenceWarranty]) {
+      expect(screen.getByText(term)).toBeVisible();
+    }
+  });
+
+  it("answers the questions a reader actually asks", () => {
+    const { container } = renderWithIntl(<MetaAbout />);
+
+    const questions = container.querySelectorAll("details");
+    expect(questions).toHaveLength(6);
+    expect(screen.getByText(meta.faqRealQ)).toBeVisible();
+    expect(screen.getByText(meta.faqRealA)).toBeInTheDocument();
+  });
+
+  it("offers a defect, a proposal, and a way to write to the maintainers", () => {
+    renderWithIntl(<MetaAbout />);
+
+    for (const [action, href] of [
+      [meta.channelBugAction, ISSUES.bug],
+      [meta.channelFeatureAction, ISSUES.feature],
+      [meta.channelContactAction, ISSUES.contact],
+    ] as const) {
+      expect(screen.getByRole("link", { name: new RegExp(action) })).toHaveAttribute("href", href);
+    }
+  });
+
+  it("keeps one language per page and every link resolvable", () => {
+    const { container } = renderWithIntl(<MetaAbout />);
+
+    for (const link of screen.getAllByRole("link")) {
+      const href = link.getAttribute("href")!;
+      if (href.startsWith("#")) {
+        expect(container.querySelector(href), href).not.toBeNull();
+        continue;
+      }
+      if (/^https?:/.test(href)) {
+        expect(link).toHaveAttribute("target", "_blank");
+        expect(link.getAttribute("rel")).toContain("noreferrer");
+        continue;
+      }
+      expect(href, href).toMatch(
+        /^\/(en|ko)(\/(site(\/records(\/[A-Z0-9/-]+)?(\/download)?|\/organizations|\/about|\/random)?|meta(\/(about|documentation(\/[a-z-]+)?))?|desktop))?$/,
+      );
+    }
+  });
+
+  it("answers in Korean when the reader asked for Korean", () => {
+    renderWithIntl(<MetaAbout />, { locale: "ko" });
+
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
+      `${korean.meta.aboutPageTitleA} ${korean.meta.aboutPageTitleB}`,
+    );
+    expect(screen.getByText(korean.meta.quote)).toBeVisible();
+    expect(screen.getByText(korean.meta.supportPromise)).toBeVisible();
   });
 });

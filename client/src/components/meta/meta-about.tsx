@@ -1,68 +1,127 @@
+import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
-import { LanguageSwitcher } from "../language-switcher";
-import "./meta.css";
+import { MAINTAINER, PROJECT_LINKS } from "./meta-links";
+import {
+  MetaBuilt,
+  MetaContact,
+  MetaContribute,
+  MetaContributors,
+  MetaEditions,
+  MetaLicence,
+  MetaPremise,
+  MetaQuestions,
+  MetaSupport,
+} from "./meta-sections";
 
 /**
- * The project page: the one page on the site that is not the fiction.
+ * The dossier: the long account of what CIRCA Archive is.
  *
- * It is deliberately plain. The public archive speaks as the Commission; this
- * page speaks as the project, and says what the Commission is, what is invented,
- * what the two editions are, and what is not being collected. The "About the
- * site" button in the archive's masthead is the only door here, and the page
- * calls itself what it is in its kicker rather than pretending to be a record.
+ * It was the whole project page when that page also had to be the front door.
+ * Now the front page makes the argument and this page holds the receipts: the
+ * premise in full, the editions, the build, how to contribute, who is on file,
+ * how the work is funded, every question, the three ways to write, and the two
+ * licences. It is allowed to be long, because a reader arrives here on purpose.
  */
-const SECTIONS = [
-  ["whatTitle", "whatBody"],
-  ["fictionTitle", "fictionBody"],
-  ["editionsTitle", "editionsBody"],
-  ["builtTitle", "builtBody"],
-  ["honestyTitle", "honestyBody"],
-  ["accessTitle", "accessBody"],
-  ["creditsTitle", "creditsBody"],
+
+const ABOUT_SECTIONS = [
+  ["navPremise", "premise"],
+  ["navEditions", "editions"],
+  ["navBuilt", "built"],
+  ["navContribute", "contribute"],
+  ["navContributors", "contributors"],
+  ["navSupport", "support"],
+  ["navQuestions", "questions"],
+  ["navContact", "contact"],
+  ["navLicence", "licence"],
 ] as const;
 
 export function MetaAbout() {
   const t = useTranslations("meta");
 
   return (
-    <div className="meta-page" id="top">
-      <a className="meta-skip" href="#meta-content">{t("skip")}</a>
+    <>
+      <section className="meta-intro" aria-labelledby="meta-about-title">
+        <div className="meta-shell meta-intro-inner meta-intro-grid">
+          <div className="meta-intro-main">
+            <nav className="meta-breadcrumb" aria-label={t("breadcrumbLabel")}>
+              <Link href="/meta">{t("brand")}</Link>
+              <span aria-hidden="true">/</span>
+              <span aria-current="page">{t("navAbout")}</span>
+            </nav>
 
-      <header className="meta-topbar">
-        <div className="meta-topbar-inner">
-          <Link className="meta-brand" href="/site">{t("brand")}</Link>
-          <p className="meta-kicker">{t("kicker")}</p>
-          <div className="meta-tools">
-            <LanguageSwitcher />
-            <Link className="meta-back" href="/site">{t("backArchive")} <span aria-hidden="true">»</span></Link>
+            <p className="meta-eyebrow">
+              <span>{t("outside")}</span>
+              <span className="meta-eyebrow-rule" aria-hidden="true" />
+              <span>{t("aboutPageKicker")}</span>
+            </p>
+
+            <h1 className="meta-display meta-display-intro" id="meta-about-title">
+              <span>{t("aboutPageTitleA")}</span>{" "}
+              <span className="meta-display-dim">{t("aboutPageTitleB")}</span>
+            </h1>
+
+            <p className="meta-hero-lede">{t("aboutPageLede")}</p>
+
+            <div className="meta-actions">
+              <Link className="meta-button" href="/meta/documentation">
+                {t("heroPrimary")}
+                <ArrowRight aria-hidden="true" size={15} />
+              </Link>
+              <Link className="meta-button-outline" href="/site">
+                {t("heroSecondary")}
+                <ArrowUpRight aria-hidden="true" size={14} />
+              </Link>
+              <a className="meta-text-link" href={PROJECT_LINKS.repository} target="_blank" rel="noreferrer">
+                {t("heroSource")}
+                <ArrowUpRight aria-hidden="true" size={13} />
+              </a>
+            </div>
           </div>
+
+          <aside className="meta-intro-register">
+            <p className="meta-kicker">{t("kicker")}</p>
+
+            <dl className="meta-intro-facts">
+              <div>
+                <dt>{t("aboutFactStatusTerm")}</dt>
+                <dd>{t("aboutFactStatusValue")}</dd>
+              </div>
+              <div>
+                <dt>{t("aboutFactMaintainerTerm")}</dt>
+                <dd>{MAINTAINER}</dd>
+              </div>
+              <div>
+                <dt>{t("aboutFactLicenceTerm")}</dt>
+                <dd>MIT · CC BY-NC-SA 4.0</dd>
+              </div>
+            </dl>
+
+            <nav className="meta-about-index" aria-label={t("aboutIndexLabel")}>
+              <ol>
+                {ABOUT_SECTIONS.map(([label, id], index) => (
+                  <li key={id}>
+                    <a href={`#${id}`}>
+                      <span className="meta-about-index-number">{String(index + 1).padStart(2, "0")}</span>
+                      {t(label)}
+                    </a>
+                  </li>
+                ))}
+              </ol>
+            </nav>
+          </aside>
         </div>
-      </header>
+      </section>
 
-      <main className="meta-main" id="meta-content">
-        <p className="meta-outside">{t("outside")}</p>
-        <h1 className="meta-title">{t("title")}</h1>
-        <p className="meta-lede">{t("lede")}</p>
-
-        <p className="meta-links">
-          <Link href="/site">{t("backArchive")} <span aria-hidden="true">»</span></Link>
-          <Link href="/">{t("backPortal")} <span aria-hidden="true">»</span></Link>
-          <Link href="/desktop">{t("backWorkstation")} <span aria-hidden="true">»</span></Link>
-        </p>
-
-        {SECTIONS.map(([title, body]) => (
-          <section className="meta-section" key={title}>
-            <h2>{t(title)}</h2>
-            <p>{t(body)}</p>
-          </section>
-        ))}
-      </main>
-
-      <footer className="meta-footer">
-        <p>{t("footer")}</p>
-        <a href="#top">{t("top")}</a>
-      </footer>
-    </div>
+      <MetaPremise />
+      <MetaEditions />
+      <MetaBuilt />
+      <MetaContribute />
+      <MetaContributors />
+      <MetaSupport />
+      <MetaQuestions />
+      <MetaContact />
+      <MetaLicence />
+    </>
   );
 }

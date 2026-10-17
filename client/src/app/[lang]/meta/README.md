@@ -2,18 +2,43 @@
 
 ## Responsibility
 
-The pages that sit outside the fiction. `about/page.tsx` renders the project
-page: what CIRCA Archive is, what is invented, the two editions, and the
-boundaries of the site. It is linked from the archive's masthead as "About the
-site".
+The project layer outside the fiction: the landing report at `/{lang}/meta`, the
+dossier at `/{lang}/meta/about`, and the documentation at
+`/{lang}/meta/documentation` and `/{lang}/meta/documentation/[slug]`.
+
+The landing page makes the argument and the five doorways (premise, editions,
+documentation, machinery, contribution). The dossier is the long account and the
+terms. The documentation is the code manual: setup, record format, renderer,
+routes, contribution, tests, and design systems.
+
+## Structure
+
+- `layout.tsx`: the one chrome for all three surfaces. It imports the project
+  fonts and `components/meta/meta.css`, sets the request locale, and renders
+  `MetaChrome` around the page. The chrome supplies the skip link, the top status
+  line, the shadcn navigation, the framed `<main>`, and the footer.
+- `page.tsx`: the landing report; metadata from `metadata.metaHome*`.
+- `about/page.tsx`: the dossier; metadata from `metadata.metaAbout*`.
+- `documentation/page.tsx`: the documentation overview at its short address.
+- `documentation/[slug]/page.tsx`: one topic, statically generated for every
+  slug except the overview; an unknown slug is a 404.
+- `documentation/README.md` and `documentation/[slug]/README.md`: the notes for
+  the two documentation routes.
 
 ## Boundaries
 
 This is the only part of the app allowed to describe the project as a project.
-The public archive and the workstation never link here except through that
-labelled button. Copy lives in the `meta` namespace and is rendered on the
-server.
+The archive links here only through labelled buttons. All copy lives in the
+`meta` namespace; the docs topics and their section keys live in
+`components/meta/docs/docs-topics.ts`, and their bodies in `docs-content.tsx`.
 
-## Usage
+The pages assert no capability the project does not have. There is no backend,
+so notes and drafts are described as living in the browser tab; there is no mail
+service, so the contact doors are repository issues.
 
-`/{lang}/meta/about`. Covered by `tests/archive-site.test.tsx`.
+## Usage and verification
+
+`/{lang}/meta`, `/{lang}/meta/about`, and `/{lang}/meta/documentation`. Covered
+by `tests/archive-site.test.tsx`, `tests/meta-pages.test.tsx`, and the catalog
+contract in `tests/i18n-messages.test.ts`. Run `bun run --cwd=client test`,
+`lint`, `typecheck`, and `build`.
