@@ -112,28 +112,28 @@ The door is still there. It is still a door. It is still in the field.
 
 If you go through it, please file a report.
 
----
-
 ### Filing Metadata
 
-```
-CIRCA CODE:      CIRCA-S-03007
-INCIDENT REF:    INC-03007
-TYPE:            DISCOVERY
-STATUS:          OPEN
-SEVERITY:        S
-ORIGINATOR:      H. Kim
-FILED:           2004-09-12
-LAST REVISION:   2004-09-14
-ORG:             Daydream Inc.
-ORG CODE:        Qterw-7-3
-CLASSIFICATION:  LEVEL 3 — REVIEWER
-CLEARANCE:       RESTRICTED
-```
+| Field | Value |
+| --- | --- |
+| Archive code | `CIRCA-S-03007` |
+| Incident ref | `INC-03007` |
+| Type | DISCOVERY |
+| Status | OPEN |
+| Severity | S |
+| Originator | H. Kim |
+| Filed | `2004-09-12` |
+| Last revision | `2004-09-14` |
+| Holder | Daydream Inc. |
+| Holder code | `Qterw-7-3` |
+| Classification | LEVEL 3 — REVIEWER |
+| Clearance | RESTRICTED |
 
-**Related incidents:** [INC-00907](#), [INC-00204](#), [CIRCA-R-000441](#)
-**Tags:** `door` · `record-inconsistency` · `gangwon` · `daydream-inc` · `bureau-crossref`
-**External reference:** *The door has been mentioned in a public forum thread, now deleted. See [archived copy](#).*
+| Cross-reference | Detail |
+| --- | --- |
+| Related records | [INC-00907](/site/records/INC-00907) · [INC-00204](/site/records/INC-00204) · CIRCA-R-000441 (not held) |
+| Tags | `door` · `record-inconsistency` · `gangwon` · `daydream-inc` · `bureau-crossref` |
+| External reference | *The door has been mentioned in a public forum thread, now deleted. No archived copy is held.* |
 
 ---
 
@@ -149,4 +149,3 @@ SYNTAX LEGEND (for your renderer):
   > blockquote            → bordered, indented, serif
   YAML frontmatter        → metadata fields for renderer
 -->
-```

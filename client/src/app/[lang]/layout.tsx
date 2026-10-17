@@ -6,6 +6,11 @@ import "@fontsource/dm-sans/400.css";
 import "@fontsource/dm-sans/600.css";
 import "@fontsource/dm-sans/700.css";
 import "@fontsource/ibm-plex-mono/400.css";
+/*
+ * The archive wordmark's serif. Declared here with the other faces, but only the
+ * masthead on `/site` names the family, so no other route downloads it.
+ */
+import "@fontsource/libre-baskerville/400.css";
 import { routing } from "@/i18n/routing";
 import "../globals.css";
 

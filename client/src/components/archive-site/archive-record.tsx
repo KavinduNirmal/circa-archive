@@ -1,23 +1,45 @@
 import { notFound } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Download,
+  List,
+  MessageSquare,
+  Monitor,
+  Shuffle,
+} from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { ARCHIVE_INDEX } from "../browser/archive-index";
 import { ANNOTATIONS, followUpsFor, notesFor } from "../reader/reader-correspondence";
 import { recordDocument } from "../reader/record-filings";
 import { sectionAnchor, type ReaderBlock } from "../reader/reader-model";
 import { ArchiveChrome } from "./archive-chrome";
+import { ArchiveButton } from "./archive-button";
+import buttonStyles from "./archive-button.module.css";
 import { CLASS_MESSAGE_KEY, CONSULTATIONS, STATUS_MESSAGE_KEY, neighboursOf } from "./archive-data";
+import { RecordNotes } from "./record-notes";
 import { RecordProse } from "./record-prose";
 import styles from "./archive-site.module.css";
 
 /**
  * One record, as a work page.
  *
- * The tools sit across the top, above the text, because a reader arrives
- * wanting to know three things before reading: whether there are notes on it,
- * whether they can take a copy away, and what comes next. The notes themselves
- * are at the foot, where a reader who has finished the filing will reach them;
- * the tool at the top is a jump link to that section.
+ * The reading edition of a filing, laid out the way a reading room hands one
+ * over: the leaf's own head at the top, the tools that act on the whole record
+ * across a single bar, then the sheet. The sheet carries the document itself —
+ * typed prose, a printed margin of section numerals, the tables the author
+ * filed — and the page's own margin carries what a reader wants while reading
+ * rather than after: the particulars, the citations, and the workstation.
+ *
+ * The foot of the sheet is where the corpus files its own footer: the metadata
+ * register, the cross-reference register, and the colophon. Those are authored
+ * Markdown tables, so they are styled by the prose rules rather than restated
+ * here — a record's own metadata is never printed twice.
+ *
+ * The notes are the page's only client island. Everything above them is server
+ * HTML, including the prose; the composer holds a draft in the browser because
+ * the public archive has no writing desk of its own.
  *
  * A filing that is held still gets a page. Its index entry is released, so the
  * page says exactly what is missing and offers no download, rather than
@@ -48,68 +70,131 @@ export function ArchiveRecord({ code }: { code: string }) {
             <p className={styles.kicker}>
               <span>{t("recordLabel")}</span> · {t(CLASS_MESSAGE_KEY[entry.klass])}
             </p>
-            <h1 className={styles.recordTitle}>{document.designation ?? t("withheldDesignation")}</h1>
-            <p className={styles.recordCode}>
-              <span className={styles.codeValue}>{document.code}</span>
-              <span className={styles.statusChip} data-status={entry.status}>{t(STATUS_MESSAGE_KEY[entry.status])}</span>
-            </p>
-            <p className={styles.byline}>
-              {t("recordHolder")}: <span className="circa-mono">{document.organization}</span> · {t("recordFiled")}: <span className="circa-mono">{document.filed}</span> · {t("recordClearance")}: {document.clearance}
-            </p>
-            <ul className={styles.tags}>
-              <li className={styles.tag}>{t(CLASS_MESSAGE_KEY[entry.klass])}</li>
-              <li className={styles.tag}>{t(STATUS_MESSAGE_KEY[entry.status])}</li>
-              <li className={styles.tag}>{document.clearance}</li>
-              <li className={styles.tag}>{t("recordLabel")}</li>
-            </ul>
+
+            {/*
+              The name of the filing and its address, on one line. The code is
+              the record's identity and its shelf address at once, so it is
+              drawn as a plate; the status is a dot and a word beside it. Nothing
+              else belongs at this level — the facts underneath are the detail.
+            */}
+            <div className={styles.recordHeadline}>
+              <h1 className={styles.recordTitle}>{document.designation ?? t("withheldDesignation")}</h1>
+              <div className={styles.recordCode}>
+                <span className={styles.codeValue} data-klass={entry.klass}>{document.code}</span>
+                <span className={styles.recordStatus} data-status={entry.status}>
+                  <span className={styles.statusDot} aria-hidden="true" />
+                  {t(STATUS_MESSAGE_KEY[entry.status])}
+                </span>
+              </div>
+            </div>
+
+            <dl className={styles.recordFacts}>
+              <div>
+                <dt>{t("recordHolder")}</dt>
+                <dd className="circa-mono">{document.organization}</dd>
+              </div>
+              <div>
+                <dt>{t("recordFiled")}</dt>
+                <dd className="circa-mono">{document.filed}</dd>
+              </div>
+              <div>
+                <dt>{t("recordClearance")}</dt>
+                <dd>{document.clearance}</dd>
+              </div>
+            </dl>
           </header>
 
+          {/*
+            One toolbar for the whole record. The three tools that act on the
+            record sit together on the left, the step through the register sits
+            with them as a pager, and the two ways out of the page sit on the
+            right. The foot of the page repeats the step at a size worth reaching
+            for once the filing has been read.
+          */}
           <nav className={styles.actions} aria-label={t("recordActions")}>
-            <a className={styles.action} href="#notes">{t("actionNotes", { count: notes.length })}</a>
+            <div className={styles.actionGroup}>
+              <ArchiveButton
+                tone="paper"
+                raw
+                href="#notes"
+                icon={<MessageSquare aria-hidden size={12} />}
+              >
+                {t("actionNotes", { count: notes.length })}
+              </ArchiveButton>
 
-            <details className={styles.download}>
-              <summary className={`${styles.action} ${styles.downloadSummary}`}>{t("actionDownload")}</summary>
-              <ul className={styles.downloadList}>
-                {held ? (
-                  <li><span>{t("downloadHeld")}</span></li>
-                ) : (
-                  <>
-                    <li>
-                      <a href={`/${locale}/site/records/${document.code}/download?format=txt`} download>
-                        {t("downloadText")}
-                      </a>
-                    </li>
-                    <li>
-                      <a href={`/${locale}/site/records/${document.code}/download?format=md`} download>
-                        {t("downloadMarkdown")}
-                      </a>
-                    </li>
-                  </>
-                )}
-              </ul>
-            </details>
+              <details className={styles.download}>
+                {/*
+                  A `<details>` trigger has to be a `<summary>`, so it cannot be an
+                  ArchiveButton; it wears the button's own class instead, which is
+                  the whole reason the class is exported.
+                */}
+                <summary className={`${buttonStyles.button} ${styles.downloadSummary}`} data-tone="paper">
+                  <Download aria-hidden size={12} />
+                  {t("actionDownload")}
+                </summary>
+                <ul className={styles.downloadList}>
+                  {held ? (
+                    <li><span>{t("downloadHeld")}</span></li>
+                  ) : (
+                    <>
+                      <li>
+                        <a href={`/${locale}/site/records/${document.code}/download?format=txt`} download>
+                          {t("downloadText")}
+                        </a>
+                      </li>
+                      <li>
+                        <a href={`/${locale}/site/records/${document.code}/download?format=md`} download>
+                          {t("downloadMarkdown")}
+                        </a>
+                      </li>
+                    </>
+                  )}
+                </ul>
+              </details>
 
-            <Link className={styles.action} href="/site/records">{t("actionIndex")}</Link>
-            {previous ? (
-              <Link className={styles.action} href={`/site/records/${previous.code}`}>
-                « {t("actionPrevious")} · {previous.code}
-              </Link>
-            ) : null}
-            {next ? (
-              <Link className={styles.action} href={`/site/records/${next.code}`}>
-                {t("actionNext")} · {next.code} »
-              </Link>
-            ) : null}
+              <ArchiveButton tone="paper" href="/site/records" icon={<List aria-hidden size={12} />}>
+                {t("actionIndex")}
+              </ArchiveButton>
+            </div>
+
             <span className={styles.actionSpacer} />
-            <Link className={styles.action} href="/site/random">{t("actionRandom")}</Link>
-            <Link className={styles.action} href="/desktop">{t("actionWorkstation")}</Link>
-          </nav>
 
-          <p className={styles.stats}>
-            <span className={styles.statsItem}>{t("popularCount", { count: consultations })}</span>
-            <span className={styles.statsItem}>{t("statNotes", { count: notes.length })}</span>
-            <span className={styles.statsItem}>{t("statCitations", { count: citations })}</span>
-          </p>
+            {(previous || next) && (
+              <div className={styles.stepper}>
+                {previous ? (
+                  <Link
+                    className={styles.step}
+                    data-dir="prev"
+                    href={`/site/records/${previous.code}`}
+                    aria-label={`${t("recordPrev")}: ${previous.code}`}
+                  >
+                    <ChevronLeft aria-hidden size={13} />
+                    <span className={styles.stepCode}>{previous.code}</span>
+                  </Link>
+                ) : null}
+                {next ? (
+                  <Link
+                    className={styles.step}
+                    data-dir="next"
+                    href={`/site/records/${next.code}`}
+                    aria-label={`${t("recordNext")}: ${next.code}`}
+                  >
+                    <span className={styles.stepCode}>{next.code}</span>
+                    <ChevronRight aria-hidden size={13} />
+                  </Link>
+                ) : null}
+              </div>
+            )}
+
+            <div className={styles.actionGroup}>
+              <ArchiveButton tone="paper" href="/site/random" icon={<Shuffle aria-hidden size={12} />}>
+                {t("actionRandom")}
+              </ArchiveButton>
+              <ArchiveButton tone="paper" href="/desktop" icon={<Monitor aria-hidden size={12} />}>
+                {t("actionWorkstation")}
+              </ArchiveButton>
+            </div>
+          </nav>
 
           {held && (
             <p className={styles.heldNotice}>
@@ -131,6 +216,11 @@ export function ArchiveRecord({ code }: { code: string }) {
             </ol>
           </nav>
 
+          {/*
+            The sheet. Section numerals sit in the printed margin rather than in
+            the running text, so a heading rule spans the body and the eye can
+            find a leaf by its number without reading the heading.
+          */}
           <div className={styles.sheet}>
             {document.sections.map((section) => (
               <section key={section.id} id={sectionAnchor(section.id)} className={styles.sheetSection}>
@@ -152,54 +242,69 @@ export function ArchiveRecord({ code }: { code: string }) {
             ))}
           </div>
 
-          <section className={styles.notes} id="notes" aria-labelledby="notes-title">
-            <h2 className={styles.notesTitle} id="notes-title">{t("notesTitle")}</h2>
-            <p className={styles.notesLead}>{t("notesLead")}</p>
-            {notes.length === 0 ? (
-              <p className={styles.body}>{t("notesEmpty")}</p>
-            ) : (
-              notes.map((note) => (
-                <article className={styles.noteCard} key={note.id}>
-                  <p className={styles.noteMeta}>
-                    <span className={styles.noteAuthor}>{note.author}</span>
-                    <span>{note.when}</span>
-                  </p>
-                  <div className={styles.noteBody}>
-                    {note.body.split("\n\n").map((paragraph, index) => (
-                      <p key={index}>{paragraph}</p>
-                    ))}
-                  </div>
-                  {note.replies.map((reply) => (
-                    <div className={styles.noteReply} key={reply.id}>
-                      <p className={styles.noteMeta}>
-                        <span className={styles.noteAuthor}>{reply.author}</span>
-                        <span>{reply.when}</span>
-                      </p>
-                      <div className={styles.noteBody}>
-                        {reply.body.split("\n\n").map((paragraph, index) => (
-                          <p key={index}>{paragraph}</p>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                </article>
-              ))
-            )}
-          </section>
+          <RecordNotes
+            notes={notes.map((note) => ({
+              id: note.id,
+              author: note.author,
+              when: note.when,
+              paragraphs: note.body.split("\n\n"),
+              replies: note.replies.map((reply) => ({
+                id: reply.id,
+                author: reply.author,
+                when: reply.when,
+                paragraphs: reply.body.split("\n\n"),
+              })),
+            }))}
+            labels={{
+              title: t("notesTitle"),
+              lead: t("notesLead"),
+              empty: t("notesEmpty"),
+              composerTitle: t("noteComposerTitle", { code: document.code }),
+              composerHint: t("noteComposerHint"),
+              name: t("noteName"),
+              namePlaceholder: t("noteNamePlaceholder"),
+              body: t("noteBody"),
+              bodyPlaceholder: t("noteBodyPlaceholder"),
+              submit: t("noteSubmit"),
+              anonymous: t("noteAnonymous"),
+              draft: t("noteDraft"),
+              draftWhen: t("noteDraftWhen"),
+              discard: t("noteDiscard"),
+              reply: t("noteReply"),
+              // The author is only known in the composer, so the template crosses
+              // to the client unformatted and is completed there.
+              replyTo: t.raw("noteReplyTo"),
+              cancel: t("noteCancel"),
+              held: t("noteHeld"),
+            }}
+          />
 
+          {/*
+            The step at the foot. Big enough to hit without aiming, because a
+            reader who has reached the end of a long filing is already deciding
+            where to go next.
+          */}
           <nav className={styles.recordNav} aria-label={t("recordOrder")}>
             {previous ? (
-              <Link href={`/site/records/${previous.code}`}>
-                <span>{t("recordPrev")}</span>
-                <strong>{previous.designation ?? previous.code}</strong>
+              <Link className={styles.leaf} data-dir="prev" href={`/site/records/${previous.code}`}>
+                <span className={styles.leafDir}>
+                  <ChevronLeft aria-hidden size={13} />
+                  {t("recordPrev")}
+                </span>
+                <strong className={styles.leafTitle}>{previous.designation ?? previous.code}</strong>
+                <span className={styles.leafCode}>{previous.code}</span>
               </Link>
-            ) : <span />}
+            ) : null}
             {next ? (
-              <Link href={`/site/records/${next.code}`}>
-                <span>{t("recordNext")}</span>
-                <strong>{next.designation ?? next.code}</strong>
+              <Link className={styles.leaf} data-dir="next" href={`/site/records/${next.code}`}>
+                <span className={styles.leafDir}>
+                  {t("recordNext")}
+                  <ChevronRight aria-hidden size={13} />
+                </span>
+                <strong className={styles.leafTitle}>{next.designation ?? next.code}</strong>
+                <span className={styles.leafCode}>{next.code}</span>
               </Link>
-            ) : <span />}
+            ) : null}
           </nav>
 
           <p className={styles.back}>
@@ -208,8 +313,8 @@ export function ArchiveRecord({ code }: { code: string }) {
         </article>
 
         <aside className={styles.recordAside}>
-          <section className={styles.panel} aria-labelledby="particulars-title">
-            <h2 className={styles.panelTitle} id="particulars-title">{t("recordParticulars")}</h2>
+          <section className={styles.asideBlock} aria-labelledby="particulars-title">
+            <h2 className={styles.asideTitle} id="particulars-title">{t("recordParticulars")}</h2>
             <dl className={styles.particulars}>
               <div><dt>{t("recordCode")}</dt><dd className="circa-mono">{document.code}</dd></div>
               <div><dt>{t("recordClass")}</dt><dd>{t(CLASS_MESSAGE_KEY[entry.klass])}</dd></div>
@@ -220,10 +325,20 @@ export function ArchiveRecord({ code }: { code: string }) {
             </dl>
           </section>
 
-          <section className={styles.panel} aria-labelledby="references-title">
-            <h2 className={styles.panelTitle} id="references-title">{t("recordReferences")}</h2>
+          {/* The reading room's own count: how often the record has been asked for. */}
+          <section className={styles.asideBlock} aria-labelledby="readership-title">
+            <h2 className={styles.asideTitle} id="readership-title">{t("recordReadership")}</h2>
+            <ul className={styles.readership}>
+              <li>{t("popularCount", { count: consultations })}</li>
+              <li>{t("statNotes", { count: notes.length })}</li>
+              <li>{t("statCitations", { count: citations })}</li>
+            </ul>
+          </section>
+
+          <section className={styles.asideBlock} aria-labelledby="references-title">
+            <h2 className={styles.asideTitle} id="references-title">{t("recordReferences")}</h2>
             {inbound.length === 0 && outbound.length === 0 && (
-              <p className={styles.panelNote}>{t("recordNoReferences")}</p>
+              <p className={styles.asideNote}>{t("recordNoReferences")}</p>
             )}
             {inbound.length > 0 && (
               <>
@@ -253,10 +368,10 @@ export function ArchiveRecord({ code }: { code: string }) {
             )}
           </section>
 
-          <section className={styles.panel} aria-labelledby="record-workstation-title">
-            <h2 className={styles.panelTitle} id="record-workstation-title">{t("homeWorkstationTitle")}</h2>
-            <p className={styles.panelBody}>{t("recordWorkstationNote")}</p>
-            <p className={styles.panelFoot}>
+          <section className={styles.asideBlock} aria-labelledby="record-workstation-title">
+            <h2 className={styles.asideTitle} id="record-workstation-title">{t("homeWorkstationTitle")}</h2>
+            <p className={styles.asideBody}>{t("recordWorkstationNote")}</p>
+            <p className={styles.asideFoot}>
               <Link className={styles.more} href="/desktop">{t("recordWorkstation")} <span aria-hidden="true">»</span></Link>
             </p>
           </section>

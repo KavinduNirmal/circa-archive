@@ -3,7 +3,10 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { ArchiveOrganizations } from "@/components/archive-site/archive-organizations";
 import { routing } from "@/i18n/routing";
 
-type OrganizationsPageProps = Readonly<{ params: Promise<{ lang: string }> }>;
+type OrganizationsPageProps = Readonly<{
+  params: Promise<{ lang: string }>;
+  searchParams: Promise<{ q?: string | string[] }>;
+}>;
 
 export function generateStaticParams() {
   return routing.locales.map((lang) => ({ lang }));
@@ -15,8 +18,14 @@ export async function generateMetadata({ params }: OrganizationsPageProps): Prom
   return { title: { absolute: t("siteOrganizationsTitle") }, description: t("siteOrganizationsDescription") };
 }
 
-export default async function OrganizationsPage({ params }: OrganizationsPageProps) {
+/** The first value of a repeated parameter, or an empty string. */
+function first(value: string | string[] | undefined) {
+  return (Array.isArray(value) ? value[0] : value) ?? "";
+}
+
+export default async function OrganizationsPage({ params, searchParams }: OrganizationsPageProps) {
   const { lang } = await params;
+  const { q } = await searchParams;
   setRequestLocale(lang);
-  return <ArchiveOrganizations />;
+  return <ArchiveOrganizations query={first(q)} />;
 }

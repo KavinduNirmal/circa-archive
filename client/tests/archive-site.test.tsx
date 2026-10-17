@@ -1,4 +1,5 @@
 import { screen, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 import { ArchiveHome } from "@/components/archive-site/archive-home";
 import { ArchiveAbout } from "@/components/archive-site/archive-about";
@@ -60,10 +61,38 @@ describe("the archive home", () => {
     }
   });
 
-  it("announces the site notice and offers the featured, popular, and random doors", () => {
+  it("gives both searches the class, status, and filed filters", () => {
+    renderWithIntl(<ArchiveHome />);
+    const [masthead, page] = screen.getAllByRole("search");
+    for (const form of [masthead, page]) {
+      expect(within(form).getByLabelText(site.filterClass)).toHaveAttribute("name", "class");
+      expect(within(form).getByLabelText(site.filterStatus)).toHaveAttribute("name", "status");
+      expect(within(form).getByLabelText(site.filterFiled)).toHaveAttribute("name", "period");
+    }
+    expect(within(page).getByRole("button", { name: site.applyFilters })).toBeVisible();
+    // The masthead's filters live behind a disclosure, so their key is only
+    // reachable once the strip is opened — the markup is there, the a11y tree
+    // hides it until then.
+    expect(within(masthead).getByRole("button", { name: site.applyFilters, hidden: true })).toBeInTheDocument();
+    expect(screen.getByText(site.filtersLabel, { selector: "summary" })).toBeVisible();
+  });
+
+  it("opens with the classification notice above the masthead", () => {
+    renderWithIntl(<ArchiveHome />);
+    expect(screen.getByText(site.classifiedLead)).toBeVisible();
+    expect(screen.getByText(site.classifiedMark)).toBeVisible();
+    expect(screen.getByText(site.classifiedFoot)).toBeVisible();
+  });
+
+  it("runs the announcement, its pause box, and its key, and offers the featured, popular, and random doors", () => {
     renderWithIntl(<ArchiveHome />);
     expect(screen.getByText(site.bannerLabel)).toBeVisible();
-    expect(screen.getByText(site.bannerText)).toBeVisible();
+    // The ticker carries two copies of the line so its loop has no seam; the
+    // second is decoration and is hidden from the accessibility tree.
+    const [firstCopy] = screen.getAllByText(site.bannerText);
+    expect(firstCopy).toBeVisible();
+    expect(screen.getByRole("checkbox", { name: site.bannerPause })).not.toBeChecked();
+    expect(screen.getByRole("link", { name: site.bannerLink })).toHaveAttribute("href", "/en/site/about");
     expect(screen.getByRole("heading", { name: site.featuredTitle })).toBeVisible();
     expect(screen.getByRole("heading", { name: site.popularTitle })).toBeVisible();
     expect(screen.getByRole("heading", { name: site.randomTitle })).toBeVisible();
@@ -142,11 +171,21 @@ describe("a released record", () => {
     expect(screen.getByText(/The designation is withheld at Level 5/)).toBeVisible();
   });
 
-  it("renders the corpus's table, figures, and redactions as plain HTML", () => {
+  it("renders the corpus's tables, figures, and redactions as plain HTML", () => {
     renderWithIntl(<ArchiveRecord code="CIRCA-S-03007" />);
-    expect(screen.getByRole("table")).toBeVisible();
+    const tables = screen.getAllByRole("table");
+    expect(tables).toHaveLength(3);
     expect(screen.getByText(/Figure 1\. The door, photographed/)).toBeVisible();
     expect(screen.getAllByText(site.recordRedaction).length).toBeGreaterThan(0);
+
+    // The filing's own footer is a register, and its citations stay inside the
+    // reader's language instead of falling back to the unprefixed route.
+    const crossReference = tables[2];
+    expect(within(crossReference).getByText("Related records")).toBeVisible();
+    expect(within(crossReference).getByRole("link", { name: "INC-00907" })).toHaveAttribute(
+      "href",
+      "/en/site/records/INC-00907",
+    );
   });
 
   it("gives every section an anchor and a contents list that reaches it", () => {
@@ -169,12 +208,26 @@ describe("the archive's directories", () => {
     const organizations = ARCHIVE_INDEX.filter((entry) => entry.klass === "organization");
     for (const organization of organizations) {
       const holdings = ARCHIVE_INDEX.filter((entry) => entry.organization === organization.code).length;
-      expect(screen.getAllByText(new RegExp(organization.code)).length, organization.code).toBeGreaterThan(0);
-      if (holdings > 0) {
-        expect(screen.getAllByText(siteT("orgFilings", { count: holdings })).length).toBeGreaterThan(0);
-      }
-      expect(screen.getAllByRole("link", { name: site.orgOpen })[0]).toBeVisible();
+      const entry = screen.getByText(organization.code).closest("li")!;
+      // The holdings are a tally in the margin: the figure and its label, not a sentence.
+      expect(within(entry).getByText(String(holdings).padStart(2, "0"))).toBeVisible();
+      expect(within(entry).getByText(site.ledgerFilings)).toBeVisible();
+      expect(within(entry).getByRole("link", { name: site.orgOpen }))
+        .toHaveAttribute("href", `/en/site/records/${organization.code}`);
     }
+  });
+
+  it("searches the directory and keeps the query in the address", () => {
+    renderWithIntl(<ArchiveOrganizations query="registry" />);
+    expect(screen.getByText(siteT("orgSearchResults", { count: 1, query: "registry" }))).toBeVisible();
+    expect(screen.queryByText("ORG-A-020748")).toBeNull();
+    expect(screen.getByRole("link", { name: site.searchClear })).toHaveAttribute("href", "/en/site/organizations");
+  });
+
+  it("says so when no organization matches", () => {
+    renderWithIntl(<ArchiveOrganizations query="zzz" />);
+    expect(screen.getByText(siteT("orgSearchNone", { query: "zzz" }))).toBeVisible();
+    expect(screen.getByRole("link", { name: site.searchClear })).toHaveAttribute("href", "/en/site/organizations");
   });
 
   it("explains the classes and statuses the index uses", () => {
@@ -187,6 +240,28 @@ describe("the archive's directories", () => {
       expect(screen.getByText(body)).toBeVisible();
     }
     expect(screen.getByRole("link", { name: site.aboutWorkstationLink })).toHaveAttribute("href", "/en/desktop");
+  });
+
+  it("keys a class and a status to the index, with a real code as the example", () => {
+    const { container } = renderWithIntl(<ArchiveAbout />);
+
+    // The class name is a filter, and the sample is an entry a reader can open.
+    expect(screen.getByRole("link", { name: site.classIncident })).toHaveAttribute(
+      "href",
+      "/en/site/records?class=incident",
+    );
+    expect(screen.getByRole("link", { name: site.statusSealed })).toHaveAttribute(
+      "href",
+      "/en/site/records?status=sealed",
+    );
+    expect(screen.getByText(ARCHIVE_INDEX.find((entry) => entry.klass === "incident")!.code)).toBeVisible();
+
+    // The guide's own margin reaches every section it lists.
+    const contents = screen.getByRole("heading", { name: site.aboutContentsTitle }).closest("section")!;
+    for (const link of within(contents).getAllByRole("link")) {
+      const href = link.getAttribute("href")!;
+      expect(container.querySelector(href), href).not.toBeNull();
+    }
   });
 });
 
@@ -211,8 +286,18 @@ describe("every link on the plain site", () => {
       const { container, unmount } = renderWithIntl(page);
       for (const link of screen.getAllByRole("link")) {
         const href = link.getAttribute("href")!;
-        if (href.startsWith("#")) expect(container.querySelector(href), href).not.toBeNull();
-        else expect(href, href).toMatch(/^\/(en|ko)(\/site(\/records(\/[A-Z0-9/-]+)?(\/download\?format=(txt|md))?|\/organizations|\/about|\/random)?|\/meta\/about|\/desktop)?(#[-\w]+)?$/);
+        if (href.startsWith("#")) {
+          expect(container.querySelector(href), href).not.toBeNull();
+          continue;
+        }
+        const url = new URL(href, "https://archive.invalid");
+        expect(url.pathname, href).toMatch(
+          /^\/(en|ko)(\/site(\/records(\/[A-Z0-9/-]+)?(\/download)?|\/organizations|\/about|\/random)?|\/meta\/about|\/desktop)?$/,
+        );
+        // A query is a filter, and only the index and the directory take one.
+        for (const key of url.searchParams.keys()) {
+          expect(["q", "class", "status", "period", "format"], `${href} carries ${key}`).toContain(key);
+        }
       }
       unmount();
     }
@@ -246,6 +331,40 @@ describe("search, random, and downloads", () => {
   it("says so when nothing matches", () => {
     renderWithIntl(<ArchiveRecords query="zzzz no such record" />);
     expect(screen.getByText(siteT("searchNone", { query: "zzzz no such record" }))).toBeVisible();
+  });
+
+  it("narrows the index by class, status, and filed range together", () => {
+    renderWithIntl(<ArchiveRecords status="sealed" period="current" />);
+    // Sealed and filed since 2000: INC-00042 and INC-00204, and nothing else.
+    expect(screen.getByRole("link", { name: site.openRecord.replace("{code}", "INC-00042") })).toBeVisible();
+    expect(screen.getByRole("link", { name: site.openRecord.replace("{code}", "INC-00204") })).toBeVisible();
+    expect(screen.queryByRole("link", { name: site.openRecord.replace("{code}", "CIRCA-M-0002") })).toBeNull();
+    expect(screen.getByText(siteT("filteredCount", { count: 2 }))).toBeVisible();
+  });
+
+  it("tags each active filter with a link that takes only that filter off", () => {
+    renderWithIntl(<ArchiveRecords status="sealed" period="current" />);
+    const tags = screen.getByRole("list", { name: site.activeFilters });
+    expect(within(tags).getByText(site.statusSealed)).toBeVisible();
+    expect(within(tags).getByText(site.periodCurrent)).toBeVisible();
+
+    expect(within(tags).getByRole("link", { name: siteT("removeFilter", { filter: site.filterStatus }) }))
+      .toHaveAttribute("href", "/en/site/records?period=current");
+    expect(within(tags).getByRole("link", { name: siteT("removeFilter", { filter: site.filterFiled }) }))
+      .toHaveAttribute("href", "/en/site/records?status=sealed");
+    expect(within(tags).getByRole("link", { name: site.clearFilters })).toHaveAttribute("href", "/en/site/records");
+  });
+
+  it("keeps the query when a filter is cleared", () => {
+    renderWithIntl(<ArchiveRecords query="record" klass="memo" />);
+    const tags = screen.getByRole("list", { name: site.activeFilters });
+    expect(within(tags).getByRole("link", { name: siteT("removeFilter", { filter: site.filterClass }) }))
+      .toHaveAttribute("href", "/en/site/records?q=record");
+  });
+
+  it("says so when the filters find nothing", () => {
+    renderWithIntl(<ArchiveRecords klass="memo" status="contested" />);
+    expect(screen.getByText(site.filterNone)).toBeVisible();
   });
 
   it("opens a record the reader did not choose", () => {
@@ -299,6 +418,64 @@ describe("the record's tools and notes", () => {
   it("says when a record carries no notes", () => {
     renderWithIntl(<ArchiveRecord code="INC-00014" />);
     expect(screen.getByText(site.notesEmpty)).toBeVisible();
+  });
+
+  it("holds a note the reader writes, stamped as not filed", async () => {
+    const user = userEvent.setup();
+    renderWithIntl(<ArchiveRecord code="INC-00014" />);
+
+    const composer = screen.getByRole("form", { name: siteT("noteComposerTitle", { code: "INC-00014" }) });
+    const submit = within(composer).getByRole("button", { name: site.noteSubmit });
+    expect(submit).toBeDisabled();
+
+    await user.type(within(composer).getByLabelText(site.noteName), "E. Park");
+    await user.type(
+      within(composer).getByLabelText(site.noteBody),
+      "The twelfth wagon is in the yard ledger after all.",
+    );
+    expect(submit).toBeEnabled();
+    await user.click(submit);
+
+    // The note is on the page, but it says which copy it is.
+    expect(screen.getByText("E. Park")).toBeVisible();
+    expect(screen.getByText(site.noteDraft)).toBeVisible();
+    expect(screen.getByText(/twelfth wagon is in the yard ledger/)).toBeVisible();
+    expect(screen.getByRole("status")).toHaveTextContent(site.noteHeld);
+    expect(screen.queryByText(site.notesEmpty)).toBeNull();
+
+    // And it can be taken away again, because the archive never received it.
+    await user.click(screen.getByRole("button", { name: new RegExp(site.noteDiscard) }));
+    expect(screen.queryByText(/twelfth wagon is in the yard ledger/)).toBeNull();
+    expect(screen.getByText(site.notesEmpty)).toBeVisible();
+  });
+
+  it("names the note's author when the reader leaves the name out", async () => {
+    const user = userEvent.setup();
+    renderWithIntl(<ArchiveRecord code="INC-00014" />);
+    const composer = screen.getByRole("form", { name: siteT("noteComposerTitle", { code: "INC-00014" }) });
+    await user.type(within(composer).getByLabelText(site.noteBody), "An unsigned observation.");
+    await user.click(within(composer).getByRole("button", { name: site.noteSubmit }));
+    expect(screen.getByText(site.noteAnonymous)).toBeVisible();
+  });
+
+  it("replies to a filed note in the viewer's own words", async () => {
+    const user = userEvent.setup();
+    renderWithIntl(<ArchiveRecord code="INC-00042" />);
+
+    const replyTo = site.noteReplyTo.replace("{author}", "M. Okafor");
+    await user.click(screen.getByRole("button", { name: replyTo }));
+
+    // The composer says who it is filing against, and the reply is filed from it.
+    const composer = screen.getByRole("form", { name: replyTo });
+    await user.type(
+      within(composer).getByLabelText(site.noteBody),
+      "The third count was the one that mattered.",
+    );
+    await user.click(within(composer).getByRole("button", { name: site.noteSubmit }));
+
+    expect(screen.getByText(/The third count was the one that mattered/)).toBeVisible();
+    expect(screen.getByText(site.noteDraft)).toBeVisible();
+    expect(screen.getByRole("form", { name: siteT("noteComposerTitle", { code: "INC-00042" }) })).toBeVisible();
   });
 
   it("offers a copy of a released filing but not of a held one", () => {

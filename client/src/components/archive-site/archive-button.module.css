@@ -1,0 +1,84 @@
+/*
+ * The site's button, in the two grounds it is drawn on.
+ *
+ * This is the workstation's tool button — `browser-tool`, `mail-tool` — with its
+ * palette widened: a one-pixel bevel that catches light on the top-left and
+ * falls away on the bottom-right, a pressed well when the control is held or is
+ * the page you are on, and tracked uppercase.
+ *
+ * `data-tone` is part of every rule, not an afterthought: `globals.css` loads
+ * after every module stylesheet, so a bare `.button` would lose its colour and
+ * text-decoration to the site's global `a` rule at equal specificity. Carrying
+ * the attribute raises the button above it without an `!important` anywhere.
+ */
+
+/* Steel: the navy chrome — masthead, section bar, the search key. */
+.button[data-tone] {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-height: 26px;
+  padding: 0 10px;
+  border: 1px solid;
+  border-color: var(--circa-bevel-light) var(--circa-bevel-shadow) var(--circa-bevel-shadow) var(--circa-bevel-light);
+  background: var(--secondary);
+  color: #a4c2e6;
+  font: inherit;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  line-height: 1;
+  text-decoration: none;
+  text-transform: uppercase;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.button[data-tone]:hover { background: #304155; color: #dce9f5; }
+
+.button[data-tone]:active,
+.button[data-tone][aria-current="page"] {
+  border-color: var(--circa-bevel-shadow) var(--circa-bevel-light) var(--circa-bevel-light) var(--circa-bevel-shadow);
+  background: var(--card);
+  color: #dce9f5;
+}
+
+.button[data-tone]:focus-visible { outline: 1px dashed #c8d6e5; outline-offset: -3px; }
+
+.button[data-tone]:disabled,
+.button[data-tone][aria-disabled="true"] {
+  border-color: #3d4c5e #131b24 #131b24 #3d4c5e;
+  background: #1e2836;
+  color: #64757f;
+  cursor: default;
+}
+
+/* Paper: a sheet's own tools — the record action bar, the index, the doors. */
+.button[data-tone="paper"] {
+  min-height: 28px;
+  padding: 0 9px;
+  border-color: #7b8b9c #46586a #46586a #7b8b9c;
+  background: var(--circa-paper-raised);
+  color: var(--circa-link);
+}
+
+.button[data-tone="paper"]:hover { background: #becbd8; color: var(--circa-ink); }
+
+.button[data-tone="paper"]:active,
+.button[data-tone="paper"][aria-current="page"] {
+  border-color: #46586a #b3c1cf #b3c1cf #46586a;
+  background: var(--circa-paper-sunken);
+  color: var(--circa-ink);
+}
+
+.button[data-tone="paper"]:focus-visible { outline: 2px dotted var(--circa-ink); outline-offset: 2px; }
+
+/*
+ * On a narrow screen the key has to be a finger's width, on both grounds: the
+ * section bar used to grow on its own, and the paper tools were left small.
+ */
+@media (max-width: 620px) {
+  .button[data-tone] { min-height: 32px; padding: 0 9px; }
+}

@@ -1,6 +1,13 @@
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
-import { searchArchive, type ArchiveEntry, type ArchiveVocabulary } from "../browser/archive-index";
+import {
+  searchArchive,
+  type ArchiveClass,
+  type ArchiveEntry,
+  type ArchivePeriod,
+  type ArchiveStatus,
+  type ArchiveVocabulary,
+} from "../browser/archive-index";
 import { ArchiveChrome } from "./archive-chrome";
 import { CLASS_MESSAGE_KEY, STATUS_MESSAGE_KEY, SITE_INDEX } from "./archive-data";
 import { SiteSearch } from "./site-search";
@@ -24,7 +31,7 @@ export function RecordTable({ entries, label, compact = false }: {
   return (
     <div className={styles.tableWrap} role="region" aria-label={label} tabIndex={0}>
       <table className={styles.table}>
-        <caption className={styles.caption}>{label}</caption>
+        <caption className={compact ? styles.captionSr : styles.caption}>{label}</caption>
         <thead>
           <tr>
             <th scope="col">{t("columnCode")}</th>
@@ -38,7 +45,7 @@ export function RecordTable({ entries, label, compact = false }: {
         <tbody>
           {entries.map((entry) => (
             <tr key={entry.code}>
-              <th scope="row" className={styles.codeCell}>
+              <th scope="row" className={styles.codeCell} data-klass={entry.klass}>
                 <Link href={`/site/records/${entry.code}`} aria-label={t("openRecord", { code: entry.code })}>
                   {entry.code}
                 </Link>
@@ -51,7 +58,7 @@ export function RecordTable({ entries, label, compact = false }: {
                   </span>
                 )}
               </td>
-              {!compact && <td>{t(CLASS_MESSAGE_KEY[entry.klass])}</td>}
+              {!compact && <td><span className={styles.classTag} data-klass={entry.klass}>{t(CLASS_MESSAGE_KEY[entry.klass])}</span></td>}
               <td className="circa-mono">{entry.filed}</td>
               {!compact && (
                 <td>
@@ -69,7 +76,34 @@ export function RecordTable({ entries, label, compact = false }: {
   );
 }
 
-export function ArchiveRecords({ query = "" }: { query?: string }) {
+/**
+ * The index address with the current query and filters on it.
+ *
+ * `drop` leaves one filter out, which is what a chip's × needs: the same view,
+ * minus the one thing the reader clicked away. Empty fields are omitted, so a
+ * plain index is `/site/records` and not a string of `?q=&class=all`.
+ */
+function recordsHref(values: {
+  query: string;
+  klass: ArchiveClass | "all";
+  status: ArchiveStatus | "all";
+  period: ArchivePeriod;
+}, drop?: "class" | "status" | "period") {
+  const params = new URLSearchParams();
+  if (values.query.trim()) params.set("q", values.query.trim());
+  if (values.klass !== "all" && drop !== "class") params.set("class", values.klass);
+  if (values.status !== "all" && drop !== "status") params.set("status", values.status);
+  if (values.period !== "any" && drop !== "period") params.set("period", values.period);
+  const search = params.toString();
+  return search ? `/site/records?${search}` : "/site/records";
+}
+
+export function ArchiveRecords({ query = "", klass = "all", status = "all", period = "any" }: {
+  query?: string;
+  klass?: ArchiveClass | "all";
+  status?: ArchiveStatus | "all";
+  period?: ArchivePeriod;
+}) {
   const t = useTranslations("site");
   const vocabulary: ArchiveVocabulary = {
     classes: {
@@ -87,9 +121,27 @@ export function ArchiveRecords({ query = "" }: { query?: string }) {
     },
   };
   const term = query.trim();
-  const results = term
-    ? searchArchive({ text: term, klass: "all", period: "any" }, SITE_INDEX, vocabulary)
+  const filtering = term !== "" || klass !== "all" || status !== "all" || period !== "any";
+  const results = filtering
+    ? searchArchive({ text: term, klass, period, status }, SITE_INDEX, vocabulary)
     : SITE_INDEX;
+
+  const activeFilters: { key: "class" | "status" | "period"; label: string; value: string }[] = [];
+  if (klass !== "all") {
+    activeFilters.push({ key: "class", label: t("filterClass"), value: t(CLASS_MESSAGE_KEY[klass]) });
+  }
+  if (status !== "all") {
+    activeFilters.push({ key: "status", label: t("filterStatus"), value: t(STATUS_MESSAGE_KEY[status]) });
+  }
+  if (period !== "any") {
+    const labels: Record<ArchivePeriod, string> = {
+      any: t("filterAnyTime"),
+      current: t("periodCurrent"),
+      recent: t("periodRecent"),
+      historical: t("periodHistorical"),
+    };
+    activeFilters.push({ key: "period", label: t("filterFiled"), value: labels[period] });
+  }
 
   return (
     <ArchiveChrome active="records" trail={[{ label: t("trailRecords") }]}>
@@ -98,20 +150,46 @@ export function ArchiveRecords({ query = "" }: { query?: string }) {
           <p className={styles.kicker}>{t("crumbRegistry")}</p>
           <h1 className={styles.title}>{t("indexTitle")}</h1>
           <p className={styles.lede}>{t("indexLede")}</p>
-          <SiteSearch value={term} large />
+          <SiteSearch values={{ query: term, klass, status, period }} />
           <p className={styles.note}>{t("indexNote")}</p>
         </header>
 
-        {term ? (
+        <div className={styles.resultBar}>
           <p className={styles.count}>
-            {results.length > 0
-              ? t("searchResults", { count: results.length, query: term })
-              : t("searchNone", { query: term })}{" "}
-            <Link href="/site/records">{t("searchClear")}</Link>
+            {term
+              ? results.length > 0
+                ? t("searchResults", { count: results.length, query: term })
+                : t("searchNone", { query: term })
+              : filtering
+                ? results.length > 0
+                  ? t("filteredCount", { count: results.length })
+                  : t("filterNone")
+                : t("indexCount", { count: SITE_INDEX.length })}{" "}
+            {term ? <Link href={recordsHref({ query: term, klass: "all", status: "all", period: "any" })}>{t("searchClear")}</Link> : null}
           </p>
-        ) : (
-          <p className={styles.count}>{t("indexCount", { count: SITE_INDEX.length })}</p>
-        )}
+
+          {activeFilters.length > 0 ? (
+            <ul className={styles.filterTags} aria-label={t("activeFilters")}>
+              {activeFilters.map((filter) => (
+                <li key={filter.key} className={styles.filterTag}>
+                  <span className={styles.filterTagLabel}>{filter.label}</span>
+                  <span className={styles.filterTagValue}>{filter.value}</span>
+                  <Link
+                    href={recordsHref({ query: term, klass, status, period }, filter.key)}
+                    aria-label={t("removeFilter", { filter: filter.label })}
+                  >
+                    ×
+                  </Link>
+                </li>
+              ))}
+              <li className={styles.filterTagClear}>
+                <Link href={recordsHref({ query: term, klass: "all", status: "all", period: "any" })}>
+                  {t("clearFilters")}
+                </Link>
+              </li>
+            </ul>
+          ) : null}
+        </div>
 
         {results.length > 0 ? (
           <RecordTable

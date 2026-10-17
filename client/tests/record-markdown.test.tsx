@@ -32,12 +32,32 @@ describe("record markdown viewer", () => {
 
   it("renders the repaired table whole, at the width the parser intended", () => {
     mount(CORPUS);
-    const table = screen.getByRole("table");
+    // The first table is the subjects table inside Brief; the filing's own footer
+    // contributes two more, the metadata register and the cross-reference.
+    const table = screen.getAllByRole("table")[0];
     expect(within(table).getAllByRole("row")).toHaveLength(7);
     // Four columns: one header cell and six body cells in each.
     expect(table.querySelectorAll("th")).toHaveLength(4);
     expect(within(table).getAllByRole("cell")).toHaveLength(24);
     expect(within(table).getByText("S-05")).toBeVisible();
+  });
+
+  it("files the record's metadata and cross-references as registers, not as a dump", () => {
+    mount(CORPUS);
+    const tables = screen.getAllByRole("table");
+    expect(tables).toHaveLength(3);
+    const [metadata, crossReference] = tables.slice(1);
+    expect(within(metadata).getByText("Archive code")).toBeVisible();
+    expect(within(metadata).getByText("CIRCA-S-03007")).toBeVisible();
+    expect(within(metadata).getAllByRole("row")).toHaveLength(13);
+    expect(within(crossReference).getByText("Related records")).toBeVisible();
+    expect(within(crossReference).getByRole("link", { name: "INC-00907" })).toHaveAttribute(
+      "href",
+      "/site/records/INC-00907",
+    );
+    // Nothing is left of the old typed dump and its stray empty fence.
+    expect(sheet()).not.toHaveTextContent("CIRCA CODE:");
+    expect(sheet().querySelectorAll("pre")).toHaveLength(0);
   });
 
   it("floats a figure the way its directive asked, with a caption and no prefix", () => {

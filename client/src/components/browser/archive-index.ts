@@ -35,6 +35,11 @@ export type ArchiveQuery = {
   text: string;
   klass: ArchiveClass | "all";
   period: ArchivePeriod;
+  /**
+   * Status is the site's fourth filter; the workstation's search takes three, so
+   * this one is optional and `undefined` and `"all"` both mean "no filter".
+   */
+  status?: ArchiveStatus | "all";
 };
 
 /** The one address the local network permits. */
@@ -194,6 +199,7 @@ export function searchArchive(
   const range = query.period === "any" ? null : PERIOD_RANGE[query.period];
   return index
     .filter((item) => query.klass === "all" || item.klass === query.klass)
+    .filter((item) => !query.status || query.status === "all" || item.status === query.status)
     .filter((item) => !range || (item.filed >= range[0] && item.filed <= range[1]))
     .filter((item) => !text || searchableText(item, vocabulary).includes(text))
     .map((item, position) => ({ item, position, hit: rank(item, text) }))

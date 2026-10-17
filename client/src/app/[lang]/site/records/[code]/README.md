@@ -9,9 +9,15 @@ and refuses a filing that is held rather than substituting a page for it.
 
 ## Boundaries
 
-The page renders `ArchiveRecord`; the filing, the notes, and the citation web
-come from the reader's own modules, so the site and the workstation cannot
+The page renders `ArchiveRecord`; the filing, the annotations, and the citation
+web come from the reader's own modules, so the site and the workstation cannot
 diverge. Unknown codes call `notFound()`.
+
+The record's own footer — the metadata register, the cross-reference register, and
+the colophon — is authored in the filing's Markdown rather than restated by the
+page, so the reading edition and the download carry the same footer. A note
+written in the annotations composer is held in the browser only: this route has no
+write path, and the page says so where the note appears.
 
 ## Usage
 

@@ -145,7 +145,16 @@ The typography is strictly sans-serif, utilitarian, and engineered for high-dens
 - **Line Heights:** Tightly constrained line heights prevent unnecessary vertical drift, supporting dense layouts typical of Unix incident desks.
 
 ### Exception: the record sheet
-The record reader's paper sheet is set in a typewriter face (`"Courier New"`, with metric-compatible clones behind it) rather than the sans stack. A sheet is a document and not interface chrome, so the archive types its filings and typesets its software; the frame around the sheet — toolbar, section rail, margin, status bar — stays sans-serif, and the value fields and inline code on the sheet keep the terminal mono. The record's code is set in Redacted Crimson as the one identifying mark on the leaf. The sheet is drawn as continuous stationery — round tractor-feed holes and a perforation down each edge, with the filing lens running as a head and a foot — and that edge is a CSS background, which keeps it out of the content, the accessibility tree, and every export. This is the only sanctioned departure from the rule above.
+The record reader's paper sheet is set in a typewriter face (`"Courier New"`, with metric-compatible clones behind it) rather than the sans stack. A sheet is a document and not interface chrome, so the archive types its filings and typesets its software; the frame around the sheet — toolbar, section rail, margin, status bar — stays sans-serif, and the value fields and inline code on the sheet keep the terminal mono. The record's code is set in Redacted Crimson as the one identifying mark on the leaf. The sheet is drawn as continuous stationery — round tractor-feed holes and a perforation down each edge, with the filing lens running as a head and a foot — and that edge is a CSS background, which keeps it out of the content, the accessibility tree, and every export.
+
+### Exception: the archive's reading face
+The public archive — the reading edition at `/{lang}/site`, not the portal — sets two voices. DM Sans carries the instrument: chrome, headings, labels, controls, keys. Libre Baskerville carries the things the institution is saying at length about itself: the `C.I.R.C.A` wordmark, a record's abstract, a page's lede, the standing note on the index. A book face is what a statement is set in, so a statement is. Record names are filing titles and are set in capitals with tracking, while the description under them stays serif and sentence-cased.
+
+A record's own prose is not that voice. It is a typed document, so the sheet at `/{lang}/site/records/{code}` is set in `"Courier New"` (with metric-compatible clones behind it) from the first paragraph to the colophon, and the Markdown renderer's tables, quotations, and inline code inherit that face. The same typewriter face still carries every code, date, and counter across the edition. The seal beside the wordmark is the supplied artwork used as a CSS mask, painted by the masthead's own text colour: no recoloured copy of the asset, and no light plate behind it.
+
+Class is the one taxonomy the edition colours: incident crimson, organization steel, continuity teal, memo ochre, carried by the code in an index, the class tag, and the class doors on the front page. Status keeps its own chip — neutral on file, crimson contested, amber sealed and restricted, struck erased.
+
+These, the reading face and the record sheet, are the only sanctioned departures from the rule above.
 
 ### Korean: the rules that do not carry over
 

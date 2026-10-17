@@ -579,7 +579,7 @@ describe("record reader renders the filed Markdown", () => {
   it("draws the corpus's repaired table, three figures, and six redactions on the sheet", () => {
     const { sheet } = mount("CIRCA-S-03007");
     expect(within(sheet()).getByRole("heading", { level: 2, name: "Brief" })).toBeVisible();
-    const table = within(sheet()).getByRole("table");
+    const table = within(sheet()).getAllByRole("table")[0];
     expect(within(table).getAllByRole("row")).toHaveLength(7);
     expect([...sheet().querySelectorAll("figure[data-align]")].map((figure) => figure.getAttribute("data-align")))
       .toEqual(["right", "full", "left"]);

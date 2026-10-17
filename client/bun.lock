@@ -7,6 +7,7 @@
       "dependencies": {
         "@fontsource/dm-sans": "5.3.0",
         "@fontsource/ibm-plex-mono": "5.3.0",
+        "@fontsource/libre-baskerville": "5.3.0",
         "class-variance-authority": "0.7.1",
         "clsx": "2.1.1",
         "lucide-react": "1.57.0",
@@ -146,6 +147,8 @@
     "@fontsource/dm-sans": ["@fontsource/dm-sans@5.3.0", "", {}, "sha512-lYJtMXXO28q1z+yz+z8XKd0s4hXaa9QdkETzkyD760sidCv5heI86weYA0sx0Nc4pAMAQTUuyf4gO44cYKKS9g=="],
 
     "@fontsource/ibm-plex-mono": ["@fontsource/ibm-plex-mono@5.3.0", "", {}, "sha512-eTgnZjZEGk1QtD3ZstF+Vclo2HLAni8YMy34/DxllwZvyz1lR/1RF/xTiAquOBO7MvqBx8D2Ig2WCPMVfdZu7Q=="],
+
+    "@fontsource/libre-baskerville": ["@fontsource/libre-baskerville@5.3.0", "", {}, "sha512-IA6OLq36/JWMX70Fha15sri2qWsijFh7hgdDXCRZHjKUHtWarLQoiGilvm7iMqm7HiYFEv9acF3+IuRHO9kUiA=="],
 
     "@formatjs/fast-memoize": ["@formatjs/fast-memoize@3.1.7", "", {}, "sha512-zXfhLpvA6T7+efdt9JLbBwZ00tT7NsBMDVnDu8rpHeNNv8KfRZAMo2gkG0k9lK/Nzc//3kJ9pImsfuJxk3KhUA=="],
 

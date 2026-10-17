@@ -1,6 +1,7 @@
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { LanguageSwitcher } from "../language-switcher";
+import { ArchiveButton } from "./archive-button";
 import { SITE_INDEX } from "./archive-data";
 import { SiteSearch } from "./site-search";
 import styles from "./archive-site.module.css";
@@ -36,31 +37,47 @@ export function ArchiveChrome({ active, trail, children }: {
   children: React.ReactNode;
 }) {
   const t = useTranslations("site");
-  // The institution's own name and service, borrowed from the public portal.
+  // The institution's motto, borrowed from the public portal, and its service line.
   const institution = useTranslations("landing");
 
   return (
     <div className={styles.shell} id="top">
       <a className={styles.skip} href="#site-content">{t("skip")}</a>
 
+      {/*
+        The classification notice sits above the masthead, so it is the first
+        thing a reader meets: white stock, the seal struck into it as a
+        watermark, and the warning in the one crimson the archive reserves for
+        a holding. It is a printed notice, not a dialog — nothing to dismiss.
+      */}
+      <aside className={styles.classified} aria-label={t("classifiedLabel")}>
+        <div className={styles.classifiedInner}>
+          <p className={styles.classifiedLead}>{t("classifiedLead")}</p>
+          <p className={styles.classifiedMark}>{t("classifiedMark")}</p>
+          <p className={styles.classifiedFoot}>{t("classifiedFoot")}</p>
+        </div>
+      </aside>
+
       <header className={styles.topbar}>
         <div className={styles.topbarInner}>
           <Link className={styles.brand} href="/site">
-            <span className={styles.brandMark} aria-hidden="true">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/circa_eye.svg" alt="" width={34} height={34} draggable={false} />
-            </span>
+            {/*
+              The seal is the SVG used as a mask; the anchor's own colour is its
+              paint. So the mark is the same blue as the wordmark beside it,
+              brightens with it on hover, and needs no light plate behind it.
+            */}
+            <span className={styles.brandMark} aria-hidden="true" />
             <span className={styles.brandText}>
               <strong>{t("brandName")}</strong>
-              <small>{t("brandSubtitle")}</small>
+              <small>{institution("motto")}</small>
             </span>
           </Link>
 
-          <SiteSearch />
+          <SiteSearch variant="masthead" />
 
           <div className={styles.topbarTools}>
             <LanguageSwitcher className={styles.language} />
-            <Link className={styles.metaButton} href="/meta/about">{t("aboutSite")}</Link>
+            <ArchiveButton href="/meta/about">{t("aboutSite")}</ArchiveButton>
           </div>
         </div>
       </header>
@@ -68,21 +85,44 @@ export function ArchiveChrome({ active, trail, children }: {
       <nav className={styles.nav} aria-label={t("navLabel")}>
         <div className={styles.navInner}>
           {NAV.map((item) => (
-            <Link key={item.section} className={styles.navLink} href={item.href} aria-current={item.section === active ? "page" : undefined}>
+            <ArchiveButton key={item.section} href={item.href} current={item.section === active}>
               {t(item.key)}
-            </Link>
+            </ArchiveButton>
           ))}
           <span className={styles.navSpacer} />
-          <Link className={styles.navLink} href="/site/random">{t("actionRandom")}</Link>
-          <Link className={styles.navLink} href="/desktop">{t("navWorkstation")} <span aria-hidden="true">»</span></Link>
+          <ArchiveButton href="/site/random">{t("actionRandom")}</ArchiveButton>
+          <ArchiveButton href="/desktop">{t("navWorkstation")} <span aria-hidden="true">»</span></ArchiveButton>
         </div>
       </nav>
 
-      <p className={styles.banner}>
-        <span className={styles.bannerLabel}>{t("bannerLabel")}</span>
-        <span className={styles.bannerText}>{t("bannerText")}</span>
-        <Link href="/site/about">{t("bannerLink")}</Link>
-      </p>
+      {/*
+        The announcement bar. The text is drawn twice on a single track so the
+        loop has no seam; the second copy is decoration and is hidden from the
+        accessibility tree. The pause box is a real checkbox because the site
+        ships no JavaScript and an automatic marquee still has to be stoppable —
+        `:checked ~` is what halts it.
+      */}
+      <aside className={styles.banner} aria-label={t("bannerLabel")}>
+        <div className={styles.bannerInner}>
+          <input
+            id="site-announcement-pause"
+            className={styles.bannerPauseInput}
+            type="checkbox"
+            aria-label={t("bannerPause")}
+          />
+          <span className={styles.bannerLabel}>{t("bannerLabel")}</span>
+          <div className={styles.bannerTicker}>
+            <div className={styles.bannerTrack}>
+              <span className={styles.bannerText}>{t("bannerText")}</span>
+              <span className={styles.bannerText} aria-hidden="true">{t("bannerText")}</span>
+            </div>
+          </div>
+          <div className={styles.bannerTools}>
+            <label className={styles.bannerPause} htmlFor="site-announcement-pause" aria-hidden="true" />
+            <ArchiveButton href="/site/about" className={styles.bannerKey}>{t("bannerLink")}</ArchiveButton>
+          </div>
+        </div>
+      </aside>
 
       <div className={styles.frame}>
         <nav className={styles.crumbs} aria-label={t("crumbsLabel")}>

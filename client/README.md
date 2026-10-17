@@ -50,6 +50,6 @@ Development serves http://localhost:3001. `bun run start` serves a production bu
 
 ## Theme
 
-Detailed component colors in `../.agents/brain/DESIGN.md` provide steel-blue surfaces, hard corners, and bevels. The supplied image controls desktop composition. The global screen overlay is pointer-transparent and can be disabled using CRT in the taskbar. DM Sans and IBM Plex Mono are bundled locally; neither carries Hangul, so `:lang(ko)` names the Korean faces to fall back to rather than letting each platform choose. Whether to bundle a Korean webfont instead is an open question in DESIGN.md.
+Detailed component colors in `../.agents/brain/DESIGN.md` provide steel-blue surfaces, hard corners, and bevels. The supplied image controls desktop composition. The global screen overlay is pointer-transparent and can be disabled using CRT in the taskbar. DM Sans and IBM Plex Mono are bundled locally, plus Libre Baskerville for the archive masthead's wordmark alone; none carries Hangul, so `:lang(ko)` names the Korean faces to fall back to rather than letting each platform choose. Whether to bundle a Korean webfont instead is an open question in DESIGN.md.
 
 See [third-party notices](THIRD_PARTY_NOTICES.md) for copied component licensing. Every new authored folder needs a README.
