@@ -37,17 +37,25 @@ test("skip navigation and archive entry work with a keyboard", async ({ page }) 
   await expect(page.getByRole("navigation", { name: "Desktop folders" })).toBeVisible();
 });
 
-test("decorative movement is brief, finite, and absent under reduced motion", async ({ page }) => {
+test("a sentence changes for a moment and is put back", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.goto("/");
-  const mark = page.getByText(/CHECKED.*04/);
-  const animation = await mark.evaluate((node) => {
-    const style = getComputedStyle(node);
-    return { duration: style.animationDuration, delay: style.animationDelay, count: style.animationIterationCount };
-  });
-  expect(animation).toEqual({ duration: "0.08s", delay: "19s", count: "1" });
+  const printed = "If a record names you in error, retain the reference number. Do not submit a second name.";
+  const altered = "If a record names you, forget the reference number. Do not submit a second name.";
+  await expect(page.getByText(printed)).toBeVisible();
+  // The notice's first cue is six seconds in and it is held for under a second,
+  // so the assertion polls quickly; a miss would mean the schedules drifted apart.
+  await expect(page.getByText(altered)).toBeVisible({ timeout: 9000 });
+  await expect(page.getByText(printed)).toBeVisible({ timeout: 5000 });
+});
+
+test("reduced motion stops the sentences changing but keeps the paperwork askew", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
-  await expect(mark).toHaveCSS("animation-name", "none");
+  await page.goto("/");
+  await page.waitForTimeout(8000);
+  await expect(page.getByText(/If a record names you, forget/)).toHaveCount(0);
+  await expect(page.getByText(/in error, retain the reference number/)).toBeVisible();
+  // The stamp is a static tilt, not movement, so it survives the preference.
   await expect(page.getByLabel("Administrative stamp: continuation sheet 2 of 1")).not.toHaveCSS("transform", "none");
 });
 

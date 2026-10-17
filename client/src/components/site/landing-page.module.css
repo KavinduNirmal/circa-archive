@@ -1,187 +1,765 @@
+/*
+ * The public portal's skin.
+ *
+ * This is not the workstation. It is the thing the workstation is issued to read:
+ * a page an institution put up in 1998 and kept at the same address, drawing its
+ * furniture from the same steel the operating system uses and its pages from the
+ * same paper the archive files on. It is denser and more irregular than the
+ * workstation, because a public agency site of that period was laid out by one
+ * clerk with a form editor: heavy tables, a directory in a box, a rotated stamp,
+ * and a counter at the bottom of the rail.
+ *
+ * Two rules hold it together. Depth comes from a one-pixel bevel and never from a
+ * blur, and there is no gradient anywhere on this page: every surface is a flat
+ * fill inside a rule. That is what makes the page read as an artefact rather than
+ * a modern interface dressed retro.
+ *
+ * Type is staged the way the era staged it: Verdana for the site's own labels,
+ * Georgia for anything the institution is saying at length, and Courier for
+ * codes, counters and dates. Every stack ends in a generic family so Korean
+ * degrades to the reader's own serif or sans rather than to a Latin face with no
+ * glyphs.
+ */
+
 .portal {
   min-height: 100dvh;
-  padding: 24px 24px 48px;
-  background: #101821;
-  color: #202c39;
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 13px;
-  line-height: 1.55;
-  letter-spacing: 0;
+  padding: 20px 16px 44px;
+  background: #111a25;
+  color: var(--circa-ink);
+  font-family: Verdana, Geneva, Arial, sans-serif;
+  font-size: 12px;
+  line-height: 1.5;
   color-scheme: light;
 }
-.site { max-width: 1180px; margin: auto; background: #d7dfe7; border: 1px solid #526e94; }
-.portal a { color: #1b3f66; text-decoration: underline; text-underline-offset: 2px; }
-.portal a:hover { color: #0d131a; background: #becbd8; }
-.portal :is(a, summary):focus-visible { outline: 2px solid #1b3f66; outline-offset: 3px; }
-.portal :is(main, section, details):target { scroll-margin-top: 16px; }
-.portal p { margin: 0 0 12px; }
-.portal h2, .portal h3 { font-weight: bold; }
-.utility { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 6px 18px; background: #0d131a; color: #a4b7ca; font-size: 10px; letter-spacing: .06em; }
-.utility a { color: #c8d6e5; }
-.utilityEdition { white-space: nowrap; }
-.utilityLanguage { margin-left: auto; }
-.masthead { display: flex; align-items: center; gap: 20px; padding: 27px 24px 30px; background: #1b2636; color: #c8d6e5; border-top: 1px solid #3a4f6d; }
-.masthead h1 { font-family: Georgia, 'Times New Roman', serif; font-size: clamp(22px, 2.4vw, 30px); font-weight: normal; line-height: 1.16; letter-spacing: -.015em; margin: 4px 0 10px; }
-.masthead .eyebrow { margin: 0; color: #a4c2e6; text-transform: uppercase; font-size: 10px; letter-spacing: .14em; }
-.masthead .motto { margin: 0; font-family: Georgia, 'Times New Roman', serif; font-size: 12px; color: #afc0d2; }
-.seal { flex: 0 0 82px; height: 82px; border: 3px double #82a1c7; border-radius: 50%; display: grid; place-items: center; outline: 1px solid #526e94; outline-offset: 4px; font-family: Georgia, serif; color: #a4c2e6; }
-.seal span { border-block: 1px solid #82a1c7; padding: 9px 2px; font-size: 17px; }
-.mastheadRef { display: grid; gap: 5px; margin-left: auto; padding-left: 18px; border-left: 1px solid #526e94; font-family: 'Courier New', monospace; font-size: 10px; white-space: nowrap; }
-.mastheadRef strong { font-size: 14px; font-weight: normal; }
-.topnav { display: flex; background: #24334a; border-block: 1px solid #526e94; }
-.topnav a { display: flex; align-items: center; min-height: 37px; padding: 7px 18px; color: #c8d6e5; border-right: 1px solid #526e94; font-size: 12px; }
-.topnav a:first-child { background: #d7dfe7; color: #202c39; font-weight: bold; text-decoration: none; }
-.topnav a:last-child { margin-left: auto; border-left: 1px solid #526e94; border-right: none; gap: 14px; }
-.topnav a:focus-visible, .utility a:focus-visible { outline-color: #a4c2e6; outline-offset: -3px; }
-.breadcrumb { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 5px; padding: 8px 18px; border-bottom: 1px solid #96a6b7; font-size: 10px; color: #435366; }
-.breadcrumb b { font-family: 'Courier New', monospace; font-weight: normal; }
-.layout { display: grid; grid-template-columns: 195px minmax(0, 1fr) 245px; grid-template-areas: "directory content notices"; }
-.mobileDirectory { display: none; }
-.sidebar { grid-area: directory; padding: 18px 12px; background: #c6d1db; border-right: 1px solid #96a6b7; }
-.portal .barTitle { margin: 0; padding: 5px 8px; background: #3a4f6d; color: #e2e9f0; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; }
-.directoryLink { display: flex; align-items: baseline; gap: 9px; padding: 10px 5px; border-bottom: 1px solid #9dacbd; font-size: 12px; }
-.directoryLink span { font-family: 'Courier New', monospace; color: #435366; font-size: 10px; }
-.sideSection { margin-top: 27px; }
-.sideSection h2 { font-family: Georgia, serif; font-size: 15px; border-bottom: 1px solid #8d9dae; padding-bottom: 5px; margin: 0 0 10px; }
-.small { font-size: 11px; color: #435366; line-height: 1.5; }
-.clearance { font-size: 10px; margin-bottom: 10px; }
-.clearance div { padding: 5px 0; border-bottom: 1px dotted #8d9dae; }
-.clearance dt { font-family: 'Courier New', monospace; font-weight: bold; }
-.clearance dd { margin: 0; color: #435366; }
-.displaced { position: relative; left: 19px; width: 142px; margin: 74px 0 39px; transform: rotate(-4deg); padding: 8px; border: 2px solid #596b7b; outline: 1px solid #596b7b; outline-offset: -5px; color: #435366; background: #c6d1db; text-align: center; font: 9px/1.5 'Courier New', monospace; }
-.displaced strong { font-size: 17px; letter-spacing: .12em; }
-.sidebarFoot { padding: 0 5px; font: 10px/1.8 'Courier New', monospace; color: #435366; }
-.redaction { display: inline-block; height: 10px; background: #24334a; }
-.main { grid-area: content; min-width: 0; padding: 24px 27px 30px; background: #e2e7ec; }
-.documentHead { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 6px; font: 9px/1.4 'Courier New', monospace; color: #435366; border-bottom: 1px solid #8d9dae; padding-bottom: 8px; }
-.portal .pageTitle { margin: 18px 0 12px; font: normal 27px/1.1 Georgia, 'Times New Roman', serif; color: #182b40; }
-.main .intro { font: 16px/1.5 Georgia, 'Times New Roman', serif; }
-.entry { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 22px 0 16px; padding-block: 17px; border-block: 1px solid #9dacbd; }
-.portal .enter { display: flex; justify-content: space-between; gap: 28px; padding: 12px 17px; background: #24334a; border: 2px solid; border-color: #637e9c #101821 #101821 #637e9c; color: #e2e9f0; font-size: 16px; font-weight: bold; text-decoration: none; }
-.portal .enter:hover { background: #3a4f6d; }
-.portal .enter:active { border-color: #101821 #637e9c #637e9c #101821; }
-.entry p { margin: 8px 0 0; font-size: 10px; color: #435366; }
-.entryCode { font: 9px/1.6 'Courier New', monospace; color: #435366; text-align: right; }
-.firstVisit { font-size: 12px; }
-.notice { margin: 22px 0 30px; padding: 12px 14px; border: 1px solid #8d9dae; border-left: 4px solid #526e94; background: #d1dbe5; }
-.notice > strong { font: bold 10px/1.5 'Courier New', monospace; letter-spacing: .04em; }
-.notice p { margin: 7px 0; font-family: Georgia, serif; font-size: 14px; }
-.notice > span { font-size: 10px; color: #435366; }
-.procedure { margin: 25px 0 0; }
-.procedure h2 { border-bottom: 1px solid #8d9dae; padding-bottom: 7px; margin-bottom: 11px; font: bold 17px/1.3 Georgia, serif; }
-.procedure h2 > span { margin-right: 8px; font: 11px 'Courier New', monospace; color: #435366; }
-.steps { list-style: decimal; padding-left: 22px; margin: 12px 0; }
-.steps li { margin-bottom: 7px; padding-left: 3px; }
-.main .serviceNote { font-size: 11px; border-left: 2px solid #8d9dae; padding-left: 10px; color: #435366; }
-.disclosure { border-block: 1px dotted #8d9dae; font-size: 12px; }
-.portal summary { cursor: pointer; padding: 10px 2px; color: #1b3f66; text-decoration: underline; text-underline-offset: 2px; }
-.disclosure > div { padding: 5px 6px; }
-.particulars { margin: 12px 0; }
-.particulars > div { display: grid; grid-template-columns: 78px 1fr; border-top: 1px dotted #9dacbd; padding: 7px 0; gap: 8px; }
-.particulars dt { font: 11px/1.6 'Courier New', monospace; }
-.particulars dd { margin: 0; font-size: 12px; }
-.about { margin-top: 38px; padding-top: 12px; border-top: 3px double #8d9dae; font-size: 12px; }
-.about h2 { margin-bottom: 9px; font-variant: small-caps; font-family: Georgia, serif; font-size: 16px; }
-.about .doctrine { font-family: Georgia, serif; font-style: italic; font-size: 14px; }
-.bulletins { grid-area: notices; min-width: 0; padding: 18px 14px; border-left: 1px solid #96a6b7; background: #d1dae3; }
-.newsUpdated { padding: 7px 0 10px; border-bottom: 1px solid #96a6b7; font-size: 10px; color: #435366; }
-.newsItem { padding: 8px 0 12px; margin-bottom: 8px; border-bottom: 1px dotted #8d9dae; }
-.newsItem time { font: 10px/1.5 'Courier New', monospace; color: #435366; }
-.newsItem h3 { font-size: 12px; margin: 4px 0 5px; }
-.newsItem p { font-size: 12px; margin: 0; }
-.newsEnd { font: italic 11px/1.5 Georgia, serif; color: #435366; }
-.documentList { margin: 0; padding: 0; list-style: none; font-size: 11px; }
-.documentList li { border-bottom: 1px solid #a6b3c1; padding: 9px 0; }
-.documentList a { display: inline-block; }
-.documentList span { display: block; font-size: 10px; margin-top: 3px; color: #435366; }
-.withdrawn { padding: 12px 10px; border: 1px dashed #8d9dae; margin-top: 18px; font-size: 11px; }
-.withdrawn h2 { font-size: 11px; margin-bottom: 6px; }
-.withdrawn p { margin-bottom: 0; }
-.registerMark { margin-top: 45px; text-align: right; color: #435366; font: 10px/1.5 'Courier New', monospace; }
-@media (prefers-reduced-motion: no-preference) {
-  .registerMark { animation: register-shift 80ms steps(1, end) 19s 1; }
+
+.site {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  background: var(--circa-paper-raised);
+  border: 1px solid #45586c;
 }
-@keyframes register-shift { 0%, 100% { transform: translateX(0); } 25%, 75% { transform: translateX(-3px); } }
-.registers { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; border-top: 1px solid #96a6b7; padding: 20px 24px 16px; }
+
+.portal a { color: var(--circa-link); text-decoration: underline; text-underline-offset: 2px; }
+.portal a:hover { background: #becbd8; color: var(--circa-ink); }
+.portal :is(a, button, summary):focus-visible { outline: 2px dotted var(--circa-ink); outline-offset: 2px; }
+.portal :is(main, section, details):target { scroll-margin-top: 10px; }
+
+/* Utility strip: the site's own name, its edition, the terminal it runs on. */
+.utility {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 14px;
+  padding: 4px 12px;
+  background: #0d131a;
+  color: #a4b7ca;
+  border-bottom: 1px solid #3a4f6d;
+  font-size: 9px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.utilityService { font-weight: 700; color: #c8d6e5; }
+.utilityEdition { color: #8fa3b6; white-space: nowrap; }
+.utilityTerminal { margin-left: auto; color: #8fa3b6; white-space: nowrap; }
+.utilityLanguage { margin-left: 12px; color: #c8d6e5; }
+.utility a { color: #c8d6e5; }
+.utility a:hover { background: #24334a; color: #ffffff; }
+.utility :is(a, button, summary):focus-visible { outline-color: #c8d6e5; }
+
+/* Masthead: the seal, the institution, and the circular still in force. */
+.masthead {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px;
+  padding: 17px 18px 15px;
+  background: #1b2636;
+  color: #c8d6e5;
+  border-bottom: 3px solid #24334a;
+}
+
+.seal {
+  display: grid;
+  place-items: center;
+  width: 92px;
+  height: 100px;
+  padding: 6px;
+  background: var(--circa-paper);
+  border: 1px solid #526e94;
+  outline: 1px solid #24334a;
+  outline-offset: 2px;
+}
+
+.sealLogo { display: block; width: 100%; height: 100%; object-fit: contain; }
+
+.mastheadCopy { min-width: 0; }
+.eyebrow { margin: 0 0 3px; color: #82a1c7; font-size: 9px; letter-spacing: .16em; text-transform: uppercase; }
+
+.mastheadCopy h1 {
+  margin: 0 0 5px;
+  color: #dce9f5;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(21px, 2.3vw, 27px);
+  font-weight: normal;
+  line-height: 1.12;
+  letter-spacing: -.01em;
+}
+
+.motto { margin: 0; color: #afc0d2; font-family: Georgia, 'Times New Roman', serif; font-size: 11px; }
+
+.circular {
+  display: grid;
+  gap: 2px;
+  align-self: stretch;
+  padding-left: 15px;
+  border-left: 1px solid #526e94;
+  color: #8fa3b6;
+  font-family: 'Courier New', monospace;
+  font-size: 9px;
+  line-height: 1.5;
+}
+
+.circular strong { color: #c8d6e5; font-size: 13px; font-weight: normal; letter-spacing: .04em; }
+.circularStatus { margin-top: 5px; color: #e8a86a; font-weight: 700; letter-spacing: .06em; }
+.circularReissue { color: #8fa3b6; }
+
+/* Navigation: the taskbar's own raised plates, with the current page pressed in. */
+.topnav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  padding: 4px 4px 0;
+  background: #1b2636;
+  border-bottom: 1px solid #0d131a;
+}
+
+.topnav a {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 29px;
+  padding: 5px 11px;
+  background: #24334a;
+  color: #c8d6e5;
+  border: 1px solid;
+  border-color: #526e94 #0d131a #0d131a #526e94;
+  font-size: 11px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.topnav a:hover { background: #304155; color: #dce9f5; }
+
+.topnav a[aria-current="page"] {
+  background: var(--circa-paper-raised);
+  color: var(--circa-ink);
+  border-color: #0d131a #526e94 var(--circa-paper-raised) #0d131a;
+}
+
+.topnav a:focus-visible { outline-color: #c8d6e5; outline-offset: -3px; }
+.topnavAccess { margin-left: auto; }
+
+/* The breadcrumb strip carries the document's status in the registrar's voice. */
+.crumbs {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 4px 12px;
+  padding: 4px 12px;
+  background: var(--circa-paper-raised);
+  border-bottom: 1px solid var(--circa-rule);
+  color: var(--circa-ink-soft);
+  font-size: 9px;
+  letter-spacing: .03em;
+}
+
+.crumbs strong, .crumbs b { font-family: 'Courier New', monospace; font-weight: normal; color: var(--circa-ink); }
+
+/* Three columns of paper, separated by rules: a table, in effect. */
+.layout {
+  display: grid;
+  grid-template-columns: 190px minmax(0, 1fr) 244px;
+  background: var(--circa-paper);
+}
+
+.rail {
+  min-width: 0;
+  padding-bottom: 12px;
+  background: var(--circa-paper);
+  border-right: 1px solid var(--circa-rule);
+}
+
+.main {
+  min-width: 0;
+  padding: 12px 18px 26px;
+  background: var(--circa-paper-sunken);
+  border-right: 1px solid var(--circa-rule);
+}
+
+.bulletins {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding-bottom: 12px;
+  background: var(--circa-paper-raised);
+}
+
+/* The boxed panels both rails are built from. */
+.box, .directory {
+  margin: 8px 8px 0;
+  border: 1px solid var(--circa-rule);
+  background: var(--circa-paper-raised);
+}
+
+.boxTitle {
+  margin: 0;
+  padding: 4px 8px;
+  background: #3a4f6d;
+  color: #e9f0f6;
+  border-bottom: 1px solid #24334a;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.boxBody { margin: 0; padding: 7px 8px; font-size: 11px; line-height: 1.5; }
+.boxNote { margin: 0; padding: 0 8px 7px; color: var(--circa-ink-soft); font-size: 10px; line-height: 1.5; }
+.directoryList { margin: 0; padding: 0; list-style: none; }
+.directoryList li { border-bottom: 1px dotted var(--circa-rule); }
+.directoryList li:last-child { border-bottom: 0; }
+
+.directoryList a {
+  display: flex;
+  gap: 7px;
+  padding: 7px 8px;
+  font-size: 11.5px;
+  line-height: 1.3;
+  text-decoration: none;
+}
+
+.directoryList a:hover { background: #becbd8; color: var(--circa-ink); text-decoration: underline; }
+.directoryNumber { flex: 0 0 13px; color: var(--circa-ink-soft); font-family: 'Courier New', monospace; font-size: 9px; line-height: 1.7; }
+
+/*
+ * The pages the site lists but does not hold. They are drawn as ordinary links,
+ * because the site's own markup cannot tell the difference, and answered with a
+ * notice slip rather than a navigation.
+ */
+.closedList { display: grid; gap: 5px; margin: 0; padding: 2px 8px 6px; list-style: none; font-size: 11px; line-height: 1.4; }
+.closedFoot {
+  margin: 0;
+  padding: 5px 8px 7px;
+  border-top: 1px dotted var(--circa-rule);
+  color: var(--circa-ink-soft);
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 10px;
+  font-style: italic;
+  line-height: 1.45;
+}
+
+.hours {
+  margin: 6px 8px 4px;
+  color: var(--circa-ink);
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.clearance { margin: 0 0 5px; padding: 5px 8px 0; font-size: 9px; }
+.clearance div { padding: 4px 0; border-bottom: 1px dotted var(--circa-rule); }
+.clearance div:last-child { border-bottom: 0; }
+.clearance dt { color: var(--circa-ink); font-family: 'Courier New', monospace; font-weight: 700; letter-spacing: .04em; }
+.clearance dd { margin: 0; color: var(--circa-ink-soft); }
+
+/* The stamp is deliberately out of register, as a hand-applied one would be. */
+.stamp {
+  width: 132px;
+  margin: 20px auto 16px;
+  padding: 6px;
+  border: 2px solid #596b7b;
+  outline: 1px solid #596b7b;
+  outline-offset: -5px;
+  background: transparent;
+  color: var(--circa-ink-soft);
+  transform: rotate(-4deg);
+  text-align: center;
+  font-family: 'Courier New', monospace;
+  font-size: 8px;
+  line-height: 1.6;
+  letter-spacing: .04em;
+}
+
+.stamp strong { color: var(--circa-ink); font-size: 16px; letter-spacing: .14em; }
+
+.received {
+  width: 96px;
+  margin: -6px 10px 12px auto;
+  padding: 3px 5px;
+  border: 2px solid #8a2b2b;
+  color: #8a2b2b;
+  transform: rotate(6deg);
+  text-align: center;
+  font-family: 'Courier New', monospace;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  line-height: 1.5;
+  opacity: .9;
+}
+
+.received span { display: block; }
+
+.railFoot {
+  margin: 0;
+  padding: 0 8px;
+  color: var(--circa-ink-soft);
+  font-family: 'Courier New', monospace;
+  font-size: 9px;
+  line-height: 1.9;
+}
+
+.redaction { display: inline-block; height: 9px; background: #24334a; }
+
+/* The document's own head and type. */
+.docHead {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 4px 12px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid var(--circa-rule);
+  color: var(--circa-ink-soft);
+  font-family: 'Courier New', monospace;
+  font-size: 9px;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.pageTitle {
+  margin: 11px 0 8px;
+  color: #101d2b;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 26px;
+  font-weight: normal;
+  line-height: 1.1;
+  letter-spacing: -.01em;
+}
+
+.main p { margin: 0 0 9px; font-size: 12.5px; line-height: 1.58; }
+.main .intro { font-family: Georgia, 'Times New Roman', serif; font-size: 15px; line-height: 1.5; }
+
+/* A sentence that has stopped short. Set apart, so the stopping is visible. */
+.main .aside {
+  margin: 0 0 12px;
+  padding-left: 8px;
+  border-left: 2px solid #b9c6d3;
+  color: var(--circa-ink-soft);
+  font-style: italic;
+}
+
+.entry {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin: 12px 0 13px;
+  padding: 11px;
+  border: 1px solid var(--circa-rule);
+  background: #dde5ec;
+}
+
+.entryBody { min-width: 0; }
+
+.portal .enter {
+  display: flex;
+  justify-content: space-between;
+  gap: 26px;
+  min-width: 220px;
+  padding: 9px 13px;
+  background: #1b3f66;
+  color: #e7eff8 !important;
+  border: 2px solid;
+  border-color: #7fa4cd #08121d #08121d #7fa4cd;
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  line-height: 1.2;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.portal .enter:hover { background: #24507f; color: #f3f8fc; }
+.portal .enter:active { border-color: #08121d #7fa4cd #7fa4cd #08121d; background: #16324f; }
+.portal .enter:focus-visible { outline: 2px dotted var(--circa-ink); outline-offset: 3px; }
+.portal .enter:visited { color: #dbe7f2; }
+
+.main .entryNote { margin: 6px 0 0; color: var(--circa-ink-soft); font-size: 10px; line-height: 1.4; }
+.entryCode { color: var(--circa-ink-soft); font-family: 'Courier New', monospace; font-size: 8.5px; line-height: 1.7; text-align: right; white-space: nowrap; }
+
+.main .firstVisit { margin: 2px 0 9px; padding-top: 8px; border-top: 1px dotted var(--circa-rule); font-size: 11.5px; }
+
+/* The notice to correspondents: the page's warmest surface and its quietest threat. */
+.notice {
+  margin: 14px 0 18px;
+  padding: 9px 11px 8px;
+  border: 1px solid #b9a777;
+  border-left: 4px solid var(--circa-stamp);
+  background: #e9dcb6;
+  color: #3b2e12;
+}
+
+.noticeHeading { display: block; margin-bottom: 5px; color: #4a3a1a; font-family: 'Courier New', monospace; font-size: 9px; letter-spacing: .1em; }
+.main .noticeBody { margin: 0 0 5px; font-family: Georgia, 'Times New Roman', serif; font-size: 14px; line-height: 1.5; }
+.main .noticePostscript { margin: 0 0 5px; color: #6a5225; font-size: 10.5px; font-style: italic; }
+.noticeSource { display: block; padding-top: 5px; border-top: 1px dotted #b9a777; color: #6a5225; font-family: 'Courier New', monospace; font-size: 9px; }
+
+.mobileDirectory { display: none; }
+
+/* Numbered procedures. */
+.procedure { margin: 18px 0 0; }
+
+.procedure h2 {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 0 0 8px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--circa-rule);
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 16px;
+  line-height: 1.3;
+}
+
+.procedure h2 > span { color: var(--circa-ink-soft); font-family: 'Courier New', monospace; font-size: 10px; letter-spacing: .04em; }
+
+.steps { margin: 8px 0 10px; padding-left: 22px; list-style: decimal; font-size: 12.5px; line-height: 1.55; }
+.steps li { margin-bottom: 4px; }
+
+.main .serviceNote {
+  margin: 9px 0;
+  padding-left: 8px;
+  border-left: 2px solid var(--circa-rule);
+  color: var(--circa-ink-soft);
+  font-size: 10.5px;
+  line-height: 1.55;
+}
+
+.disclosure { border-block: 1px dotted var(--circa-rule); font-size: 11px; }
+.disclosure > div { padding: 2px 4px 6px; }
+.disclosure p { font-size: 11px; margin-bottom: 6px; }
+
+.portal summary { padding: 6px 0; color: var(--circa-link); cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
+.portal summary::marker { content: "► "; font-size: 8px; }
+.portal details[open] > summary::marker { content: "▼ "; }
+
+.particulars { margin: 9px 0; font-size: 12px; }
+.particulars > div { display: grid; grid-template-columns: 74px minmax(0, 1fr); gap: 8px; padding: 5px 0; border-top: 1px dotted var(--circa-rule); }
+.particulars dt { font-family: 'Courier New', monospace; font-size: 10px; letter-spacing: .02em; }
+.particulars dd { margin: 0; }
+
+.about { margin-top: 24px; padding-top: 9px; border-top: 3px double var(--circa-rule); }
+.about h2 { margin: 0 0 7px; font-family: Georgia, 'Times New Roman', serif; font-size: 16px; font-variant: small-caps; }
+.about .doctrine { font-family: Georgia, 'Times New Roman', serif; font-size: 14px; font-style: italic; }
+.main .small { color: var(--circa-ink-soft); font-size: 10px; }
+
+.textLink { display: inline-block; margin-bottom: 6px; font-size: 11.5px; font-weight: 700; }
+
+/* The register column. */
+.newsList { margin: 0; padding: 0; list-style: none; }
+
+.newsItem { padding: 7px 8px 8px; border-bottom: 1px dotted var(--circa-rule); }
+.newsItem:last-child { border-bottom: 0; }
+
+.newsTag {
+  display: inline-block;
+  margin-right: 5px;
+  padding: 0 3px;
+  background: #8a4a12;
+  color: #f8edda;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  line-height: 1.6;
+  text-transform: uppercase;
+}
+
+.newsMeta { display: flex; align-items: baseline; gap: 5px; margin: 0 0 2px; }
+.newsDate { color: var(--circa-ink-soft); font-family: 'Courier New', monospace; font-size: 9px; }
+.newsItem h3 { margin: 0 0 3px; font-size: 11px; line-height: 1.4; }
+.newsItem p { margin: 0; font-size: 11px; line-height: 1.45; }
+.newsEnd { margin: 0; padding: 6px 8px; color: var(--circa-ink-soft); font-family: Georgia, 'Times New Roman', serif; font-size: 10px; font-style: italic; }
+
+.attendanceBox :global(.site-attendance) { padding: 6px 8px 8px; }
+
+.visitsBody { padding: 7px 8px 8px; }
+.visitsNote { margin: 5px 0 0; color: var(--circa-ink-soft); font-size: 10px; line-height: 1.5; }
+
+/* The hit counter, in the sunken cells a page of this age would use. */
+.counter { display: flex; margin: 0; padding: 2px; background: #0d131a; border: 1px solid; border-color: #0d131a #526e94 #526e94 #0d131a; }
+.counterDigits { display: inline-flex; gap: 1px; }
+.counterDigits span {
+  display: grid;
+  place-items: center;
+  width: 12px;
+  height: 21px;
+  background: #151d27;
+  color: #a4c2e6;
+  font-family: 'Courier New', monospace;
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.documentList { margin: 0; padding: 3px 8px 6px; list-style: none; font-size: 11px; }
+.documentList li { padding: 5px 0; border-bottom: 1px dotted var(--circa-rule); }
+.documentList li:last-child { border-bottom: 0; }
+.documentList a { display: inline-block; }
+.documentList span { display: block; margin-top: 1px; color: var(--circa-ink-soft); font-size: 9px; }
+
+.boardList { margin: 0; padding: 6px 8px 7px; list-style: none; font-size: 10px; line-height: 1.5; }
+.boardList li { padding: 4px 0; border-bottom: 1px dotted var(--circa-rule); }
+.boardList li:last-child { border-bottom: 0; }
+
+.withdrawn { margin: 8px; padding: 7px 8px; border: 1px dashed #8d9dae; background: transparent; }
+.withdrawn h2 { margin: 0 0 4px; font-size: 10px; letter-spacing: .04em; }
+.withdrawn p { margin: 0; font-size: 10px; line-height: 1.5; }
+
+/* The picture the page cannot supply: a torn corner is enough. */
+.held { margin: 12px 8px 0; }
+.heldPlate {
+  display: grid;
+  place-items: center;
+  width: 88px;
+  height: 54px;
+  border: 1px solid #8d9dae;
+  background: var(--circa-paper-sunken);
+  color: #8a2b2b;
+  font-family: Verdana, Geneva, sans-serif;
+  font-size: 17px;
+  line-height: 1;
+}
+.held figcaption { margin-top: 3px; color: var(--circa-ink-soft); font-size: 9px; line-height: 1.45; }
+
+.registerMark {
+  margin: auto 8px 0;
+  padding-top: 16px;
+  padding-top: 4px;
+  border-top: 1px dotted var(--circa-rule);
+  color: var(--circa-ink-soft);
+  font-family: 'Courier New', monospace;
+  font-size: 9px;
+  line-height: 1.55;
+  text-align: right;
+}
+
+/* The registers under the fold: contact routing and revisions. */
+.registers {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  padding: 12px 14px;
+  background: var(--circa-paper-raised);
+  border-top: 1px solid var(--circa-rule);
+}
+
 .registers section { min-width: 0; }
-.registers h2 { font: bold 12px 'Courier New', monospace; margin-bottom: 12px; text-transform: uppercase; }
-.registers table { width: 100%; border-collapse: collapse; text-align: left; font-size: 11px; }
-.registers :is(th, td) { border: 1px solid #96a6b7; padding: 6px 8px; overflow-wrap: anywhere; vertical-align: top; }
+.registers h2 { margin: 0 0 7px; font-family: 'Courier New', monospace; font-size: 10px; letter-spacing: .06em; text-transform: uppercase; }
+
+.registers table { width: 100%; border-collapse: collapse; text-align: left; font-size: 10.5px; }
+.registers :is(th, td) { padding: 4px 6px; border: 1px solid #96a6b7; overflow-wrap: anywhere; vertical-align: top; }
 .registers th { font-weight: normal; }
-.registers thead th { background: #bdcad7; font-size: 10px; font-weight: bold; }
+.registers thead th { background: #bdcad7; font-size: 9px; font-weight: 700; }
 .registers tbody tr:nth-child(even) { background: #cbd5df; }
-.registers p { margin: 8px 0 0; font-size: 10px; color: #435366; }
-.policies { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; padding: 8px 24px; border-top: 1px solid #96a6b7; font-size: 11px; }
-.policies p { font-size: 12px; }
-.footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; background: #1b2636; color: #c8d6e5; padding: 16px 24px 12px; font-size: 11px; }
+.registers .registerNote { margin: 6px 0 0; color: var(--circa-ink-soft); font-size: 9.5px; line-height: 1.5; }
+.registers .registerAction { margin: 6px 0 0; font-size: 10.5px; }
+
+.policies {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  padding: 6px 14px 8px;
+  border-top: 1px solid var(--circa-rule);
+  font-size: 10.5px;
+}
+
+.policies details { min-width: 0; }
+.policies p { margin: 0 0 6px; font-size: 11px; line-height: 1.5; }
+.portal .policies summary { padding: 8px 0; }
+
+/* The foot of the page, and the panel that says what the page is. */
+.footer {
+  padding: 9px 14px 11px;
+  background: #1b2636;
+  color: #c8d6e5;
+  border-top: 1px solid #3a4f6d;
+  font-size: 10px;
+}
+
+.footerRow { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 12px; }
+.footerFoot { margin-top: 7px; padding-top: 6px; border-top: 1px solid #3a4f6d; }
 .footer p { margin: 0; }
 .footer a { color: #c8d6e5; }
-.footer a:focus-visible { outline-color: #a4c2e6; }
-.footer p > span:not(:first-child) { margin-left: 10px; }
-.footer .footerEnd { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; width: 100%; padding-top: 10px; border-top: 1px solid #3a4f6d; color: #a4b7ca; font: 9px/1.5 'Courier New', monospace; }
-.skip { position: fixed; top: -100px; left: 12px; z-index: 100; padding: 12px; background: #e2e7ec; }
+.footer a:hover { background: #24334a; color: #ffffff; }
+.footer :is(a, button, summary):focus-visible { outline-color: #c8d6e5; }
+.footerRevised { color: #a4b7ca; font-family: 'Courier New', monospace; font-size: 9px; }
+
+.footerEnd { display: flex; flex-wrap: wrap; gap: 4px 10px; color: #a4b7ca; font-family: 'Courier New', monospace; font-size: 9px; }
+.footerTop { font-size: 10px; }
+
+.skip {
+  position: fixed;
+  top: -100px;
+  left: 12px;
+  z-index: 100;
+  padding: 10px 12px;
+  background: var(--circa-paper-sunken);
+  color: var(--circa-ink);
+  border: 1px solid var(--circa-rule);
+}
 .skip:focus { top: 8px; }
-@media (max-width: 1050px) {
-  .portal { padding: 12px; }
-  .layout { grid-template-columns: 170px minmax(0, 1fr) 205px; }
-  .main { padding-inline: 20px; }
-  .mastheadRef { display: none; }
-  .entryCode { display: none; }
-  .topnav a { padding-inline: 12px; }
-  .documentHead span:last-child { display: none; }
+
+/*
+ * Korean breaks between syllables by default, which is wrong for prose: a word
+ * like "마십시오" should not be split across two lines. `keep-all` restores word
+ * boundaries in the reading matter. It is scoped to Korean so Latin pages keep
+ * their normal overflow breaking.
+ */
+:lang(ko) .main p,
+:lang(ko) .main li,
+:lang(ko) .main summary,
+:lang(ko) .boxBody,
+:lang(ko) .boxNote,
+:lang(ko) .newsItem p,
+:lang(ko) .boardList li,
+:lang(ko) .footer p {
+  word-break: keep-all;
 }
-@media (max-width: 800px) {
-  .layout { grid-template-columns: 160px minmax(0, 1fr); grid-template-areas: "directory content" "notices notices"; }
-  .bulletins { grid-column: 1 / -1; border-top: 1px solid #96a6b7; border-left: none; display: grid; grid-template-columns: 1fr 1fr; gap: 16px 24px; padding: 20px; }
-  .bulletins .sideSection { margin-top: 0; }
-  .withdrawn { margin-top: 0; }
-  .registerMark { align-self: end; }
-  .topnav { flex-wrap: wrap; }
-  .topnav a { min-height: 40px; }
-  .topnav a:last-child { margin-left: 0; border-left: none; }
-  .registers { grid-template-columns: 1fr; gap: 24px; padding-inline: 20px; }
+
+@media (max-width: 1080px) {
+  .portal { padding: 12px 10px 32px; }
+  .layout { grid-template-columns: 176px minmax(0, 1fr) 226px; }
+  .main { padding-inline: 15px; }
+  .circular { display: none; }
+  .masthead { grid-template-columns: 84px minmax(0, 1fr); }
+  .seal { width: 78px; height: 86px; padding: 5px; }
 }
-@media (max-width: 560px) {
-  .portal { padding: 0; font-size: 13px; }
-  .site { border-inline: none; }
-  .utility { padding: 7px 12px; font-size: 9px; }
-  .utilityEdition { font-size: 0; }
-  .utilityEdition a { font-size: 10px; }
-  .masthead { padding: 22px 15px; gap: 14px; align-items: flex-start; }
-  .seal { flex-basis: 42px; height: 42px; margin-top: 7px; outline-offset: 2px; }
-  .seal span { font-size: 9px; padding: 4px 0; }
-  .masthead h1 { font-size: 21px; margin-top: 7px; line-height: 1.16; }
-  .masthead .eyebrow { font-size: 8px; letter-spacing: .05em; }
-  .masthead .motto { font-size: 10px; }
-  .topnav a { min-height: 44px; font-size: 11px; padding: 8px 12px; border-bottom: 1px solid #526e94; flex-grow: 1; }
-  .breadcrumb { padding-inline: 12px; font-size: 9px; }
-  .breadcrumb > span:last-child { display: none; }
+
+@media (max-width: 940px) {
+  .layout {
+    grid-template-columns: 178px minmax(0, 1fr);
+    grid-template-areas: "rail content" "bulletins bulletins";
+  }
+  .rail { grid-area: rail; }
+  .main { grid-area: content; border-right: 0; }
+  .bulletins {
+    grid-area: bulletins;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+    border-top: 1px solid var(--circa-rule);
+    padding-bottom: 4px;
+  }
+  .bulletins .box { margin-top: 8px; }
+  .bulletins .registerMark { grid-column: 2; }
+  .registers { grid-template-columns: 1fr; gap: 14px; }
+  .policies { grid-template-columns: 1fr; gap: 0; }
+  .policies details { border-bottom: 1px dotted var(--circa-rule); }
+  .policies details:last-child { border-bottom: 0; }
+}
+
+@media (max-width: 720px) {
+  .portal { padding: 0; }
+  .site { border-inline: 0; }
+  .utility { gap: 8px; padding: 5px 10px; }
+  .utilityTerminal { display: none; }
+  .masthead { grid-template-columns: 62px minmax(0, 1fr); gap: 12px; padding: 14px 12px 12px; }
+  .seal { width: 58px; height: 64px; padding: 3px; }
+  .mastheadCopy h1 { font-size: 20px; line-height: 1.16; }
+  .eyebrow { font-size: 8px; letter-spacing: .1em; }
+  .motto { font-size: 10px; }
+      .topnav { padding: 4px 4px 0; gap: 2px; }
+  .topnav a { flex: 1 1 auto; justify-content: center; min-height: 34px; padding: 5px 8px; font-size: 10.5px; }
+  .topnavAccess { margin-left: 0; }
+  .crumbs { padding: 4px 10px; }
   .layout { display: flex; flex-direction: column; }
-  .mobileDirectory { display: flex; flex-wrap: wrap; gap: 0 16px; border-block: 1px dotted #8d9dae; margin-top: 16px; font-size: 11px; }
-  .mobileDirectory a { display: inline-flex; align-items: center; min-height: 44px; }
-  .main { padding: 20px 17px 25px; }
-  .portal .pageTitle { font-size: 25px; }
-  .main .intro { font-size: 16px; }
-  .entry { margin-top: 17px; }
-  .entry > div { width: 100%; }
-  .portal .enter { min-height: 48px; }
-  .sidebar { border-top: 1px solid #96a6b7; border-right: none; padding: 18px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-  .sidebar nav { grid-column: 1 / -1; }
-  .directoryLink { min-height: 44px; }
-  .sideSection { margin-top: 0; }
-  .displaced { left: 10px; margin: 15px 0; }
-  .sidebarFoot { align-self: center; }
-  .bulletins { display: block; padding: 18px; }
-  .bulletins .sideSection { margin-top: 28px; }
-  .documentList a { padding-block: 8px; }
-  .withdrawn { margin-top: 22px; }
-  .registerMark { margin-top: 25px; }
-  .registers, .policies { grid-template-columns: 1fr; padding-inline: 17px; }
-  .registers { gap: 24px; }
-  .registers :is(th, td) { padding: 8px 5px; }
-  .registers td a { display: inline-block; padding-block: 5px; }
-  .policies { gap: 0; }
-  .policies summary { min-height: 44px; }
-  .footer { padding-inline: 17px; }
-  .footer > a { padding-block: 8px; }
+  .main { order: 1; padding: 11px 12px 22px; }
+  .rail { order: 2; display: grid; grid-template-columns: 1fr 1fr; gap: 0; border-right: 0; border-top: 1px solid var(--circa-rule); padding-bottom: 6px; }
+  .rail .directory { grid-column: 1 / -1; }
+  .rail .stamp { grid-column: 2; grid-row: span 1; margin: 12px auto 8px; align-self: start; }
+  .rail .received {
+  width: 96px;
+  margin: -6px 10px 12px auto;
+  padding: 3px 5px;
+  border: 2px solid #8a2b2b;
+  color: #8a2b2b;
+  transform: rotate(6deg);
+  text-align: center;
+  font-family: 'Courier New', monospace;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  line-height: 1.5;
+  opacity: .9;
+}
+
+.received span { display: block; }
+
+.railFoot { grid-column: 1; padding-top: 12px; }
+  .bulletins { order: 3; display: block; border-top: 1px solid var(--circa-rule); }
+  .bulletins .registerMark { grid-column: auto; }
+  .entry { flex-direction: column; gap: 8px; }
+  .entryBody { width: 100%; }
+  .portal .enter { min-width: 0; width: 100%; min-height: 44px; align-items: center; }
+  .entryCode { text-align: left; }
+  .pageTitle { font-size: 23px; }
+  .main p { font-size: 12.5px; }
+  .registers { padding-inline: 12px; }
+  .policies { padding-inline: 12px; }
+  .footer { padding-inline: 12px; }
+}
+
+@media (max-width: 460px) {
+  .utilityEdition { display: none; }
+  .utilityService { font-size: 8.5px; letter-spacing: .05em; }
+  .utilityLanguage { flex-basis: 100%; margin-left: 0; justify-content: flex-end; }
+  .masthead { grid-template-columns: 52px minmax(0, 1fr); gap: 10px; }
+  .seal { width: 48px; height: 54px; padding: 3px; }
+  .mastheadCopy h1 { font-size: 18px; }
+  .main .intro { font-size: 14px; }
+  .main p { font-size: 12px; }
+  .steps { font-size: 12px; }
+  .main .noticeBody { font-size: 13px; }
+  .rail { display: block; }
+  .rail .stamp { width: 120px; margin: 14px auto 10px; }
+  .rail .received { margin: -8px 14px 12px auto; }
+  .registers :is(th, td) { padding: 4px; }
+  .registers table { font-size: 10px; }
+  }
+
+@media (prefers-contrast: more) {
+  .site { border-color: #0d131a; }
+  .box, .directory { border-color: #45586c; }
+  .boxNote, .main .small, .received {
+  width: 96px;
+  margin: -6px 10px 12px auto;
+  padding: 3px 5px;
+  border: 2px solid #8a2b2b;
+  color: #8a2b2b;
+  transform: rotate(6deg);
+  text-align: center;
+  font-family: 'Courier New', monospace;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  line-height: 1.5;
+  opacity: .9;
+}
+
+.received span { display: block; }
+
+.railFoot { color: #26313d; }
 }

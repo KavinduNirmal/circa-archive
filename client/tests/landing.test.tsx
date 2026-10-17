@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { LandingPage } from "@/components/site/landing-page";
@@ -77,5 +79,56 @@ describe("public access portal", () => {
     expect(englishMetadata.openGraph?.locale).toBe("en_GB");
     expect(koreanMetadata.openGraph?.locale).toBe("ko_KR");
     expect(koreanMetadata.title).toEqual({ absolute: catalogFor("ko").metadata.homeTitle });
+  });
+});
+
+describe("staying inside the fiction", () => {
+  it("never announces out of character, and keeps its structure legible instead", () => {
+    const { container } = renderWithIntl(<LandingPage />);
+    // The page is an agency's own site. The meta layer lives in the route
+    // metadata and in where the archive link leads, not in a banner.
+    expect(container.textContent).not.toMatch(/not a real office|demonstration|reconstruction|simulation|fictional/i);
+    // What a reader needs instead is a way to see the whole site at once.
+    expect(screen.getByRole("navigation", { name: english.landing.navLabel })).toBeVisible();
+    expect(screen.getByRole("navigation", { name: english.landing.directoryLabel })).toBeVisible();
+    expect(screen.getByText(/Registry \/ Public information/)).toBeVisible();
+  });
+});
+
+describe("the sentences that change", () => {
+  it("carries the other version of the correspondent notice, ready to replace the printed one", () => {
+    renderWithIntl(<LandingPage />);
+    const notice = screen.getByText(english.landing.noticeBody);
+    expect(notice).toHaveAttribute("data-alter", english.landing.noticeAlter);
+    // The altered sentence is the one the brief names: the reference number is forgotten.
+    expect(english.landing.noticeAlter).toMatch(/forget the reference number/);
+  });
+
+  it("staggers the alterations instead of firing them all at once", () => {
+    const { container } = renderWithIntl(<LandingPage />);
+    const cues = [...container.querySelectorAll("[data-alter]")].map((node) => Number(node.getAttribute("data-alter-after")));
+    expect(cues.length).toBeGreaterThan(2);
+    expect(new Set(cues).size).toBe(cues.length);
+  });
+});
+
+describe("pages on this site that are not held", () => {
+  it("lists four pages as controls, because choosing one answers rather than navigates", () => {
+    renderWithIntl(<LandingPage />);
+    const rail = screen.getByRole("navigation", { name: english.landing.directoryLabel }).parentElement!;
+    for (const name of [english.landing.closedPlan, english.landing.closedGuest, english.landing.closedCircular, english.landing.closedPersonnel]) {
+      expect(within(rail).getByRole("button", { name })).toBeVisible();
+    }
+    expect(within(rail).getByText(english.landing.closedIntro)).toBeVisible();
+    expect(within(rail).getByText(english.landing.closedFootnote)).toBeVisible();
+  });
+});
+
+describe("the portal's skin", () => {
+  it("draws no gradients, whose absence is what makes the page look its age", () => {
+    const css = ["landing-page.module.css", "portal-signs.css"]
+      .map((name) => readFileSync(resolve(process.cwd(), "src/components/site", name), "utf8"))
+      .join("\n");
+    expect(css).not.toMatch(/gradient\(/i);
   });
 });

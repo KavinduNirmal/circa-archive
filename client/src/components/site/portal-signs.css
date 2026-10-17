@@ -1,0 +1,102 @@
+/*
+ * The portal's small client apparatus: attendance, the refreshable register,
+ * and the links to pages the site lists but does not hold.
+ *
+ * These are plain global classes rather than a CSS module because the same
+ * names are read by the landing page's stylesheet and by the tests that assert
+ * on the un-hydrated markup. The palette is the archive's paper and ink, and the
+ * counters borrow the workstation's sunken trough, so the page still looks like
+ * something the Commission's own clerk assembled.
+ *
+ * No gradients: every surface here is a solid fill inside a bevel, which is what
+ * a 2003 intranet page could actually be drawn with.
+ */
+
+.site-attendance {
+  display: grid;
+  gap: 4px;
+}
+
+.site-attendance-value {
+  display: inline-block;
+  padding: 3px 7px;
+  border: 1px solid;
+  border-color: #0d131a #526e94 #526e94 #0d131a;
+  background: #0d131a;
+  color: #a4c2e6;
+  font-size: 15px;
+  letter-spacing: .14em;
+  line-height: 1.3;
+}
+
+.site-attendance-note {
+  margin: 0;
+  color: var(--circa-ink-soft);
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+/* The second line is the page noticing it is still being read. */
+.site-attendance-note[data-still="true"] { color: var(--circa-stamp); }
+
+.site-register-updated {
+  margin: 0;
+  padding: 6px 8px 5px;
+  border-bottom: 1px dotted var(--circa-rule);
+  color: var(--circa-ink-soft);
+  font-size: 10px;
+}
+
+.site-register-refreshed {
+  margin: 7px 8px;
+  padding: 6px 8px;
+  border: 1px solid #b9a777;
+  background: #e9dcb6;
+  color: #4a3a1a;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.site-register-foot {
+  margin: 0;
+  padding: 6px 8px 7px;
+  border-top: 1px dotted var(--circa-rule);
+}
+
+.site-refresh {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--circa-link);
+  font: inherit;
+  font-size: 11px;
+  text-align: left;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+.site-refresh:hover { background: #becbd8; color: var(--circa-ink); }
+.site-refresh:focus-visible { outline: 1px dotted var(--circa-link); outline-offset: 2px; }
+
+.site-refresh-count { color: var(--circa-ink-soft); font-size: 10px; }
+
+/*
+ * A page the site lists and does not hold. It reads as a link because the site's
+ * own markup cannot tell the difference, and turns into a notice when chosen.
+ */
+.site-dead-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--circa-link);
+  font: inherit;
+  font-size: inherit;
+  text-align: left;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+.site-dead-link:hover { background: #becbd8; color: var(--circa-ink); }
+.site-dead-link:focus-visible { outline: 1px dotted var(--circa-link); outline-offset: 2px; }
