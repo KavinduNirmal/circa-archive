@@ -25,7 +25,7 @@ This is the living checklist for the public repository. Checked items are config
 - [x] Squash and merge-commit merges enabled; rebase merges disabled; merged head branches are deleted.
 - [x] Rulesets on `main` and `develop` require a pull request, passing checks, and resolved conversations; force pushes and deletion are blocked.
 - [x] Tag ruleset prevents updating or deleting `v*` release tags.
-- [x] Secret scanning, push protection, and validity checks enabled.
+- [x] Secret scanning and push protection enabled. Validity checks and non-provider patterns remain disabled; see owner actions.
 - [x] Private vulnerability reporting enabled.
 - [x] Dependabot alerts and security updates enabled, with weekly Bun and Actions version updates.
 - [x] CodeQL analysis for JavaScript/TypeScript and GitHub Actions.
@@ -42,6 +42,7 @@ This is the living checklist for the public repository. Checked items are config
 - [ ] Confirm that the copyright notice in `LICENSE` names the intended rights holder.
 - [ ] Publish the first tagged release and verify the Release workflow on a real tag.
 - [ ] Raise the required approval count to one when a second maintainer joins.
+- [ ] Enable secret scanning validity checks and non-provider patterns if GitHub makes them available for this repository.
 - [ ] Review Bun advisories manually: Dependabot covers Bun version updates, not Bun security updates.
 - [ ] Consider GitHub Discussions or a project board only if the issue tracker stops being sufficient.
 

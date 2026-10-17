@@ -6,7 +6,7 @@ Run the repository's verification and security checks on every change, and publi
 
 ## Structure
 
-- `ci.yml`: repository tooling checks, client lint, typecheck, unit tests, production build, and Playwright end-to-end tests.
+- `ci.yml`: repository tooling checks, client lint, typecheck, unit tests, production build, and Playwright end-to-end tests against that production build.
 - `codeql.yml`: CodeQL analysis for JavaScript/TypeScript and GitHub Actions on pushes, pull requests, and a weekly schedule.
 - `dependency-review.yml`: fails a pull request that introduces a high-severity vulnerable dependency.
 - `release.yml`: creates a GitHub Release from a `v*.*.*` tag after confirming the tag is on `main`.

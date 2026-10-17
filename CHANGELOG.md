@@ -6,7 +6,7 @@ All notable changes to CIRCA Archive are documented here. The format follows [Ke
 
 ### Added
 
-- Continuous integration for repository checks, client lint, typecheck, unit tests, production build, and Playwright browser tests.
+- Continuous integration for repository checks, client lint, typecheck, unit tests, production build, and Playwright browser tests against that build.
 - CodeQL analysis for JavaScript/TypeScript and GitHub Actions, plus dependency review on pull requests.
 - Weekly Dependabot updates for Bun dependencies and GitHub Actions.
 - `CODEOWNERS`, a release workflow, issue contact links, and a support guide.

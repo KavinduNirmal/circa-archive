@@ -4,6 +4,12 @@ export default defineConfig({
   reporter: [["list"], ["html", { open: "never" }]],
   use: { baseURL: "http://127.0.0.1:3001", trace: "retain-on-failure" },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
-  // Readiness is probed at the concrete prerendered route, not at the bare path the proxy redirects.
-  webServer: { command: "bun run dev", url: "http://127.0.0.1:3001/en/desktop", reuseExistingServer: !process.env.CI, timeout: 120000 },
+  webServer: {
+    // CI exercises the production build; a fresh development server hydrates the
+    // workstation too slowly for the boot handover window used by these specs.
+    command: process.env.CI ? "bun run start -- --port 3001" : "bun run dev",
+    url: "http://127.0.0.1:3001/en/desktop",
+    reuseExistingServer: !process.env.CI,
+    timeout: 120000,
+  },
 });
