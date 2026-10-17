@@ -71,7 +71,8 @@ for (const viewport of [{ width: 1440, height: 900 }, { width: 390, height: 844 
     await page.keyboard.press("Escape");
     await navigation.getByRole("button", { name: "Archive", exact: true }).focus();
     await page.keyboard.press("Enter");
-    await page.getByRole("button", { name: "Close folder" }).click();
+    await page.getByRole("button", { name: `Close ${ARCHIVE_WINDOW}`, exact: true }).click();
+    await expect(page.getByRole("dialog")).toHaveCount(0);
     await page.screenshot({ path: `/tmp/circa-desktop-${viewport.width}.png` });
     expect(errors).toEqual([]);
   });
@@ -86,7 +87,7 @@ test("desktop shortcuts explain themselves with the beveled tooltip", async ({ p
   await expect(tooltip).toBeVisible();
   await expect(tooltip).toContainText("Organization dossiers and continuities");
   await expect(tooltip.locator(".tooltip-arrow")).toHaveCount(1);
-  await page.mouse.move(720, 500);
+  await page.mouse.move(5, 5);
   await expect(tooltip).toBeHidden();
 });
 
@@ -140,7 +141,7 @@ test("windows drag, resize, minimize, and maximize", async ({ page }) => {
 
   await page.getByRole("button", { name: `Minimize ${ARCHIVE_WINDOW}`, exact: true }).click();
   await expect(windowFrame).toHaveCount(0);
-  const taskEntry = page.getByRole("contentinfo", { name: "Taskbar" }).getByRole("button", { name: ARCHIVE_WINDOW, exact: true });
+  const taskEntry = page.locator("footer[aria-label='Taskbar']").getByRole("button", { name: ARCHIVE_WINDOW, exact: true });
   await taskEntry.click();
   await expect(page.getByRole("dialog", { name: ARCHIVE_WINDOW, exact: true })).toBeVisible();
   await expect(taskEntry).toHaveAttribute("aria-pressed", "false");
