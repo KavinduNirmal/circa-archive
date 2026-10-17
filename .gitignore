@@ -4,6 +4,7 @@
 !.env.example
 *.pem
 *.key
+.aws/
 
 # JavaScript dependencies and build output
 node_modules/
@@ -28,11 +29,8 @@ TestResults/
 .DS_Store
 Thumbs.db
 
-# Machine-specific agent/cloud configuration
-.codex/
-.aws/
-# Agent scratch space: probe scripts and captures, never authored source
-.dsh-scratch/
+# Per-clone ignore rules. Activate with core.excludesFile; see the file itself.
+.local.gitignore
 
 # Husky-generated support files
 .husky/_/

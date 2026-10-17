@@ -1,5 +1,9 @@
 import { describe, expect, test } from "bun:test";
-import { findMissingReadmes, repositoryPaths } from "../scripts/check-repository";
+import {
+  findMissingReadmes,
+  findShadowingRepositoryReadme,
+  repositoryPaths,
+} from "../scripts/check-repository";
 import { execFileSync } from "node:child_process";
 import { existsSync, mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -44,9 +48,25 @@ describe("folder README policy", () => {
   });
 
   test("requires documentation in authored hidden directories", () => {
-    expect(findMissingReadmes(["README.md", ".agents/rules/tdd.md"])).toEqual([
-      ".agents/README.md", ".agents/rules/README.md",
+    expect(findMissingReadmes(["README.md", ".internal/rules/tdd.md"])).toEqual([
+      ".internal/README.md", ".internal/rules/README.md",
     ]);
+  });
+
+  test("exempts only .github's own README, not nested folders", () => {
+    expect(findMissingReadmes([
+      "README.md", ".github/ABOUT.md", ".github/workflows/ci.yml",
+    ])).toEqual([".github/workflows/README.md"]);
+    expect(findMissingReadmes([
+      "README.md", ".github/ABOUT.md", ".github/workflows/README.md", ".github/workflows/ci.yml",
+    ])).toEqual([]);
+  });
+
+  test("flags .github/README.md as a shadowing readme", () => {
+    expect(findShadowingRepositoryReadme(["README.md", ".github/README.md"])).toEqual([
+      ".github/README.md",
+    ]);
+    expect(findShadowingRepositoryReadme(["README.md", ".github/ABOUT.md"])).toEqual([]);
   });
 
   test("does not require documentation for generated directories", () => {

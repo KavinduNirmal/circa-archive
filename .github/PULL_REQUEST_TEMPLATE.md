@@ -4,7 +4,14 @@
 
 ## Related context
 
-<!-- Link an issue (e.g. Closes #123) or a specific design/specification section. -->
+<!-- Link an issue (e.g. Closes #123) or a specific specification section. -->
+
+## Target branch
+
+<!-- Mark the branch this PR targets. -->
+
+- [ ] `develop` for features, fixes, documentation, and maintenance.
+- [ ] `main` only for a `release/*` or `hotfix/*` branch, as described in [docs/GITFLOW.md](../docs/GITFLOW.md).
 
 ## Verification
 
@@ -20,7 +27,8 @@
 
 ## Checklist
 
-- [ ] I followed CONTRIBUTING.md and the repository style conventions.
-- [ ] I updated affected documentation and added relevant tests where executable behavior changes.
-- [ ] I reported verification accurately, including unavailable checks.
-- [ ] My contribution contains no secrets or private data, and I have permission to submit it under MIT.
+- [ ] I followed [CONTRIBUTING.md](../CONTRIBUTING.md) and the repository style conventions.
+- [ ] I updated affected documentation and added tests where executable behavior changes.
+- [ ] I reported verification accurately, including checks that could not run.
+- [ ] The change contains no secrets or private data, and I have permission to submit it under MIT.
+- [ ] Any new third-party asset or dependency is identified in `client/THIRD_PARTY_NOTICES.md` or `NOTICE`.

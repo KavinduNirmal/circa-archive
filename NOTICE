@@ -1,0 +1,25 @@
+# Third-party asset notice
+
+Original source code and documentation in this repository are licensed under the [MIT License](LICENSE). That license does not grant rights to the third-party material listed here.
+
+## Windows 98 icon set
+
+The shortcut and file-type bitmaps in `client/public/icons/` are Microsoft Windows 98 artwork, retrieved from the [Windows 98 Icon Viewer](https://win98icons.alexmeub.com/). They are included as placeholder shell art for a fictional interface. They are not MIT-licensed, and Microsoft does not grant redistribution rights through this repository.
+
+Replace these files with original artwork, or obtain a suitable license, before distributing a release or any package that contains them. The destination mapping and replacement notes are in [client/public/icons/README.md](client/public/icons/README.md).
+
+## Supplied wallpaper
+
+`client/public/Government_agency_emblem_seal_de…_2K_20261014194612.jpg` is the desktop wallpaper supplied with the project. Its provenance and license have not been confirmed. Treat it as excluded from the MIT grant and do not redistribute it until the rights are documented.
+
+## Fonts
+
+The bundled font packages under `client/node_modules/@fontsource/` retain their own license files. Check those licenses before redistributing a build that embeds the font files.
+
+## shadcn/ui
+
+The primitives in `client/src/components/ui/` are derived from [shadcn/ui](https://github.com/shadcn-ui/ui) under the MIT License. The required notice is reproduced in [client/THIRD_PARTY_NOTICES.md](client/THIRD_PARTY_NOTICES.md).
+
+## Retention
+
+Keep this notice and the notices referenced above with any redistribution of the repository or a build produced from it. If an asset is replaced, update this file and the relevant folder README in the same change.
