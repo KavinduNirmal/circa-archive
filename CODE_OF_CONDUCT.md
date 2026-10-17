@@ -12,8 +12,8 @@ Harassment, threats, discriminatory abuse, sexual harassment, personal attacks, 
 
 ## Reporting and enforcement
 
-Report concerns privately to a repository maintainer using a private contact they have explicitly published. Include relevant links, context, and the outcome you need. Avoid posting sensitive evidence in public issues. If no private contact is listed, request a reporting channel without sharing personal details. Maintainers must publish a private contact before opening community participation.
+Report concerns privately to the maintainer at **kavindunirmald@gmail.com**. Include relevant links, context, and the outcome you need. Avoid posting sensitive evidence in public issues.
 
 Maintainers will review reports, limit disclosure to those needed to address the concern, and explain the outcome when appropriate. Responses may include requesting an edit, removing content, a warning, temporary restrictions, or a permanent ban, depending on severity and repetition.
 
-Anyone involved in a report should step aside from reviewing it when another uninvolved maintainer is available. Appeals may be sent through the same private channel, with relevant new information. Response times depend on maintainer availability; no fixed response deadline is promised.
+Anyone involved in a report should step aside from reviewing it when another uninvolved maintainer is available. Appeals may be sent to the same address with relevant new information. Response times depend on maintainer availability; no fixed response deadline is promised.

@@ -1,0 +1,15 @@
+# Review routing for the repository.
+#
+# The project currently has one maintainer. Add specific paths here if another
+# reviewer takes ownership of an area; keep the catch-all last.
+
+* @KavinduNirmal
+
+/.github/ @KavinduNirmal
+/docs/ @KavinduNirmal
+/client/ @KavinduNirmal
+
+/CODE_OF_CONDUCT.md @KavinduNirmal
+/CONTRIBUTING.md @KavinduNirmal
+/LICENSE @KavinduNirmal
+/SECURITY.md @KavinduNirmal
