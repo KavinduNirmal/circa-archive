@@ -1,6 +1,7 @@
 "use client";
 
 import { Plus, Minus } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { childrenOf, isFolder, type FileNode } from "./files-index";
 import { folderIconUrl } from "./file-list";
 
@@ -24,12 +25,13 @@ export function FolderTree({ rootId, currentId, expanded, onToggle, onSelect, tr
   onSelect: (id: string) => void;
   tree: readonly FileNode[];
 }) {
+  const t = useTranslations("files");
   const root = tree.find((node) => node.id === rootId);
   if (!root) return null;
   return (
     <div className="files-treepane">
-      <div className="files-treepane-heading">Folders</div>
-      <ul className="files-tree" role="tree" aria-label="Folders">
+      <div className="files-treepane-heading">{t("folders")}</div>
+      <ul className="files-tree" role="tree" aria-label={t("folders")}>
         <TreeLevel id={rootId} currentId={currentId} expanded={expanded} onToggle={onToggle} onSelect={onSelect} tree={tree} />
       </ul>
     </div>
@@ -45,6 +47,7 @@ function TreeLevel({ id, currentId, expanded, onToggle, onSelect, tree }: {
   onSelect: (id: string) => void;
   tree: readonly FileNode[];
 }) {
+  const t = useTranslations("files");
   const node = tree.find((item) => item.id === id);
   if (!node) return null;
   const kids = childrenOf(id, tree).filter(isFolder);
@@ -59,7 +62,7 @@ function TreeLevel({ id, currentId, expanded, onToggle, onSelect, tree }: {
           folder's own name is already announced by the row beside it.
         */}
         {kids.length > 0 ? (
-          <button type="button" className="files-twisty" aria-label={`${open ? "Collapse" : "Expand"} ${node.name}`}
+          <button type="button" className="files-twisty" aria-label={open ? t("collapseFolder", { name: node.name }) : t("expandFolder", { name: node.name })}
             onClick={() => onToggle(id)}>
             {open
               ? <Minus className="files-twisty-glyph" aria-hidden="true" />

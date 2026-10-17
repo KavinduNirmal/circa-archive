@@ -1,51 +1,75 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { Dialog, Popover } from "radix-ui";
+import { Link } from "@/i18n/navigation";
 import { ArchiveBrowser } from "./browser/browser-window";
-import { BROWSER_WINDOW_TITLE } from "./browser/browser-identity";
 import { FileExplorer } from "./files/file-explorer";
-import { WORD_WINDOW_TITLE } from "./word/word-identity";
 import { WordWindow } from "./word/word-window";
-import { explorerTitle } from "./files/files-identity";
-import { MAIL_WINDOW_TITLE } from "./mail/mail-identity";
 import { MailWindow } from "./mail/mail-window";
-import { READER_WINDOW_TITLE } from "./reader/reader-identity";
+import { LanguageSwitcher } from "./language-switcher";
 import { useReaderSession } from "./reader/reader-session";
 import { RecordReader, type RecordTrail } from "./reader/reader-window";
 import { RecordFilingBody } from "./reader/record-filings";
 import { TaskbarWindows, WindowLayer, useWorkstationWindows } from "./window-manager";
 import { DesktopIcon, notificationGlyph, settingsGlyph, type DesktopIconSpec } from "./desktop-icons";
-import { DesktopNavigation, type DesktopDestination } from "./desktop-navigation";
+import {
+  DesktopNavigation,
+  allDestinations,
+  desktopLabel,
+  type DesktopCopy,
+  type DesktopDestination,
+  type DesktopEntry,
+} from "./desktop-navigation";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
 import "./workstation.css";
 
 const NotificationIcon = notificationGlyph;
 const SettingsIcon = settingsGlyph;
 
+type ShellTranslate = (key: string, values?: Record<string, string>) => string;
+
 /** A destination opened as a window, plus the copy its own status strip shows. */
 type DestinationWindow = { id: string; title: string; status: string | null; icon: DesktopIconSpec; detail: string | null };
 
 /**
- * Destinations the file browser hosts, and the folder each one opens.
+ * Destinations the file browser hosts.
  *
- * One explorer serves all of them: `scope` picks the root, the mount its status
- * bar claims, and the read-only reference it quotes. Everything the desktop
- * offers is either a folder here or an application with its own window.
+ * One explorer serves all of them. Each scope is the destination's own id,
+ * because the explorer roots its tree at the shortcut that opened it, and this
+ * set is what separates a folder from the three applications that bring their own
+ * window. Membership is structural, not copy, so it is the same in every
+ * language.
  */
-const EXPLORER_ROUTES: Record<string, { scope: string; title: string; initialPath?: string }> = {
-  "my-pc": { scope: "my-pc", title: explorerTitle("My Computer") },
-  records: { scope: "records", title: explorerTitle("My Documents") },
-  "my-work": { scope: "my-work", title: explorerTitle("My Work") },
-  archive: { scope: "archive", title: explorerTitle("Archive") },
-  organizations: { scope: "organizations", title: explorerTitle("Organizations") },
-  expunged: { scope: "expunged", title: explorerTitle("_EXPUNGED") },
-  recycle: { scope: "recycle", title: explorerTitle("Recycle Bin") },
-  system: { scope: "system", title: explorerTitle("System Files") },
-};
+const EXPLORER_SCOPES = new Set([
+  "my-pc", "records", "my-work", "archive", "organizations", "expunged", "recycle", "system",
+]);
+
+/**
+ * The name the file browser gives a folder.
+ *
+ * Two destinations are named differently by the explorer than by the desktop:
+ * the workstation root is a computer rather than "My PC", and System is a folder
+ * of files rather than a place. Everything else keeps its shortcut name.
+ */
+function explorerFolderName(t: ShellTranslate, entry: DesktopEntry): string {
+  if (entry.id === "my-pc") return t("explorerMyComputer");
+  if (entry.id === "system") return t("explorerSystemFiles");
+  return desktopLabel(t, entry);
+}
+
+/** Explorer is named for the folder it is showing, so the title is composed per destination. */
+function explorerTitle(t: ShellTranslate, entry: DesktopEntry): string {
+  return `${explorerFolderName(t, entry)} - ${t("explorerSuffix")}`;
+}
+
+function destinationFor(id: string): DesktopEntry | undefined {
+  return allDestinations.find((entry) => entry.id === id);
+}
 
 function WorkstationClock() {
+  const t = useTranslations("shell");
   const [now, setNow] = useState<Date | null>(null);
   useEffect(() => {
     const update = () => setNow(new Date());
@@ -53,54 +77,68 @@ function WorkstationClock() {
     const timer = window.setInterval(update, 1000);
     return () => window.clearInterval(timer);
   }, []);
+  /*
+   * The clock keeps the workstation's own format rather than the reader's: this
+   * is a machine readout in UTC, and a locale-dependent am/pm would change its
+   * width as the language changed.
+   */
   return <time dateTime={now?.toISOString()} className="workstation-clock">
     {now ? now.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", timeZone: "UTC" }) : "--:--"}
-    <span> UTC</span>
+    <span> {t("clockUtc")}</span>
   </time>;
 }
 
 /** Pinned task item. The reference keeps window buttons directly beside Start, so this sits left-aligned. */
 function SettingsTaskItem({ open, onOpen }: { open: boolean; onOpen: () => void }) {
+  const t = useTranslations("shell");
   return (
     <Tooltip>
       <TooltipTrigger asChild>
         <span className="taskbar-task-anchor">
-          <button className="taskbar-task" type="button" aria-label="Settings"
+          <button className="taskbar-task" type="button" aria-label={t("settingsTaskLabel")}
             data-open={open ? "true" : undefined} onClick={onOpen}>
             <SettingsIcon className="tray-glyph" />
-            <span>Settings</span>
+            <span>{t("settingsTaskLabel")}</span>
           </button>
         </span>
       </TooltipTrigger>
-      <TooltipContent className="circa-label" side="top">Workstation preferences</TooltipContent>
+      <TooltipContent className="circa-label" side="top">{t("settingsTaskHint")}</TooltipContent>
     </Tooltip>
   );
 }
 
-/** Right-hand tray, beside the clock. */
+/**
+ * Right-hand tray, beside the clock.
+ *
+ * The language switcher lives here because it is a machine-level preference the
+ * reader may need without opening Settings, and because the tray is where the
+ * workstation already keeps its standing controls.
+ */
 function TaskbarTray() {
+  const t = useTranslations("shell");
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   return (
     <>
       <div className="taskbar-tray">
+        <LanguageSwitcher className="tray-language" />
         <Tooltip>
           <TooltipTrigger asChild>
             <span className="tray-anchor">
               <Popover.Root open={notificationsOpen} onOpenChange={setNotificationsOpen}>
-                <Popover.Trigger className="tray-button" aria-label="Notifications">
+                <Popover.Trigger className="tray-button" aria-label={t("notificationsLabel")}>
                   <NotificationIcon className="tray-glyph" />
                 </Popover.Trigger>
                 <Popover.Portal>
                   <Popover.Content className="tray-panel circa-raised" side="top" align="end" sideOffset={8}>
-                    <div className="tray-heading">NOTIFICATIONS</div>
+                    <div className="tray-heading">{t("notificationsHeading")}</div>
                     {/* TODO: Replace with real notification delivery when the backend exists. */}
-                    <p className="tray-note">Notifications are not connected yet.</p>
+                    <p className="tray-note">{t("notificationsEmpty")}</p>
                   </Popover.Content>
                 </Popover.Portal>
               </Popover.Root>
             </span>
           </TooltipTrigger>
-          <TooltipContent className="circa-label" side="top">Notifications</TooltipContent>
+          <TooltipContent className="circa-label" side="top">{t("notificationsLabel")}</TooltipContent>
         </Tooltip>
       </div>
       <WorkstationClock />
@@ -115,22 +153,28 @@ function SettingsDialog({ open, onOpenChange, screenFilter, onToggleScreenFilter
   screenFilter: boolean;
   onToggleScreenFilter: (next: boolean) => void;
 }) {
+  const t = useTranslations("shell");
+  const tSwitcher = useTranslations("switcher");
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
         <Dialog.Overlay className="settings-backdrop" />
         <Dialog.Content className="settings-window circa-raised">
           <div className="settings-titlebar">
-            <Dialog.Title>Settings</Dialog.Title>
-            <Dialog.Close className="settings-close circa-raised" aria-label="Close settings">×</Dialog.Close>
+            <Dialog.Title>{t("settingsTitle")}</Dialog.Title>
+            <Dialog.Close className="settings-close circa-raised" aria-label={t("settingsClose")}>×</Dialog.Close>
           </div>
-          <Dialog.Description className="settings-intro">Workstation preferences. Only screen surface options respond in this preview.</Dialog.Description>
+          <Dialog.Description className="settings-intro">{t("settingsIntro")}</Dialog.Description>
           <label className="settings-option">
             <input type="checkbox" className="settings-checkbox" checked={screenFilter}
               onChange={(event) => onToggleScreenFilter(event.target.checked)} />
-            <span>CRT screen filter</span>
+            <span>{t("settingsScreenFilter")}</span>
           </label>
-          <p className="settings-note">Wallpaper, sound, and session preferences are not connected yet.</p>
+          <p className="settings-note">{t("settingsNote")}</p>
+          <div className="settings-language-row">
+            <span>{tSwitcher("label")}</span>
+            <LanguageSwitcher className="settings-language" />
+          </div>
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>
@@ -138,6 +182,7 @@ function SettingsDialog({ open, onOpenChange, screenFilter, onToggleScreenFilter
 }
 
 export function DesktopShell() {
+  const t = useTranslations("shell");
   const [startOpen, setStartOpen] = useState(false);
   const [screenFilter, setScreenFilter] = useState(true);
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -170,22 +215,22 @@ export function DesktopShell() {
   }, [lastFocused]);
 
   /** Opens a desktop shortcut as a window, naming the entry for the titlebar and status strip. */
-  function openFolder(folder: DesktopDestination, trigger?: HTMLButtonElement) {
+  function openFolder(folder: DesktopDestination, copy: DesktopCopy, trigger?: HTMLButtonElement) {
     // An application that names its own window and prints its own status bar
     // drops the frame's generic strip rather than stacking a second one on it.
-    const titles: Partial<Record<string, string>> = {
-      search: BROWSER_WINDOW_TITLE,
-      inbox: MAIL_WINDOW_TITLE,
-      write: WORD_WINDOW_TITLE,
+    const applicationTitles: Partial<Record<string, string>> = {
+      search: t("browserTitle"),
+      inbox: t("mailTitle"),
+      write: t("wordTitle"),
     };
-    const route = EXPLORER_ROUTES[folder.id];
-    const title = titles[folder.id] ?? route?.title;
+    const entry = destinationFor(folder.id);
+    const title = applicationTitles[folder.id] ?? (entry ? explorerTitle(t, entry) : undefined);
     openWindow({
       id: folder.id,
-      title: title ?? folder.label,
-      status: title ? null : folder.detail ?? "LOCATION",
+      title: title ?? copy.label,
+      status: title ? null : copy.detail || t("locationStatus"),
       icon: folder.icon,
-      detail: folder.detail,
+      detail: copy.detail,
     }, trigger);
   }
 
@@ -213,7 +258,7 @@ export function DesktopShell() {
       const codes = [...current.codes.slice(0, current.at + 1), code];
       return { codes, at: codes.length - 1 };
     });
-    openWindow({ id: "reader", title: READER_WINDOW_TITLE, status: null, icon: { glyph: "reader" }, detail: null }, undefined, true);
+    openWindow({ id: "reader", title: t("readerTitle"), status: null, icon: { glyph: "reader" }, detail: null }, undefined, true);
   }
 
   /** Reads along the trail the viewer already has. */
@@ -283,24 +328,23 @@ export function DesktopShell() {
       return <WordWindow onCloseWindow={() => closeWindow(id)} />;
     }
     // Every folder destination is the file browser, rooted at that destination.
-    const route = EXPLORER_ROUTES[id];
-    if (route) {
-      return <FileExplorer scopeId={route.scope} initialPath={route.initialPath} onCloseWindow={() => closeWindow(id)} />;
+    if (EXPLORER_SCOPES.has(id)) {
+      return <FileExplorer scopeId={id} onCloseWindow={() => closeWindow(id)} />;
     }
     const detail = windows.find((item) => item.id === id)?.status ?? null;
     return (
       <div className="window-pane window-pane-empty">
-        <h2>Coming soon</h2>
+        <h2>{t("emptyTitle")}</h2>
         {/* TODO: Connect each destination when its application screen is implemented. */}
-        <p className="window-note">This folder is not connected yet.</p>
-        {detail && detail !== "LOCATION" && <p>{detail} will appear here.</p>}
-        <p className="window-hint">Drag the titlebar to move this window. Use the corner to resize it.</p>
+        <p className="window-note">{t("emptyNote")}</p>
+        {detail && detail !== t("locationStatus") && <p>{t("emptyDetail", { detail })}</p>}
+        <p className="window-hint">{t("emptyHint")}</p>
       </div>
     );
   }
 
   return (
-    <main className="desktop-shell" aria-label="CIRCA desktop" ref={shellRef}>
+    <main className="desktop-shell" aria-label={t("desktopLabel")} ref={shellRef}>
       <TooltipProvider>
         <div className="desktop-wallpaper" aria-hidden="true" />
         <div className="desktop-area" ref={areaRef} tabIndex={-1}>
@@ -317,17 +361,17 @@ export function DesktopShell() {
             onGeometryChange={setGeometry}
           />
         </div>
-        <footer className="desktop-taskbar" aria-label="Taskbar">
+        <footer className="desktop-taskbar" aria-label={t("taskbarLabel")}>
           <Popover.Root open={startOpen} onOpenChange={setStartOpen}>
-            <Popover.Trigger ref={startTrigger} className="taskbar-start circa-raised" aria-label="Start">
-              <span className="start-symbol" aria-hidden="true">▦</span> START
+            <Popover.Trigger ref={startTrigger} className="taskbar-start circa-raised" aria-label={t("startLabel")}>
+              <span className="start-symbol" aria-hidden="true">▦</span> {t("start")}
             </Popover.Trigger>
             <Popover.Portal>
               <Popover.Content className="start-panel circa-raised" side="top" align="start" sideOffset={8}
                 onCloseAutoFocus={(event) => { if (windows.length > 0) event.preventDefault(); }}>
-                <div className="start-heading">CIRCA/OS <span>APPLICATIONS</span></div>
+                <div className="start-heading">{t("startHeading")} <span>{t("startHeadingNote")}</span></div>
                 <DesktopNavigation compact onOpen={openFolder} activeId={lastFocused ?? undefined} />
-                <p className="start-note">Application contents coming soon.</p>
+                <p className="start-note">{t("startNote")}</p>
                 {/*
                   The one way out of the fiction. The workstation is reached from
                   the public landing page, so leaving it has to be a real control
@@ -336,8 +380,8 @@ export function DesktopShell() {
                 <Link className="start-public" href="/">
                   <DesktopIcon icon={{ glyph: "public" }} />
                   <span className="start-public-copy">
-                    <span className="start-public-title">Public archive site</span>
-                    <span className="start-public-note">Project record and contributing</span>
+                    <span className="start-public-title">{t("publicSiteTitle")}</span>
+                    <span className="start-public-note">{t("publicSiteNote")}</span>
                   </span>
                 </Link>
               </Popover.Content>

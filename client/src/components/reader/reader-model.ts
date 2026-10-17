@@ -14,6 +14,17 @@
 
 import type { ArchiveClass, ArchiveStatus } from "../browser/archive-index";
 
+/**
+ * A word lookup, in the shape `next-intl`'s `useTranslations` returns.
+ *
+ * The model holds the structure — which arrangements, which faces, which sizes,
+ * which points on the scale — and the catalogs in `messages/{en,ko}/reader.json`
+ * hold the words for each language. The model never asks what language it is in
+ * and never imports React: the frame hands it a translator whenever it asks for
+ * a word, so the frame stays the only thing that knows who is reading.
+ */
+export type ReaderTranslate = (key: string, values?: Record<string, string | number>) => string;
+
 /* ------------------------------------------------------------------------- */
 /* View and scale                                                             */
 /* ------------------------------------------------------------------------- */
@@ -23,14 +34,14 @@ export type ReaderView = "single" | "continuous" | "two-up";
 
 export const READER_VIEWS: readonly ReaderView[] = ["single", "continuous", "two-up"];
 
-const VIEW_LABELS: Record<ReaderView, string> = {
-  single: "Single page",
-  continuous: "Continuous",
-  "two-up": "Two-up",
+const VIEW_KEYS: Record<ReaderView, string> = {
+  single: "viewSingle",
+  continuous: "viewContinuous",
+  "two-up": "viewTwoUp",
 };
 
-export function viewLabel(view: ReaderView): string {
-  return VIEW_LABELS[view];
+export function viewLabel(view: ReaderView, t: ReaderTranslate): string {
+  return t(VIEW_KEYS[view]);
 }
 
 export const SCALE_MIN = 80;
@@ -81,15 +92,15 @@ export type ReaderFont = "courier" | "sans" | "serif" | "mono";
 
 export const READER_FONTS: readonly ReaderFont[] = ["courier", "sans", "serif", "mono"];
 
-const FONT_LABELS: Record<ReaderFont, string> = {
-  courier: "Courier",
-  sans: "Sans serif",
-  serif: "Serif",
-  mono: "Monospaced",
+const FONT_KEYS: Record<ReaderFont, string> = {
+  courier: "fontCourier",
+  sans: "fontSans",
+  serif: "fontSerif",
+  mono: "fontMono",
 };
 
-export function fontLabel(font: ReaderFont): string {
-  return FONT_LABELS[font];
+export function fontLabel(font: ReaderFont, t: ReaderTranslate): string {
+  return t(FONT_KEYS[font]);
 }
 
 /**
@@ -107,12 +118,15 @@ export const FONT_STACKS: Record<ReaderFont, string> = {
  * The sizes the Text menu offers. They are presets over the same value the
  * toolbar's scale buttons step through, rather than a second size of their own:
  * one number, two ways to reach it.
+ *
+ * `key` names the printed size in the catalogs. The number stays here, because
+ * the scale is the reader's own setting rather than a word about it.
  */
-export const DOCUMENT_SIZES: readonly { scale: number; label: string }[] = [
-  { scale: 80, label: "Small" },
-  { scale: 100, label: "Regular" },
-  { scale: 120, label: "Large" },
-  { scale: 140, label: "Extra large" },
+export const DOCUMENT_SIZES: readonly { scale: number; key: string }[] = [
+  { scale: 80, key: "sizeSmall" },
+  { scale: 100, key: "sizeRegular" },
+  { scale: 120, key: "sizeLarge" },
+  { scale: 140, key: "sizeExtraLarge" },
 ];
 
 /* ------------------------------------------------------------------------- */
@@ -120,11 +134,32 @@ export const DOCUMENT_SIZES: readonly { scale: number; label: string }[] = [
 /* ------------------------------------------------------------------------- */
 
 /**
+ * The mark that stands for the absence of a judgement.
+ *
+ * It is not a word, so it is never looked up in a catalog: it is printed as it
+ * stands, in every language, because what it says is that there is nothing to
+ * print yet.
+ */
+export const ASSESSMENT_MARK = "—";
+
+/**
  * The quality scale, as five points of institutional judgement rather than
  * stars. Index 0 is the absence of an assessment, which is what a record that
- * nobody has reviewed reads as.
+ * nobody has reviewed reads as; the other four are catalog keys, because the
+ * words are the reader's rather than the scale's.
  */
-export const ASSESSMENT_SCALE: readonly string[] = ["—", "Marginal", "Adequate", "Sound", "Exemplary"];
+export const ASSESSMENT_SCALE: readonly string[] = [
+  ASSESSMENT_MARK,
+  "assessmentMarginal",
+  "assessmentAdequate",
+  "assessmentSound",
+  "assessmentExemplary",
+];
+
+/** What one point of the assessment scale prints: the mark stands for itself. */
+export function assessmentLabel(point: string, t: ReaderTranslate): string {
+  return point === ASSESSMENT_MARK ? point : t(point);
+}
 
 /**
  * How many of a record's follow-ups the strip will list in one direction.
@@ -232,10 +267,10 @@ export function matchRanges(text: string, query: string): TextMatch[] {
   return ranges;
 }
 
-/** What the toolbar's search readout says, in the reader's own voice. */
-export function describeMatches(count: number, query: string): string {
+/** What the toolbar's search readout says, in the reader's own voice and tongue. */
+export function describeMatches(count: number, query: string, t: ReaderTranslate): string {
   const term = query.trim();
   if (!term) return "";
-  if (count === 0) return `No matches for ${term}.`;
-  return `${count} match${count === 1 ? "" : "es"} for ${term}.`;
+  if (count === 0) return t("matchesNone", { term });
+  return t("matchesFound", { count, term });
 }

@@ -41,6 +41,7 @@ export type ArchiveQuery = {
 export const ARCHIVE_ADDRESS = "http://archive.circa.local/index.htm";
 
 export const ARCHIVE_CLASSES: readonly ArchiveClass[] = ["incident", "organization", "continuity", "memo"];
+export const ARCHIVE_STATUSES: readonly ArchiveStatus[] = ["on-file", "contested", "sealed", "restricted", "erased"];
 export const ARCHIVE_PERIODS: readonly ArchivePeriod[] = ["any", "current", "recent", "historical"];
 
 export const CLASS_LABELS: Record<ArchiveClass, string> = {
@@ -57,6 +58,22 @@ export const STATUS_LABELS: Record<ArchiveStatus, string> = {
   restricted: "Restricted",
   erased: "Erased",
 };
+
+/**
+ * The words a reader sees for an entry's class and status.
+ *
+ * A class and a status are drawn as words, so a query has to match the words on
+ * screen; which language those are is decided above this module, which is why
+ * the vocabulary is handed in rather than read from the constants below. Plain
+ * strings keep this module free of any rendering concern.
+ */
+export type ArchiveVocabulary = {
+  classes: Record<ArchiveClass, string>;
+  statuses: Record<ArchiveStatus, string>;
+};
+
+/** What the English interface prints, so a call that names no vocabulary searches what it shows. */
+const DEFAULT_VOCABULARY: ArchiveVocabulary = { classes: CLASS_LABELS, statuses: STATUS_LABELS };
 
 export const PERIOD_LABELS: Record<ArchivePeriod, string> = {
   any: "Any time",
@@ -131,15 +148,22 @@ export const ARCHIVE_INDEX: readonly ArchiveEntry[] = [
     "Denied for cause. The requesting analyst's later filings are filed under a different lens."),
 ];
 
-/** Everything the index lets a query match against, lower-cased once per call. */
-function searchableText(item: ArchiveEntry): string {
+/**
+ * Everything the index lets a query match against, lower-cased once per call.
+ *
+ * The class and status words come from the vocabulary rather than from the
+ * constants, so a Korean reader who can see 봉인됨 can also search for it.
+ * Filing periods are not part of the haystack: a period is a filter, never a
+ * word printed against an entry.
+ */
+function searchableText(item: ArchiveEntry, vocabulary: ArchiveVocabulary): string {
   return [
     item.code,
     item.designation ?? "",
     item.organization,
     item.abstract,
-    CLASS_LABELS[item.klass],
-    STATUS_LABELS[item.status],
+    vocabulary.classes[item.klass],
+    vocabulary.statuses[item.status],
   ].join(" ").toLowerCase();
 }
 
@@ -156,14 +180,22 @@ function rank(item: ArchiveEntry, text: string): number {
  * Filters the index by text, class, and filing period, then orders the result:
  * code hits first, then newest filing first, then archive order. An empty query
  * with no filters lists the whole index, which is what the index links use.
+ *
+ * `vocabulary` is the language the screen is printed in; it defaults to the
+ * English words, so a caller that names none — the English interface, and the
+ * model's own tests — searches exactly what it always searched.
  */
-export function searchArchive(query: ArchiveQuery, index: readonly ArchiveEntry[] = ARCHIVE_INDEX): ArchiveEntry[] {
+export function searchArchive(
+  query: ArchiveQuery,
+  index: readonly ArchiveEntry[] = ARCHIVE_INDEX,
+  vocabulary: ArchiveVocabulary = DEFAULT_VOCABULARY,
+): ArchiveEntry[] {
   const text = query.text.trim().toLowerCase();
   const range = query.period === "any" ? null : PERIOD_RANGE[query.period];
   return index
     .filter((item) => query.klass === "all" || item.klass === query.klass)
     .filter((item) => !range || (item.filed >= range[0] && item.filed <= range[1]))
-    .filter((item) => !text || searchableText(item).includes(text))
+    .filter((item) => !text || searchableText(item, vocabulary).includes(text))
     .map((item, position) => ({ item, position, hit: rank(item, text) }))
     .sort((a, b) => b.hit - a.hit
       || b.item.filed.localeCompare(a.item.filed)

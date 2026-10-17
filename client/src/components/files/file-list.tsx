@@ -1,6 +1,7 @@
 "use client";
 
 import { ChevronDown, ChevronUp, ChevronsUpDown } from "lucide-react";
+import { useTranslations } from "next-intl";
 import {
   FILE_TYPES,
   FOLDER_ICONS,
@@ -10,7 +11,6 @@ import {
   formatModified,
   formatSize,
   isFolder,
-  sortKeyLabel,
   type FileNode,
   type FileSortKey,
   type FileView,
@@ -40,6 +40,22 @@ export function folderIconUrl(open: boolean): string {
 }
 
 /**
+ * Where each column's name comes from.
+ *
+ * `files-index.ts` carries the tree and the sort keys, not the interface copy:
+ * the label above a column and the label on a Sort by item are what the chrome
+ * prints, so the names live in the `files` catalog and this record only maps a
+ * sort key to its catalog key. A record rather than a key built from the sort
+ * key, because the catalog is flat and camelCase.
+ */
+export const SORT_LABEL_KEYS: Record<FileSortKey, string> = {
+  name: "sortName",
+  type: "sortType",
+  size: "sortSize",
+  modified: "sortModified",
+};
+
+/**
  * The details columns after the name cell, which is drawn separately because it
  * carries the icon and the open control.
  *
@@ -48,9 +64,7 @@ export function folderIconUrl(open: boolean): string {
  * the cells printed name, size, type, so every value sat under the wrong
  * heading. Reading one list twice is what makes that impossible.
  */
-const COLUMNS: readonly { key: FileSortKey; label: string }[] = SORT_KEYS
-  .filter((key) => key !== "name")
-  .map((key) => ({ key, label: sortKeyLabel(key) }));
+const COLUMNS: readonly FileSortKey[] = SORT_KEYS.filter((key) => key !== "name");
 
 /**
  * The listing, in the three layouts the View menu offers.
@@ -71,6 +85,7 @@ export function FileList({ view, nodes, sort, direction, selected, openFolder, o
   onToggleSelected: (node: FileNode, next: boolean) => void;
   onSort: (key: FileSortKey) => void;
 }) {
+  const t = useTranslations("files");
   const isSelected = (id: string) => selected.includes(id);
   /** Enter or Space opens the focused node, which is how a mouse double-click behaves. */
   const keyOpen = (node: FileNode) => (event: React.KeyboardEvent) => {
@@ -82,7 +97,7 @@ export function FileList({ view, nodes, sort, direction, selected, openFolder, o
   if (view === "icons") {
     return (
       <div className="files-listing" data-view="icons">
-        <ul className="files-icons" role="list" aria-label="Files">
+        <ul className="files-icons" role="list" aria-label={t("files")}>
           {nodes.map((node) => (
             <li key={node.id}>
               <button type="button" className="files-icon" data-node={node.id} aria-pressed={isSelected(node.id)}
@@ -101,7 +116,7 @@ export function FileList({ view, nodes, sort, direction, selected, openFolder, o
   if (view === "list") {
     return (
       <div className="files-listing" data-view="list">
-        <ul className="files-rows" role="list" aria-label="Files">
+        <ul className="files-rows" role="list" aria-label={t("files")}>
           {nodes.map((node) => (
             <li key={node.id}>
               <button type="button" className="files-row" data-node={node.id} aria-pressed={isSelected(node.id)}
@@ -119,24 +134,24 @@ export function FileList({ view, nodes, sort, direction, selected, openFolder, o
 
   return (
     <div className="files-listing" data-view="details">
-      <table className="files-table" role="grid" aria-label="Files" data-nodes={nodes.length}>
+      <table className="files-table" role="grid" aria-label={t("files")} data-nodes={nodes.length}>
         <thead>
           <tr>
-            <th scope="col" className="files-col-check" aria-label="Selection" />
+            <th scope="col" className="files-col-check" aria-label={t("selectionColumn")} />
             {/* The name header sorts the listing but has no cell in the body loop. */}
             <th scope="col" className="files-col-name" aria-sort={sort === "name" ? direction : "none"}>
               <button type="button" className="files-sort" data-active={sort === "name" ? "true" : undefined} onClick={() => onSort("name")}>
                 <SortGlyph active={sort === "name"} direction={direction} />
-                <span className="files-sort-label">{sortKeyLabel("name")}</span>
+                <span className="files-sort-label">{t(SORT_LABEL_KEYS.name)}</span>
               </button>
             </th>
             {COLUMNS.map((column) => (
-              <th key={column.key} scope="col" className={`files-col-${column.key}`}
-                aria-sort={sort === column.key ? direction : "none"}>
-                <button type="button" className="files-sort" data-active={sort === column.key ? "true" : undefined}
-                  onClick={() => onSort(column.key)}>
-                  <SortGlyph active={sort === column.key} direction={direction} />
-                  <span className="files-sort-label">{column.label}</span>
+              <th key={column} scope="col" className={`files-col-${column}`}
+                aria-sort={sort === column ? direction : "none"}>
+                <button type="button" className="files-sort" data-active={sort === column ? "true" : undefined}
+                  onClick={() => onSort(column)}>
+                  <SortGlyph active={sort === column} direction={direction} />
+                  <span className="files-sort-label">{t(SORT_LABEL_KEYS[column])}</span>
                 </button>
               </th>
             ))}
@@ -147,7 +162,7 @@ export function FileList({ view, nodes, sort, direction, selected, openFolder, o
             <tr key={node.id} className="files-tr" data-node={node.id} aria-selected={isSelected(node.id)}>
               <td className="files-col-check">
                 <input type="checkbox" className="files-check" checked={isSelected(node.id)}
-                  aria-label={`Select ${node.name}`} onChange={(event) => onToggleSelected(node, event.target.checked)} />
+                  aria-label={t("selectNode", { name: node.name })} onChange={(event) => onToggleSelected(node, event.target.checked)} />
               </td>
               <td className="files-namecell">
                 {/*
@@ -170,11 +185,11 @@ export function FileList({ view, nodes, sort, direction, selected, openFolder, o
                 </span>
               </td>
               {COLUMNS.map((column) => (
-                <td key={column.key} className={`files-col-${column.key}`}>
-                  {column.key === "size"
-                    ? (isFolder(node) ? countLabel(node.id) : formatSize(node.size))
-                    : column.key === "type"
-                      ? describeNode(node)
+                <td key={column} className={`files-col-${column}`}>
+                  {column === "size"
+                    ? (isFolder(node) ? countLabel(node.id, t) : formatSize(node.size))
+                    : column === "type"
+                      ? describeNode(node, t)
                       : formatModified(node)}
                 </td>
               ))}

@@ -5,8 +5,10 @@ import {
   FolderCog, Info, RotateCw, Scissors, Trash2, Undo2, List, LayoutGrid, Table2,
 } from "lucide-react";
 import { Menubar } from "radix-ui";
+import { useTranslations } from "next-intl";
 import { EXPLORER_NAME } from "./files-identity";
-import { SORT_KEYS, sortKeyLabel, type FileSortKey, type FileView, type SortDirection } from "./files-index";
+import { SORT_LABEL_KEYS } from "./file-list";
+import { SORT_KEYS, type FileSortKey, type FileView, type SortDirection } from "./files-index";
 import "../ui/menubar.css";
 
 /** Every chrome action the explorer owns, handed to the menu and the toolbar together. */
@@ -34,18 +36,20 @@ export type FileActions = {
 
 export type FileViewState = { view: FileView; sort: FileSortKey; direction: SortDirection };
 
-const VIEWS: readonly { id: FileView; label: string }[] = [
-  { id: "icons", label: "Large Icons" },
-  { id: "list", label: "List" },
-  { id: "details", label: "Details" },
+/** The three layouts, paired with the catalog keys that name them. */
+const VIEWS: readonly { id: FileView; key: string }[] = [
+  { id: "icons", key: "viewLargeIcons" },
+  { id: "list", key: "viewList" },
+  { id: "details", key: "viewDetails" },
 ];
 
-const FAVOURITES: readonly { id: string; label: string }[] = [
-  { id: "pc-drive", label: "MY COMPUTER" },
-  { id: "dir-documents", label: "My Documents" },
-  { id: "dir-archive", label: "Archive" },
-  { id: "dir-organizations", label: "Organizations" },
-  { id: "dir-system", label: "System Files" },
+/** The Go menu's favourites, paired with the catalog keys that name them. */
+const FAVOURITES: readonly { id: string; key: string }[] = [
+  { id: "pc-drive", key: "menuMyComputer" },
+  { id: "dir-documents", key: "placeMyDocuments" },
+  { id: "dir-archive", key: "placeArchive" },
+  { id: "dir-organizations", key: "placeOrganizations" },
+  { id: "dir-system", key: "placeSystemFiles" },
 ];
 
 /**
@@ -62,95 +66,96 @@ export function FileMenu({ state, setState, canGoBack, canGoForward, canGoUp, ac
   canGoUp: boolean;
   actions: FileActions;
 }) {
+  const t = useTranslations("files");
   return (
-    <Menubar.Root className="circa-menubar" aria-label="File browser menu">
+    <Menubar.Root className="circa-menubar" aria-label={t("menubarLabel")}>
       <Menubar.Menu>
-        <Menubar.Trigger className="circa-menutitle">File</Menubar.Trigger>
+        <Menubar.Trigger className="circa-menutitle">{t("menuFile")}</Menubar.Trigger>
         <Menubar.Portal>
           <Menubar.Content className="circa-menu" align="start" sideOffset={0}>
             <Menubar.Item className="circa-menuitem" data-restricted="true" onSelect={actions.policies.create}>
-              New folder<span className="circa-menurestricted">restricted</span>
+              {t("newFolder")}<span className="circa-menurestricted">{t("restricted")}</span>
             </Menubar.Item>
             <Menubar.Separator className="circa-menuseparator" />
             <Menubar.Item className="circa-menuitem" data-restricted="true" onSelect={actions.policies.rename}>
-              Rename<span className="circa-menurestricted">restricted</span>
+              {t("rename")}<span className="circa-menurestricted">{t("restricted")}</span>
             </Menubar.Item>
             <Menubar.Item className="circa-menuitem" data-restricted="true" onSelect={actions.policies.delete}>
-              Delete<span className="circa-menurestricted">restricted</span>
+              {t("delete")}<span className="circa-menurestricted">{t("restricted")}</span>
             </Menubar.Item>
             <Menubar.Separator className="circa-menuseparator" />
             <Menubar.Item className="circa-menuitem" onSelect={actions.policies.properties}>
-              Properties
+              {t("properties")}
             </Menubar.Item>
             <Menubar.Separator className="circa-menuseparator" />
-            <Menubar.Item className="circa-menuitem" onSelect={actions.close}>Close window</Menubar.Item>
+            <Menubar.Item className="circa-menuitem" onSelect={actions.close}>{t("closeWindow")}</Menubar.Item>
           </Menubar.Content>
         </Menubar.Portal>
       </Menubar.Menu>
 
       <Menubar.Menu>
-        <Menubar.Trigger className="circa-menutitle">Edit</Menubar.Trigger>
+        <Menubar.Trigger className="circa-menutitle">{t("menuEdit")}</Menubar.Trigger>
         <Menubar.Portal>
           <Menubar.Content className="circa-menu" align="start" sideOffset={0}>
             <Menubar.Item className="circa-menuitem" onSelect={actions.selectAll}>
-              Select all<span className="circa-menukey">Ctrl+A</span>
+              {t("selectAll")}<span className="circa-menukey">Ctrl+A</span>
             </Menubar.Item>
             <Menubar.Item className="circa-menuitem" onSelect={actions.invert}>
-              Invert selection
+              {t("invertSelection")}
             </Menubar.Item>
             <Menubar.Separator className="circa-menuseparator" />
             <Menubar.Item className="circa-menuitem" data-restricted="true" onSelect={actions.policies.clipboard}>
-              Cut<span className="circa-menurestricted">restricted</span>
+              {t("cut")}<span className="circa-menurestricted">{t("restricted")}</span>
             </Menubar.Item>
             <Menubar.Item className="circa-menuitem" data-restricted="true" onSelect={actions.policies.clipboard}>
-              Copy<span className="circa-menurestricted">restricted</span>
+              {t("copy")}<span className="circa-menurestricted">{t("restricted")}</span>
             </Menubar.Item>
             <Menubar.Item className="circa-menuitem" data-restricted="true" onSelect={actions.policies.clipboard}>
-              Paste<span className="circa-menurestricted">restricted</span>
+              {t("paste")}<span className="circa-menurestricted">{t("restricted")}</span>
             </Menubar.Item>
           </Menubar.Content>
         </Menubar.Portal>
       </Menubar.Menu>
 
       <Menubar.Menu>
-        <Menubar.Trigger className="circa-menutitle">View</Menubar.Trigger>
+        <Menubar.Trigger className="circa-menutitle">{t("menuView")}</Menubar.Trigger>
         <Menubar.Portal>
           <Menubar.Content className="circa-menu" align="start" sideOffset={0}>
             <Menubar.Item className="circa-menuitem" onSelect={actions.refresh}>
-              Refresh<span className="circa-menukey">F5</span>
+              {t("refresh")}<span className="circa-menukey">F5</span>
             </Menubar.Item>
             <Menubar.Separator className="circa-menuseparator" />
             <Menubar.RadioGroup value={state.view} onValueChange={(value) => setState({ view: value as FileView })}>
               {VIEWS.map((view) => (
-                <Menubar.RadioItem key={view.id} className="circa-menuitem" value={view.id}>{view.label}</Menubar.RadioItem>
+                <Menubar.RadioItem key={view.id} className="circa-menuitem" value={view.id}>{t(view.key)}</Menubar.RadioItem>
               ))}
             </Menubar.RadioGroup>
             <Menubar.Separator className="circa-menuseparator" />
-            <Menubar.Label className="circa-menulabel">Sort by</Menubar.Label>
+            <Menubar.Label className="circa-menulabel">{t("sortBy")}</Menubar.Label>
             <Menubar.RadioGroup value={state.sort} onValueChange={(value) => setState({ sort: value as FileSortKey })}>
               {SORT_KEYS.map((key) => (
-                <Menubar.RadioItem key={key} className="circa-menuitem" value={key}>{sortKeyLabel(key)}</Menubar.RadioItem>
+                <Menubar.RadioItem key={key} className="circa-menuitem" value={key}>{t(SORT_LABEL_KEYS[key])}</Menubar.RadioItem>
               ))}
             </Menubar.RadioGroup>
             <Menubar.Separator className="circa-menuseparator" />
             <Menubar.Item className="circa-menuitem" onSelect={() => setState({ direction: state.direction === "ascending" ? "descending" : "ascending" })}>
-              {state.direction === "ascending" ? "Descending order" : "Ascending order"}
+              {state.direction === "ascending" ? t("descendingOrder") : t("ascendingOrder")}
             </Menubar.Item>
           </Menubar.Content>
         </Menubar.Portal>
       </Menubar.Menu>
 
       <Menubar.Menu>
-        <Menubar.Trigger className="circa-menutitle">Go</Menubar.Trigger>
+        <Menubar.Trigger className="circa-menutitle">{t("menuGo")}</Menubar.Trigger>
         <Menubar.Portal>
           <Menubar.Content className="circa-menu" align="start" sideOffset={0}>
-            <Menubar.Item className="circa-menuitem" disabled={!canGoBack} onSelect={actions.back}>Back</Menubar.Item>
-            <Menubar.Item className="circa-menuitem" disabled={!canGoForward} onSelect={actions.forward}>Forward</Menubar.Item>
-            <Menubar.Item className="circa-menuitem" disabled={!canGoUp} onSelect={actions.up}>Up one level</Menubar.Item>
+            <Menubar.Item className="circa-menuitem" disabled={!canGoBack} onSelect={actions.back}>{t("back")}</Menubar.Item>
+            <Menubar.Item className="circa-menuitem" disabled={!canGoForward} onSelect={actions.forward}>{t("forward")}</Menubar.Item>
+            <Menubar.Item className="circa-menuitem" disabled={!canGoUp} onSelect={actions.up}>{t("upOneLevel")}</Menubar.Item>
             <Menubar.Separator className="circa-menuseparator" />
             {FAVOURITES.map((place) => (
               <Menubar.Item key={place.id} className="circa-menuitem" onSelect={() => actions.goTo(place.id)}>
-                {place.label}
+                {t(place.key)}
               </Menubar.Item>
             ))}
           </Menubar.Content>
@@ -158,12 +163,12 @@ export function FileMenu({ state, setState, canGoBack, canGoForward, canGoUp, ac
       </Menubar.Menu>
 
       <Menubar.Menu>
-        <Menubar.Trigger className="circa-menutitle">Help</Menubar.Trigger>
+        <Menubar.Trigger className="circa-menutitle">{t("menuHelp")}</Menubar.Trigger>
         <Menubar.Portal>
           <Menubar.Content className="circa-menu" align="start" sideOffset={0}>
-            <Menubar.Item className="circa-menuitem" onSelect={actions.policies.policy}>Storage policy</Menubar.Item>
+            <Menubar.Item className="circa-menuitem" onSelect={actions.policies.policy}>{t("storagePolicy")}</Menubar.Item>
             <Menubar.Separator className="circa-menuseparator" />
-            <Menubar.Item className="circa-menuitem" onSelect={actions.policies.about}>About {EXPLORER_NAME}</Menubar.Item>
+            <Menubar.Item className="circa-menuitem" onSelect={actions.policies.about}>{t("aboutExplorer", { name: EXPLORER_NAME })}</Menubar.Item>
           </Menubar.Content>
         </Menubar.Portal>
       </Menubar.Menu>
@@ -183,34 +188,35 @@ export function FileToolbar({ state, setState, canGoBack, canGoForward, canGoUp,
   onEmptyBin: () => void;
   actions: FileActions;
 }) {
+  const t = useTranslations("files");
   return (
-    <div className="files-toolbar" role="toolbar" aria-label="File browser tools">
-      <FileToolButton label="Back" icon={ArrowLeft} disabled={!canGoBack} onClick={actions.back} />
-      <FileToolButton label="Forward" icon={ArrowRight} disabled={!canGoForward} onClick={actions.forward} />
-      <FileToolButton label="Up" icon={ChevronUp} disabled={!canGoUp} onClick={actions.up} />
-      <FileToolButton label="Refresh" icon={RotateCw} onClick={actions.refresh} />
+    <div className="files-toolbar" role="toolbar" aria-label={t("toolbarLabel")}>
+      <FileToolButton label={t("back")} icon={ArrowLeft} disabled={!canGoBack} onClick={actions.back} />
+      <FileToolButton label={t("forward")} icon={ArrowRight} disabled={!canGoForward} onClick={actions.forward} />
+      <FileToolButton label={t("toolUp")} icon={ChevronUp} disabled={!canGoUp} onClick={actions.up} />
+      <FileToolButton label={t("refresh")} icon={RotateCw} onClick={actions.refresh} />
       <span className="files-toolbar-divider" aria-hidden="true" />
       {/*
         The five file operations are present and refused, not absent: the archive
         mount is read only, and each button says which policy refuses it.
       */}
-      <FileToolButton label="Cut" icon={Scissors} onClick={actions.policies.clipboard} />
-      <FileToolButton label="Copy" icon={ClipboardCopy} onClick={actions.policies.clipboard} />
-      <FileToolButton label="Paste" icon={ClipboardPaste} onClick={actions.policies.clipboard} />
+      <FileToolButton label={t("cut")} icon={Scissors} onClick={actions.policies.clipboard} />
+      <FileToolButton label={t("copy")} icon={ClipboardCopy} onClick={actions.policies.clipboard} />
+      <FileToolButton label={t("paste")} icon={ClipboardPaste} onClick={actions.policies.clipboard} />
       <span className="files-toolbar-divider" aria-hidden="true" />
-      <FileToolButton label="Undo" icon={Undo2} onClick={actions.policies.create} />
-      <FileToolButton label="Delete" icon={Trash2} onClick={actions.policies.delete} />
+      <FileToolButton label={t("undo")} icon={Undo2} onClick={actions.policies.create} />
+      <FileToolButton label={t("delete")} icon={Trash2} onClick={actions.policies.delete} />
       <span className="files-toolbar-divider" aria-hidden="true" />
       {showEmptyBin && (
         <>
-          <FileToolButton label="Empty Recycle Bin" icon={Trash2} onClick={onEmptyBin} />
+          <FileToolButton label={t("emptyRecycleBin")} icon={Trash2} onClick={onEmptyBin} />
           <span className="files-toolbar-divider" aria-hidden="true" />
         </>
       )}
-      <div className="files-views" role="group" aria-label="View">
-        <FileToolButton label="Large Icons" icon={LayoutGrid} pressed={state.view === "icons"} onClick={() => setState({ view: "icons" })} />
-        <FileToolButton label="List" icon={List} pressed={state.view === "list"} onClick={() => setState({ view: "list" })} />
-        <FileToolButton label="Details" icon={Table2} pressed={state.view === "details"} onClick={() => setState({ view: "details" })} />
+      <div className="files-views" role="group" aria-label={t("menuView")}>
+        <FileToolButton label={t("viewLargeIcons")} icon={LayoutGrid} pressed={state.view === "icons"} onClick={() => setState({ view: "icons" })} />
+        <FileToolButton label={t("viewList")} icon={List} pressed={state.view === "list"} onClick={() => setState({ view: "list" })} />
+        <FileToolButton label={t("viewDetails")} icon={Table2} pressed={state.view === "details"} onClick={() => setState({ view: "details" })} />
       </div>
     </div>
   );
@@ -224,20 +230,21 @@ export function FileAddressBar({ address, up, places, current, actions }: {
   current: string;
   actions: FileActions;
 }) {
+  const t = useTranslations("files");
   return (
     <div className="files-addressrow">
-      <label className="files-address-label" htmlFor="files-address">Address</label>
+      <label className="files-address-label" htmlFor="files-address">{t("addressLabel")}</label>
       <span className="files-address-field">
         {up
-          ? <button type="button" className="files-address-up" aria-label="Up one level" onClick={actions.up}>
+          ? <button type="button" className="files-address-up" aria-label={t("upOneLevel")} onClick={actions.up}>
               <ChevronUp className="files-address-uphglyph" aria-hidden="true" />
             </button>
           : <FolderCog className="files-address-glyph" aria-hidden="true" />}
         <input id="files-address" className="files-address-input" type="text" readOnly spellCheck={false}
-          value={address} aria-label="Current path" />
+          value={address} aria-label={t("currentPath")} />
       </span>
-      <button type="button" className="files-address-go" onClick={actions.refresh}>Go</button>
-      <label className="sr-only" htmlFor="files-place">Jump to a place</label>
+      <button type="button" className="files-address-go" onClick={actions.refresh}>{t("addressGo")}</button>
+      <label className="sr-only" htmlFor="files-place">{t("jumpToPlace")}</label>
       <select id="files-place" className="files-place" value={current} onChange={(event) => actions.goTo(event.target.value)}>
         {places.map((place) => <option key={place.id} value={place.id}>{place.label}</option>)}
       </select>
@@ -251,12 +258,13 @@ export function FileStatus({ summary, selection, reference }: {
   selection: string;
   reference: string;
 }) {
+  const t = useTranslations("files");
   return (
     <div className="files-statusbar">
       <span className="files-status-text" role="status">{selection || summary}</span>
       <span className="files-status-cell">{summary}</span>
       <span className="files-status-cell">{reference}</span>
-      <span className="files-status-cell">Read only</span>
+      <span className="files-status-cell">{t("readOnly")}</span>
     </div>
   );
 }
@@ -284,11 +292,12 @@ function FileToolButton({ label, icon: Icon, disabled, pressed, onClick }: {
  * ordinary empty folder does not claim anything it cannot.
  */
 export function FileEmpty({ folder, summary, hint }: { folder: string; summary: string | null; hint?: string | null }) {
+  const t = useTranslations("files");
   return (
     <div className="files-empty">
       <FileQuestion className="files-empty-glyph" aria-hidden="true" />
-      <p className="files-empty-title">{folder} is empty</p>
-      <p className="files-empty-note">{summary ?? "This folder contains no files or subfolders."}</p>
+      <p className="files-empty-title">{t("folderEmpty", { folder })}</p>
+      <p className="files-empty-note">{summary ?? t("emptyNote")}</p>
       {hint && (
         <p className="files-empty-hint">
           <Info className="files-empty-hintglyph" aria-hidden="true" />

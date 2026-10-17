@@ -17,6 +17,10 @@ It exists so a folder can be used twice. The archive index is a browsable tree a
 - `files-identity.ts`: the in-world product name and the per-folder window title helper.
 - `files.css`: the Explorer chrome, the tree pane, the three listing layouts, and their container queries. Imported by `file-explorer.tsx`.
 
+## Interface copy
+
+Every component here is a client component and reads its copy with `useTranslations("files")` from `next-intl`; the strings live in `messages/<locale>/files.json` and nowhere else. `files-index.ts` is deliberately not a copy source: the folder and file names, scope titles, counts, sizes, modified stamps, and selection summary it returns are filed content that stays as filed in both languages, and the interface names it used to hand out (`sortKeyLabel`) are now catalog keys resolved by the components. The brand in `files-identity.ts` stays a constant, and the archive codes (`LN-POLICY-*`, `CIRCA-OS 4.12`) are identical in both catalogs.
+
 ## The read-only fiction
 
 The archive mount is read only, so the five file operations are present, correct, and refused with a named policy rather than hidden. A missing control is indistinguishable from a broken one; a refused control with a reference is a rule of the world.

@@ -1,13 +1,14 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { render, screen, within } from "@testing-library/react";
+import { screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 import { RecordMarkdown } from "@/components/reader/record-markdown";
+import { renderWithIntl } from "./intl";
 
 const CORPUS = readFileSync(resolve(process.cwd(), "public/Ghost_story.md"), "utf8");
 
-const mount = (source: string) => render(<RecordMarkdown source={source} />);
+const mount = (source: string) => renderWithIntl(<RecordMarkdown source={source} />);
 const sheet = () => document.body;
 
 /** The mark holding one particular withheld phrase, found by its own text. */

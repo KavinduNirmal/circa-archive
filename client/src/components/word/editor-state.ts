@@ -24,6 +24,18 @@ import type { TextSize } from "./word-identity";
 /** The initial document: an empty page with the caret at the top. */
 export const EMPTY_DOCUMENT = "";
 
+/**
+ * A status-bar report, as the catalog key that phrases it plus the one value a
+ * report can carry.
+ *
+ * The reducer decides *which* report an action produces and never how it reads:
+ * the key names the message in the editor's catalog and `size` names the text
+ * scale the size report is about. The chrome translates the descriptor, so this
+ * module stays free of copy (and of React), and a language change re-phrases a
+ * report that is already on screen rather than leaving the old language behind.
+ */
+export type EditorNotice = { key: string; size?: TextSize };
+
 export type EditorState = {
   past: readonly string[];
   present: string;
@@ -39,8 +51,8 @@ export type EditorState = {
   focused: boolean;
   size: TextSize;
   ruler: boolean;
-  /** What the status bar last reported. */
-  notice: string | null;
+  /** What the status bar last reported, named rather than phrased. */
+  notice: EditorNotice | null;
   /**
    * When the last edit landed. Keystrokes inside the window share one undo step,
    * so Ctrl+Z after a sentence removes the sentence rather than a letter.
@@ -67,8 +79,8 @@ export type EditorAction =
   | { type: "undo" }
   | { type: "redo" }
   | { type: "new" }
-  /** Puts a line in the status bar. */
-  | { type: "report"; message: string }
+  /** Puts a line in the status bar. A key and its values, so the reducer holds no copy. */
+  | { type: "report"; message: EditorNotice }
   /** Clears the status report, which is what a menu opening does. */
   | { type: "quiet" }
   | { type: "size"; size: TextSize }
@@ -224,10 +236,10 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
     case "quiet":
       return state.notice === null ? state : { ...state, notice: null };
     case "size":
-      return { ...state, size: action.size, notice: `Text size: ${action.size}.` };
+      return { ...state, size: action.size, notice: { key: "textSizeNotice", size: action.size } };
     case "ruler":
-      return { ...state, ruler: action.ruler, notice: action.ruler ? "Ruler shown." : "Ruler hidden." };
+      return { ...state, ruler: action.ruler, notice: { key: action.ruler ? "rulerShown" : "rulerHidden" } };
     case "about":
-      return { ...state, notice: "CIRCA Word, build 1999.4." };
+      return { ...state, notice: { key: "buildNotice" } };
   }
 }

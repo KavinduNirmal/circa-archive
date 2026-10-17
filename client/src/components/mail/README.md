@@ -27,6 +27,10 @@ The fiction decides the interaction model, the same way it does in the archive b
 - `message-view.tsx`: the reading pane, the composer, and the draft a reply or forward starts from.
 - `mail-notice.tsx`: the retention refusal and the About box, over the shared [message box](../ui/message-box.tsx).
 - `mail-window.tsx`: the store, the view over it, and the action set.
+
+## Interface copy
+
+Every component here is a client component and reads its copy with `useTranslations("mail")` from `next-intl`; the strings live in `messages/<locale>/mail.json` and nowhere else. `mailbox-index.ts` is deliberately not a copy source for chrome: `MAIL_FOLDERS` keeps a folder's id and icon but not its name, because a folder name is interface chrome — `folderLabel` in `mail-chrome.tsx` resolves it from the catalog, so Inbox and 받은 편지함 are one key rather than two literals. The message fixture itself (subjects, senders, bodies, addresses, stamps) is filed correspondence and stays as filed in both languages, as does the quoted original a reply carries. `MAIL_NAME` stays a constant, and the retention policy references (`LN-POLICY-19 / RETENTION-SCHEDULE-0`, `Build 1999.4 / CIRCA-OS`) are identical in both catalogs.
 - `mail-identity.ts`: the in-world product name and window title, in their own module so the chrome and the notices do not import each other in a cycle.
 - `mail.css`: the Outlook Bar, find bar, grid, reading pane, composer, and status bar, with the white viewer override scoped to `.mail-view`. Imported by `mail-window.tsx`.
 

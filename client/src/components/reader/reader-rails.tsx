@@ -2,7 +2,8 @@
 
 import { ChevronDown, ChevronRight, PanelLeft, PanelRight } from "lucide-react";
 import { useId, useState, type RefObject } from "react";
-import { READER_VOCABULARY, userCodeFor } from "./reader-identity";
+import { useTranslations } from "next-intl";
+import { userCodeFor } from "./reader-identity";
 import type { ReaderAnnotation } from "./reader-correspondence";
 import type { ReaderSection } from "./reader-model";
 
@@ -33,14 +34,15 @@ export function SectionRail({ sections, activeId, rail, collapsed, onSelect, onT
   onSelect: (id: string) => void;
   onToggle: () => void;
 }) {
+  const t = useTranslations("reader");
   return (
     <nav className="reader-rail reader-rail-left" data-rail={rail} data-collapsed={collapsed ? "true" : undefined}
-      aria-label={READER_VOCABULARY.sections}>
+      aria-label={t("sections")}>
       <div className="reader-rail-head">
-        <h2 className="reader-rail-title circa-label">{READER_VOCABULARY.sections}</h2>
+        <h2 className="reader-rail-title circa-label">{t("sections")}</h2>
         <button type="button" className="reader-rail-toggle" aria-expanded={!collapsed} aria-controls="reader-sections" onClick={onToggle}>
           <PanelLeft className="reader-rail-toggle-glyph" aria-hidden="true" />
-          <span className="sr-only">{collapsed ? "Show sections" : "Hide sections"}</span>
+          <span className="sr-only">{collapsed ? t("showSections") : t("hideSections")}</span>
         </button>
       </div>
       {/*
@@ -53,7 +55,7 @@ export function SectionRail({ sections, activeId, rail, collapsed, onSelect, onT
         <span className="reader-thumb"><span className="reader-thumb-page" /></span>
         <span className="reader-preview-text">
           <span className="reader-preview-index circa-mono">00</span>
-          <span className="reader-preview-heading">Preliminary review</span>
+          <span className="reader-preview-heading">{t("phantomHeading")}</span>
         </span>
       </div>
       <ol className="reader-previews" id="reader-sections">
@@ -72,7 +74,7 @@ export function SectionRail({ sections, activeId, rail, collapsed, onSelect, onT
           </li>
         ))}
       </ol>
-      {sections.length === 0 && <p className="reader-rail-none">No sections are filed for this record.</p>}
+      {sections.length === 0 && <p className="reader-rail-none">{t("noSections")}</p>}
     </nav>
   );
 }
@@ -92,6 +94,7 @@ export function AnnotationRail({ notes, sections, activeHeading, rail, collapsed
   onEndorse: (id: string) => void;
   onToggle: () => void;
 }) {
+  const t = useTranslations("reader");
   const threads = notes.flatMap((note) => [note, ...note.replies]);
   const replyTarget = replyTo ? threads.find((entry) => entry.id === replyTo) : undefined;
   /*
@@ -105,21 +108,21 @@ export function AnnotationRail({ notes, sections, activeHeading, rail, collapsed
 
   return (
     <aside className="reader-rail reader-rail-right" data-rail={rail} data-collapsed={collapsed ? "true" : undefined}
-      aria-label={READER_VOCABULARY.annotations}>
+      aria-label={t("annotations")}>
       <div className="reader-rail-head">
-        <h2 className="reader-rail-title circa-label">{READER_VOCABULARY.annotations}</h2>
+        <h2 className="reader-rail-title circa-label">{t("annotations")}</h2>
         <span className="reader-annotation-count circa-mono" data-testid="reader-annotation-count">{notes.length}</span>
         <button type="button" className="reader-rail-toggle" aria-expanded={!collapsed} aria-controls="reader-annotations" onClick={onToggle}>
           <PanelRight className="reader-rail-toggle-glyph" aria-hidden="true" />
-          <span className="sr-only">{collapsed ? "Show annotations" : "Hide annotations"}</span>
+          <span className="sr-only">{collapsed ? t("showAnnotations") : t("hideAnnotations")}</span>
         </button>
       </div>
 
       <div className="reader-notes" id="reader-annotations">
         {notes.length === 0 && (
           <div className="reader-notes-empty">
-            <p className="reader-notes-empty-title">{READER_VOCABULARY.emptyMargin}</p>
-            <p className="reader-notes-empty-note">{READER_VOCABULARY.emptyMarginNote}</p>
+            <p className="reader-notes-empty-title">{t("emptyMargin")}</p>
+            <p className="reader-notes-empty-note">{t("emptyMarginNote")}</p>
           </div>
         )}
         {groups.map(({ section, items }) => (
@@ -138,15 +141,15 @@ export function AnnotationRail({ notes, sections, activeHeading, rail, collapsed
 
       <form className="reader-composer" onSubmit={(event) => { event.preventDefault(); onFile(); }}>
         <p className="reader-composer-where circa-label">
-          {replyTarget ? `Reply to ${replyTarget.author}` : `Filing against ${activeHeading ?? "the record"}`}
+          {replyTarget ? t("replyTo", { author: replyTarget.author }) : t("filingAgainst", { heading: activeHeading ?? t("theRecord") })}
         </p>
         <textarea className="reader-composer-input" ref={composerRef} rows={3} value={draft}
-          placeholder={READER_VOCABULARY.notePlaceholder} aria-label={READER_VOCABULARY.notePlaceholder}
+          placeholder={t("notePlaceholder")} aria-label={t("notePlaceholder")}
           onChange={(event) => onDraftChange(event.target.value)} />
         <div className="reader-composer-actions">
-          <button type="submit" className="reader-composer-file">File note</button>
+          <button type="submit" className="reader-composer-file">{t("fileNote")}</button>
           {replyTarget && (
-            <button type="button" className="reader-composer-cancel" onClick={() => onReply(null)}>Cancel</button>
+            <button type="button" className="reader-composer-cancel" onClick={() => onReply(null)}>{t("cancel")}</button>
           )}
         </div>
       </form>
@@ -171,6 +174,7 @@ function NoteBlock({ note, onEndorse, onReply }: {
   onEndorse: (id: string) => void;
   onReply: (noteId: string | null) => void;
 }) {
+  const t = useTranslations("reader");
   const [folded, setFolded] = useState(false);
   const bodyId = useId();
   return (
@@ -181,7 +185,7 @@ function NoteBlock({ note, onEndorse, onReply }: {
         <NoteBody body={note.body} />
         <div className="reader-note-actions">
           <EndorseButton id={note.id} count={note.noted} onEndorse={onEndorse} />
-          <button type="button" className="reader-note-reply" onClick={() => onReply(note.id)}>Reply</button>
+          <button type="button" className="reader-note-reply" onClick={() => onReply(note.id)}>{t("reply")}</button>
         </div>
         {note.replies.length > 0 && (
           <ul className="reader-replies">
@@ -216,6 +220,7 @@ function NoteHead({ author, when, fold }: {
   when: string;
   fold?: { folded: boolean; controls: string; onToggle: () => void };
 }) {
+  const t = useTranslations("reader");
   const code = userCodeFor(author);
   return (
     <header className="reader-note-head">
@@ -224,7 +229,7 @@ function NoteHead({ author, when, fold }: {
           {fold.folded
             ? <ChevronRight className="reader-note-caret" aria-hidden="true" />
             : <ChevronDown className="reader-note-caret" aria-hidden="true" />}
-          <span className="sr-only">{fold.folded ? `Show the note from ${author}` : `Hide the note from ${author}`}</span>
+          <span className="sr-only">{fold.folded ? t("showNoteFrom", { author }) : t("hideNoteFrom", { author })}</span>
         </button>
       )}
       <span className="reader-note-who">
@@ -258,9 +263,10 @@ function NoteBody({ body }: { body: string }) {
 }
 
 function EndorseButton({ id, count, onEndorse }: { id: string; count: number; onEndorse: (id: string) => void }) {
+  const t = useTranslations("reader");
   return (
-    <button type="button" className="reader-note-noted" aria-label={`Noted ${count}`} onClick={() => onEndorse(id)}>
-      {READER_VOCABULARY.noted} <span className="reader-note-noted-count circa-mono">{count}</span>
+    <button type="button" className="reader-note-noted" aria-label={t("notedCount", { count })} onClick={() => onEndorse(id)}>
+      {t("noted")} <span className="reader-note-noted-count circa-mono">{count}</span>
     </button>
   );
 }

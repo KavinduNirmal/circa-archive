@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
+import { useTranslations } from "next-intl";
 import { ARCHIVE_INDEX } from "../browser/archive-index";
 import { DesktopIcon } from "../desktop-icons";
 import { FILE_TREE } from "../files/files-index";
@@ -18,30 +19,41 @@ import "./boot.css";
 
 export type BootLine = { label: string; detail: string };
 
+type BootTranslate = (key: string, values?: Record<string, string | number>) => string;
+
 /** One line per step, then a hold on the final line before the shell takes over. */
 export const BOOT_STEP_MS = 260;
 export const BOOT_HOLD_MS = 520;
 
-export function bootLines(): readonly BootLine[] {
+/**
+ * How many lines the post prints.
+ *
+ * Declared separately from the lines themselves so the total duration can be
+ * computed without a translator; a test holds the two in step, because a line
+ * added to `bootLines` and forgotten here would shorten the post by a step.
+ */
+export const BOOT_LINE_COUNT = 7;
+
+export function bootLines(t: BootTranslate): readonly BootLine[] {
   const records = FILE_TREE.filter((node) => node.kind === "file").length;
   const folders = FILE_TREE.length - records;
   const letters = folderMessages(MAILBOX_FIXTURE, "inbox").length;
   return [
-    { label: "CIRCA/OS 4.12", detail: "post passed" },
+    { label: t("postLabel"), detail: t("postDetail") },
     {
-      label: "VOLUME C:",
-      detail: `${FILE_TREE.length} nodes indexed, ${folders} folders, ${records} records`,
+      label: t("volumeCLabel"),
+      detail: t("volumeCDetail", { nodes: FILE_TREE.length, folders, records }),
     },
-    { label: "VOLUME D:", detail: "record store mounted read only" },
-    { label: "MAIL SPOOL", detail: `${letters} letters waiting` },
-    { label: "ARCHIVE INDEX", detail: `${ARCHIVE_INDEX.length} entries on file` },
-    { label: "CLEARANCE", detail: "ANALYST, TERMINAL 04" },
-    { label: "SHELL", detail: "workstation ready" },
+    { label: t("volumeDLabel"), detail: t("volumeDDetail") },
+    { label: t("mailLabel"), detail: t("mailDetail", { letters }) },
+    { label: t("archiveLabel"), detail: t("archiveDetail", { entries: ARCHIVE_INDEX.length }) },
+    { label: t("clearanceLabel"), detail: t("clearanceDetail") },
+    { label: t("shellLabel"), detail: t("shellDetail") },
   ];
 }
 
 export function bootDurationMs(): number {
-  return BOOT_STEP_MS * (bootLines().length + 1) + BOOT_HOLD_MS;
+  return BOOT_STEP_MS * (BOOT_LINE_COUNT + 1) + BOOT_HOLD_MS;
 }
 
 /** Reads the media query without assuming the environment implements it. */
@@ -60,18 +72,19 @@ function BootScreen({ lines, revealed, onSkip }: {
   revealed: number;
   onSkip: () => void;
 }) {
+  const t = useTranslations("boot");
   const filled = Math.round((revealed / lines.length) * PROGRESS_CELLS);
   return (
-    <div className="boot" role="region" aria-label="Workstation boot">
+    <div className="boot" role="region" aria-label={t("regionLabel")}>
       <div className="boot-panel circa-raised">
         <div className="boot-head">
           {/* The same workstation mark the desktop wears, so the boot reads as this machine. */}
           <DesktopIcon icon={{ glyph: "my-pc" }} className="boot-seal" />
           <div className="boot-headline">
-            <p className="boot-title">CIRCA/OS 4.12</p>
-            <p className="boot-sub">Commission for Incident Review and Corrective Action</p>
+            <p className="boot-title">{t("postLabel")}</p>
+            <p className="boot-sub">{t("agency")}</p>
           </div>
-          <span className="boot-badge">Boot</span>
+          <span className="boot-badge">{t("badge")}</span>
         </div>
         <ol className="boot-lines">
           {lines.map((line, index) => (
@@ -87,11 +100,11 @@ function BootScreen({ lines, revealed, onSkip }: {
         <div
           className="boot-progress"
           role="progressbar"
-          aria-label="Boot progress"
+          aria-label={t("progressLabel")}
           aria-valuemin={0}
           aria-valuemax={lines.length}
           aria-valuenow={revealed}
-          aria-valuetext={`${revealed} of ${lines.length} checks`}
+          aria-valuetext={t("progressText", { revealed, total: lines.length })}
         >
           {Array.from({ length: PROGRESS_CELLS }, (_, index) => (
             <span key={index} className="boot-cell" data-on={index < filled ? "true" : "false"} />
@@ -99,13 +112,13 @@ function BootScreen({ lines, revealed, onSkip }: {
         </div>
         <div className="boot-foot">
           <span className="boot-state circa-mono" role="status">
-            {revealed >= lines.length ? "Handing over to shell" : "Posting"}
+            {revealed >= lines.length ? t("handingOver") : t("posting")}
           </span>
           <button type="button" className="boot-skip" onClick={onSkip}>
-            Skip post
+            {t("skip")}
           </button>
         </div>
-        <p className="boot-hint">Press any key to skip the post.</p>
+        <p className="boot-hint">{t("hint")}</p>
       </div>
     </div>
   );
@@ -120,6 +133,7 @@ function subscribeToMotion(onChange: () => void) {
 }
 
 export function WorkstationBoot({ children }: { children: React.ReactNode }) {
+  const t = useTranslations("boot");
   /*
    * The preference is read through `useSyncExternalStore` rather than in an
    * effect: an operator who asked for reduced motion must never be shown the
@@ -132,7 +146,13 @@ export function WorkstationBoot({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!booting) return;
-    const timers = bootLines().map((_, index) =>
+    /*
+     * The timers are sized from the line count, not from `bootLines(t)`: the
+     * translator is a new value on every render, so depending on it here would
+     * restart the schedule at each reveal and hold the operator at the post screen
+     * for twice the intended time. The words are read in render instead.
+     */
+    const timers = Array.from({ length: BOOT_LINE_COUNT }, (_, index) =>
       window.setTimeout(() => setRevealed(index + 1), BOOT_STEP_MS * (index + 1)),
     );
     timers.push(window.setTimeout(() => setHandedOver(true), bootDurationMs()));
@@ -157,7 +177,7 @@ export function WorkstationBoot({ children }: { children: React.ReactNode }) {
       <div className="boot-stage" aria-hidden={booting || undefined} inert={booting}>
         {children}
       </div>
-      {booting && <BootScreen lines={bootLines()} revealed={revealed} onSkip={skip} />}
+      {booting && <BootScreen lines={bootLines(t)} revealed={revealed} onSkip={skip} />}
     </>
   );
 }

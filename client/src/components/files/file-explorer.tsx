@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { FolderTree } from "./folder-tree";
 import { FileAddressBar, FileEmpty, FileMenu, FileStatus, FileToolbar, type FileActions, type FileViewState } from "./files-chrome";
 import { EXPLORER_NAME } from "./files-identity";
@@ -16,6 +17,8 @@ import {
   isWithin,
   nodeById,
   pathOf,
+  scopeSummary,
+  scopeTitle,
   selectionSummary,
   sortNodes,
   subtreeOf,
@@ -25,15 +28,21 @@ import {
 } from "./files-index";
 import "./files.css";
 
-/** The favourites the Go menu and the address bar's place list both offer. */
-const PLACES: readonly { id: string; label: string }[] = [
-  { id: "pc-drive", label: "My Computer" },
-  { id: "dir-documents", label: "My Documents" },
-  { id: "dir-archive", label: "Archive" },
-  { id: "dir-organizations", label: "Organizations" },
-  { id: "dir-system", label: "System Files" },
-  { id: "dir-recycle", label: "Recycle Bin" },
-  { id: "dir-expunged", label: "_EXPUNGED" },
+/**
+ * The favourites the Go menu and the address bar's place list both offer.
+ *
+ * Each place carries the catalog key that names it rather than a label, since
+ * next-intl's translator is a hook and this table is module scope. The ids are
+ * the tree's own and stay as filed.
+ */
+const PLACES: readonly { id: string; key: string }[] = [
+  { id: "pc-drive", key: "placeMyComputer" },
+  { id: "dir-documents", key: "placeMyDocuments" },
+  { id: "dir-archive", key: "placeArchive" },
+  { id: "dir-organizations", key: "placeOrganizations" },
+  { id: "dir-system", key: "placeSystemFiles" },
+  { id: "dir-recycle", key: "placeRecycleBin" },
+  { id: "dir-expunged", key: "placeExpunged" },
 ];
 
 /** Keeps a requested path inside the scope the window was opened in. */
@@ -72,6 +81,7 @@ export function FileExplorer({ scopeId, initialPath, initialView = "details", on
   initialView?: FileView;
   onCloseWindow: () => void;
 }) {
+  const t = useTranslations("files");
   const scope = SCOPES.find((item) => item.id === scopeId) ?? SCOPES[0];
   const start = normalize(initialPath ?? scope.rootId, scope.rootId);
   const [currentId, setCurrentId] = useState<string>(start);
@@ -86,11 +96,13 @@ export function FileExplorer({ scopeId, initialPath, initialView = "details", on
 
   const folder = nodeById(currentId, FILE_TREE) ?? FILE_TREE[0];
   const counts = folderCounts(folder.id, FILE_TREE);
-  const listed = sortNodes(childrenOf(folder.id, FILE_TREE), state.sort, state.direction, state.view, FILE_TREE);
+  const listed = sortNodes(childrenOf(folder.id, FILE_TREE), state.sort, state.direction, state.view, t, FILE_TREE);
   const canGoBack = cursor > 0;
   const canGoForward = cursor < history.length - 1;
   const canGoUp = folder.parent !== null;
   const place = PLACES.some((item) => item.id === currentId) ? currentId : scope.rootId;
+  /** The same places, with the label the current language's catalog holds. */
+  const places = PLACES.map((item) => ({ id: item.id, label: t(item.key) }));
 
   function update(next: Partial<FileViewState>) {
     setState((current) => ({ ...current, ...next }));
@@ -111,7 +123,7 @@ export function FileExplorer({ scopeId, initialPath, initialView = "details", on
     const target = nodeById(id, FILE_TREE);
     if (!target) return;
     if (!isWithin(id, scope.rootId, FILE_TREE)) {
-      setStatus(`${target.name} is outside ${scope.title}. Open it from its own desktop shortcut.`);
+      setStatus(t("outsideScope", { name: target.name, scope: scopeTitle(scope, t) }));
       return;
     }
     if (id === currentId) return;
@@ -132,11 +144,11 @@ export function FileExplorer({ scopeId, initialPath, initialView = "details", on
     setCurrentId(destination);
     setExpanded((current) => [...new Set([...current, destination, ...pathOf(destination, FILE_TREE)])]);
     setSelected([]);
-    setStatus(`${delta < 0 ? "Back to" : "Forward to"} ${name}.`);
+    setStatus(t(delta < 0 ? "backTo" : "forwardTo", { name }));
   }
 
   function refresh() {
-    setStatus(`${folder.name} reloaded. The listing is unchanged on a read-only volume.`);
+    setStatus(t("reloaded", { name: folder.name }));
   }
 
   function openFolder(node: FileNode) {
@@ -145,7 +157,7 @@ export function FileExplorer({ scopeId, initialPath, initialView = "details", on
       return;
     }
     // TODO: Hand the record to the archive reader once the two screens share a router.
-    setStatus(`${node.name} is filed read-only. Opening it in the archive reader is not connected yet.`);
+    setStatus(t("filedReadOnly", { name: node.name }));
   }
 
   /** A folder's checkbox covers the branch under it, which is what the tri-state means. */
@@ -159,7 +171,7 @@ export function FileExplorer({ scopeId, initialPath, initialView = "details", on
 
   function selectAll() {
     setSelected(listed.map((node) => node.id));
-    setStatus(`Selected all ${listed.length} items in ${folder.name}.`);
+    setStatus(t("selectedAll", { count: listed.length, name: folder.name }));
   }
 
   function invert() {
@@ -168,7 +180,7 @@ export function FileExplorer({ scopeId, initialPath, initialView = "details", on
       ...listed.filter((node) => !current.includes(node.id)).map((node) => node.id),
       ...current.filter((id) => !shown.has(id)),
     ]);
-    setStatus("Selection inverted.");
+    setStatus(t("selectionInverted"));
   }
 
   /** A header click sorts by that column, or flips the direction on the active one. */
@@ -203,18 +215,22 @@ export function FileExplorer({ scopeId, initialPath, initialView = "details", on
     },
   };
 
-  const summary = scope.summary
-    ?? `${counts.folders + counts.files} object${counts.folders + counts.files === 1 ? "" : "s"} (${counts.folders} folders, ${counts.files} files)`;
-  const emptyHint = scope.id === "expunged"
-    ? "Expunged records are removed from discoverability. There is no listing to open."
-    : null;
+  /*
+   * The scope's own summary is filed with the scope, so only the composed count
+   * is interface copy; the singular branch is kept because English printed
+   * "1 object" and "8 objects" from the same sentence.
+   */
+  const objects = counts.folders + counts.files;
+  const summary = scopeSummary(scope, t)
+    ?? t(objects === 1 ? "objectCountOne" : "objectCount", { count: objects, folders: counts.folders, files: counts.files });
+  const emptyHint = scope.id === "expunged" ? t("expungedHint") : null;
 
   return (
     <div className="files" data-scope={scope.id} data-view={state.view}>
       <FileMenu state={state} setState={update} canGoBack={canGoBack} canGoForward={canGoForward} canGoUp={canGoUp} actions={actions} />
       <FileToolbar state={state} setState={update} canGoBack={canGoBack} canGoForward={canGoForward} canGoUp={canGoUp}
         showEmptyBin={scope.id === "recycle"} onEmptyBin={actions.policies.empty} actions={actions} />
-      <FileAddressBar address={addressOf(folder.id, FILE_TREE)} up={canGoUp} places={PLACES} current={place} actions={actions} />
+      <FileAddressBar address={addressOf(folder.id, FILE_TREE)} up={canGoUp} places={places} current={place} actions={actions} />
       <div className="files-body">
         <FolderTree rootId="pc-root" currentId={folder.id} expanded={expanded}
           onToggle={toggleExpanded} onSelect={navigate} tree={FILE_TREE} />
@@ -224,7 +240,7 @@ export function FileExplorer({ scopeId, initialPath, initialView = "details", on
             <span className="files-path-crumb">{addressOf(folder.id, FILE_TREE)}</span>
           </div>
           {listed.length === 0
-            ? <FileEmpty folder={folder.name} summary={scope.summary ?? null} hint={emptyHint} />
+            ? <FileEmpty folder={folder.name} summary={scopeSummary(scope, t) ?? null} hint={emptyHint} />
             : <FileList view={state.view} nodes={listed} sort={state.sort} direction={state.direction}
                 selected={selected} openFolder={openFolder} onToggleSelected={toggleBranch} onSort={onSort} />}
         </div>

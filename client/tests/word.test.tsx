@@ -1,13 +1,14 @@
-import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { fireEvent, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 import { WORD_WINDOW_TITLE } from "@/components/word/word-identity";
 import { WordWindow } from "@/components/word/word-window";
+import { renderWithIntl } from "./intl";
 
 /** The editor is rendered on its own; the desktop tests cover opening it as a window. */
 function openEditor(body = "") {
   const user = userEvent.setup();
-  render(<WordWindow initialBody={body} onCloseWindow={() => {}} />);
+  renderWithIntl(<WordWindow initialBody={body} onCloseWindow={() => {}} />);
   const root = document.querySelector<HTMLElement>(".word");
   if (!root) throw new Error("the editor did not render");
   const area = () => within(root).getByLabelText("Record body, in Markdown") as HTMLTextAreaElement;
@@ -191,7 +192,7 @@ describe("record editor", () => {
     await user.click(within(root).getByRole("menuitem", { name: "View" }));
     const view = await screen.findByRole("menu");
     await user.click(within(view).getByRole("menuitemradio", { name: "LARGE" }));
-    expect(within(root).getByRole("status")).toHaveTextContent("Text size: large.");
+    expect(within(root).getByRole("status")).toHaveTextContent("Text size: LARGE.");
     expect(root).toHaveAttribute("data-size", "large");
     expect(area().ownerDocument.body.textContent).toContain("LARGE");
   });

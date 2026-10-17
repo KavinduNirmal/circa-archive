@@ -29,6 +29,8 @@ The fiction drives the interaction model. The local network permits one address 
 - `browser-identity.ts`: the in-world product name and window title, in their own module so the notices and the chrome do not import each other in a cycle.
 - `browser.css`: the browser's own chrome and the archive document it frames, including the container queries that reflow both. Imported by `browser-window.tsx`.
 
+Copy is not in the components. Every word this window prints is read at render with `useTranslations("browser")` from `messages/<locale>/browser.json`; the class, status, and period vocabulary the index classifies by is mapped to message keys in `archive-page.tsx` (`CLASS_MESSAGE_KEYS`, `STATUS_MESSAGE_KEYS`, `PERIOD_MESSAGE_KEYS`, `TEXT_SIZE_MESSAGE_KEYS`), and the status bar keeps the message key and its values in state so a language change re-reads the line. Codes, dates, addresses, keyboard shortcuts, and policy references stay filed verbatim in both languages, `BROWSER_NAME` stays a constant, and `archive-index.ts` is untouched: it classifies entries rather than naming them.
+
 ## Visual contract
 
 The chrome is workstation furniture: steel palette, hard bevels, uppercase micro-labels, no rounding. The document inside the tab is not: it switches to the paper surface the records render on. That contrast is the whole idea, because it makes the window read as a frame around someone else's document rather than one more steel panel.

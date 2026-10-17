@@ -45,14 +45,18 @@ export const MAILBOX_ADDRESS: MailAddress = { name: "Analyst, Terminal 04", addr
 /**
  * The Outlook Bar entries, in reading order. Icons are the supplied Windows 98
  * artwork; no two folders share a bitmap, so the strip reads at a glance.
+ *
+ * The folder *names* are not here. A folder's name is interface chrome, so it is
+ * translated: the components read it from the `mail` namespace through
+ * `folderLabel`, which keeps one source of truth for the label in each language.
  */
-export const MAIL_FOLDERS: readonly { id: MailFolderId; label: string; icon: string }[] = [
-  { id: "inbox", label: "Inbox", icon: "/icons/envelope_closed-0.png" },
-  { id: "drafts", label: "Drafts", icon: "/icons/registration-0.png" },
-  { id: "outbox", label: "Outbox", icon: "/icons/envelope_open_sheet-0.png" },
-  { id: "sent", label: "Sent Items", icon: "/icons/message_file-0.png" },
-  { id: "deleted", label: "Deleted Items", icon: "/icons/recycle_bin_empty-4.png" },
-  { id: "dead", label: "Dead Letters", icon: "/icons/msg_error-0.png" },
+export const MAIL_FOLDERS: readonly { id: MailFolderId; icon: string }[] = [
+  { id: "inbox", icon: "/icons/envelope_closed-0.png" },
+  { id: "drafts", icon: "/icons/registration-0.png" },
+  { id: "outbox", icon: "/icons/envelope_open_sheet-0.png" },
+  { id: "sent", icon: "/icons/message_file-0.png" },
+  { id: "deleted", icon: "/icons/recycle_bin_empty-4.png" },
+  { id: "dead", icon: "/icons/msg_error-0.png" },
 ];
 
 const OFFICE = {
@@ -338,10 +342,6 @@ export const MAILBOX_FIXTURE: readonly MailMessage[] = [
 /** Folder icons, keyed for the Outlook Bar. */
 export function folderIcon(folderId: MailFolderId): string {
   return MAIL_FOLDERS.find((folder) => folder.id === folderId)?.icon ?? "/icons/envelope_closed-0.png";
-}
-
-export function folderLabel(folderId: MailFolderId): string {
-  return MAIL_FOLDERS.find((folder) => folder.id === folderId)?.label ?? folderId;
 }
 
 /** Every message in one folder, in store order. */

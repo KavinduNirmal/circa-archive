@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
+import { translatorFor } from "./intl";
 import {
   ASSESSMENT_SCALE,
   FOLLOW_UP_PREVIEW_LIMIT,
@@ -16,7 +17,11 @@ import {
   sectionIndex,
   stepScale,
   viewLabel,
+  assessmentLabel,
 } from "@/components/reader/reader-model";
+
+/** The shipped English catalog, so these assertions pin the words a reader sees. */
+const reader = translatorFor("reader");
 
 /** The count is the number of ranges; spelling it once keeps the tests readable. */
 const countMatches = (text: string, query: string) => matchRanges(text, query).length;
@@ -52,15 +57,16 @@ describe("reader scale", () => {
 
 describe("reader vocabulary", () => {
   it("names the three views rather than describing them", () => {
-    expect(viewLabel("single")).toBe("Single page");
-    expect(viewLabel("continuous")).toBe("Continuous");
-    expect(viewLabel("two-up")).toBe("Two-up");
+    expect(viewLabel("single", reader)).toBe("Single page");
+    expect(viewLabel("continuous", reader)).toBe("Continuous");
+    expect(viewLabel("two-up", reader)).toBe("Two-up");
   });
 
   it("uses a bureaucratic assessment scale instead of stars", () => {
-    expect(ASSESSMENT_SCALE).toEqual(["—", "Marginal", "Adequate", "Sound", "Exemplary"]);
+    expect(ASSESSMENT_SCALE.map((point) => assessmentLabel(point, reader)))
+      .toEqual(["—", "Marginal", "Adequate", "Sound", "Exemplary"]);
     // The first point is the absence of a judgement, not the lowest one.
-    expect(ASSESSMENT_SCALE[0]).toBe("—");
+    expect(assessmentLabel(ASSESSMENT_SCALE[0], reader)).toBe("—");
   });
 });
 
@@ -117,16 +123,16 @@ describe("reader search", () => {
 
 describe("reader search readout", () => {
   it("says nothing at all until there is a term to look for", () => {
-    expect(describeMatches(3, "   ")).toBe("");
+    expect(describeMatches(3, "   ", reader)).toBe("");
   });
 
   it("counts in the singular and in the plural", () => {
-    expect(describeMatches(1, "door plate")).toBe("1 match for door plate.");
-    expect(describeMatches(3, "landing")).toBe("3 matches for landing.");
+    expect(describeMatches(1, "door plate", reader)).toBe("1 match for door plate.");
+    expect(describeMatches(3, "landing", reader)).toBe("3 matches for landing.");
   });
 
   it("says so plainly when the term is not on the sheet", () => {
-    expect(describeMatches(0, "quay")).toBe("No matches for quay.");
+    expect(describeMatches(0, "quay", reader)).toBe("No matches for quay.");
   });
 });
 

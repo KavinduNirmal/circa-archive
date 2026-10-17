@@ -86,40 +86,58 @@
   color: var(--foreground);
 }
 
-/* --- The toolbar: document actions on the left, engagement on the right --- */
+/* --- The menu bar and toolbar: document actions left, engagement right --- */
+/*
+ * The reader wears the same two top rows as every other window here: a menu bar
+ * of worded commands, then a bar of raised plates. The plates are the shared
+ * treatment, copied rather than shared because each application's stylesheet
+ * owns its own chrome; the numbers are the browser's and the mail client's, so
+ * a tool in this window is the same size and the same weight as a tool in those.
+ */
 .reader-toolbar {
   display: flex;
   flex: 0 0 auto;
   flex-wrap: wrap;
-  align-items: stretch;
-  gap: 2px;
+  align-items: center;
+  gap: 3px;
   padding: 4px 6px;
   background: var(--card);
   border-bottom: 1px solid var(--circa-bevel-shadow);
   /* The document reads as loaded first and the software catching up. */
   animation: reader-chrome-in 160ms ease-out 130ms backwards;
 }
-.reader-toolgroup { display: flex; align-items: stretch; gap: 2px; }
+.reader-toolgroup { display: flex; align-items: center; gap: 3px; }
 .reader-toolbar-spacer { flex: 1 1 20px; min-width: 0; }
-.reader-divider { align-self: stretch; width: 0; margin: 1px 4px; border-left: 1px solid var(--circa-bevel-shadow); border-right: 1px solid #4b5d6a; }
+.reader-divider { align-self: stretch; width: 0; margin: 0 4px; border-left: 1px solid var(--circa-bevel-shadow); border-right: 1px solid #4b5d6a; }
+/* A group's name, the way the format bar names Text and Blocks. */
+.reader-legend { flex: 0 0 auto; padding-right: 2px; color: #8fa3b6; font-size: 8px; letter-spacing: .1em; }
 .reader-action {
   display: flex;
-  flex-direction: column;
+  flex: 0 0 auto;
   align-items: center;
-  justify-content: center;
-  gap: 2px;
-  min-width: 36px;
-  padding: 3px 6px 4px;
-  border: 1px solid transparent;
-  background: none;
-  color: #b7c8dd;
+  gap: 5px;
+  padding: 3px 7px;
+  border: 1px solid;
+  border-color: var(--circa-bevel-light) var(--circa-bevel-shadow) var(--circa-bevel-shadow) var(--circa-bevel-light);
+  background: var(--secondary);
+  color: #a4c2e6;
   font: inherit;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
   cursor: pointer;
 }
-.reader-action:hover:not(:disabled) { border-color: var(--circa-bevel-light); background: var(--secondary); color: #dbe7f5; }
-.reader-action:active:not(:disabled) { border-color: var(--circa-bevel-shadow) var(--circa-bevel-light) var(--circa-bevel-light) var(--circa-bevel-shadow); }
-/* A pressed tool is a hole in the bar, the way a held button always read. */
-.reader-action[data-pressed="true"] { border-color: var(--circa-bevel-shadow) var(--circa-bevel-light) var(--circa-bevel-light) var(--circa-bevel-shadow); background: #22304a; color: #e8f1fc; }
+/* A glyph that already says the word does not need the word beside it. */
+.reader-action[data-glyph-only="true"] { padding: 3px 6px; }
+.reader-action:hover:not(:disabled) { background: #304155; color: #dce9f5; }
+/* A held plate is a hole in the bar, which is how a pressed button always read. */
+.reader-action:active:not(:disabled),
+.reader-action[data-pressed="true"] {
+  border-color: var(--circa-bevel-shadow) var(--circa-bevel-light) var(--circa-bevel-light) var(--circa-bevel-shadow);
+  background: var(--card);
+  color: #dce9f5;
+}
 /*
  * A verdict is not a neutral press. Corroboration fills green and contest fills
  * red at the same weight, because they are two readings of one record and
@@ -128,19 +146,27 @@
  */
 .reader-action[data-pressed="true"][data-tone="affirm"] { border-color: var(--circa-affirm); background: var(--circa-affirm-deep); color: #dff0e4; }
 .reader-action[data-pressed="true"][data-tone="deny"] { border-color: #8a2b2b; background: #5c1d1d; color: #f0dcdc; }
-.reader-action:disabled { color: #5d7085; cursor: default; }
-.reader-action-glyph { width: 14px; height: 14px; }
-.reader-action-label { font-size: 8px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.reader-action:disabled { border-color: #3d4c5e #131b24 #131b24 #3d4c5e; background: #1e2836; color: #64757f; cursor: default; }
+.reader-action:focus-visible { outline: 1px dashed #c8d6e5; outline-offset: -3px; }
+.reader-action-glyph { flex: 0 0 auto; width: 13px; height: 13px; }
 
-/* The scale readout is a control: pressing it puts the sheet back to 100%. */
+/*
+ * The scale and the search field are readouts, not buttons, so they sink into
+ * the bar rather than standing on it. That is the grammar the rest of the shell
+ * keeps: raised is a thing you press, sunken is a thing you read.
+ */
 .reader-scale {
   position: relative;
   display: flex;
+  flex: 0 0 auto;
   align-items: center;
   justify-content: center;
   min-width: 52px;
-  margin: 4px 2px;
+  height: 22px;
   padding: 0 6px;
+  border: 1px solid;
+  border-color: var(--circa-bevel-shadow) var(--border) var(--border) var(--circa-bevel-shadow);
+  background: var(--card);
   color: #dbe7f5;
   font-family: var(--font-mono);
   font-size: 10px;
@@ -158,46 +184,52 @@
   opacity: 0;
   animation: reader-scale-blip 260ms steps(1, end) 170ms 1;
 }
-.reader-search { display: flex; align-items: center; min-width: 148px; margin: 4px 2px; padding: 0 6px; }
+.reader-search {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 5px;
+  height: 22px;
+  min-width: 150px;
+  padding: 0 5px;
+  border: 1px solid;
+  border-color: var(--circa-bevel-shadow) var(--border) var(--border) var(--circa-bevel-shadow);
+  background: var(--card);
+}
 .reader-search-input { width: 100%; border: 0; background: none; color: #dbe7f5; font: inherit; font-family: var(--font-mono); font-size: 10px; outline: none; }
 .reader-search-input::placeholder { color: #6d8199; }
 .reader-search-input::-webkit-search-cancel-button { filter: invert(80%); }
-.reader-match-count { align-self: center; min-width: 0; padding: 0 6px; color: #8fa3b6; font-family: var(--font-mono); font-size: 9px; white-space: nowrap; }
+.reader-match-count { align-self: center; min-width: 0; padding: 0 5px; color: #8fa3b6; font-family: var(--font-mono); font-size: 9px; white-space: nowrap; }
 
-/* Quality, kept in its own frame so it cannot be read as a vote. */
-.reader-engagement { align-items: center; }
-.reader-assessment {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  padding: 3px 8px;
-  border-left: 1px solid var(--circa-bevel-shadow);
-  border-right: 1px solid #4b5d6a;
-}
+/* Quality, kept in its own field so it cannot be read as a vote. */
+.reader-engagement { align-items: center; gap: 4px; }
+.reader-assessment { display: flex; flex-direction: column; gap: 2px; }
 .reader-assessment-label { color: #8fa3b6; }
-.reader-points { display: flex; gap: 2px; }
+.reader-assessment-well { display: flex; align-items: stretch; gap: 1px; height: 22px; padding: 1px; }
+.reader-points { display: flex; gap: 1px; }
 .reader-point {
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
   min-width: 42px;
-  padding: 2px 5px;
-  border: 1px solid var(--circa-bevel-light);
+  padding: 0 5px;
+  border: 1px solid;
+  border-color: #2c3a4c #0d131a #0d131a #2c3a4c;
   background: #1a2534;
-  color: #93a8bf;
+  color: #8b9fb5;
   font-size: 8px;
   font-weight: 700;
   letter-spacing: .07em;
   text-transform: uppercase;
   cursor: pointer;
 }
-.reader-point:hover { color: #dbe7f5; border-color: #7f9cbe; }
+.reader-point:hover { color: #dbe7f5; background: #22304a; }
 /* The scale fills up to the grade reached; the chosen block is the loudest. */
 .reader-point[data-lit="true"] { background: #26364f; color: #cfe0f2; }
 .reader-point[data-checked="true"] { border-color: var(--circa-stamp); background: #2c2416; color: var(--circa-hazard); }
 /* How many of the five points the record has been given. */
-.reader-assessment-score { align-self: flex-end; min-width: 26px; color: #8fa3b6; font-size: 9px; letter-spacing: .06em; text-align: right; }
+.reader-assessment-score { display: flex; align-items: center; min-width: 30px; padding: 0 5px; border-left: 1px solid #0d131a; color: #8fa3b6; font-size: 9px; letter-spacing: .06em; }
 /* A real radio, so the scale keeps its arrow keys and one tab stop. */
 .reader-point-input { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
 .reader-point-input:focus-visible + .reader-point-word { outline: 2px solid var(--ring); outline-offset: 3px; }
@@ -657,7 +689,10 @@
   .reader-rail[data-rail="open"] { position: absolute; z-index: 6; top: 0; bottom: 0; }
   .reader-rail-left[data-rail="open"] { left: 0; width: var(--reader-rail-left); box-shadow: 3px 0 0 rgb(8 17 25 / 40%); }
   .reader-rail-right[data-rail="open"] { right: 0; width: var(--reader-rail-right); box-shadow: -3px 0 0 rgb(8 17 25 / 40%); }
-  .reader-assessment { padding-inline: 6px; }
+  /* The bar is dense enough that the word on each plate is the first thing to go. */
+  .reader-action-label { display: none; }
+  .reader-action { padding: 3px 6px; }
+  .reader-legend { display: none; }
 }
 @container (max-width: 767px) {
   /* The follow-ups stack, and their cards stop pretending to be a filmstrip. */
@@ -673,8 +708,8 @@
   .reader-sheet { padding: 22px 20px 34px; --reader-perf-x: 9px; --reader-perf-r: 2.6px; }
   .reader-leaf-title { font-size: 1.4em; }
   .reader-stamp { margin-left: 0; }
-  .reader-assessment { border: 0; }
-  .reader-point { min-width: 34px; }
+  .reader-point { min-width: 28px; padding: 0 3px; }
+  .reader-assessment-score { min-width: 24px; padding: 0 3px; }
   .reader-status-cell:nth-last-child(1),
   .reader-status-cell:nth-last-child(2) { display: none; }
 }

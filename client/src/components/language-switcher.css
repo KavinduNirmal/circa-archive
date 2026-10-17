@@ -1,0 +1,33 @@
+/*
+ * The language switcher, shared by the landing page and the workstation.
+ *
+ * Colour is inherited rather than declared, so the one control reads correctly on
+ * the landing page's dark utility bar and in the workstation's steel taskbar. The
+ * active language is marked by a border as well as by colour, so it survives a
+ * monochrome screen and a colour-blind reader.
+ */
+.circa-language {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 10px;
+  letter-spacing: .06em;
+}
+
+.circa-language-option {
+  padding: 1px 6px;
+  border: 1px solid transparent;
+  color: inherit;
+  line-height: 1.6;
+  text-decoration: none;
+}
+
+.circa-language-option[data-active="true"] {
+  border-color: currentColor;
+  font-weight: 700;
+}
+
+.circa-language-option:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 1px;
+}

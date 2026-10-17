@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { translatorFor } from "./intl";
 import {
   FILE_TREE,
   SCOPES,
@@ -19,6 +20,8 @@ import {
   sortNodes,
   type FileNode,
   type FileView,
+  scopeSummary,
+  scopeTitle,
 } from "@/components/files/files-index";
 
 /**
@@ -62,9 +65,12 @@ describe("file tree lookups", () => {
   });
 });
 
+/** The shipped English catalog, so these assertions pin the words a reader sees. */
+const files = translatorFor("files");
+
 describe("sorting", () => {
   const ids = (view: FileView, key: "name" | "type" | "size" | "modified", direction: "ascending" | "descending") =>
-    sortNodes(childrenOf("f", CANVAS), key, direction, view, CANVAS).map((node) => node.id);
+    sortNodes(childrenOf("f", CANVAS), key, direction, view, files, CANVAS).map((node) => node.id);
 
   it("orders names and reverses only the files when the direction flips", () => {
     expect(ids("details", "name", "ascending")).toEqual(["a", "c", "e", "d"]);
@@ -114,21 +120,21 @@ describe("selection and tri-state", () => {
 
 describe("type and size presentation", () => {
   it("labels a file by its extension and a folder by its kind", () => {
-    expect(fileTypeOf(PDF)).toBe("Record document");
-    expect(fileTypeOf(EML)).toBe("Filed email");
-    expect(fileTypeOf(FOLDER)).toBe("File folder");
-    expect(fileTypeOf({ id: "x", name: "X.weird", kind: "file", ext: "weird" as never, parent: null, size: 1, modified: "2003-01-01 00:00" }))
+    expect(fileTypeOf(PDF, files)).toBe("Record document");
+    expect(fileTypeOf(EML, files)).toBe("Filed email");
+    expect(fileTypeOf(FOLDER, files)).toBe("File folder");
+    expect(fileTypeOf({ id: "x", name: "X.weird", kind: "file", ext: "weird" as never, parent: null, size: 1, modified: "2003-01-01 00:00" }, files))
       .toBe("Unregistered file");
     // The two unreadable cases stay distinct: one is a known orphan, the other an
     // extension the table has never heard of.
-    expect(fileTypeOf({ id: "y", name: "ORPHAN.bin", kind: "file", ext: "bin", parent: null, size: 1, modified: "2003-01-01 00:00" }))
+    expect(fileTypeOf({ id: "y", name: "ORPHAN.bin", kind: "file", ext: "bin", parent: null, size: 1, modified: "2003-01-01 00:00" }, files))
       .toBe("Unreadable binary");
   });
 
   it("describes a node for the status bar", () => {
-    expect(describeNode(PDF)).toBe("Record document (PDF)");
-    expect(describeNode(FOLDER)).toBe("File folder (empty)");
-    expect(describeNode(EMPTY)).toBe("File folder (empty)");
+    expect(describeNode(PDF, files)).toBe("Record document (PDF)");
+    expect(describeNode(FOLDER, files)).toBe("File folder (empty)");
+    expect(describeNode(EMPTY, files)).toBe("File folder (empty)");
   });
 
   it("formats a size that a 1998 listing could have shown", () => {
@@ -145,8 +151,8 @@ describe("type and size presentation", () => {
   });
 
   it("counts a folder's contents the way the size column reads", () => {
-    expect(countLabel("f", CANVAS)).toBe("3 files, 1 folder");
-    expect(countLabel("b", CANVAS)).toBe("empty");
+    expect(countLabel("f", files, CANVAS)).toBe("3 files, 1 folder");
+    expect(countLabel("b", files, CANVAS)).toBe("empty");
   });
 });
 
@@ -202,7 +208,7 @@ describe("the shipped tree and its scopes", () => {
       expect(root, `${scope.id} points at a missing folder`).toBeDefined();
       expect(root?.kind, `${scope.id} points at a file`).toBe("folder");
     }
-    expect(scopeById("my-pc")?.title).toBe("My Computer");
+    expect(scopeTitle(scopeById("my-pc")!, files)).toBe("My Computer");
     expect(scopeById("archive")).toBeDefined();
     expect(scopeById("nope")).toBeUndefined();
   });
@@ -211,7 +217,7 @@ describe("the shipped tree and its scopes", () => {
     const expunged = SCOPES.find((scope) => scope.id === "expunged");
     expect(expunged).toBeDefined();
     expect(childrenOf(expunged!.rootId, FILE_TREE)).toEqual([]);
-    expect(expunged!.summary).toMatch(/^\d+ records expunged\.$/);
+    expect(scopeSummary(expunged!, files)).toMatch(/^\d+ records expunged\.$/);
   });
 
   it("files every archive record with a code the case folder names", () => {

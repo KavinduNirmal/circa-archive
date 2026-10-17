@@ -1,10 +1,11 @@
-import { render, screen, within } from "@testing-library/react";
+import { screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
-// The shell directly: the /desktop route now posts first, and these tests are about the shell.
-import { DesktopShell as Home } from "@/components/desktop-shell";
+// The shell directly: the locale desktop route now posts first, and these tests are about the shell.
+import { DesktopShell } from "@/components/desktop-shell";
 import { MAIL_WINDOW_TITLE } from "@/components/mail/mail-identity";
 import { MAILBOX_FIXTURE, DEFAULT_SORT, folderMessages, readIds, sortMessages, unreadCount } from "@/components/mail/mailbox-index";
+import { renderWithIntl } from "./intl";
 
 const read = readIds(MAILBOX_FIXTURE);
 const INBOX = folderMessages(MAILBOX_FIXTURE, "inbox");
@@ -17,7 +18,7 @@ const FIRST_LISTED = sortMessages(INBOX, DEFAULT_SORT)[0];
 
 /** Opens the Inbox destination, which hosts the mail client. */
 async function openMail(user: ReturnType<typeof userEvent.setup>) {
-  render(<Home />);
+  renderWithIntl(<DesktopShell />);
   await user.click(screen.getByRole("button", { name: "Inbox" }));
   const frame = screen.getByRole("dialog", { name: MAIL_WINDOW_TITLE });
   const status = () => within(frame).getByRole("status").textContent ?? "";

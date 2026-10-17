@@ -119,6 +119,21 @@
   --font-mono: "IBM Plex Mono", monospace;
 }
 
+/*
+ * Neither bundled face carries Hangul, so Korean is set by the reader's own
+ * Korean face. The fallbacks are named rather than left to `sans-serif` so the
+ * three platforms agree: without them Windows, macOS, and Android each pick a
+ * different default and the workstation drifts between them.
+ *
+ * These are fallbacks, not a decision about Korean typography. A Korean webfont
+ * would hold the institutional voice far better — see the open question in
+ * `.agents/brain/DESIGN.md`.
+ */
+:lang(ko) {
+  --font-sans: "DM Sans", "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", sans-serif;
+  --font-mono: "IBM Plex Mono", "Nanum Gothic Coding", "Apple SD Gothic Neo", "Malgun Gothic", monospace;
+}
+
 @layer base {
   * { @apply border-border outline-ring/50; }
   body {

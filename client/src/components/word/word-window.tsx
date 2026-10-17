@@ -1,9 +1,10 @@
 "use client";
 
 import { useCallback, useEffect, useLayoutEffect, useReducer, useRef, useState } from "react";
-import { CHANGE_LABELS, formatCounts, type MarkdownToolId } from "./document-model";
+import { useTranslations } from "next-intl";
+import { type MarkdownToolId } from "./document-model";
 import { WORD_NAME, WORD_WINDOW_TITLE } from "./word-identity";
-import { WordMenu, WordRuler, WordStatus, WordToolbar, type WordActions } from "./word-chrome";
+import { TOOL_CHANGE_KEYS, WordMenu, WordRuler, WordStatus, WordToolbar, type WordActions } from "./word-chrome";
 import { WordNotice, type WordNoticeKind } from "./word-notice";
 import { cursorPosition, editorReducer, editorStats, initialState } from "./editor-state";
 import "./word.css";
@@ -43,6 +44,7 @@ export function WordWindow({ onCloseWindow, initialBody = STARTER }: {
 }) {
   const [state, dispatch] = useReducer(editorReducer, initialBody, initialState);
   const [notice, setNotice] = useState<WordNoticeKind | null>(null);
+  const t = useTranslations("word");
   const area = useRef<HTMLTextAreaElement | null>(null);
   const address = useRef<HTMLInputElement | null>(null);
 
@@ -84,7 +86,7 @@ export function WordWindow({ onCloseWindow, initialBody = STARTER }: {
     // The button took the focus, so the caret in the area is stale-looking but
     // still correct; the effect above puts both back.
     applyTool(tool);
-    dispatch({ type: "report", message: CHANGE_LABELS[tool] });
+    dispatch({ type: "report", message: { key: TOOL_CHANGE_KEYS[tool] } });
     dispatch({ type: "focus", focused: true });
   }
 
@@ -97,7 +99,7 @@ export function WordWindow({ onCloseWindow, initialBody = STARTER }: {
     const pending = state.address;
     if (!pending) return;
     applyTool(pending.tool, pending.value.trim());
-    dispatch({ type: "report", message: CHANGE_LABELS[pending.tool] });
+    dispatch({ type: "report", message: { key: TOOL_CHANGE_KEYS[pending.tool] } });
     dispatch({ type: "focus", focused: true });
   }
 
@@ -136,7 +138,10 @@ export function WordWindow({ onCloseWindow, initialBody = STARTER }: {
 
   const stats = editorStats(state);
   const caret = cursorPosition(state.present, state.selection);
-  const summary = `${formatCounts(stats)} | line ${caret.line}, column ${caret.column}`;
+  // The counts cell is interface chrome, so the plural forms come from the
+  // catalog rather than from the model's English-only formatter.
+  const counts = t("statusCounts", { words: stats.words, lines: stats.lines, characters: stats.characters });
+  const summary = `${counts} | ${t("statusCaret", { line: caret.line, column: caret.column })}`;
   const tool = state.active[0];
 
   /** The editing keys the text area would otherwise swallow, plus the file keys. */
@@ -184,22 +189,22 @@ export function WordWindow({ onCloseWindow, initialBody = STARTER }: {
       <WordMenu state={state} actions={actions} />
       <WordToolbar state={state} actions={actions} />
       {state.address && (
-        <form className="word-addressbar" aria-label={`${state.address.tool === "link" ? "Link" : "Image"} address`}
+        <form className="word-addressbar" aria-label={state.address.tool === "link" ? t("addressFormLink") : t("addressFormImage")}
           onSubmit={(event) => { event.preventDefault(); insertAddress(); }}>
           <label className="word-addresslabel" htmlFor="word-address">
-            {state.address.tool === "link" ? "Link to" : "Image at"}
+            {state.address.tool === "link" ? t("addressLinkTo") : t("addressImageAt")}
           </label>
           <input id="word-address" ref={address} className="word-addressinput circa-mono" type="text" spellCheck={false}
-            autoComplete="off" value={state.address.value} placeholder="address or path"
+            autoComplete="off" value={state.address.value} placeholder={t("addressPlaceholder")}
             onChange={(event) => dispatch({ type: "addressValue", value: event.target.value })} />
-          <button type="submit" className="word-addressbutton">Insert</button>
-          <button type="button" className="word-addressbutton" onClick={() => dispatch({ type: "address", tool: null })}>Cancel</button>
+          <button type="submit" className="word-addressbutton">{t("addressInsert")}</button>
+          <button type="button" className="word-addressbutton" onClick={() => dispatch({ type: "address", tool: null })}>{t("addressCancel")}</button>
         </form>
       )}
       {state.ruler && <WordRuler />}
       <div className="word-desk">
         <div className="word-page">
-          <label className="sr-only" htmlFor="word-document">Record body, in Markdown</label>
+          <label className="sr-only" htmlFor="word-document">{t("documentLabel")}</label>
           <textarea
             key={state.revision}
             id="word-document"
@@ -217,14 +222,14 @@ export function WordWindow({ onCloseWindow, initialBody = STARTER }: {
             onKeyDown={onKeyDown}
           />
           <span className="sr-only" id="word-document-note">
-            Markdown, filed as .pdf into a case folder. The toolbar writes the markers for you.
+            {t("documentNote")}
           </span>
-          <span className="word-page-stamp" aria-hidden="true">UNFILED DRAFT</span>
+          <span className="word-page-stamp" aria-hidden="true">{t("draftStamp")}</span>
         </div>
       </div>
       <WordStatus state={state} summary={tool ? `${summary} | ${state.active.join(", ")}` : summary} />
       <WordNotice kind={notice} onClose={() => setNotice(null)} />
-      <span className="sr-only">{WORD_NAME} window: {WORD_WINDOW_TITLE}</span>
+      <span className="sr-only">{t("windowLabel", { name: WORD_NAME, title: WORD_WINDOW_TITLE })}</span>
     </div>
   );
 }

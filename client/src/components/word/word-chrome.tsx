@@ -1,6 +1,7 @@
 "use client";
 
 import { Menubar } from "radix-ui";
+import { useTranslations } from "next-intl";
 import { WORD_NAME, TEXT_SIZE_LABELS, type TextSize } from "./word-identity";
 import { MARKDOWN_TOOLS, findTool, type MarkdownTool, type MarkdownToolId } from "./document-model";
 import { canRedo, canUndo, type EditorState } from "./editor-state";
@@ -25,6 +26,60 @@ export type WordActions = {
 
 const TEXT_SIZES: readonly TextSize[] = ["small", "normal", "large"];
 
+/**
+ * Where each tool's accessible name comes from.
+ *
+ * `document-model.ts` carries the tool table and the markdown each tool writes,
+ * not the editor's interface copy: the plain-language name is a label the chrome
+ * puts on a control, so the names live in the `word` catalog and this record only
+ * maps a tool to its key. A record rather than a key built from the id, because
+ * the catalog is flat and camelCase.
+ */
+export const TOOL_NAME_KEYS: Record<MarkdownToolId, string> = {
+  bold: "toolBold",
+  italic: "toolItalic",
+  strike: "toolStrike",
+  code: "toolCode",
+  heading1: "toolHeading1",
+  heading2: "toolHeading2",
+  heading3: "toolHeading3",
+  bullets: "toolBullets",
+  numbers: "toolNumbers",
+  quote: "toolQuote",
+  codeblock: "toolCodeblock",
+  link: "toolLink",
+  image: "toolImage",
+  table: "toolTable",
+  rule: "toolRule",
+  clear: "toolClear",
+};
+
+/**
+ * Where each tool's status-bar report comes from.
+ *
+ * The report the editor shows after a tool runs is a notice, so it is catalog
+ * copy for the same reason the tool names are; the change table in the model
+ * stays the model's own, and the chrome reads the key it needs.
+ */
+export const TOOL_CHANGE_KEYS: Record<MarkdownToolId, string> = {
+  bold: "changeBold",
+  italic: "changeItalic",
+  strike: "changeStrike",
+  code: "changeCode",
+  heading1: "changeHeading1",
+  heading2: "changeHeading2",
+  heading3: "changeHeading3",
+  bullets: "changeBullets",
+  numbers: "changeNumbers",
+  quote: "changeQuote",
+  codeblock: "changeCodeblock",
+  link: "changeLink",
+  image: "changeImage",
+  table: "changeTable",
+  rule: "changeRule",
+  clear: "changeClear",
+};
+
 function toolGroup(group: MarkdownTool["group"]): MarkdownTool[] {
   return MARKDOWN_TOOLS.filter((tool) => tool.group === group);
 }
@@ -38,70 +93,71 @@ function toolGroup(group: MarkdownTool["group"]): MarkdownTool[] {
  * and saving is refused by the filing key. Nothing here is a dead control.
  */
 export function WordMenu({ state, actions }: { state: EditorState; actions: WordActions }) {
+  const t = useTranslations("word");
   return (
-    <Menubar.Root className="circa-menubar" aria-label={`${WORD_NAME} menu`}>
+    <Menubar.Root className="circa-menubar" aria-label={t("menubarLabel", { name: WORD_NAME })}>
       <Menubar.Menu>
-        <Menubar.Trigger className="circa-menutitle" onClick={actions.quiet}>File</Menubar.Trigger>
+        <Menubar.Trigger className="circa-menutitle" onClick={actions.quiet}>{t("menuFile")}</Menubar.Trigger>
         <Menubar.Portal>
           <Menubar.Content className="circa-menu" align="start" sideOffset={0}>
             <Menubar.Item className="circa-menuitem" onSelect={actions.newDocument}>
-              New<span className="circa-menukey">Ctrl+N</span>
+              {t("fileNew")}<span className="circa-menukey">Ctrl+N</span>
             </Menubar.Item>
-            <Menubar.Item className="circa-menuitem" disabled title="This workstation holds no other route to a document">
-              Open...
+            <Menubar.Item className="circa-menuitem" disabled title={t("fileOpenTitle")}>
+              {t("fileOpen")}
             </Menubar.Item>
-            <Menubar.Item className="circa-menuitem" disabled title="A draft can be filed once, by the filing key">
-              Save<span className="circa-menukey">Ctrl+S</span>
+            <Menubar.Item className="circa-menuitem" disabled title={t("fileSaveTitle")}>
+              {t("fileSave")}<span className="circa-menukey">Ctrl+S</span>
             </Menubar.Item>
             <Menubar.Item className="circa-menuitem" data-restricted="true" onSelect={actions.save}>
-              File to case<span className="circa-menurestricted">no key</span>
+              {t("fileToCase")}<span className="circa-menurestricted">{t("fileToCaseNoKey")}</span>
             </Menubar.Item>
             <Menubar.Separator className="circa-menuseparator" />
-            <Menubar.Item className="circa-menuitem" disabled title="No printer is attached to this terminal">
-              Print<span className="circa-menukey">Ctrl+P</span>
+            <Menubar.Item className="circa-menuitem" disabled title={t("filePrintTitle")}>
+              {t("filePrint")}<span className="circa-menukey">Ctrl+P</span>
             </Menubar.Item>
             <Menubar.Separator className="circa-menuseparator" />
-            <Menubar.Item className="circa-menuitem" onSelect={actions.close}>Close window</Menubar.Item>
+            <Menubar.Item className="circa-menuitem" onSelect={actions.close}>{t("fileCloseWindow")}</Menubar.Item>
           </Menubar.Content>
         </Menubar.Portal>
       </Menubar.Menu>
 
       <Menubar.Menu>
-        <Menubar.Trigger className="circa-menutitle" onClick={actions.quiet}>Edit</Menubar.Trigger>
+        <Menubar.Trigger className="circa-menutitle" onClick={actions.quiet}>{t("menuEdit")}</Menubar.Trigger>
         <Menubar.Portal>
           <Menubar.Content className="circa-menu" align="start" sideOffset={0}>
             <Menubar.Item className="circa-menuitem" disabled={!canUndo(state)} onSelect={actions.undo}>
-              Undo<span className="circa-menukey">Ctrl+Z</span>
+              {t("undoLabel")}<span className="circa-menukey">Ctrl+Z</span>
             </Menubar.Item>
             <Menubar.Item className="circa-menuitem" disabled={!canRedo(state)} onSelect={actions.redo}>
-              Redo<span className="circa-menukey">Ctrl+Y</span>
+              {t("redoLabel")}<span className="circa-menukey">Ctrl+Y</span>
             </Menubar.Item>
             <Menubar.Separator className="circa-menuseparator" />
             {/* The editor keeps its own undo stack, so the browser's menu items
                 would cut across it; the keys and these two items are the route. */}
-            <Menubar.Item className="circa-menuitem" disabled title="The editor keeps its own undo history">
-              Cut / Copy / Paste (use the keyboard)
+            <Menubar.Item className="circa-menuitem" disabled title={t("editCutCopyPasteTitle")}>
+              {t("editCutCopyPaste")}
             </Menubar.Item>
             <Menubar.Separator className="circa-menuseparator" />
             <Menubar.Item className="circa-menuitem" onSelect={() => actions.tool("clear")}>
-              Clear formatting
+              {t(TOOL_NAME_KEYS.clear)}
             </Menubar.Item>
           </Menubar.Content>
         </Menubar.Portal>
       </Menubar.Menu>
 
       <Menubar.Menu>
-        <Menubar.Trigger className="circa-menutitle" onClick={actions.quiet}>View</Menubar.Trigger>
+        <Menubar.Trigger className="circa-menutitle" onClick={actions.quiet}>{t("menuView")}</Menubar.Trigger>
         <Menubar.Portal>
           <Menubar.Content className="circa-menu" align="start" sideOffset={0}>
             <Menubar.CheckboxItem className="circa-menuitem" checked={state.ruler} onCheckedChange={actions.toggleRuler}>
-              Ruler
+              {t("viewRuler")}
             </Menubar.CheckboxItem>
             <Menubar.Separator className="circa-menuseparator" />
-            <Menubar.Label className="circa-menulabel">Text size</Menubar.Label>
+            <Menubar.Label className="circa-menulabel">{t("viewTextSize")}</Menubar.Label>
             <Menubar.RadioGroup value={state.size} onValueChange={(value) => actions.setSize(value as TextSize)}>
               {TEXT_SIZES.map((size) => (
-                <Menubar.RadioItem key={size} className="circa-menuitem" value={size}>{TEXT_SIZE_LABELS[size]}</Menubar.RadioItem>
+                <Menubar.RadioItem key={size} className="circa-menuitem" value={size}>{t(TEXT_SIZE_LABELS[size])}</Menubar.RadioItem>
               ))}
             </Menubar.RadioGroup>
           </Menubar.Content>
@@ -109,7 +165,7 @@ export function WordMenu({ state, actions }: { state: EditorState; actions: Word
       </Menubar.Menu>
 
       <Menubar.Menu>
-        <Menubar.Trigger className="circa-menutitle" onClick={actions.quiet}>Insert</Menubar.Trigger>
+        <Menubar.Trigger className="circa-menutitle" onClick={actions.quiet}>{t("menuInsert")}</Menubar.Trigger>
         <Menubar.Portal>
           <Menubar.Content className="circa-menu" align="start" sideOffset={0}>
             {(["link", "image", "table", "rule", "codeblock"] as const).map((id) => {
@@ -118,7 +174,7 @@ export function WordMenu({ state, actions }: { state: EditorState; actions: Word
               return (
                 <Menubar.Item key={id} className="circa-menuitem"
                   onSelect={() => (id === "link" || id === "image" ? actions.askAddress(id) : actions.tool(id))}>
-                  {tool.name}<span className="circa-menukey">{tool.syntax}</span>
+                  {t(TOOL_NAME_KEYS[tool.id])}<span className="circa-menukey">{tool.syntax}</span>
                 </Menubar.Item>
               );
             })}
@@ -127,12 +183,12 @@ export function WordMenu({ state, actions }: { state: EditorState; actions: Word
       </Menubar.Menu>
 
       <Menubar.Menu>
-        <Menubar.Trigger className="circa-menutitle" onClick={actions.quiet}>Help</Menubar.Trigger>
+        <Menubar.Trigger className="circa-menutitle" onClick={actions.quiet}>{t("menuHelp")}</Menubar.Trigger>
         <Menubar.Portal>
           <Menubar.Content className="circa-menu" align="start" sideOffset={0}>
-            <Menubar.Item className="circa-menuitem" onSelect={actions.policy}>Filing policy</Menubar.Item>
+            <Menubar.Item className="circa-menuitem" onSelect={actions.policy}>{t("filingPolicy")}</Menubar.Item>
             <Menubar.Separator className="circa-menuseparator" />
-            <Menubar.Item className="circa-menuitem" onSelect={actions.about}>About {WORD_NAME}</Menubar.Item>
+            <Menubar.Item className="circa-menuitem" onSelect={actions.about}>{t("aboutLabel", { name: WORD_NAME })}</Menubar.Item>
           </Menubar.Content>
         </Menubar.Portal>
       </Menubar.Menu>
@@ -150,46 +206,47 @@ export function WordMenu({ state, actions }: { state: EditorState; actions: Word
  * `{ }` cannot stagger the row.
  */
 export function WordToolbar({ state, actions }: { state: EditorState; actions: WordActions }) {
+  const t = useTranslations("word");
   const active = new Set(state.active);
   return (
-    <div className="word-formatbar" role="toolbar" aria-label="Markdown tools">
+    <div className="word-formatbar" role="toolbar" aria-label={t("toolbarLabel")}>
       {/*
         The style box is a real control rather than a readout: choosing a level
         is the same edit the heading tools make, which is what the box was for in
         the first place. It reads the caret's line and writes it back.
       */}
       <div className="word-formatgroup">
-        <label className="word-stylelabel" htmlFor="word-style">Style</label>
+        <label className="word-stylelabel" htmlFor="word-style">{t("styleLabel")}</label>
         <select id="word-style" className="word-style" value={styleValue(state)} onChange={(event) => actions.setStyle(event.target.value as "body" | "h1" | "h2" | "h3")}>
-          <option value="body">Body Text</option>
-          <option value="h1">Heading 1</option>
-          <option value="h2">Heading 2</option>
-          <option value="h3">Heading 3</option>
+          <option value="body">{t("styleBody")}</option>
+          <option value="h1">{t(TOOL_NAME_KEYS.heading1)}</option>
+          <option value="h2">{t(TOOL_NAME_KEYS.heading2)}</option>
+          <option value="h3">{t(TOOL_NAME_KEYS.heading3)}</option>
         </select>
       </div>
       <span className="word-formatdivider" aria-hidden="true" />
-      <div className="word-formatgroup" role="group" aria-label="Text">
-        <span className="word-formatlegend">Text</span>
+      <div className="word-formatgroup" role="group" aria-label={t("groupText")}>
+        <span className="word-formatlegend">{t("groupText")}</span>
         {[...toolGroup("text")].map((tool) => (
           <WordToolButton key={tool.id} tool={tool} pressed={active.has(tool.id)} onClick={() => actions.tool(tool.id)} />
         ))}
       </div>
       <span className="word-formatdivider" aria-hidden="true" />
-      <div className="word-formatgroup" role="group" aria-label="Blocks">
-        <span className="word-formatlegend">Blocks</span>
+      <div className="word-formatgroup" role="group" aria-label={t("groupBlocks")}>
+        <span className="word-formatlegend">{t("groupBlocks")}</span>
         {[...toolGroup("blocks")].map((tool) => (
           <WordToolButton key={tool.id} tool={tool} pressed={active.has(tool.id)}
             onClick={() => (tool.id === "link" || tool.id === "image" ? actions.askAddress(tool.id) : actions.tool(tool.id))} />
         ))}
       </div>
       <div className="word-formatgroup">
-        <button type="button" className="word-tool word-tool-wide" aria-label="Undo" title="Undo (Ctrl+Z)"
+        <button type="button" className="word-tool word-tool-wide" aria-label={t("undoLabel")} title={t("undoTitle")}
           disabled={!canUndo(state)} onClick={actions.undo}>
-          <span className="word-toollabel">Undo</span>
+          <span className="word-toollabel">{t("undoLabel")}</span>
         </button>
-        <button type="button" className="word-tool word-tool-wide" aria-label="Redo" title="Redo (Ctrl+Y)"
+        <button type="button" className="word-tool word-tool-wide" aria-label={t("redoLabel")} title={t("redoTitle")}
           disabled={!canRedo(state)} onClick={actions.redo}>
-          <span className="word-toollabel">Redo</span>
+          <span className="word-toollabel">{t("redoLabel")}</span>
         </button>
       </div>
     </div>
@@ -206,9 +263,11 @@ function styleValue(state: EditorState): "body" | "h1" | "h2" | "h3" {
 
 /** One markdown tool. The tooltip is the markdown it writes, so nothing is a guess. */
 function WordToolButton({ tool, pressed, onClick }: { tool: MarkdownTool; pressed: boolean; onClick: () => void }) {
+  const t = useTranslations("word");
+  const name = t(TOOL_NAME_KEYS[tool.id]);
   return (
-    <button type="button" className="word-tool" data-tool={tool.id} aria-label={tool.name}
-      aria-pressed={pressed ? "true" : undefined} title={`${tool.name}  ${tool.syntax}`} onClick={onClick}>
+    <button type="button" className="word-tool" data-tool={tool.id} aria-label={name}
+      aria-pressed={pressed ? "true" : undefined} title={`${name}  ${tool.syntax}`} onClick={onClick}>
       <span className="word-toollabel" aria-hidden="true">{tool.label}</span>
     </button>
   );
@@ -234,13 +293,16 @@ export function WordRuler() {
  * the counts, then the size cell, then the filing state.
  */
 export function WordStatus({ state, summary }: { state: EditorState; summary: string }) {
+  const t = useTranslations("word");
   return (
     <div className="word-statusbar">
-      <span className="word-status-report" role="status">{state.notice ?? summary}</span>
-      <span className="word-status-cell">Page 1</span>
-      <span className="word-status-cell">Body Text</span>
-      <span className="word-status-cell">{TEXT_SIZE_LABELS[state.size]}</span>
-      <span className="word-status-cell">Unfiled</span>
+      <span className="word-status-report" role="status">{state.notice
+        ? t(state.notice.key, state.notice.size ? { size: t(TEXT_SIZE_LABELS[state.notice.size]) } : undefined)
+        : summary}</span>
+      <span className="word-status-cell">{t("statusPage")}</span>
+      <span className="word-status-cell">{t("styleBody")}</span>
+      <span className="word-status-cell">{t(TEXT_SIZE_LABELS[state.size])}</span>
+      <span className="word-status-cell">{t("statusUnfiled")}</span>
     </div>
   );
 }

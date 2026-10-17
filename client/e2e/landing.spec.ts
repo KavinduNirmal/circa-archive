@@ -50,3 +50,41 @@ test("decorative movement is brief, finite, and absent under reduced motion", as
   await expect(mark).toHaveCSS("animation-name", "none");
   await expect(page.getByLabel("Administrative stamp: continuation sheet 2 of 1")).not.toHaveCSS("transform", "none");
 });
+
+test("a Korean-preferring browser reaches the Korean portal without being asked", async ({ browser }) => {
+  // Detection is on Accept-Language, so the browser's own locale is the input.
+  const context = await browser.newContext({ locale: "ko-KR" });
+  const page = await context.newPage();
+  await page.goto("/");
+  await expect(page).toHaveURL(/\/ko$/);
+  await expect(page.locator("html")).toHaveAttribute("lang", "ko");
+  await expect(page.getByRole("link", { name: "기록보관소 열람" })).toHaveAttribute("href", "/ko/desktop");
+  await context.close();
+});
+
+test("the language switcher changes language without losing the page", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/ko");
+  await expect(page.locator("html")).toHaveAttribute("lang", "ko");
+
+  await page.getByRole("navigation", { name: "언어" }).getByRole("link", { name: "English" }).click();
+  await expect(page).toHaveURL(/\/en$/);
+  await expect(page.locator("html")).toHaveAttribute("lang", "en");
+  await expect(page.getByRole("link", { name: "Enter the archive", exact: true })).toBeVisible();
+
+  // The choice outranks the browser's preference next time, so it is remembered.
+  const remembered = (await page.context().cookies()).find((item) => item.name === "NEXT_LOCALE");
+  expect(remembered?.value).toBe("en");
+});
+
+test("the switcher keeps the reader on the workstation rather than sending them home", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/en/desktop");
+  await expect(page.getByRole("button", { name: "Start", exact: true })).toBeVisible();
+
+  await page.getByRole("navigation", { name: "Language" }).getByRole("link", { name: "한국어" }).click();
+  await expect(page).toHaveURL(/\/ko\/desktop$/);
+  // The workstation's own chrome followed the language, not just the document.
+  await expect(page.getByRole("button", { name: "시작", exact: true })).toBeVisible();
+  await expect(page.getByRole("navigation", { name: "데스크톱 폴더" })).toBeVisible();
+});

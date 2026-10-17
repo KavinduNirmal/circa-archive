@@ -147,6 +147,16 @@ The typography is strictly sans-serif, utilitarian, and engineered for high-dens
 ### Exception: the record sheet
 The record reader's paper sheet is set in a typewriter face (`"Courier New"`, with metric-compatible clones behind it) rather than the sans stack. A sheet is a document and not interface chrome, so the archive types its filings and typesets its software; the frame around the sheet — toolbar, section rail, margin, status bar — stays sans-serif, and the value fields and inline code on the sheet keep the terminal mono. The record's code is set in Redacted Crimson as the one identifying mark on the leaf. The sheet is drawn as continuous stationery — round tractor-feed holes and a perforation down each edge, with the filing lens running as a head and a foot — and that edge is a CSS background, which keeps it out of the content, the accessibility tree, and every export. This is the only sanctioned departure from the rule above.
 
+### Korean: the rules that do not carry over
+
+The interface ships in English and Korean, and three rules above are Latin conventions rather than universal ones. They are recorded here as open questions rather than settled decisions, because a Korean pass deserves its own design review.
+
+- **Uppercase is not available.** Korean has no letter case, so the `UPPERCASE` rule on labels, headers, and taskbar indicators cannot be honoured in Korean and is simply inert there. No substitute has been chosen: the question is whether Korean chrome should lean on weight, on a rule, or on nothing at all.
+- **Tracking reads differently.** Expanded letter-spacing (`0.06em`–`0.1em`) makes Latin micro-labels read as machine plates. Applied to Hangul it pulls syllables apart, because a Korean syllable block is already a composed unit rather than a sequence of letters. The current build applies the same tracking in both languages, which is the untested half of this.
+- **No Korean webfont is bundled.** `@fontsource/dm-sans` and `@fontsource/ibm-plex-mono` carry no Hangul, so Korean falls back to the reader's own Korean face; `:lang(ko)` in `globals.css` names the three platform faces to fall back to so Windows, macOS, and Android at least agree with each other. Bundling `IBM Plex Sans KR` — the same superfamily as the bundled mono, and the obvious candidate for keeping the institutional voice — is an open question with a real cost, since Korean webfonts are large and would need subsetting and a third-party notice.
+
+The staged display faces (`Georgia`, `Arial`, `'Courier New'`) in the portal's stylesheet name generic `serif`, `sans-serif`, and `monospace` fallbacks, so Korean already degrades to a platform serif or monospace there rather than to a Latin face with no glyphs. That is acceptable as a fallback and is not a decision about Korean display typography.
+
 ## Layout & Spacing
 
 The layout philosophy mirrors an authenticated multi-window workstation operating under an X-Window System root canvas.

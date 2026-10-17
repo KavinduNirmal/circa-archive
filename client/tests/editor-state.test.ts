@@ -201,12 +201,12 @@ describe("tools through the reducer", () => {
 describe("status reports", () => {
   it("reports a view change and can be quieted", () => {
     const sized = run({ type: "size", size: "large" });
-    expect(sized.notice).toBe("Text size: large.");
+    expect(sized.notice).toEqual({ key: "textSizeNotice", size: "large" });
     expect(editorReducer(sized, { type: "quiet" }).notice).toBeNull();
   });
 
   it("reports the build in its About line", () => {
-    expect(run({ type: "about" }).notice).toBe("CIRCA Word, build 1999.4.");
+    expect(run({ type: "about" }).notice).toEqual({ key: "buildNotice" });
   });
 
   it("tracks where the caret is", () => {

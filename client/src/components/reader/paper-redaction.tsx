@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type KeyboardEvent, type ReactNode } from "react";
+import { useTranslations } from "next-intl";
 
 /**
  * One redacted span, drawn on the sheet.
@@ -18,6 +19,7 @@ import { useState, type KeyboardEvent, type ReactNode } from "react";
  * has no children and this component has nothing to reveal.
  */
 export function PaperRedaction({ children }: { children?: ReactNode }) {
+  const t = useTranslations("reader");
   const [revealed, setRevealed] = useState(false);
   const hasText = children !== undefined && children !== null && children !== false;
 
@@ -42,14 +44,14 @@ export function PaperRedaction({ children }: { children?: ReactNode }) {
       aria-label={
         hasText
           ? revealed
-            ? "Redacted text, revealed. Activate to hide it again."
-            : "Redacted text. Activate to reveal it."
-          : "Redacted text, withheld from this copy."
+            ? t("redactionRevealed")
+            : t("redactionClosed")
+          : t("redactionWithheld")
       }
       onClick={toggle}
       onKeyDown={onKeyDown}
     >
-      {hasText ? <span aria-hidden={revealed ? undefined : true}>{children}</span> : <span aria-hidden="true">[REDACTED]</span>}
+      {hasText ? <span aria-hidden={revealed ? undefined : true}>{children}</span> : <span aria-hidden="true">{t("redactionMarker")}</span>}
     </mark>
   );
 }

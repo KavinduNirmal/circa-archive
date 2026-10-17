@@ -4,10 +4,19 @@
 
 The public agency portal at `/` and the workstation's boot sequence.
 
-- `landing-page.tsx`: server-rendered public notices, audience procedures, directory, revision register, and archive entry.
+- `landing-page.tsx`: server-rendered public notices, audience procedures, directory, revision register, and archive entry. All copy comes from the `landing` namespace, so the page is the same composition in every language.
 - `landing-page.module.css`: scoped portal layout, steel and paper palette, responsive rules, and rare decorative movement.
-- `boot-sequence.tsx`: the existing `/desktop` power-on screen and `WorkstationBoot` wrapper.
+- `boot-sequence.tsx`: the existing `/{lang}/desktop` power-on screen and `WorkstationBoot` wrapper. `bootLines` takes a translator, so the post reports the mounted index in the reader's language.
 - `boot.css`: the post screen's plate, seals, progress cells, and its blink and settle animation. Imported by `boot-sequence.tsx`.
+- The language switcher both this portal and the workstation use lives one level up, in `../language-switcher.tsx`.
+
+## Localization decision — 2026-10-15
+
+The portal and the workstation chrome follow the request's language; the application interiors behind them do not yet. Strings were moved to `messages/en.json` and `messages/ko.json` rather than into a per-component dictionary, and the landing page is a Server Component, so its prose is rendered rather than shipped: `src/app/[lang]/layout.tsx` sends the browser only the `shell`, `boot`, and `switcher` namespaces.
+
+Two things deliberately did not translate. The seal monogram `IR / CA` is a graphic device, not prose, and stays in the markup. Archive codes, document numbers, dates, and the circular number are identifiers — `PA–01` is the same document in either language — so they are carried through the catalogs unchanged and a test holds them.
+
+Neither bundled face carries Hangul. `:lang(ko)` in `globals.css` names the Korean faces to fall back to so the three platforms agree; the portal's own stacks name generic `serif` and `monospace` fallbacks and already degrade that way. Bundling a Korean webfont, and whether the uppercase micro-label tracking should be relaxed for Hangul, are open questions recorded in `../../../.agents/brain/DESIGN.md`.
 
 ## Design decision — 2026-10-15
 
@@ -17,7 +26,7 @@ The purpose is orientation and entry. A compact blue-steel masthead and conventi
 
 ## Boundaries
 
-The only application destination is `/desktop`. Local links resolve to real sections, including an unavailable-document notice. Public access explains how to use Archive and Search. Submission guidance describes temporary editor drafts and does not promise transmission. Organization registration and credential verification are explicitly unconnected, with no fake form or invented authentication. The contact directory lists routing references, not operational email addresses. The page makes no claim of a network security clearance.
+The only application destination is the workstation, reached in the reader's own language. Local links resolve to real sections, including an unavailable-document notice. Public access explains how to use Archive and Search. Submission guidance describes temporary editor drafts and does not promise transmission. Organization registration and credential verification are explicitly unconnected, with no fake form or invented authentication. The contact directory lists routing references, not operational email addresses. The page makes no claim of a network security clearance.
 
 ## Usage and verification
 

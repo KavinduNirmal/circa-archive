@@ -1,9 +1,10 @@
-import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { fireEvent, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 import { FileExplorer } from "@/components/files/file-explorer";
 import { EXPLORER_NAME } from "@/components/files/files-identity";
 import { FILE_TREE, SCOPES, childrenOf, folderCounts, nodeById } from "@/components/files/files-index";
+import { renderWithIntl } from "./intl";
 
 /**
  * The explorer is rendered on its own here rather than through the desktop.
@@ -12,7 +13,7 @@ import { FILE_TREE, SCOPES, childrenOf, folderCounts, nodeById } from "@/compone
  */
 function openExplorer(scopeId = "my-pc", props: { initialPath?: string } = {}) {
   const user = userEvent.setup();
-  render(<FileExplorer scopeId={scopeId} initialPath={props.initialPath} onCloseWindow={() => {}} />);
+  renderWithIntl(<FileExplorer scopeId={scopeId} initialPath={props.initialPath} onCloseWindow={() => {}} />);
   const root = document.querySelector<HTMLElement>(".files");
   if (!root) throw new Error("the explorer did not render");
   const tree = () => within(root).getByRole("tree", { name: "Folders" });

@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
 import {
   DEFAULT_SORT,
   MAIL_FOLDERS,
@@ -8,7 +9,6 @@ import {
   MAILBOX_FIXTURE,
   countInFolder,
   findMessages,
-  folderLabel,
   folderMessages,
   isUnread,
   nextStamp,
@@ -20,17 +20,35 @@ import {
   type MailSort,
   type MailSortColumn,
 } from "./mailbox-index";
-import { MailFindBar, MailFolders, MailMenu, MailStatus, MailToolbar, type MailActions, type MailView } from "./mail-chrome";
+import {
+  MailFindBar,
+  MailFolders,
+  MailMenu,
+  MailStatus,
+  MailToolbar,
+  folderLabel,
+  type MailActions,
+  type MailView,
+} from "./mail-chrome";
 import { MessageList } from "./message-list";
 import { ComposePane, ReadingEmpty, ReadingPane, draftFrom, type ComposeDraft, type ComposeKind } from "./message-view";
 import { MailNotice, type MailNoticeKind } from "./mail-notice";
 import "./mail.css";
 
-const SORTABLE_TITLES: Record<MailSortColumn, string> = {
-  importance: "importance",
-  from: "sender",
-  subject: "subject",
-  received: "date received",
+/** How the status bar names the column a sort was applied to. */
+const SORTABLE_KEYS: Record<MailSortColumn, string> = {
+  importance: "sortByImportance",
+  from: "sortByFrom",
+  subject: "sortBySubject",
+  received: "sortByReceived",
+};
+
+/** What the status bar reports after each composer is opened. */
+const PREPARED_KEYS: Record<ComposeKind, string> = {
+  new: "messageStarted",
+  reply: "replyPrepared",
+  "reply-all": "replyAllPrepared",
+  forward: "forwardPrepared",
 };
 
 /**
@@ -47,6 +65,7 @@ const SORTABLE_TITLES: Record<MailSortColumn, string> = {
  * transfer.
  */
 export function MailWindow({ onCloseWindow }: { onCloseWindow: () => void }) {
+  const t = useTranslations("mail");
   const [messages, setMessages] = useState<readonly MailMessage[]>(MAILBOX_FIXTURE);
   const [read, setRead] = useState<ReadonlySet<string>>(() => readIds(MAILBOX_FIXTURE));
   const [folderId, setFolderId] = useState<MailFolderId>("inbox");
@@ -57,7 +76,7 @@ export function MailWindow({ onCloseWindow }: { onCloseWindow: () => void }) {
   const [query, setQuery] = useState("");
   const [compose, setCompose] = useState<ComposeDraft | null>(null);
   const [notice, setNotice] = useState<MailNoticeKind | null>(null);
-  const [report, setReport] = useState(`Ready. ${MAILBOX_FIXTURE.length} messages in the store.`);
+  const [report, setReport] = useState(() => t("ready", { count: MAILBOX_FIXTURE.length }));
 
   const selected = compose || !selectedId ? null : messages.find((item) => item.id === selectedId) ?? null;
 
@@ -75,35 +94,35 @@ export function MailWindow({ onCloseWindow }: { onCloseWindow: () => void }) {
   }, [messages, folderId, view, query, sort, read, selectedId]);
 
   const unreadListed = unreadCount(listed, read);
-  const counts = `${listed.length} ${listed.length === 1 ? "item" : "items"}, ${unreadListed} unread`;
+  const counts = t("counts", { items: listed.length, unread: unreadListed });
 
   function showFolder(next: MailFolderId) {
     setFolderId(next);
     setSelectedId(null);
     setCompose(null);
     setQuery("");
-    setReport(`Opened ${folderLabel(next)}.`);
+    setReport(t("openedFolder", { folder: folderLabel(t, next) }));
   }
 
   function select(message: MailMessage) {
     setSelectedId(message.id);
     setCompose(null);
     setRead((current) => (current.has(message.id) ? current : new Set(current).add(message.id)));
-    setReport(`${message.subject} opened.`);
+    setReport(t("messageOpened", { subject: message.subject }));
   }
 
   function sortBy(column: MailSortColumn) {
     setSort((current) => current.column === column
       ? { column, direction: current.direction === "asc" ? "desc" : "asc" }
       : { column, direction: column === "received" ? "desc" : "asc" });
-    setReport(`Sorted by ${SORTABLE_TITLES[column]}.`);
+    setReport(t("sortedBy", { column: t(SORTABLE_KEYS[column]) }));
   }
 
   function deleteSelected() {
     if (!selected) return;
     setMessages((current) => current.map((item) => (item.id === selected.id ? { ...item, folder: "deleted" } : item)));
     setSelectedId(null);
-    setReport(`${selected.subject} moved to Deleted Items.`);
+    setReport(t("movedToDeleted", { subject: selected.subject }));
   }
 
   function markSelected(isRead: boolean) {
@@ -114,31 +133,29 @@ export function MailWindow({ onCloseWindow }: { onCloseWindow: () => void }) {
       else next.delete(selected.id);
       return next;
     });
-    setReport(isRead ? "Marked as read." : "Marked as unread.");
+    setReport(isRead ? t("markedAsRead") : t("markedAsUnread"));
   }
 
   function markAllRead() {
     setRead(new Set(messages.map((item) => item.id)));
-    setReport(`Marked ${folderLabel(folderId)} as read.`);
+    setReport(t("markedFolderRead", { folder: folderLabel(t, folderId) }));
   }
 
   function sendReceive() {
     const waiting = countInFolder(messages, "outbox");
-    setReport(waiting === 0
-      ? "Send and receive: no correspondence transport is connected, and the Outbox is empty."
-      : `Send and receive: no correspondence transport is connected, so ${waiting} message${waiting === 1 ? "" : "s"} cannot leave the Outbox.`);
+    setReport(waiting === 0 ? t("transportIdle") : t("transportBlocked", { count: waiting }));
   }
 
   function startCompose(kind: ComposeKind) {
-    setCompose(draftFrom(kind, selected));
-    setReport(kind === "new" ? "New message." : `${kind === "reply-all" ? "Reply all" : kind === "reply" ? "Reply" : "Forward"} prepared.`);
+    setCompose(draftFrom(kind, selected, t));
+    setReport(t(PREPARED_KEYS[kind]));
   }
 
   function sendDraft() {
     if (!compose) return;
     const recipient = compose.to.trim();
     if (!recipient) {
-      setReport("This message needs a recipient before it can be queued.");
+      setReport(t("needsRecipient"));
       return;
     }
     const id = `MSG-${String(messages.length + 1).padStart(4, "0")}`;
@@ -147,14 +164,14 @@ export function MailWindow({ onCloseWindow }: { onCloseWindow: () => void }) {
       folder: "outbox",
       from: MAILBOX_ADDRESS,
       to: [{ name: recipient, address: recipient }],
-      subject: compose.subject.trim() || "(no subject)",
+      subject: compose.subject.trim() || t("noSubject"),
       received: nextStamp(messages),
       body: compose.body.trim() ? compose.body.split(/\n{2,}/) : [""],
     };
     setMessages((current) => [...current, queued]);
     setRead((current) => new Set(current).add(id));
     setCompose(null);
-    setReport(`${queued.subject} queued in the Outbox. No transport is connected.`);
+    setReport(t("queuedInOutbox", { subject: queued.subject }));
   }
 
   const actions: MailActions = {
@@ -170,7 +187,7 @@ export function MailWindow({ onCloseWindow }: { onCloseWindow: () => void }) {
     setFindOpen,
     setView: (next) => {
       setView(next);
-      setReport(next === "unread" ? "Showing unread messages." : "Showing all messages.");
+      setReport(next === "unread" ? t("showingUnread") : t("showingAll"));
     },
     goToFolder: showFolder,
     about: () => setNotice("about"),
@@ -191,11 +208,11 @@ export function MailWindow({ onCloseWindow }: { onCloseWindow: () => void }) {
             {compose
               ? <ComposePane draft={compose} onChange={setCompose} onSend={sendDraft} onDiscard={() => {
                 setCompose(null);
-                setReport("Message discarded.");
+                setReport(t("messageDiscarded"));
               }} />
               : selected
                 ? <ReadingPane message={selected} />
-                : <ReadingEmpty folderLabel={folderLabel(folderId)} items={listed.length} />}
+                : <ReadingEmpty folderLabel={folderLabel(t, folderId)} items={listed.length} />}
           </div>
         </div>
       </div>

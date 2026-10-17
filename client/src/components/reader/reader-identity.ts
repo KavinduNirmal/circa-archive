@@ -1,13 +1,16 @@
 /**
  * The reader's in-world identity: the name the chrome carries, the handle a
- * reviewer files under, and the words this screen uses for things the rest of
- * the world calls by a plainer name.
+ * reviewer files under, and the numbers the margin prints beside a name.
  *
- * The vocabulary is the point of the file. A reader of a 1999 filing system
- * does not leave comments, cannot upvote, and does not read references; it
- * files annotations, corroborates or contests, and shows the subsequent
- * records. Keeping those words in one place is what stops a plain-language
- * synonym from leaking into one label at a time.
+ * The words this screen uses for things the rest of the world calls by a
+ * plainer name — annotations, corroboration, contest, follow-ups, sections —
+ * are interface copy, and they live in the `reader` namespace of
+ * `messages/en/reader.json` and `messages/ko/reader.json`. The vocabulary is
+ * still the point: a reader of a 1999 filing system does not leave comments,
+ * cannot upvote, and does not read references; it files annotations,
+ * corroborates or contests, and shows the subsequent records. Keeping those
+ * words in one catalog is what stops a plain-language synonym from leaking into
+ * one label at a time, in either language.
  */
 
 export const READER_NAME = "CIRCA Reader";
@@ -47,27 +50,3 @@ export const USER_CODES: Readonly<Record<string, string>> = {
 export function userCodeFor(author: string): string | null {
   return USER_CODES[author] ?? null;
 }
-
-export const READER_VOCABULARY = {
-  /** Comments. */
-  annotations: "Annotations",
-  notePlaceholder: "File a note.",
-  assessment: "Reviewer Assessment",
-  /** Upvote. */
-  corroborate: "Corroborate",
-  /** Downvote. */
-  contest: "Contest",
-  /** Liking a note. */
-  noted: "Noted",
-  /** The references footer. */
-  followUps: "Subsequent Records",
-  filedAgainst: "Filed against this record",
-  citedIn: "Cited in this record",
-  sections: "Sections",
-  scale: "Scale",
-  fitToMargin: "Fit to margin",
-  emptyMargin: "No annotations filed.",
-  emptyMarginNote: "Correspondents may add notes below.",
-  emptyFollowUps: "No follow-up records filed.",
-  fixture: "Preview record",
-} as const;

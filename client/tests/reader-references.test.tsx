@@ -1,10 +1,11 @@
 import type { ComponentProps } from "react";
-import { render, screen, within } from "@testing-library/react";
+import { screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import type { ReaderFollowUp } from "@/components/reader/reader-correspondence";
 import { FOLLOW_UP_PREVIEW_LIMIT } from "@/components/reader/reader-model";
 import { FollowUpStrip } from "@/components/reader/reader-references";
+import { renderWithIntl } from "./intl";
 
 /** A card is four fields, so a synthetic list is one line each. */
 function cards(count: number): ReaderFollowUp[] {
@@ -19,7 +20,7 @@ function cards(count: number): ReaderFollowUp[] {
 function mount(props: Partial<ComponentProps<typeof FollowUpStrip>> = {}) {
   const onOpen = vi.fn();
   const onToggle = vi.fn();
-  const view = render(
+  const view = renderWithIntl(
     <FollowUpStrip code="INC-00042" inbound={[]} outbound={[]} collapsed={false} onToggle={onToggle} onOpen={onOpen} {...props} />,
   );
   const rerender = (next: Partial<ComponentProps<typeof FollowUpStrip>>) => view.rerender(

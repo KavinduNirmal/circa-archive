@@ -1,7 +1,27 @@
 import { expect, test } from "@playwright/test";
 
-/** Desktop shortcuts in reading order, matching `desktopFolders`. */
-const shortcuts = ["My PC", "My Documents", "Archive", "Organizations", "Inbox", "CIRCA Word", "Search", "_EXPUNGED", "Recycle Bin"];
+/**
+ * Desktop shortcuts in reading order, each paired with the title its window takes.
+ *
+ * A folder window is named for the folder plus the explorer, and the three
+ * applications name their own windows, so the shortcut label and the dialog title
+ * are not the same string.
+ */
+const shortcuts = [
+  ["My PC", "My Computer - CIRCA Explorer"],
+  ["My Documents", "My Documents - CIRCA Explorer"],
+  ["My Work", "My Work - CIRCA Explorer"],
+  ["Archive", "Archive - CIRCA Explorer"],
+  ["Organizations", "Organizations - CIRCA Explorer"],
+  ["Inbox", "Titan Mail - CIRCA Correspondence"],
+  ["CIRCA Word", "CIRCA Word - Untitled Record"],
+  ["Search", "Titan Browser - CIRCA Archive"],
+  ["_EXPUNGED", "_EXPUNGED - CIRCA Explorer"],
+  ["Recycle Bin", "Recycle Bin - CIRCA Explorer"],
+] as const;
+
+/** The archive explorer's window, which several gestures below act on. */
+const ARCHIVE_WINDOW = "Archive - CIRCA Explorer";
 
 /** Destinations that carry a retro shortcut marker. */
 const shortcutMarked = ["Archive", "_EXPUNGED"];
@@ -12,22 +32,23 @@ for (const viewport of [{ width: 1440, height: 900 }, { width: 390, height: 844 
     page.on("pageerror", (error) => errors.push(error.message));
     await page.setViewportSize(viewport);
     await page.goto("/desktop");
-    await expect(page).toHaveTitle("CIRCA Archive");
+    // The workstation page's own title, which the root layout's default does not override.
+    await expect(page).toHaveTitle("Workstation");
     await page.evaluate(() => document.fonts.ready);
     await expect(page.getByRole("main", { name: "CIRCA desktop" })).toBeVisible();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
     const navigation = page.getByRole("navigation", { name: "Desktop folders" });
-    for (const folder of shortcuts) {
+    for (const [folder, windowTitle] of shortcuts) {
       const shortcut = navigation.getByRole("button", { name: folder, exact: true });
       await expect(shortcut).toBeVisible();
       await shortcut.click();
-      const windowFrame = page.getByRole("dialog", { name: folder, exact: true });
+      const windowFrame = page.getByRole("dialog", { name: windowTitle, exact: true });
       await expect(windowFrame).toBeVisible();
       // Escape closes the focused window; focus restoration is covered by the close-button test.
       await page.keyboard.press("Escape");
       await expect(windowFrame).toHaveCount(0);
     }
-    expect(await navigation.locator('[data-icon="network"]').count()).toBe(1);
+    expect(await navigation.locator('[data-icon="organizations"]').count()).toBe(1);
     expect(await navigation.locator('[data-icon="inbox"]').count()).toBe(1);
     expect(await navigation.locator('[data-icon="circa-word"]').count()).toBe(1);
     for (const folder of shortcutMarked) {
@@ -36,8 +57,9 @@ for (const viewport of [{ width: 1440, height: 900 }, { width: 390, height: 844 
     expect(await navigation.locator("[data-shortcut]").count()).toBe(shortcutMarked.length);
     await page.getByRole("button", { name: "Start", exact: true }).click();
     await page.getByRole("navigation", { name: "Start applications" }).getByRole("button", { name: "Archive", exact: true }).click();
-    await page.getByRole("button", { name: "Return to desktop" }).click();
-    await expect(page.getByRole("button", { name: "Start", exact: true })).toBeFocused();
+    await page.getByRole("button", { name: `Close ${ARCHIVE_WINDOW}`, exact: true }).click();
+    await expect(page.getByRole("dialog")).toHaveCount(0);
+    await expect(navigation).toBeVisible();
     await page.getByRole("button", { name: "Notifications", exact: true }).click();
     await expect(page.getByText("Notifications are not connected yet.")).toBeVisible();
     await page.keyboard.press("Escape");
@@ -63,7 +85,7 @@ test("desktop shortcuts explain themselves with the beveled tooltip", async ({ p
   const tooltip = page.getByRole("tooltip");
   await expect(tooltip).toBeVisible();
   await expect(tooltip).toContainText("Organization dossiers and continuities");
-  await expect(tooltip.locator(".tooltip-arrow-fill")).toBeVisible();
+  await expect(tooltip.locator(".tooltip-arrow")).toHaveCount(1);
   await page.mouse.move(720, 500);
   await expect(tooltip).toBeHidden();
 });
@@ -72,7 +94,7 @@ test("windows drag, resize, minimize, and maximize", async ({ page }) => {
   await page.goto("/desktop");
   const shortcut = page.getByRole("navigation", { name: "Desktop folders" }).getByRole("button", { name: "Archive", exact: true });
   await shortcut.click();
-  const windowFrame = page.getByRole("dialog", { name: "Archive", exact: true });
+  const windowFrame = page.getByRole("dialog", { name: ARCHIVE_WINDOW, exact: true });
   await expect(windowFrame).toBeVisible();
 
   // A frame that is not absolutely positioned flows into a vertical stack.
@@ -103,7 +125,7 @@ test("windows drag, resize, minimize, and maximize", async ({ page }) => {
   expect(Math.round(resized.width - moved.width)).toBe(90);
   expect(Math.round(resized.height - moved.height)).toBe(60);
 
-  await page.getByRole("button", { name: "Maximize Archive", exact: true }).click();
+  await page.getByRole("button", { name: `Maximize ${ARCHIVE_WINDOW}`, exact: true }).click();
   await expect(windowFrame).toHaveAttribute("data-maximized", "true");
   // A maximized window fills the desktop layer exactly, never overflowing it.
   const maximized = (await windowFrame.boundingBox())!;
@@ -112,27 +134,33 @@ test("windows drag, resize, minimize, and maximize", async ({ page }) => {
   expect(Math.round(maximized.height)).toBe(Math.round(layer.height));
   expect(Math.round(maximized.x)).toBe(Math.round(layer.x));
   expect(Math.round(maximized.y)).toBe(Math.round(layer.y));
-  await page.getByRole("button", { name: "Restore Archive", exact: true }).click();
+  await page.getByRole("button", { name: `Restore ${ARCHIVE_WINDOW}`, exact: true }).click();
   await expect(windowFrame).not.toHaveAttribute("data-maximized");
   expect(Math.round((await windowFrame.boundingBox())!.width)).toBe(Math.round(resized.width));
 
-  await page.getByRole("button", { name: "Minimize Archive", exact: true }).click();
+  await page.getByRole("button", { name: `Minimize ${ARCHIVE_WINDOW}`, exact: true }).click();
   await expect(windowFrame).toHaveCount(0);
-  const taskEntry = page.getByRole("contentinfo", { name: "Taskbar" }).getByRole("button", { name: "Archive", exact: true });
+  const taskEntry = page.getByRole("contentinfo", { name: "Taskbar" }).getByRole("button", { name: ARCHIVE_WINDOW, exact: true });
   await taskEntry.click();
-  await expect(page.getByRole("dialog", { name: "Archive", exact: true })).toBeVisible();
+  await expect(page.getByRole("dialog", { name: ARCHIVE_WINDOW, exact: true })).toBeVisible();
   await expect(taskEntry).toHaveAttribute("aria-pressed", "false");
 });
 
 test("My PC contains System and back-tracks", async ({ page }) => {
   await page.goto("/desktop");
   await page.getByRole("button", { name: "My PC", exact: true }).click();
-  await expect(page.getByRole("dialog", { name: "My PC", exact: true })).toBeVisible();
-  await page.getByRole("button", { name: "System", exact: true }).click();
-  await expect(page.getByRole("dialog", { name: "System", exact: true })).toBeVisible();
-  await expect(page.getByText("DESKTOP / MY PC / SYSTEM")).toBeVisible();
-  await page.getByRole("button", { name: "Back to My PC" }).click();
-  await expect(page.getByRole("dialog", { name: "My PC", exact: true })).toBeVisible();
+  // The workstation root is a computer, so the explorer titles it as one.
+  const frame = page.getByRole("dialog", { name: "My Computer - CIRCA Explorer", exact: true });
+  await expect(frame).toBeVisible();
+  // System lives inside My PC, as a folder in the tree.
+  const tree = frame.getByRole("tree", { name: "Folders" });
+  const systemFiles = tree.getByRole("button", { name: /^System Files/ });
+  await expect(systemFiles).toBeVisible();
+  await systemFiles.click();
+  // The window keeps the title it opened with; the address field reports where it now is.
+  await expect(frame).toBeVisible();
+  await expect(frame.getByText("CIRCA_OS_MANUAL.pdf")).toBeVisible();
+  await expect(frame.getByLabel("Current path")).toHaveValue("My Computer\\C: [SYSTEM]\\System Files");
 });
 
 test("home leads to the desktop", async ({ page }) => {

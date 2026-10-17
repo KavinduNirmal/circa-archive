@@ -16,8 +16,10 @@
 .portal :is(main, section, details):target { scroll-margin-top: 16px; }
 .portal p { margin: 0 0 12px; }
 .portal h2, .portal h3 { font-weight: bold; }
-.utility { display: flex; justify-content: space-between; gap: 12px; padding: 6px 18px; background: #0d131a; color: #a4b7ca; font-size: 10px; letter-spacing: .06em; }
+.utility { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 6px 18px; background: #0d131a; color: #a4b7ca; font-size: 10px; letter-spacing: .06em; }
 .utility a { color: #c8d6e5; }
+.utilityEdition { white-space: nowrap; }
+.utilityLanguage { margin-left: auto; }
 .masthead { display: flex; align-items: center; gap: 20px; padding: 27px 24px 30px; background: #1b2636; color: #c8d6e5; border-top: 1px solid #3a4f6d; }
 .masthead h1 { font-family: Georgia, 'Times New Roman', serif; font-size: clamp(22px, 2.4vw, 30px); font-weight: normal; line-height: 1.16; letter-spacing: -.015em; margin: 4px 0 10px; }
 .masthead .eyebrow { margin: 0; color: #a4c2e6; text-transform: uppercase; font-size: 10px; letter-spacing: .14em; }
@@ -143,8 +145,8 @@
   .portal { padding: 0; font-size: 13px; }
   .site { border-inline: none; }
   .utility { padding: 7px 12px; font-size: 9px; }
-  .utility > span:last-child { font-size: 0; }
-  .utility a { font-size: 10px; }
+  .utilityEdition { font-size: 0; }
+  .utilityEdition a { font-size: 10px; }
   .masthead { padding: 22px 15px; gap: 14px; align-items: flex-start; }
   .seal { flex-basis: 42px; height: 42px; margin-top: 7px; outline-offset: 2px; }
   .seal span { font-size: 9px; padding: 4px 0; }

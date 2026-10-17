@@ -1,16 +1,17 @@
-import { render, screen, within } from "@testing-library/react";
+import { screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
-// The shell directly: the /desktop route now posts first, and these tests are about the shell.
-import { DesktopShell as Home } from "@/components/desktop-shell";
+// The shell directly: the locale desktop route now posts first, and these tests are about the shell.
+import { DesktopShell } from "@/components/desktop-shell";
 import { ARCHIVE_INDEX } from "@/components/browser/archive-index";
+import { renderWithIntl } from "./intl";
 
 /** The browser names its own window, so the frame and its taskbar entry read as the browser. */
 const BROWSER_TITLE = "Titan Browser - CIRCA Archive";
 
 /** Opens the Search destination, which hosts the archive browser. */
 async function openBrowser(user: ReturnType<typeof userEvent.setup>) {
-  render(<Home />);
+  renderWithIntl(<DesktopShell />);
   await user.click(screen.getByRole("button", { name: "Search" }));
   const frame = screen.getByRole("dialog", { name: BROWSER_TITLE });
   const status = () => within(frame).getByRole("status").textContent ?? "";

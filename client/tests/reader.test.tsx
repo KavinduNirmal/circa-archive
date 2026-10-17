@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { render, screen, within } from "@testing-library/react";
+import { screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { RecordFilingBody } from "@/components/reader/record-filings";
 import { useReaderSession } from "@/components/reader/reader-session";
 import { RecordReader, type RecordTrail } from "@/components/reader/reader-window";
 import type { ReaderSection } from "@/components/reader/reader-model";
+import { renderWithIntl } from "./intl";
 
 const READER = "Record Viewer";
 
@@ -45,7 +46,7 @@ function Harness({ codes, at = 0, slot = true, onCloseWindow = () => {} }: {
 }
 
 function mount(code: string | null, slot = true) {
-  render(<Harness codes={code ? [code] : []} slot={slot} />);
+  renderWithIntl(<Harness codes={code ? [code] : []} slot={slot} />);
   const reader = screen.getByRole("dialog", { name: READER });
   return {
     reader,
@@ -113,7 +114,7 @@ describe("record reader frame", () => {
   it("closes the window from the reader's own control", async () => {
     const user = userEvent.setup();
     const onCloseWindow = vi.fn();
-    render(<Harness codes={["INC-00042"]} onCloseWindow={onCloseWindow} />);
+    renderWithIntl(<Harness codes={["INC-00042"]} onCloseWindow={onCloseWindow} />);
     await user.click(screen.getByRole("button", { name: "Close reader" }));
     expect(onCloseWindow).toHaveBeenCalledTimes(1);
   });
@@ -122,9 +123,12 @@ describe("record reader frame", () => {
 describe("record reader toolbar", () => {
   it("carries the document actions and the engagement controls", () => {
     const { reader } = mount("INC-00042");
-    for (const name of ["View", "Scale down", "Scale up", "Fit to margin", "Rotate", "Print", "Download", "Search", "Comment", "Corroborate", "Contest"]) {
+    for (const name of ["Scale down", "Scale up", "Fit to margin", "Rotate", "Print", "Download", "Search", "Comment", "Corroborate", "Contest"]) {
       expect(within(reader).getByRole("button", { name }), name).toBeVisible();
     }
+    // The View and Text menus live on the reader's menu bar rather than on the toolbar.
+    expect(within(reader).getByRole("menuitem", { name: "View" })).toBeVisible();
+    expect(within(reader).getByRole("menuitem", { name: "Text" })).toBeVisible();
     expect(within(reader).getByRole("radiogroup", { name: "Reviewer Assessment" })).toBeVisible();
     for (const point of ["—", "Marginal", "Adequate", "Sound", "Exemplary"]) {
       expect(within(reader).getByRole("radio", { name: point }), point).toBeVisible();
@@ -191,12 +195,12 @@ describe("record reader toolbar", () => {
     const { reader, sheet } = mount("INC-00042");
     expect(sheet()).toHaveAttribute("data-view", "continuous");
     expect(within(sheet()).getAllByRole("region")).toHaveLength(4);
-    await user.click(within(reader).getByRole("button", { name: "View" }));
+    await user.click(within(reader).getByRole("menuitem", { name: "View" }));
     await user.click(await screen.findByRole("menuitemradio", { name: "Single page" }));
     expect(sheet()).toHaveAttribute("data-view", "single");
     // One page at a time: the sheet holds the current section and nothing else.
     expect(within(sheet()).getAllByRole("region")).toHaveLength(1);
-    await user.click(within(reader).getByRole("button", { name: "View" }));
+    await user.click(within(reader).getByRole("menuitem", { name: "View" }));
     await user.click(await screen.findByRole("menuitemradio", { name: "Two-up" }));
     expect(sheet()).toHaveAttribute("data-view", "two-up");
     expect(within(sheet()).getAllByRole("region")).toHaveLength(4);
@@ -213,7 +217,7 @@ describe("record reader text controls", () => {
   it("changes the typeface from the Text menu and keeps the machine values monospaced", async () => {
     const user = userEvent.setup();
     const { reader, sheet } = mount("INC-00042");
-    await user.click(within(reader).getByRole("button", { name: "Text" }));
+    await user.click(within(reader).getByRole("menuitem", { name: "Text" }));
     await user.click(await screen.findByRole("menuitemradio", { name: "Serif" }));
     expect(sheet()).toHaveAttribute("data-font", "serif");
     expect(sheet()!.style.getPropertyValue("--reader-document-font")).toContain("Georgia");
@@ -225,7 +229,7 @@ describe("record reader text controls", () => {
     const user = userEvent.setup();
     const { reader, sheet } = mount("INC-00042");
     expect(sheet()!.style.getPropertyValue("--reader-scale")).toBe("1");
-    await user.click(within(reader).getByRole("button", { name: "Text" }));
+    await user.click(within(reader).getByRole("menuitem", { name: "Text" }));
     await user.click(await screen.findByRole("menuitem", { name: /^Large/ }));
     expect(sheet()!.style.getPropertyValue("--reader-scale")).toBe("1.2");
     // One size, two affordances: the toolbar readout is the same value.
@@ -235,7 +239,7 @@ describe("record reader text controls", () => {
   it("keeps the reader's own typeface when the record changes", async () => {
     const user = userEvent.setup();
     const { reader, sheet } = mount("INC-00042");
-    await user.click(within(reader).getByRole("button", { name: "Text" }));
+    await user.click(within(reader).getByRole("menuitem", { name: "Text" }));
     await user.click(await screen.findByRole("menuitemradio", { name: "Sans serif" }));
     expect(sheet()).toHaveAttribute("data-font", "sans");
     await user.click(within(reader).getByRole("button", { name: "Next record" }));
@@ -561,7 +565,7 @@ describe("record reader follow-ups", () => {
     const user = userEvent.setup();
     // The workstation opened a second record over the first, and the viewer
     // took the second; both steps are the shell's, not the viewer's.
-    render(<Harness codes={["INC-00042", "INC-00907"]} at={1} />);
+    renderWithIntl(<Harness codes={["INC-00042", "INC-00907"]} at={1} />);
     const reader = screen.getByRole("dialog", { name: READER });
     expect(within(reader).getByRole("heading", { level: 1 })).toHaveTextContent("Tide gauge disagreement");
     await user.click(within(reader).getByRole("button", { name: "Previous record" }));

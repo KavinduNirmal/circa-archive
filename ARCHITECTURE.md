@@ -536,6 +536,19 @@ The email client is a desktop app. It has four folders:
 - Windows are draggable, resizable, minimizable, closable.
 - Double-click title bar to maximize.
 
+### 5.11 Localization
+
+The interface ships in English and Korean. This is implemented, in `client/src/i18n/`, and the shape is deliberate:
+
+- **Routing.** Every page lives under a language segment — `/{lang}` and `/{lang}/desktop` — with `localePrefix: "always"`, so one document answers at exactly one address. A bare path is redirected by `client/src/proxy.ts` (Next.js 16's rename of `middleware.ts`).
+- **Detection.** Resolution order is an explicit path prefix, then the `NEXT_LOCALE` cookie, then the browser's `Accept-Language` weighting, then English. There is no geolocation: IP country describes a connection, not a reader, and would misroute Korean speakers abroad and English speakers in Korea.
+- **Override.** A visible language switcher on the portal's utility bar and in the workstation tray writes the cookie, and each option links to the current page in the other language rather than to the site root.
+- **Messages.** One catalog file per namespace per language under `client/messages/<locale>/`, loaded by `client/src/i18n/request.ts`. The `landing` namespace is rendered on the server and is the only one held back from the client bundle.
+
+**The chrome/content boundary.** Interface chrome is translated; filed content is not. Menus, labels, status lines, notices, and empty states localize. The archive index, the incident titles, the record corpus, the mail fixture, and the file tree are the fiction's filed documents and stay as filed in both languages — an archive does not translate a document that was filed in English, and the fiction makes the same point in its own words when it describes an organization by "a short sample record in the organization's own language". Brand names (`CIRCA`, `Titan Browser`, `CIRCA Explorer`, `CIRCA Word`, `CIRCA Reader`) and identifiers (archive codes, document numbers, dates, version strings) are proper nouns or citations and are never translated.
+
+**Consequences to carry forward.** Classification and status words are interface vocabulary rather than record metadata, so the archive's internal search has to match the words a reader can see; that fix is implemented. A Korean webfont is not bundled, so Hangul falls back to the reader's own Korean face, and the uppercase and letter-spacing conventions in section 5 are Latin conventions that still need a Korean decision — both are recorded in `.agents/brain/DESIGN.md`.
+
 ---
 
 ## 6. Record Lifecycle

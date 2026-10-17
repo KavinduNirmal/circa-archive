@@ -1,15 +1,17 @@
 import { readFileSync } from "node:fs";
-import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { fireEvent, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
-// The shell directly: the /desktop route now posts first, and these tests are about the shell.
-import { DesktopShell as Home } from "@/components/desktop-shell";
+// The shell directly: the locale desktop route now posts first, and these tests are about the shell.
+import { DesktopShell } from "@/components/desktop-shell";
 import { BROWSER_WINDOW_TITLE } from "@/components/browser/browser-identity";
-import { explorerTitle } from "@/components/files/files-identity";
 import { MAIL_WINDOW_TITLE } from "@/components/mail/mail-identity";
+import { catalogFor, renderWithIntl } from "./intl";
+
+const english = catalogFor("en");
 
 /** The file browser is named for the folder it shows, so Archive has its own titlebar text. */
-const ARCHIVE_WINDOW_TITLE = explorerTitle("Archive");
+const ARCHIVE_WINDOW_TITLE = `${english.shell.archiveLabel} - ${english.shell.explorerSuffix}`;
 
 /**
  * jsdom performs no layout, so these stubs give the desktop layer and window
@@ -55,7 +57,7 @@ function stubLayout() {
 
 async function openArchive() {
   const user = userEvent.setup();
-  render(<Home />);
+  renderWithIntl(<DesktopShell />);
   await user.click(screen.getByRole("button", { name: "Archive" }));
   const windowFrame = screen.getByRole("dialog", { name: ARCHIVE_WINDOW_TITLE });
   return { user, windowFrame };
@@ -146,7 +148,7 @@ describe("workstation windows", () => {
   it("keeps the most recently used window on top", async () => {
     stubLayout();
     const user = userEvent.setup();
-    render(<Home />);
+    renderWithIntl(<DesktopShell />);
     await user.click(screen.getByRole("button", { name: "Archive" }));
     await user.click(screen.getByRole("button", { name: "Inbox" }));
     const archive = screen.getByRole("dialog", { name: ARCHIVE_WINDOW_TITLE });
@@ -159,7 +161,7 @@ describe("workstation windows", () => {
   it("marks the focused window in the taskbar", async () => {
     stubLayout();
     const user = userEvent.setup();
-    render(<Home />);
+    renderWithIntl(<DesktopShell />);
     const taskbar = () => within(screen.getByRole("contentinfo", { name: "Taskbar" }));
     await user.click(screen.getByRole("button", { name: "Archive" }));
     expect(taskbar().getByRole("button", { name: ARCHIVE_WINDOW_TITLE })).toHaveAttribute("data-active", "true");
@@ -180,7 +182,7 @@ describe("workstation windows", () => {
   it("remembers which window is minimized or closed across many open windows", async () => {
     stubLayout();
     const user = userEvent.setup();
-    render(<Home />);
+    renderWithIntl(<DesktopShell />);
     const taskbar = () => within(screen.getByRole("contentinfo", { name: "Taskbar" }));
     for (const name of ["Archive", "Inbox", "Search"]) await user.click(screen.getByRole("button", { name }));
 
@@ -222,7 +224,7 @@ describe("workstation windows", () => {
   it("places each window out of document flow so frames cannot stack", async () => {
     stubLayout();
     const user = userEvent.setup();
-    render(<Home />);
+    renderWithIntl(<DesktopShell />);
     for (const name of ["Archive", "Inbox"]) await user.click(screen.getByRole("button", { name }));
     const archive = screen.getByRole("dialog", { name: ARCHIVE_WINDOW_TITLE });
     const inbox = screen.getByRole("dialog", { name: MAIL_WINDOW_TITLE });
@@ -262,7 +264,7 @@ describe("workstation windows", () => {
   it("restores focus to the launching shortcut after closing", async () => {
     stubLayout();
     const user = userEvent.setup();
-    render(<Home />);
+    renderWithIntl(<DesktopShell />);
     const shortcut = screen.getByRole("button", { name: "Archive" });
     await user.click(shortcut);
     await user.click(within(screen.getByRole("dialog", { name: ARCHIVE_WINDOW_TITLE })).getByRole("button", { name: `Close ${ARCHIVE_WINDOW_TITLE}` }));

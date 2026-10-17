@@ -1,8 +1,9 @@
 "use client";
 
 import { ArrowLeft, ArrowRight, Home, Lock, Plus, RotateCw, Square } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Menubar } from "radix-ui";
-import { TEXT_SIZE_LABELS, type ArchiveTextSize } from "./archive-page";
+import { TEXT_SIZE_MESSAGE_KEYS, type ArchiveTextSize } from "./archive-page";
 import "../ui/menubar.css";
 
 /** Every chrome action the browser owns, passed to the menu and the toolbar together. */
@@ -35,34 +36,35 @@ export function BrowserMenu({ textSize, onTextSizeChange, canGoBack, canGoForwar
   canGoForward: boolean;
   actions: BrowserActions;
 }) {
+  const t = useTranslations("browser");
   return (
-    <Menubar.Root className="circa-menubar" aria-label="Browser menu">
+    <Menubar.Root className="circa-menubar" aria-label={t("menuBarLabel")}>
       <Menubar.Menu>
-        <Menubar.Trigger className="circa-menutitle">File</Menubar.Trigger>
+        <Menubar.Trigger className="circa-menutitle">{t("menuFile")}</Menubar.Trigger>
         <Menubar.Portal>
           <Menubar.Content className="circa-menu" align="start" sideOffset={0}>
             <Menubar.Item className="circa-menuitem" onSelect={actions.newTab}>
-              New tab<span className="circa-menukey">Ctrl+T</span>
+              {t("newTab")}<span className="circa-menukey">Ctrl+T</span>
             </Menubar.Item>
             <Menubar.Separator className="circa-menuseparator" />
-            <Menubar.Item className="circa-menuitem" onSelect={actions.closeWindow}>Close window</Menubar.Item>
+            <Menubar.Item className="circa-menuitem" onSelect={actions.closeWindow}>{t("closeWindow")}</Menubar.Item>
           </Menubar.Content>
         </Menubar.Portal>
       </Menubar.Menu>
 
       <Menubar.Menu>
-        <Menubar.Trigger className="circa-menutitle">View</Menubar.Trigger>
+        <Menubar.Trigger className="circa-menutitle">{t("menuView")}</Menubar.Trigger>
         <Menubar.Portal>
           <Menubar.Content className="circa-menu" align="start" sideOffset={0}>
             <Menubar.Item className="circa-menuitem" onSelect={actions.refresh}>
-              Refresh<span className="circa-menukey">F5</span>
+              {t("refresh")}<span className="circa-menukey">F5</span>
             </Menubar.Item>
             <Menubar.Separator className="circa-menuseparator" />
-            <Menubar.Label className="circa-menulabel">Text size</Menubar.Label>
+            <Menubar.Label className="circa-menulabel">{t("textSize")}</Menubar.Label>
             <Menubar.RadioGroup value={textSize} onValueChange={(value) => onTextSizeChange(value as ArchiveTextSize)}>
               {TEXT_SIZES.map((size) => (
                 <Menubar.RadioItem key={size} className="circa-menuitem" value={size}>
-                  {TEXT_SIZE_LABELS[size]}
+                  {t(TEXT_SIZE_MESSAGE_KEYS[size])}
                 </Menubar.RadioItem>
               ))}
             </Menubar.RadioGroup>
@@ -71,38 +73,38 @@ export function BrowserMenu({ textSize, onTextSizeChange, canGoBack, canGoForwar
       </Menubar.Menu>
 
       <Menubar.Menu>
-        <Menubar.Trigger className="circa-menutitle">Go</Menubar.Trigger>
+        <Menubar.Trigger className="circa-menutitle">{t("go")}</Menubar.Trigger>
         <Menubar.Portal>
           <Menubar.Content className="circa-menu" align="start" sideOffset={0}>
-            <Menubar.Item className="circa-menuitem" disabled={!canGoBack} onSelect={actions.back}>Back</Menubar.Item>
-            <Menubar.Item className="circa-menuitem" disabled={!canGoForward} onSelect={actions.forward}>Forward</Menubar.Item>
+            <Menubar.Item className="circa-menuitem" disabled={!canGoBack} onSelect={actions.back}>{t("back")}</Menubar.Item>
+            <Menubar.Item className="circa-menuitem" disabled={!canGoForward} onSelect={actions.forward}>{t("forward")}</Menubar.Item>
             <Menubar.Separator className="circa-menuseparator" />
-            <Menubar.Item className="circa-menuitem" onSelect={actions.home}>Archive home</Menubar.Item>
+            <Menubar.Item className="circa-menuitem" onSelect={actions.home}>{t("archiveHome")}</Menubar.Item>
           </Menubar.Content>
         </Menubar.Portal>
       </Menubar.Menu>
 
       <Menubar.Menu>
-        <Menubar.Trigger className="circa-menutitle">Bookmarks</Menubar.Trigger>
+        <Menubar.Trigger className="circa-menutitle">{t("menuBookmarks")}</Menubar.Trigger>
         <Menubar.Portal>
           <Menubar.Content className="circa-menu" align="start" sideOffset={0}>
-            <Menubar.Item className="circa-menuitem" data-current="true" onSelect={actions.home}>CIRCA Internal Archive</Menubar.Item>
+            <Menubar.Item className="circa-menuitem" data-current="true" onSelect={actions.home}>{t("internalArchive")}</Menubar.Item>
             <Menubar.Separator className="circa-menuseparator" />
             <Menubar.Item className="circa-menuitem" disabled
-              title="Bookmarking is disabled on a restricted local connection">
-              Add bookmark
+              title={t("bookmarkDisabled")}>
+              {t("addBookmark")}
             </Menubar.Item>
           </Menubar.Content>
         </Menubar.Portal>
       </Menubar.Menu>
 
       <Menubar.Menu>
-        <Menubar.Trigger className="circa-menutitle">Help</Menubar.Trigger>
+        <Menubar.Trigger className="circa-menutitle">{t("menuHelp")}</Menubar.Trigger>
         <Menubar.Portal>
           <Menubar.Content className="circa-menu" align="start" sideOffset={0}>
-            <Menubar.Item className="circa-menuitem" onSelect={actions.policy}>Local network policy</Menubar.Item>
+            <Menubar.Item className="circa-menuitem" onSelect={actions.policy}>{t("networkPolicy")}</Menubar.Item>
             <Menubar.Separator className="circa-menuseparator" />
-            <Menubar.Item className="circa-menuitem" onSelect={actions.about}>About CIRCA Browser</Menubar.Item>
+            <Menubar.Item className="circa-menuitem" onSelect={actions.about}>{t("aboutBrowser")}</Menubar.Item>
           </Menubar.Content>
         </Menubar.Portal>
       </Menubar.Menu>
@@ -119,28 +121,29 @@ export function BrowserToolbar({ address, onAddressChange, onAddressSubmit, canG
   canGoForward: boolean;
   actions: BrowserActions;
 }) {
+  const t = useTranslations("browser");
   return (
     <div className="browser-toolbar">
       <div className="browser-nav">
-        <ToolbarButton label="Back" icon={ArrowLeft} disabled={!canGoBack} onClick={actions.back} />
-        <ToolbarButton label="Forward" icon={ArrowRight} disabled={!canGoForward} onClick={actions.forward} />
+        <ToolbarButton label={t("back")} icon={ArrowLeft} disabled={!canGoBack} onClick={actions.back} />
+        <ToolbarButton label={t("forward")} icon={ArrowRight} disabled={!canGoForward} onClick={actions.forward} />
         {/* Stop stays disabled because this browser never has a transfer to abort; the title says so. */}
-        <ToolbarButton label="Stop" icon={Square} disabled title="No transfer in progress" onClick={actions.policy} />
-        <ToolbarButton label="Refresh" icon={RotateCw} onClick={actions.refresh} />
-        <ToolbarButton label="Home" icon={Home} onClick={actions.home} />
+        <ToolbarButton label={t("stop")} icon={Square} disabled title={t("stopReason")} onClick={actions.policy} />
+        <ToolbarButton label={t("refresh")} icon={RotateCw} onClick={actions.refresh} />
+        <ToolbarButton label={t("home")} icon={Home} onClick={actions.home} />
       </div>
       <form className="browser-address" onSubmit={(event) => { event.preventDefault(); onAddressSubmit(); }}>
-        <label className="browser-address-label" htmlFor="browser-address">Address</label>
+        <label className="browser-address-label" htmlFor="browser-address">{t("address")}</label>
         <span className="browser-address-field">
           <Lock className="browser-address-lock" aria-hidden="true" />
           <input id="browser-address" className="browser-address-input circa-mono" type="text" spellCheck={false}
             autoComplete="off" aria-describedby="browser-address-note"
             value={address} onChange={(event) => onAddressChange(event.target.value)} />
           <span className="sr-only" id="browser-address-note">
-            Addresses are assigned by the local network. Only the archive index is reachable from this terminal.
+            {t("addressNote")}
           </span>
         </span>
-        <button type="submit" className="browser-go">Go</button>
+        <button type="submit" className="browser-go">{t("go")}</button>
       </form>
     </div>
   );
@@ -151,18 +154,19 @@ export function BrowserToolbar({ address, onAddressChange, onAddressSubmit, canG
  * archive is always the document behind it; activating it returns to the index.
  */
 export function BrowserTabs({ onOpenHome, onNewTab }: { onOpenHome: () => void; onNewTab: () => void }) {
+  const t = useTranslations("browser");
   return (
     <div className="browser-tabstrip">
-      <div className="browser-tablist" role="tablist" aria-label="Browser tabs">
+      <div className="browser-tablist" role="tablist" aria-label={t("tabsLabel")}>
         <button type="button" role="tab" id="browser-tab-archive" className="browser-tab"
           aria-selected="true" aria-controls="browser-page" onClick={onOpenHome}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img className="browser-tab-icon" src="/icons/directory_open_cabinet_fc-2.png" alt="" width={16} height={16} draggable={false} />
-          <span>CIRCA Internal Archive</span>
+          <span>{t("internalArchive")}</span>
           <Lock className="browser-tab-lock" aria-hidden="true" />
         </button>
       </div>
-      <button type="button" className="browser-newtab" aria-label="New tab" onClick={onNewTab}>
+      <button type="button" className="browser-newtab" aria-label={t("newTab")} onClick={onNewTab}>
         <Plus className="browser-newtab-glyph" aria-hidden="true" />
       </button>
     </div>
@@ -171,14 +175,15 @@ export function BrowserTabs({ onOpenHome, onNewTab }: { onOpenHome: () => void; 
 
 /** Left segment narrates the last action; right cells name the zone and clearance. */
 export function BrowserStatus({ status }: { status: string }) {
+  const t = useTranslations("browser");
   return (
     <div className="browser-statusbar">
       <span className="browser-status-text" role="status">{status}</span>
       <span className="browser-status-cell">
         <Lock className="browser-status-glyph" aria-hidden="true" />
-        Local intranet (restricted)
+        {t("zoneLocalIntranet")}
       </span>
-      <span className="browser-status-cell">Clearance level 4</span>
+      <span className="browser-status-cell">{t("clearanceLevel")}</span>
     </div>
   );
 }

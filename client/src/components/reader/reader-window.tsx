@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore, type CSSProperties, type ReactNode } from "react";
+import { useTranslations } from "next-intl";
 import { CLASS_LABELS, STATUS_LABELS, type ArchiveStatus } from "../browser/archive-index";
 import { ReaderCredentials, ReaderToolbar, type ReaderActions } from "./reader-chrome";
 import { followUpsFor } from "./reader-correspondence";
-import { READER_VOCABULARY } from "./reader-identity";
 import { FONT_STACKS, READER_MATCH_HIGHLIGHT, SCALE_DEFAULT, clampScale, describeMatches, formatScale, matchRanges, sectionAnchor, stepScale, viewLabel, type ReaderFont, type ReaderSection, type ReaderView } from "./reader-model";
 import { AnnotationRail, SectionRail, type RailState } from "./reader-rails";
 import { FollowUpStrip } from "./reader-references";
@@ -41,11 +41,11 @@ import "./reader.css";
 export type RecordTrail = { codes: readonly string[]; at: number };
 
 /** The states a section's status earns it. An ordinary filing is not stamped. */
-const STATUS_STAMPS: Partial<Record<ArchiveStatus, string>> = {
-  contested: "Contested",
-  sealed: "Sealed",
-  restricted: "Restricted",
-  erased: "Erased",
+const STATUS_STAMPS: Partial<Record<ArchiveStatus, "stampContested" | "stampSealed" | "stampRestricted" | "stampErased">> = {
+  contested: "stampContested",
+  sealed: "stampSealed",
+  restricted: "stampRestricted",
+  erased: "stampErased",
 };
 
 const NARROW_QUERY = "(max-width: 1023px)";
@@ -143,6 +143,7 @@ export function RecordReader({ trail, session, onOpenRecord, onTravel, onCloseWi
   const composerRef = useRef<HTMLTextAreaElement | null>(null);
   const matchRef = useRef<HTMLSpanElement | null>(null);
   const narrow = useNarrowViewport();
+  const t = useTranslations("reader");
 
   const code = trail.codes[trail.at] ?? null;
   const record = useMemo(() => (code ? recordDocument(code) : undefined), [code]);
@@ -164,9 +165,9 @@ export function RecordReader({ trail, session, onOpenRecord, onTravel, onCloseWi
   useEffect(() => {
     const sheet = sheetRef.current;
     const ranges = sheet ? collectMatchRanges(sheet, query) : [];
-    if (matchRef.current) matchRef.current.textContent = describeMatches(ranges.length, query);
+    if (matchRef.current) matchRef.current.textContent = describeMatches(ranges.length, query, t);
     paintMatches(ranges);
-  }, [query, code, view]);
+  }, [query, code, view, t]);
 
   function selectSection(id: string) {
     setSelected({ code: code ?? "", sectionId: id });
@@ -237,18 +238,19 @@ export function RecordReader({ trail, session, onOpenRecord, onTravel, onCloseWi
       session.fileNote(code, section, draft, replyTo ?? undefined);
       setDraft("");
       setReply(null);
-      setNotice({ code, text: `Note filed against ${record?.code} for review.` });
+      setNotice({ code, text: t("statusNoteFiled", { code: record?.code ?? code }) });
     });
   }
 
   const total = followUps.inbound.length + followUps.outbound.length;
+  const stampKey = record ? STATUS_STAMPS[record.status] : undefined;
   const status = notice && notice.code === code
     ? notice.text
     : !code
-      ? "No record is open."
+      ? t("statusNoRecord")
       : record
-        ? `Opened ${record.code}, ${record.sections.length} section${record.sections.length === 1 ? "" : "s"}. ${notes.length} annotation${notes.length === 1 ? "" : "s"} on file.`
-        : `Opened ${code}. Not in the index.`;
+        ? t("statusOpened", { code: record.code, sections: record.sections.length, annotations: notes.length })
+        : t("statusNotIndexed", { code });
   const shown = view === "single" ? sections.filter((section) => section.id === active) : sections;
 
   return (
@@ -285,12 +287,12 @@ export function RecordReader({ trail, session, onOpenRecord, onTravel, onCloseWi
                     <div className="reader-leaf-text">
                       <p className="reader-leaf-code circa-mono">{record.code}</p>
                       <h1 className="reader-leaf-title">
-                        {record.designation ?? <span className="reader-redaction" role="img" aria-label="Designation withheld" />}
+                        {record.designation ?? <span className="reader-redaction" role="img" aria-label={t("designationWithheld")} />}
                       </h1>
                       <p className="reader-leaf-line">
                         <span>{CLASS_LABELS[record.klass]}</span>
                         <span className="reader-leaf-sep" aria-hidden="true" />
-                        <span className="circa-mono">Filed {record.filed}</span>
+                        <span className="circa-mono">{t("filedOn", { date: record.filed })}</span>
                         <span className="reader-leaf-sep" aria-hidden="true" />
                         <span>{STATUS_LABELS[record.status]}</span>
                         <span className="reader-leaf-sep" aria-hidden="true" />
@@ -299,10 +301,10 @@ export function RecordReader({ trail, session, onOpenRecord, onTravel, onCloseWi
                         <span>{record.clearance}</span>
                       </p>
                     </div>
-                    {STATUS_STAMPS[record.status] && (
+                    {stampKey && (
                       // The status is on the stamp as data, so the sheet can give a state
                       // its own treatment without the frame styling it here.
-                      <span className="reader-stamp" data-status={record.status}>{STATUS_STAMPS[record.status]}</span>
+                      <span className="reader-stamp" data-status={record.status}>{t(stampKey)}</span>
                     )}
                   </header>
 
@@ -325,17 +327,15 @@ export function RecordReader({ trail, session, onOpenRecord, onTravel, onCloseWi
                   </p>
 
                   <p className="reader-fixture">
-                    {READER_VOCABULARY.fixture}: the filing on this sheet is illustrative sample content, not canon.
+                    {t("fixture")}{t("fixtureNote")}
                   </p>
                 </>
               ) : (
                 <div className="reader-empty">
-                  <h1 className="reader-empty-title">{code ? "No entry carries this code" : "No record is open"}</h1>
+                  <h1 className="reader-empty-title">{code ? t("noEntry") : t("noRecordOpen")}</h1>
                   {code && <p className="reader-empty-code circa-mono">{code}</p>}
                   <p className="reader-empty-note">
-                    {code
-                      ? "The code is well formed and the index does not list it. It may have been withdrawn after the index was rebuilt."
-                      : "Choose a record in the archive index, or a follow-up filed against another record, to open it here."}
+                    {code ? t("noEntryNote") : t("noRecordNote")}
                   </p>
                 </div>
               )}
@@ -357,9 +357,9 @@ export function RecordReader({ trail, session, onOpenRecord, onTravel, onCloseWi
       <div className="reader-statusbar">
         <span className="reader-status-text" role="status">{status}</span>
         <span className="reader-status-cell circa-mono">{formatScale(scale)}</span>
-        <span className="reader-status-cell">{viewLabel(view)}</span>
-        <span className="reader-status-cell circa-mono">{total} follow-up{total === 1 ? "" : "s"}</span>
-        <span className="reader-status-cell reader-status-fixture">{READER_VOCABULARY.fixture}</span>
+        <span className="reader-status-cell">{viewLabel(view, t)}</span>
+        <span className="reader-status-cell circa-mono">{t("followUpCount", { count: total })}</span>
+        <span className="reader-status-cell reader-status-fixture">{t("fixture")}</span>
       </div>
 
       <ReaderCredentials open={credentialsOpen} onEnter={verifyAndAct}

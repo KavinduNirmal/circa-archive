@@ -1,19 +1,19 @@
 "use client";
 
 import { Fragment } from "react";
+import { useTranslations } from "next-intl";
 import {
   ARCHIVE_CLASSES,
   ARCHIVE_PERIODS,
-  CLASS_LABELS,
-  PERIOD_LABELS,
-  STATUS_LABELS,
+  ARCHIVE_STATUSES,
   countClass,
-  describeQuery,
   recentFilings,
   type ArchiveClass,
   type ArchiveEntry,
   type ArchivePeriod,
   type ArchiveQuery,
+  type ArchiveStatus,
+  type ArchiveVocabulary,
 } from "./archive-index";
 
 /**
@@ -31,11 +31,76 @@ export type ArchiveDocument =
 
 export type ArchiveTextSize = "small" | "normal" | "large";
 
-export const TEXT_SIZE_LABELS: Record<ArchiveTextSize, string> = {
-  small: "Small",
-  normal: "Normal",
-  large: "Large",
+/**
+ * The archive's own vocabulary, by catalog key.
+ *
+ * The index module classifies an entry; the page is what names the
+ * classification to a reader, so the words are messages here and not constants
+ * over there. Naming a key once keeps one word in one language in every place
+ * that word appears — a section link, a select option, a table cell, a menu
+ * radio.
+ */
+export const CLASS_MESSAGE_KEYS: Record<ArchiveClass, string> = {
+  incident: "classIncident",
+  organization: "classOrganization",
+  continuity: "classContinuity",
+  memo: "classMemo",
 };
+
+export const STATUS_MESSAGE_KEYS: Record<ArchiveStatus, string> = {
+  "on-file": "statusOnFile",
+  contested: "statusContested",
+  sealed: "statusSealed",
+  restricted: "statusRestricted",
+  erased: "statusErased",
+};
+
+export const PERIOD_MESSAGE_KEYS: Record<ArchivePeriod, string> = {
+  any: "periodAny",
+  current: "periodCurrent",
+  recent: "periodRecent",
+  historical: "periodHistorical",
+};
+
+export const TEXT_SIZE_MESSAGE_KEYS: Record<ArchiveTextSize, string> = {
+  small: "textSizeSmall",
+  normal: "textSizeNormal",
+  large: "textSizeLarge",
+};
+
+/** A translator as this module's helpers take it, so none of them needs the hook. */
+type BrowserTranslate = (key: string, values?: Record<string, string | number>) => string;
+
+/**
+ * The class and status words as this reader sees them.
+ *
+ * The page is what names a class and a status on screen, so the page is also
+ * what knows which words those are. The index takes them as a plain vocabulary
+ * and matches a query against them, which is how a Korean reader searching for
+ * 봉인됨 finds the entry whose chip reads 봉인됨.
+ */
+export function archiveVocabulary(t: BrowserTranslate): ArchiveVocabulary {
+  const classes = {} as Record<ArchiveClass, string>;
+  for (const klass of ARCHIVE_CLASSES) classes[klass] = t(CLASS_MESSAGE_KEYS[klass]);
+  const statuses = {} as Record<ArchiveStatus, string>;
+  for (const status of ARCHIVE_STATUSES) statuses[status] = t(STATUS_MESSAGE_KEYS[status]);
+  return { classes, statuses };
+}
+
+/**
+ * The query line above a results table and inside the no-match state.
+ *
+ * The index module can describe a query in its own words, but a description of
+ * a search is interface copy: it has to speak the reader's language, so it is
+ * composed into a message here rather than printed from a constant.
+ */
+export function summariseQuery(t: BrowserTranslate, query: ArchiveQuery): string {
+  return [
+    query.text.trim() ? t("queryTerm", { term: query.text.trim() }) : t("queryWholeIndex"),
+    t("queryClass", { klass: query.klass === "all" ? t("classAll") : t(CLASS_MESSAGE_KEYS[query.klass]) }),
+    t("queryFiled", { filed: t(PERIOD_MESSAGE_KEYS[query.period]) }),
+  ].join(" · ");
+}
 
 /** The desktop emblem reused as the archive's masthead seal. */
 export const ARCHIVE_SEAL = "/Government_agency_emblem_seal_de…_2K_20261014194612.jpg";
@@ -70,6 +135,7 @@ export type ArchivePageProps = {
  */
 export function ArchivePage(props: ArchivePageProps) {
   const { document, draft, results, visited, textSize, onDraftChange, onSearch, onClear, onOpenRecord, onIndexLink, onWidenPeriod } = props;
+  const t = useTranslations("browser");
 
   return (
     <div className="archive-page" data-testid="archive-page" data-text-size={textSize}>
@@ -78,18 +144,18 @@ export function ArchivePage(props: ArchivePageProps) {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img className="archive-seal" src={ARCHIVE_SEAL} alt="" width={56} height={56} />
           <div className="archive-masthead-text">
-            <p className="archive-kicker">CIRCA internal network</p>
-            <p className="archive-title">Internal Archive</p>
-            <p className="archive-subtitle">Commission for Incident Review and Corrective Action</p>
+            <p className="archive-kicker">{t("archiveKicker")}</p>
+            <p className="archive-title">{t("archiveTitle")}</p>
+            <p className="archive-subtitle">{t("agency")}</p>
           </div>
         </div>
-        <p className="archive-clearance">Level 4 clearance</p>
+        <p className="archive-clearance">{t("clearanceStamp")}</p>
       </header>
 
-      <nav className="archive-sections" aria-label="Archive sections">
+      <nav className="archive-sections" aria-label={t("sectionsLabel")}>
         <button type="button" className="archive-tablink"
           aria-current={document.kind === "home" ? "page" : undefined} onClick={onClear}>
-          Index
+          {t("indexTab")}
         </button>
         {ARCHIVE_CLASSES.map((klass) => (
           <Fragment key={klass}>
@@ -97,7 +163,7 @@ export function ArchivePage(props: ArchivePageProps) {
             <button type="button" className="archive-tablink"
               aria-current={document.kind === "results" && document.query.klass === klass ? "true" : undefined}
               onClick={() => onIndexLink(klass)}>
-              {CLASS_LABELS[klass]} index ({countClass(klass)})
+              {t("classIndexLink", { klass: t(CLASS_MESSAGE_KEYS[klass]), count: countClass(klass) })}
             </button>
           </Fragment>
         ))}
@@ -112,10 +178,10 @@ export function ArchivePage(props: ArchivePageProps) {
         : <NoMatchBody query={document.query} onWidenPeriod={onWidenPeriod} onClear={onClear} />)}
 
       <footer className="archive-footer">
-        <p>Internal index. Not for public networks. Filing is a Level 3 infraction.</p>
-        <p className="circa-mono">Index rebuilt 2003-03-04</p>
+        <p>{t("footerNotice")}</p>
+        <p className="circa-mono">{t("footerRebuilt")}</p>
         {/* The preview's honesty marker: these entries are fixture content, not canon. */}
-        <p className="archive-fixture">Preview index: codes, designations, and dates are illustrative sample data.</p>
+        <p className="archive-fixture">{t("footerFixture")}</p>
       </footer>
     </div>
   );
@@ -133,36 +199,37 @@ function SearchForm({ variant, draft, onDraftChange, onSearch, onClear }: {
   onSearch: () => void;
   onClear: () => void;
 }) {
+  const t = useTranslations("browser");
   return (
-    <form className="archive-search" role="search" aria-label="Archive search" data-variant={variant}
+    <form className="archive-search" role="search" aria-label={t("searchLabel")} data-variant={variant}
       onSubmit={(event) => { event.preventDefault(); onSearch(); }}>
       <fieldset className="archive-fieldset">
-        <legend className="archive-legend">Search the archive</legend>
+        <legend className="archive-legend">{t("searchLegend")}</legend>
         <div className="archive-search-fields">
           <div className="archive-field archive-field-query">
-            <label htmlFor="archive-query">Search records</label>
+            <label htmlFor="archive-query">{t("searchRecords")}</label>
             <input id="archive-query" className="archive-input circa-mono" type="text" autoComplete="off"
-              spellCheck={false} placeholder="INC-00014 or a designation"
+              spellCheck={false} placeholder={t("searchPlaceholder")}
               value={draft.text} onChange={(event) => onDraftChange({ ...draft, text: event.target.value })} />
           </div>
           <div className="archive-field">
-            <label htmlFor="archive-class">Class</label>
+            <label htmlFor="archive-class">{t("fieldClass")}</label>
             <select id="archive-class" className="archive-select" value={draft.klass}
               onChange={(event) => onDraftChange({ ...draft, klass: event.target.value as ArchiveClass | "all" })}>
-              <option value="all">All classes</option>
-              {ARCHIVE_CLASSES.map((klass) => <option key={klass} value={klass}>{CLASS_LABELS[klass]}</option>)}
+              <option value="all">{t("classAllOption")}</option>
+              {ARCHIVE_CLASSES.map((klass) => <option key={klass} value={klass}>{t(CLASS_MESSAGE_KEYS[klass])}</option>)}
             </select>
           </div>
           <div className="archive-field">
-            <label htmlFor="archive-period">Filed</label>
+            <label htmlFor="archive-period">{t("fieldFiled")}</label>
             <select id="archive-period" className="archive-select" value={draft.period}
               onChange={(event) => onDraftChange({ ...draft, period: event.target.value as ArchivePeriod })}>
-              {ARCHIVE_PERIODS.map((period) => <option key={period} value={period}>{PERIOD_LABELS[period]}</option>)}
+              {ARCHIVE_PERIODS.map((period) => <option key={period} value={period}>{t(PERIOD_MESSAGE_KEYS[period])}</option>)}
             </select>
           </div>
           <div className="archive-actions">
-            <button type="submit" className="archive-button">Search archive</button>
-            <button type="button" className="archive-button" onClick={onClear}>Clear</button>
+            <button type="submit" className="archive-button">{t("searchButton")}</button>
+            <button type="button" className="archive-button" onClick={onClear}>{t("clear")}</button>
           </div>
         </div>
       </fieldset>
@@ -174,11 +241,12 @@ function IndexBody({ visited, onOpenRecord }: {
   visited: readonly string[];
   onOpenRecord: (code: string) => void;
 }) {
+  const t = useTranslations("browser");
   return (
     <>
-      <h2 className="archive-heading">Archive index</h2>
+      <h2 className="archive-heading">{t("indexHeading")}</h2>
       <p className="archive-lede">
-        The index lists what the archive admits exists. Sealed bodies are held at the desk.
+        {t("indexLede")}
       </p>
       <ul className="archive-recent">
         {recentFilings().map((item) => (
@@ -189,7 +257,7 @@ function IndexBody({ visited, onOpenRecord }: {
           </li>
         ))}
       </ul>
-      <p className="archive-hint">Recently filed. Choose a class above to list the whole section.</p>
+      <p className="archive-hint">{t("indexHint")}</p>
     </>
   );
 }
@@ -200,19 +268,20 @@ function ResultsBody({ query, results, visited, onOpenRecord }: {
   visited: readonly string[];
   onOpenRecord: (code: string) => void;
 }) {
+  const t = useTranslations("browser");
   return (
     <>
-      <h2 className="archive-heading">Search results</h2>
-      <p className="archive-query-line">{describeQuery(query)}</p>
+      <h2 className="archive-heading">{t("searchResults")}</h2>
+      <p className="archive-query-line">{summariseQuery(t, query)}</p>
       <div className="archive-table-scroll">
-        <table className="archive-table" aria-label="Search results">
+        <table className="archive-table" aria-label={t("searchResults")}>
           <thead>
             <tr>
-              <th scope="col">Code</th>
-              <th scope="col">Designation</th>
-              <th scope="col">Class</th>
-              <th scope="col">Filed</th>
-              <th scope="col">Status</th>
+              <th scope="col">{t("fieldCode")}</th>
+              <th scope="col">{t("fieldDesignation")}</th>
+              <th scope="col">{t("fieldClass")}</th>
+              <th scope="col">{t("fieldFiled")}</th>
+              <th scope="col">{t("fieldStatus")}</th>
             </tr>
           </thead>
           <tbody>
@@ -220,9 +289,9 @@ function ResultsBody({ query, results, visited, onOpenRecord }: {
               <tr key={item.code}>
                 <td><CodeLink item={item} visited={visited} onOpenRecord={onOpenRecord} /></td>
                 <td>{item.designation ?? <Redacted />}</td>
-                <td>{CLASS_LABELS[item.klass]}</td>
+                <td>{t(CLASS_MESSAGE_KEYS[item.klass])}</td>
                 <td className="circa-mono">{item.filed}</td>
-                <td><span className="archive-chip" data-status={item.status}>{STATUS_LABELS[item.status]}</span></td>
+                <td><span className="archive-chip" data-status={item.status}>{t(STATUS_MESSAGE_KEYS[item.status])}</span></td>
               </tr>
             ))}
           </tbody>
@@ -252,24 +321,26 @@ function NoMatchBody({ query, onWidenPeriod, onClear }: {
   onWidenPeriod: () => void;
   onClear: () => void;
 }) {
+  const t = useTranslations("browser");
   return (
     <section className="archive-empty">
-      <h2 className="archive-heading">No records match</h2>
-      <p>{describeQuery(query)}</p>
+      <h2 className="archive-heading">{t("noMatchHeading")}</h2>
+      <p>{summariseQuery(t, query)}</p>
       <ul className="archive-hints">
-        <li>Incident codes are five digits after INC. Organization codes carry a carnage letter and six digits.</li>
-        <li>A withheld designation is not searchable. Search its code instead.</li>
-        <li>Filing dates run from the earliest ledger to the current year.</li>
+        <li>{t("hintCodes")}</li>
+        <li>{t("hintWithheld")}</li>
+        <li>{t("hintDates")}</li>
       </ul>
       {query.period !== "any" && (
-        <button type="button" className="archive-button" onClick={onWidenPeriod}>Search all periods</button>
+        <button type="button" className="archive-button" onClick={onWidenPeriod}>{t("searchAllPeriods")}</button>
       )}
-      <button type="button" className="archive-button" onClick={onClear}>Clear filters</button>
+      <button type="button" className="archive-button" onClick={onClear}>{t("clearFilters")}</button>
     </section>
   );
 }
 
 /** A withheld value, drawn as the design system's solid redaction bar. */
-function Redacted({ label = "Designation withheld" }: { label?: string }) {
-  return <span className="archive-redacted" role="img" aria-label={label} />;
+function Redacted() {
+  const t = useTranslations("browser");
+  return <span className="archive-redacted" role="img" aria-label={t("designationWithheld")} />;
 }

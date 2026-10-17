@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { MessageBox } from "../ui/message-box";
 import { WORD_NAME } from "./word-identity";
 
@@ -14,29 +15,34 @@ export type WordNoticeKind = "save" | "policy" | "about";
 
 type NoticeCopy = { title: string; heading: string; body: string; reference: string };
 
-const COPY: Record<WordNoticeKind, NoticeCopy> = {
-  save: {
-    title: WORD_NAME,
-    heading: "This draft cannot be filed yet",
-    body: "Filing a record needs the case, the organization, and the type, and those are chosen by the filing key rather than by the editor. This workstation holds the draft until that key is present, so the document stays in the window.",
-    reference: "LN-POLICY-26 / KEY_FILING_AUTHORITY",
-  },
-  policy: {
-    title: WORD_NAME,
-    heading: "Filing policy",
-    body: "Records are written in Markdown and filed as .pdf into a case folder. What this editor writes is a draft: it is not indexed, not discoverable, and not citable until the filing key assigns it a case code. Drafts are held on the local volume and never leave the terminal.",
-    reference: "LN-POLICY-12 / RECORD_FILING",
-  },
-  about: {
-    title: `About ${WORD_NAME}`,
-    heading: `${WORD_NAME} 2000`,
-    body: "Document editor for CIRCA/OS. Writes the archive's record format: Markdown, filed as .pdf into a case folder. This build carries the markdown tools and the local draft store; filing metadata and the record reader are separate.",
-    reference: "Build 1999.4 / CIRCA-OS",
-  },
-};
-
 export function WordNotice({ kind, onClose }: { kind: WordNoticeKind | null; onClose: () => void }) {
-  const copy = kind ? COPY[kind] : null;
+  const t = useTranslations("word");
+  // The copy is read here rather than from a table of English strings, so the
+  // notice a reader sees is the one their language's catalog holds. The brand
+  // stays the constant the rest of the app reads; the archive codes stay codes.
+  let copy: NoticeCopy | null = null;
+  if (kind === "save") {
+    copy = {
+      title: WORD_NAME,
+      heading: t("saveHeading"),
+      body: t("saveBody"),
+      reference: t("referenceSave"),
+    };
+  } else if (kind === "policy") {
+    copy = {
+      title: WORD_NAME,
+      heading: t("filingPolicy"),
+      body: t("policyBody"),
+      reference: t("referencePolicy"),
+    };
+  } else if (kind === "about") {
+    copy = {
+      title: t("aboutLabel", { name: WORD_NAME }),
+      heading: t("aboutHeading", { name: WORD_NAME }),
+      body: t("aboutBody"),
+      reference: t("referenceAbout"),
+    };
+  }
   return (
     <MessageBox
       open={kind !== null}

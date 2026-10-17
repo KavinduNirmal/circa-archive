@@ -1,29 +1,45 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import {
   ARCHIVE_ADDRESS,
   ARCHIVE_INDEX,
-  CLASS_LABELS,
-  PERIOD_LABELS,
   searchArchive,
   type ArchiveClass,
   type ArchiveQuery,
 } from "./archive-index";
-import { ArchivePage, type ArchiveDocument, type ArchiveTextSize } from "./archive-page";
+import {
+  ArchivePage,
+  CLASS_MESSAGE_KEYS,
+  PERIOD_MESSAGE_KEYS,
+  archiveVocabulary,
+  type ArchiveDocument,
+  type ArchiveTextSize,
+} from "./archive-page";
 import { BrowserMenu, BrowserStatus, BrowserTabs, BrowserToolbar, type BrowserActions } from "./browser-chrome";
 import { BrowserNotice, type BrowserNoticeKind } from "./browser-notice";
 import "./browser.css";
 
 const EMPTY_QUERY: ArchiveQuery = { text: "", klass: "all", period: "any" };
 
+/**
+ * A status line as copy rather than as text.
+ *
+ * The bar is a live readout, so what a navigation says has to be resolved where
+ * it renders: keeping the key and its values in state means a language change
+ * re-reads the sentence instead of leaving the previous language on screen.
+ */
+type StatusMessage = { key: string; values?: Record<string, string | number> };
+
 /** The form mirrors the document, so a document is the only place a query lives. */
 function draftFor(document: ArchiveDocument): ArchiveQuery {
   return document.kind === "results" ? document.query : EMPTY_QUERY;
 }
 
-function describe(document: ArchiveDocument): string {
-  return document.kind === "home" ? "the index" : "the result list";
+/** The document Back and Forward landed on, named by the message that names it. */
+function documentMessageKey(document: ArchiveDocument): string {
+  return document.kind === "home" ? "documentIndex" : "documentResults";
 }
 
 /**
@@ -44,6 +60,7 @@ export function ArchiveBrowser({ onCloseWindow, onOpenRecord }: {
   onCloseWindow: () => void;
   onOpenRecord: (code: string) => void;
 }) {
+  const t = useTranslations("browser");
   const [history, setHistory] = useState<ArchiveDocument[]>([{ kind: "home" }]);
   const [cursor, setCursor] = useState(0);
   const [draft, setDraft] = useState<ArchiveQuery>(EMPTY_QUERY);
@@ -51,10 +68,14 @@ export function ArchiveBrowser({ onCloseWindow, onOpenRecord }: {
   const [textSize, setTextSize] = useState<ArchiveTextSize>("normal");
   const [notice, setNotice] = useState<BrowserNoticeKind | null>(null);
   const [visited, setVisited] = useState<readonly string[]>([]);
-  const [status, setStatus] = useState(`Ready. ${ARCHIVE_INDEX.length} entries indexed.`);
+  const [status, setStatus] = useState<StatusMessage>({ key: "statusReady", values: { count: ARCHIVE_INDEX.length } });
+  const statusText = t(status.key, status.values);
+  // The words the page prints for a class and a status, so a query matches what
+  // the reader can see rather than only the index's English vocabulary.
+  const vocabulary = archiveVocabulary(t);
 
   const document = history[cursor];
-  const results = document.kind === "results" ? searchArchive(document.query) : [];
+  const results = document.kind === "results" ? searchArchive(document.query, ARCHIVE_INDEX, vocabulary) : [];
   const canGoBack = cursor > 0;
   const canGoForward = cursor < history.length - 1;
   /** Pushes a document, which is what every deliberate navigation does. */
@@ -69,17 +90,20 @@ export function ArchiveBrowser({ onCloseWindow, onOpenRecord }: {
     if (target < 0 || target >= history.length) return;
     setCursor(target);
     setDraft(draftFor(history[target]));
-    setStatus(`${delta < 0 ? "Back to" : "Forward to"} ${describe(history[target])}.`);
+    setStatus({
+      key: delta < 0 ? "statusBackTo" : "statusForwardTo",
+      values: { document: t(documentMessageKey(history[target])) },
+    });
   }
 
   function report(query: ArchiveQuery) {
-    const matched = searchArchive(query);
+    const matched = searchArchive(query, ARCHIVE_INDEX, vocabulary);
     const scope = [
-      query.text.trim() ? `term "${query.text.trim()}"` : "whole index",
-      query.klass === "all" ? "all classes" : CLASS_LABELS[query.klass],
-      PERIOD_LABELS[query.period],
+      query.text.trim() ? t("scopeTerm", { term: query.text.trim() }) : t("scopeWholeIndex"),
+      query.klass === "all" ? t("scopeAllClasses") : t(CLASS_MESSAGE_KEYS[query.klass]),
+      t(PERIOD_MESSAGE_KEYS[query.period]),
     ].join(" · ");
-    setStatus(`${matched.length} of ${ARCHIVE_INDEX.length} entries match · ${scope}`);
+    setStatus({ key: "statusMatch", values: { count: matched.length, total: ARCHIVE_INDEX.length, scope } });
   }
 
   function runSearch() {
@@ -107,28 +131,27 @@ export function ArchiveBrowser({ onCloseWindow, onOpenRecord }: {
   function handOff(code: string) {
     onOpenRecord(code);
     setVisited((current) => (current.includes(code) ? current : [...current, code]));
-    setStatus(`Opened ${code} in the reader.`);
+    setStatus({ key: "statusOpened", values: { code } });
   }
 
   function openHome() {
     go({ kind: "home" });
-    setStatus(`Archive home. ${ARCHIVE_INDEX.length} entries indexed.`);
+    setStatus({ key: "statusArchiveHome", values: { count: ARCHIVE_INDEX.length } });
   }
 
   function clearAll() {
     setDraft(EMPTY_QUERY);
     go({ kind: "home" });
-    setStatus(`Filters cleared. ${ARCHIVE_INDEX.length} entries indexed.`);
+    setStatus({ key: "statusFiltersCleared", values: { count: ARCHIVE_INDEX.length } });
   }
 
   function refresh() {
-    if (document.kind === "home") setStatus("Archive index reloaded.");
-    else setStatus("Search reloaded. The result set is unchanged.");
+    setStatus({ key: document.kind === "home" ? "statusIndexReloaded" : "statusSearchReloaded" });
   }
 
   function attemptNewTab() {
     setNotice("tab");
-    setStatus("New tab refused: not permitted on the local network.");
+    setStatus({ key: "statusTabRefused" });
   }
 
   function submitAddress() {
@@ -138,7 +161,7 @@ export function ArchiveBrowser({ onCloseWindow, onOpenRecord }: {
     }
     setNotice("navigation");
     setAddress(ARCHIVE_ADDRESS);
-    setStatus("Navigation refused: no other host is permitted on the local network.");
+    setStatus({ key: "statusNavigationRefused" });
   }
 
   const actions: BrowserActions = {
@@ -164,7 +187,7 @@ export function ArchiveBrowser({ onCloseWindow, onOpenRecord }: {
           onDraftChange={setDraft} onSearch={runSearch} onClear={clearAll} onOpenRecord={handOff}
           onIndexLink={openIndexLink} onWidenPeriod={widenPeriod} />
       </div>
-      <BrowserStatus status={status} />
+      <BrowserStatus status={statusText} />
       <BrowserNotice kind={notice} attempted={address} onClose={() => setNotice(null)} />
     </div>
   );

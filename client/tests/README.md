@@ -2,7 +2,10 @@
 
 ## Responsibility and structure
 
-- `landing.test.tsx`: archive entry, audience procedures, local link integrity, service limitations, and diegetic route metadata.
+- `intl.tsx`: the render helpers. `renderWithIntl` wraps a subject in `NextIntlClientProvider` with the real shipped catalogs, `catalogFor` exposes a catalog for assertions, and `translatorFor` builds a translator for helpers that take one outside React, such as `bootLines`. Client components read copy from context, so a shell or portal test that renders without these fails rather than mis-asserting.
+- `i18n-routing.test.ts`: the language decision — the supported locales and default, and the proxy's resolution order of explicit prefix, `NEXT_LOCALE` cookie, `Accept-Language` weighting, and the English fallback.
+- `i18n-messages.test.ts`: the catalogs against each other — identical key sets, no empty values, and the same ICU `{placeholders}` and rich-text tags in both languages, with no unbalanced tag or brace. Catches the two failure modes a type checker cannot see: a key present in one language only, and a translation that drops an argument or a `<strong>`.
+- `landing.test.tsx`: archive entry, audience procedures, local link integrity, service limitations, diegetic route metadata, and the whole portal in Korean with its identifiers intact.
 - `setup.ts`: DOM matchers and cleanup.
 - `utils.test.ts`: class composition and Tailwind conflict resolution.
 - `desktop.test.tsx`: folder navigation, Escape dismissal, Start launcher behavior, and the reader as a maximized window that survives a trip to the taskbar.

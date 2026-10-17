@@ -19,9 +19,17 @@ export const WORD_WINDOW_TITLE = `${WORD_NAME} - Untitled Record`;
 /** The document scales the View menu offers. */
 export type TextSize = "small" | "normal" | "large";
 
-/** Uppercase, like every other workstation label on the screen. */
+/**
+ * The catalog key each text size reads its label from.
+ *
+ * The labels are uppercase and read like every other workstation label on the
+ * screen, so they are interface chrome and live in `messages/<locale>/word.json`
+ * with the rest of the editor's copy. This record maps a size to its key and
+ * keeps the size set where the type declares it; the chrome resolves the key,
+ * because a constant here could not be translated and a label is not a brand.
+ */
 export const TEXT_SIZE_LABELS: Record<TextSize, string> = {
-  small: "SMALL",
-  normal: "NORMAL",
-  large: "LARGE",
+  small: "sizeSmall",
+  normal: "sizeNormal",
+  large: "sizeLarge",
 };

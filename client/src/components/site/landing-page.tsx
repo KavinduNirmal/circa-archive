@@ -1,11 +1,23 @@
-import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
+import { LanguageSwitcher } from "../language-switcher";
 import styles from "./landing-page.module.css";
 
+/**
+ * The public portal, rendered in whatever language the request resolved to.
+ *
+ * This is a Server Component, so the prose is never sent to the browser as
+ * messages; it arrives as rendered HTML. Only the two archive links and the
+ * language switcher are interactive, and the switcher's own copy is the one
+ * small namespace the client bundle carries.
+ */
+
+/** Directory rows, in reading order. Numbers and anchors are structural, not copy. */
 const directory = [
-  ["01", "Public access", "public-access"],
-  ["02", "Submission procedure", "submissions"],
-  ["03", "Organization filings", "organizations"],
-  ["04", "Credential verification", "credentials"],
+  ["01", "publicAccess", "public-access"],
+  ["02", "submissions", "submissions"],
+  ["03", "organizations", "organizations"],
+  ["04", "credentials", "credentials"],
 ] as const;
 
 function Procedure({ id, number, title, children }: {
@@ -20,187 +32,199 @@ function Procedure({ id, number, title, children }: {
 }
 
 export function LandingPage() {
+  const t = useTranslations("landing");
+
   return (
     <div className={styles.portal} id="top">
-      <a className={styles.skip} href="#public-access">Skip to public access</a>
+      <a className={styles.skip} href="#public-access">{t("skipToAccess")}</a>
       <div className={styles.site}>
         <div className={styles.utility}>
-          <span>PUBLIC INFORMATION SERVICE</span>
-          <span>Text edition · <a href="#accessibility">Access assistance</a></span>
+          <span>{t("utilityService")}</span>
+          <span className={styles.utilityEdition}>{t("utilityEdition")} <a href="#accessibility">{t("utilityAssistance")}</a></span>
+          <LanguageSwitcher className={styles.utilityLanguage} />
         </div>
         <header className={styles.masthead}>
           <div className={styles.seal} aria-hidden="true"> <span>IR / CA</span> </div>
           <div>
-            <p className={styles.eyebrow}>Office of the Permanent Registry</p>
-            <h1>Commission for Incident Review<br />and Corrective Action</h1>
-            <p className={styles.motto}>Continuity of record. Continuity of administration.</p>
+            <p className={styles.eyebrow}>{t("eyebrow")}</p>
+            <h1>{t("agencyLineOne")}<br />{t("agencyLineTwo")}</h1>
+            <p className={styles.motto}>{t("motto")}</p>
           </div>
           <div className={styles.mastheadRef}>
-            <span>PUBLIC CIRCULAR</span><strong>No. 04 / 1998</strong><span>ISSUE STILL IN FORCE</span>
+            <span>{t("circularLabel")}</span><strong>{t("circularNumber")}</strong><span>{t("circularStatus")}</span>
           </div>
         </header>
-        <nav className={styles.topnav} aria-label="Agency navigation">
-          <a href="#public-access" aria-current="page">Home</a>
-          <a href="#about">About the Commission</a>
-          <a href="#documents">Forms &amp; circulars</a>
-          <a href="#contacts">Contact directory</a>
-          <a href="#credentials">Personnel access <span aria-hidden="true">→</span></a>
+        <nav className={styles.topnav} aria-label={t("navLabel")}>
+          <a href="#public-access" aria-current="page">{t("navHome")}</a>
+          <a href="#about">{t("navAbout")}</a>
+          <a href="#documents">{t("navDocuments")}</a>
+          <a href="#contacts">{t("navContacts")}</a>
+          <a href="#credentials">{t("navCredentials")} <span aria-hidden="true">→</span></a>
         </nav>
         <div className={styles.breadcrumb}>
-          <span>Registry / Public information / <strong>Index</strong></span>
-          <span>Document status: <b>CURRENT</b></span>
+          <span>{t("breadcrumbTrail")} <strong>{t("breadcrumbIndex")}</strong></span>
+          <span>{t("documentStatus")} <b>{t("documentCurrent")}</b></span>
         </div>
 
         <div className={styles.layout}>
 
 
           <main id="public-access" tabIndex={-1} aria-labelledby="public-access-title" className={styles.main}>
-            <div className={styles.documentHead}><span>PA–01 / GENERAL CIRCULATION</span><span>Retain for reference</span></div>
-            <h2 id="public-access-title" className={styles.pageTitle}>Public access to the registry</h2>
-            <p className={styles.intro}>The Commission maintains records of reported incidents, subsequent reviews, and actions entered against them.</p>
-            <p>Correspondents may consult released records without an appointment. The presence of a record confirms its receipt. It does not confirm the events described.</p>
+            <div className={styles.documentHead}><span>{t("accessCode")}</span><span>{t("accessRetain")}</span></div>
+            <h2 id="public-access-title" className={styles.pageTitle}>{t("accessTitle")}</h2>
+            <p className={styles.intro}>{t("accessIntro")}</p>
+            <p>{t("accessBody")}</p>
             <div className={styles.entry}>
-              <div><Link href="/desktop" className={styles.enter}>Enter the archive <span aria-hidden="true">→</span></Link><p>No credentials required for public inspection.</p></div>
-              <span className={styles.entryCode}>ACCESS POINT 01<br />READING ROOM</span>
+              <div><Link href="/desktop" className={styles.enter}>{t("enterArchive")} <span aria-hidden="true">→</span></Link><p>{t("enterNote")}</p></div>
+              <span className={styles.entryCode}>{t("accessPoint")}<br />{t("readingRoom")}</span>
             </div>
-            <p className={styles.firstVisit}><strong>First consultation?</strong> Open <b>Archive</b> at the workstation to browse records, or <b>Search</b> to find a title or reference number. Begin with an incident, then consult the records filed against it.</p>
-            <nav className={styles.mobileDirectory} aria-label="Procedure shortcuts">
-              <a href="#submissions">Submission procedure</a>
-              <a href="#organizations">Organization filings</a>
-              <a href="#credentials">Credential verification</a>
+            <p className={styles.firstVisit}>
+              {t.rich("firstVisit", {
+                strong: (chunks) => <strong>{chunks}</strong>,
+                b: (chunks) => <b>{chunks}</b>,
+              })}
+            </p>
+            <nav className={styles.mobileDirectory} aria-label={t("procedureShortcuts")}>
+              <a href="#submissions">{t("submissions")}</a>
+              <a href="#organizations">{t("organizations")}</a>
+              <a href="#credentials">{t("credentials")}</a>
             </nav>
             <div className={styles.notice}>
-              <strong>NOTICE TO CORRESPONDENTS</strong>
-              <p>If a record names you in error, retain the reference number. Do not submit a second name.</p>
-              <span>Administrative instruction 6(b). Reissued without amendment.</span>
+              <strong>{t("noticeHeading")}</strong>
+              <p>{t("noticeBody")}</p>
+              <span>{t("noticeSource")}</span>
             </div>
 
-            <Procedure id="submissions" number="02" title="Submission procedure">
-              <p>File an account of an incident, a discovery report, or a subsequent exploration. Separate what was observed from what was supplied by another correspondent.</p>
+            <Procedure id="submissions" number="02" title={t("submissions")}>
+              <p>{t("submissionsBody")}</p>
               <ol className={styles.steps}>
-                <li>Consult existing records. Cite the incident reference where one exists.</li>
-                <li>Record the location, sequence of events, and source of each observation. Preserve contradictory accounts as separate continuities.</li>
-                <li>Open the record editor at the workstation to prepare a draft. Retain author credit and the lineage of any record you extend.</li>
+                <li>{t("submissionsStepOne")}</li>
+                <li>{t("submissionsStepTwo")}</li>
+                <li>{t("submissionsStepThree")}</li>
               </ol>
-              <p className={styles.serviceNote}><strong>Transmission notice:</strong> Drafts remain in this browser only while the editor is open. Retain a separate copy before closing or reloading. Saving, publication, and remote filing are not connected.</p>
+              <p className={styles.serviceNote}>
+                {t.rich("submissionsNotice", { strong: (chunks) => <strong>{chunks}</strong> })}
+              </p>
               <details className={styles.disclosure}>
-                <summary>Read the rules for submitted material · SP–02</summary>
-                <div><p>Submit original material or material you have permission to use. Preserve citations and author credit. Do not include personal details, threats, or targeted harassment of real persons.</p><p>Disagreement between accounts may be filed. Misconduct toward a correspondent may not. Records removed from public discovery are retained as tombstones under the applicable review procedure.</p></div>
+                <summary>{t("submissionsDisclosure")}</summary>
+                <div><p>{t("submissionsRuleOne")}</p><p>{t("submissionsRuleTwo")}</p></div>
               </details>
             </Procedure>
-            <Procedure id="organizations" number="03" title="Organization filings">
-              <p>To identify an organization, prepare the following particulars. An organization is an entry in the directory; it is not a personnel account.</p>
+            <Procedure id="organizations" number="03" title={t("organizations")}>
+              <p>{t("organizationsBody")}</p>
               <dl className={styles.particulars}>
-                <div><dt>A. BRIEF</dt><dd>Name, remit, and terms used to classify incidents.</dd></div>
-                <div><dt>B. VOICE</dt><dd>A short sample record in the organization’s own language.</dd></div>
-                <div><dt>C. SEED</dt><dd>An initial incident establishing the basis for a file.</dd></div>
+                <div><dt>{t("particularsBriefTerm")}</dt><dd>{t("particularsBriefText")}</dd></div>
+                <div><dt>{t("particularsVoiceTerm")}</dt><dd>{t("particularsVoiceText")}</dd></div>
+                <div><dt>{t("particularsSeedTerm")}</dt><dd>{t("particularsSeedText")}</dd></div>
               </dl>
-              <p>Review considers interest and coherence. Advisory votes do not confer recognition. Recognition by an existing body requires a separate record and approval from both parties.</p>
-              <p className={styles.serviceNote}>Organization submissions are not being transmitted from this terminal. Existing dossiers may be consulted through <b>Organizations</b> at the workstation.</p>
+              <p>{t("organizationsReview")}</p>
+              <p className={styles.serviceNote}>
+                {t.rich("organizationsNotice", { b: (chunks) => <b>{chunks}</b> })}
+              </p>
             </Procedure>
-            <Procedure id="credentials" number="04" title="Credential verification">
-              <p>Returning reviewers may resume public inspection at the workstation. Credential verification is not connected; no password or personnel number is required or collected here.</p>
-              <Link href="/desktop">Continue to the public workstation <span aria-hidden="true">»</span></Link>
-              <p className={styles.small}>A previous appointment does not imply a present vacancy.</p>
+            <Procedure id="credentials" number="04" title={t("credentials")}>
+              <p>{t("credentialsBody")}</p>
+              <Link href="/desktop">{t("credentialsContinue")} <span aria-hidden="true">»</span></Link>
+              <p className={styles.small}>{t("credentialsSmall")}</p>
             </Procedure>
 
             <section id="about" className={styles.about} aria-labelledby="about-title">
-              <h2 id="about-title">Concerning the Commission</h2>
-              <p>The Commission receives incident reports, preserves their supporting records, and maintains the register of organizations and continuities. Its jurisdiction is limited to the material on file.</p>
-              <p className={styles.doctrine}>The archive does not decide truth. It decides what is on file.</p>
-              <p className={styles.small}>Authority: continuing administrative arrangement, date of commencement not transferred.</p>
+              <h2 id="about-title">{t("aboutTitle")}</h2>
+              <p>{t("aboutBody")}</p>
+              <p className={styles.doctrine}>{t("aboutDoctrine")}</p>
+              <p className={styles.small}>{t("aboutSmall")}</p>
             </section>
           </main>
 
           <aside className={styles.sidebar}>
-            <nav aria-label="Public directory">
-              <h2 className={styles.barTitle}>Public directory</h2>
-              {directory.map(([number, title, id]) => (
-                <a className={styles.directoryLink} href={`#${id}`} key={id}><span>{number}</span>{title}</a>
+            <nav aria-label={t("directoryLabel")}>
+              <h2 className={styles.barTitle}>{t("directoryTitle")}</h2>
+              {directory.map(([number, key, id]) => (
+                <a className={styles.directoryLink} href={`#${id}`} key={id}><span>{number}</span>{t(key)}</a>
               ))}
-              <a className={styles.directoryLink} href="#notices"><span>05</span>Notices &amp; revisions</a>
+              <a className={styles.directoryLink} href="#notices"><span>05</span>{t("directoryNotices")}</a>
             </nav>
             <section className={styles.sideSection} aria-labelledby="hours-title">
-              <h2 id="hours-title">Registry hours</h2>
-              <p>Monday–Friday<br />09:00–17:00</p>
-              <p className={styles.small}>Correspondence received outside these hours will be dated the preceding working day.</p>
+              <h2 id="hours-title">{t("hoursTitle")}</h2>
+              <p>{t("hoursDays")}<br />{t("hoursTimes")}</p>
+              <p className={styles.small}>{t("hoursNote")}</p>
             </section>
             <section className={styles.sideSection} aria-labelledby="clearance-title">
-              <h2 id="clearance-title">Access classification</h2>
+              <h2 id="clearance-title">{t("clearanceTitle")}</h2>
               <dl className={styles.clearance}>
-                <div><dt>PUBLIC</dt><dd>Released index</dd></div>
-                <div><dt>REVIEWER</dt><dd>Assigned records</dd></div>
-                <div><dt>RESTRICTED</dt><dd>By reference only</dd></div>
+                <div><dt>{t("clearancePublicTerm")}</dt><dd>{t("clearancePublicText")}</dd></div>
+                <div><dt>{t("clearanceReviewerTerm")}</dt><dd>{t("clearanceReviewerText")}</dd></div>
+                <div><dt>{t("clearanceRestrictedTerm")}</dt><dd>{t("clearanceRestrictedText")}</dd></div>
               </dl>
-              <p className={styles.small}>Classification describes the record, not the correspondent.</p>
+              <p className={styles.small}>{t("clearanceNote")}</p>
             </section>
-            <div className={styles.displaced} aria-label="Administrative stamp: continuation sheet 2 of 1">
-              CONTINUATION SHEET<br /><strong>2 OF 1</strong><br />RETAIN WITH ORIGINAL
+            <div className={styles.displaced} aria-label={t("stampLabel")}>
+              {t("stampSheet")}<br /><strong>{t("stampCount")}</strong><br />{t("stampRetain")}
             </div>
-            <p className={styles.sidebarFoot}>Index maintained by<br />the Office of <span className={styles.redaction} aria-label="name withheld">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><br />Room 014 · Registry annex</p>
+            <p className={styles.sidebarFoot}>{t("sidebarFootMaintained")}<br />{t("sidebarFootOffice")} <span className={styles.redaction} aria-label={t("redactionLabel")}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><br />{t("sidebarFootRoom")}</p>
           </aside>
 
-          <aside className={styles.bulletins} aria-label="Circulars and registry notices">
+          <aside className={styles.bulletins} aria-label={t("bulletinsLabel")}>
             <section id="notices" aria-labelledby="news-title">
-              <h2 className={styles.barTitle} id="news-title">What’s new</h2>
-              <p className={styles.newsUpdated}>Last updated: 14 November 2003</p>
-              <article className={styles.newsItem}><time dateTime="2003-11-14">14.11.2003</time><h3><a href="#documents">Revised public access circular</a></h3><p>The previous circular remains in force until this revision has been withdrawn.</p></article>
-              <article className={styles.newsItem}><time dateTime="2001-06-08">08.06.2001</time><h3><a href="#contacts">Directory correction</a></h3><p>Room 014 has been removed from the floor plan. Correspondence should continue to be addressed there.</p></article>
-              <article className={styles.newsItem}><time dateTime="1999-01-01">01.01.1999</time><h3>Calendar conversion complete</h3><p>No interruption to the previous year is anticipated.</p></article>
-              <p className={styles.newsEnd}>No further notices have been received.</p>
+              <h2 className={styles.barTitle} id="news-title">{t("newsTitle")}</h2>
+              <p className={styles.newsUpdated}>{t("newsUpdated")}</p>
+              <article className={styles.newsItem}><time dateTime="2003-11-14">{t("newsOneDate")}</time><h3><a href="#documents">{t("newsOneTitle")}</a></h3><p>{t("newsOneBody")}</p></article>
+              <article className={styles.newsItem}><time dateTime="2001-06-08">{t("newsTwoDate")}</time><h3><a href="#contacts">{t("newsTwoTitle")}</a></h3><p>{t("newsTwoBody")}</p></article>
+              <article className={styles.newsItem}><time dateTime="1999-01-01">{t("newsThreeDate")}</time><h3>{t("newsThreeTitle")}</h3><p>{t("newsThreeBody")}</p></article>
+              <p className={styles.newsEnd}>{t("newsEnd")}</p>
             </section>
             <section id="documents" aria-labelledby="documents-title" className={styles.sideSection}>
-              <h2 id="documents-title">Forms &amp; circulars</h2>
+              <h2 id="documents-title">{t("documentsTitle")}</h2>
               <ul className={styles.documentList}>
-                <li><a href="#public-access">PA–01 · Public access statement</a><span>Current issue · 1 page</span></li>
-                <li><a href="#submissions">SP–02 · Preparation of records</a><span>Revision 3 · 2 pages</span></li>
-                <li><a href="#organizations">OF–03 · Organization particulars</a><span>Unnumbered attachment</span></li>
-                <li><a href="#withdrawn">AC–09 · Closure of a file</a><span>Copy unavailable</span></li>
+                <li><a href="#public-access">{t("documentOne")}</a><span>{t("documentOneMeta")}</span></li>
+                <li><a href="#submissions">{t("documentTwo")}</a><span>{t("documentTwoMeta")}</span></li>
+                <li><a href="#organizations">{t("documentThree")}</a><span>{t("documentThreeMeta")}</span></li>
+                <li><a href="#withdrawn">{t("documentFour")}</a><span>{t("documentFourMeta")}</span></li>
               </ul>
             </section>
             <section id="withdrawn" className={styles.withdrawn} aria-labelledby="withdrawn-title">
-              <h2 id="withdrawn-title">Document not supplied</h2>
-              <p>AC–09 is listed for completeness. No public copy is held. The instruction to remove this reference was filed under AC–09.</p>
+              <h2 id="withdrawn-title">{t("withdrawnTitle")}</h2>
+              <p>{t("withdrawnBody")}</p>
             </section>
-            <div className={styles.registerMark} aria-hidden="true">REGISTRY COPY<br />CHECKED &nbsp; / &nbsp; 04</div>
+            <div className={styles.registerMark} aria-hidden="true">{t("registerMark")}<br />{t("registerChecked")}</div>
           </aside>
         </div>
 
         <div className={styles.registers}>
           <section id="contacts" aria-labelledby="contacts-title">
-            <h2 id="contacts-title">06 / Contact directory</h2>
-            <table aria-label="Contact directory">
-              <thead><tr><th scope="col">Enquiries concerning</th><th scope="col">Refer to</th><th scope="col">Room</th></tr></thead>
+            <h2 id="contacts-title">{t("contactsTitle")}</h2>
+            <table aria-label={t("contactsLabel")}>
+              <thead><tr><th scope="col">{t("contactsEnquiries")}</th><th scope="col">{t("contactsRefer")}</th><th scope="col">{t("contactsRoom")}</th></tr></thead>
               <tbody>
-                <tr><th scope="row">Public inspection</th><td><a href="#public-access">Access desk</a></td><td>001</td></tr>
-                <tr><th scope="row">New records / amendments</th><td><a href="#submissions">Filing clerk</a></td><td>014</td></tr>
-                <tr><th scope="row">Missing correspondence</th><td><a href="#withdrawn">Records retention</a></td><td>014</td></tr>
+                <tr><th scope="row">{t("contactsPublic")}</th><td><a href="#public-access">{t("contactsPublicDesk")}</a></td><td>001</td></tr>
+                <tr><th scope="row">{t("contactsRecords")}</th><td><a href="#submissions">{t("contactsRecordsDesk")}</a></td><td>014</td></tr>
+                <tr><th scope="row">{t("contactsMissing")}</th><td><a href="#withdrawn">{t("contactsMissingDesk")}</a></td><td>014</td></tr>
               </tbody>
             </table>
-            <p>Routing references only. Direct correspondence is not available from this terminal.</p>
+            <p>{t("contactsNote")}</p>
           </section>
           <section aria-labelledby="revision-title">
-            <h2 id="revision-title">07 / Revision register</h2>
-            <table aria-label="Revision register">
-              <thead><tr><th scope="col">Issue</th><th scope="col">Date entered</th><th scope="col">Amendment</th></tr></thead>
+            <h2 id="revision-title">{t("revisionTitle")}</h2>
+            <table aria-label={t("revisionLabel")}>
+              <thead><tr><th scope="col">{t("revisionIssue")}</th><th scope="col">{t("revisionDate")}</th><th scope="col">{t("revisionAmendment")}</th></tr></thead>
               <tbody>
-                <tr><th scope="row">04.2</th><td>14.11.2003</td><td>Public directory corrected.</td></tr>
-                <tr><th scope="row">04.1</th><td>08.06.2001</td><td>Previous signatory removed.</td></tr>
-                <tr><th scope="row">04.1</th><td>08.06.2001</td><td>No previous signatory recorded.</td></tr>
+                <tr><th scope="row">04.2</th><td>14.11.2003</td><td>{t("revisionOneAmendment")}</td></tr>
+                <tr><th scope="row">04.1</th><td>08.06.2001</td><td>{t("revisionTwoAmendment")}</td></tr>
+                <tr><th scope="row">04.1</th><td>08.06.2001</td><td>{t("revisionThreeAmendment")}</td></tr>
               </tbody>
             </table>
-            <p>Entries reproduced as received. Numbering discrepancies are retained.</p>
+            <p>{t("revisionNote")}</p>
           </section>
         </div>
         <div className={styles.policies}>
-          <details id="accessibility"><summary>Accessibility statement</summary><p>This index supports keyboard navigation, text enlargement, and reduced motion. All public instructions are supplied as text. Reading order takes precedence over the order in which material was received.</p></details>
-          <details id="privacy"><summary>Privacy &amp; retention</summary><p>This page contains no credential or correspondence form. Draft records prepared at the workstation are temporary. Closing the editor or reloading discards them; retain a separate copy. A name withheld from a public copy is not an empty field.</p></details>
-          <details id="terms"><summary>Conditions of consultation</summary><p>Released records may contain incomplete, contradictory, or withdrawn accounts. A reference is evidence of filing, not verification. Retain attribution when extending a record. The Commission assumes no authority over events not yet entered.</p></details>
+          <details id="accessibility"><summary>{t("policyAccessibility")}</summary><p>{t("policyAccessibilityBody")}</p></details>
+          <details id="privacy"><summary>{t("policyPrivacy")}</summary><p>{t("policyPrivacyBody")}</p></details>
+          <details id="terms"><summary>{t("policyTerms")}</summary><p>{t("policyTermsBody")}</p></details>
         </div>
         <footer className={styles.footer}>
-          <p>Office of the Permanent Registry <span>·</span> Public information service</p>
-          <a href="#top">Return to top ↑</a>
-          <p className={styles.footerEnd}><span>Page 1 of 1 · Approved for general circulation</span><span>End of available document.</span></p>
+          <p>{t("footerRegistry")} <span>·</span> {t("footerService")}</p>
+          <a href="#top">{t("footerTop")}</a>
+          <p className={styles.footerEnd}><span>{t("footerPage")}</span><span>{t("footerEnd")}</span></p>
         </footer>
       </div>
     </div>

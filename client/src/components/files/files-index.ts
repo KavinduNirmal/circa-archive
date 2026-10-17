@@ -18,6 +18,17 @@ export type FileSortKey = "name" | "type" | "size" | "modified";
 
 export type SortDirection = "ascending" | "descending";
 
+/**
+ * The translator shape the display helpers take.
+ *
+ * `files-index.ts` stays free of React and next-intl on purpose: the words the
+ * helpers print are handed in by the component that owns the catalog hook, so a
+ * listing can be sorted, described, and counted without a renderer or a
+ * language. The filed content they read (names, stamps, sizes, extensions) is
+ * never translated.
+ */
+export type FileTranslate = (key: string, values?: Record<string, string | number>) => string;
+
 /** A registered extension. Anything else is an unregistered file. */
 export type FileExt =
   | "pdf" | "eml" | "txt" | "jpg" | "png" | "wav" | "lnk"
@@ -66,11 +77,11 @@ export function isFolder(node: IconTarget): node is FileFolder {
  */
 export type FileScope = {
   id: string;
-  /** Titlebar text, in the workstation's casing. */
-  title: string;
+  /** Catalog key for the titlebar text, in the workstation's casing. */
+  titleKey: string;
   rootId: string;
-  /** Printed in the status bar instead of an item count. */
-  summary?: string;
+  /** Catalog key for the status-bar line printed instead of an item count. */
+  summaryKey?: string;
   /** The registry keys the policy notices quote. */
   reference?: string;
 };
@@ -211,22 +222,28 @@ const NODES: readonly FileNode[] = [
 
 export const FILE_TREE: readonly FileNode[] = NODES;
 
-/** Extension table: label, artwork, and whether the explorer opens a reader for it. */
-export const FILE_TYPES: Record<string, { label: string; icon: string }> = {
-  pdf: { label: "Record document", icon: "document-0" },
-  eml: { label: "Filed email", icon: "message_envelope_open-0" },
-  txt: { label: "Text note", icon: "file_lines-0" },
-  jpg: { label: "Evidence photograph", icon: "image_old_jpeg-0" },
-  png: { label: "Evidence photograph", icon: "image_old_jpeg-0" },
-  wav: { label: "Audio evidence", icon: "media_player_file-0" },
-  lnk: { label: "Shortcut", icon: "search_directory-0" },
-  com: { label: "Command program", icon: "console_prompt-0" },
-  bat: { label: "Batch file", icon: "file_gears-0" },
-  sys: { label: "System file", icon: "file_gears-0" },
-  hlp: { label: "Help file", icon: "help_book_big-0" },
-  spl: { label: "System splash", icon: "file_gears-0" },
-  key: { label: "Key material", icon: "file_padlock" },
-  bin: { label: "Unreadable binary", icon: "file_question" },
+/**
+ * Extension table: catalog key for the type name, and the artwork.
+ *
+ * The key rather than the word: the Type column and the status bar print these
+ * in the reader's language, and the index is not allowed to know what language
+ * that is. A file whose extension has no entry falls back to `typeUnregisteredFile`.
+ */
+export const FILE_TYPES: Record<string, { key: string; icon: string }> = {
+  pdf: { key: "typeRecordDocument", icon: "document-0" },
+  eml: { key: "typeFiledEmail", icon: "message_envelope_open-0" },
+  txt: { key: "typeTextNote", icon: "file_lines-0" },
+  jpg: { key: "typeEvidencePhotograph", icon: "image_old_jpeg-0" },
+  png: { key: "typeEvidencePhotograph", icon: "image_old_jpeg-0" },
+  wav: { key: "typeAudioEvidence", icon: "media_player_file-0" },
+  lnk: { key: "typeShortcut", icon: "search_directory-0" },
+  com: { key: "typeCommandProgram", icon: "console_prompt-0" },
+  bat: { key: "typeBatchFile", icon: "file_gears-0" },
+  sys: { key: "typeSystemFile", icon: "file_gears-0" },
+  hlp: { key: "typeHelpFile", icon: "help_book_big-0" },
+  spl: { key: "typeSystemSplash", icon: "file_gears-0" },
+  key: { key: "typeKeyMaterial", icon: "file_padlock" },
+  bin: { key: "typeUnreadableBinary", icon: "file_question" },
 };
 
 /** Folder artwork: closed, open, and the two special cases the archive needs. */
@@ -253,18 +270,28 @@ export const SCOPES: readonly FileScope[] = [
    * one level down means the pane and the listing always agree about where the
    * window is instead of the pane showing a folder the listing is not.
    */
-  { id: "my-pc", title: "My Computer", rootId: "pc-drive", summary: "8 objects, 2.1 GB free.", reference: "CIRCA-OS 4.12" },
-  { id: "records", title: "My Documents", rootId: "dir-documents" },
-  { id: "my-work", title: "My Work", rootId: "dir-work" },
-  { id: "archive", title: "Archive", rootId: "dir-archive", reference: "LN-POLICY-12" },
-  { id: "organizations", title: "Organizations", rootId: "dir-organizations", reference: "LN-POLICY-12" },
-  { id: "system", title: "System Files", rootId: "dir-system", reference: "CIRCA-OS 4.12" },
-  { id: "recycle", title: "Recycle Bin", rootId: "dir-recycle", reference: "LN-POLICY-19" },
-  { id: "expunged", title: "_EXPUNGED", rootId: "dir-expunged", summary: "47 records expunged.", reference: "LN-POLICY-22" },
+  { id: "my-pc", titleKey: "placeMyComputer", rootId: "pc-drive", summaryKey: "summaryMyComputer", reference: "CIRCA-OS 4.12" },
+  { id: "records", titleKey: "placeMyDocuments", rootId: "dir-documents" },
+  { id: "my-work", titleKey: "placeMyWork", rootId: "dir-work" },
+  { id: "archive", titleKey: "placeArchive", rootId: "dir-archive", reference: "LN-POLICY-12" },
+  { id: "organizations", titleKey: "placeOrganizations", rootId: "dir-organizations", reference: "LN-POLICY-12" },
+  { id: "system", titleKey: "placeSystemFiles", rootId: "dir-system", reference: "CIRCA-OS 4.12" },
+  { id: "recycle", titleKey: "placeRecycleBin", rootId: "dir-recycle", reference: "LN-POLICY-19" },
+  { id: "expunged", titleKey: "placeExpunged", rootId: "dir-expunged", summaryKey: "summaryExpunged", reference: "LN-POLICY-22" },
 ];
 
 export function scopeById(id: string): FileScope | undefined {
   return SCOPES.find((scope) => scope.id === id);
+}
+
+/** The scope's destination name in the reader's language. */
+export function scopeTitle(scope: FileScope, t: FileTranslate): string {
+  return t(scope.titleKey);
+}
+
+/** The scope's own status line, or undefined when it counts its contents instead. */
+export function scopeSummary(scope: FileScope, t: FileTranslate): string | undefined {
+  return scope.summaryKey ? t(scope.summaryKey) : undefined;
 }
 
 /* ------------------------------------------------------------------------- */
@@ -318,25 +345,26 @@ export function addressOf(id: string, tree: readonly FileNode[] = FILE_TREE): st
   return (breadcrumbOf(id, tree) ?? []).map((node) => node.name).join("\\");
 }
 
-export function fileTypeOf(node: IconTarget): string {
-  if (isFolder(node)) return "File folder";
-  return (node.ext && FILE_TYPES[node.ext]?.label) || "Unregistered file";
+export function fileTypeOf(node: IconTarget, t: FileTranslate): string {
+  if (isFolder(node)) return t("typeFileFolder");
+  const type = node.ext ? FILE_TYPES[node.ext] : undefined;
+  return type ? t(type.key) : t("typeUnregisteredFile");
 }
 
 /** Type plus extension, as the status bar and the details type column print it. */
-export function describeNode(node: FileNode, tree: readonly FileNode[] = FILE_TREE): string {
-  const label = fileTypeOf(node);
+export function describeNode(node: FileNode, t: FileTranslate, tree: readonly FileNode[] = FILE_TREE): string {
+  const label = fileTypeOf(node, t);
   if (!isFolder(node)) return `${label} (${node.ext.toUpperCase()})`;
-  return childrenOf(node.id, tree).length === 0 ? `${label} (empty)` : label;
+  return childrenOf(node.id, tree).length === 0 ? `${label} (${t("emptyLabel")})` : label;
 }
 
 /** The summary a folder shows in place of a size, since a folder has none. */
-export function countLabel(id: string, tree: readonly FileNode[] = FILE_TREE): string {
+export function countLabel(id: string, t: FileTranslate, tree: readonly FileNode[] = FILE_TREE): string {
   const { folders, files } = folderCounts(id, tree);
-  if (folders + files === 0) return "empty";
+  if (folders + files === 0) return t("emptyLabel");
   const parts: string[] = [];
-  if (files > 0) parts.push(`${files} file${files === 1 ? "" : "s"}`);
-  if (folders > 0) parts.push(`${folders} folder${folders === 1 ? "" : "s"}`);
+  if (files > 0) parts.push(t(files === 1 ? "countFile" : "countFiles", { count: files }));
+  if (folders > 0) parts.push(t(folders === 1 ? "countFolder" : "countFolders", { count: folders }));
   return parts.join(", ");
 }
 
@@ -373,12 +401,16 @@ export function sortKeyLabel(key: FileSortKey): string {
  * Orders one level of a listing. Folders stay ahead of files in every key and
  * both directions, which is what makes a details listing read the way Explorer's
  * did; the three views without column headers keep the stored order instead.
+ *
+ * Sorting by type compares the printed type name, so the order follows the
+ * language the reader is using rather than an English table hidden in the index.
  */
 export function sortNodes(
   nodes: readonly FileNode[],
   key: FileSortKey,
   direction: SortDirection,
   view: FileView,
+  t: FileTranslate,
   tree: readonly FileNode[] = FILE_TREE,
 ): FileNode[] {
   if (view !== "details") return [...nodes];
@@ -388,7 +420,7 @@ export function sortNodes(
     if (isFolder(a) !== isFolder(b)) return isFolder(a) ? -1 : 1;
     let result = 0;
     if (key === "name") result = byName(a, b);
-    else if (key === "type") result = fileTypeOf(a).localeCompare(fileTypeOf(b)) || byName(a, b);
+    else if (key === "type") result = fileTypeOf(a, t).localeCompare(fileTypeOf(b, t)) || byName(a, b);
     else if (key === "size") result = (isFolder(a) ? folderCounts(a.id, tree).files : a.size) - (isFolder(b) ? folderCounts(b.id, tree).files : b.size) || byName(a, b);
     else result = formatModified(a).localeCompare(formatModified(b)) || byName(a, b);
     return result * sign;

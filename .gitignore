@@ -40,3 +40,6 @@ Thumbs.db
 # Browser test artifacts
 playwright-report/
 test-results/
+
+# Playwright browser installs, when the default cache is not writable
+.pw-browsers/

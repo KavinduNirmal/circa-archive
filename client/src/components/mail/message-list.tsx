@@ -1,12 +1,13 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { ChevronDown, ChevronUp, Mail, MailOpen, Paperclip } from "lucide-react";
 import { isUnread, type MailMessage, type MailSort, type MailSortColumn } from "./mailbox-index";
 
-const COLUMNS: readonly { id: MailSortColumn; label: string; className: string }[] = [
-  { id: "from", label: "From", className: "mail-col-from" },
-  { id: "subject", label: "Subject", className: "mail-col-subject" },
-  { id: "received", label: "Received", className: "mail-col-received" },
+const COLUMNS: readonly { id: MailSortColumn; key: string; className: string }[] = [
+  { id: "from", key: "columnFrom", className: "mail-col-from" },
+  { id: "subject", key: "columnSubject", className: "mail-col-subject" },
+  { id: "received", key: "columnReceived", className: "mail-col-received" },
 ];
 
 export type MessageListProps = {
@@ -28,14 +29,15 @@ export type MessageListProps = {
  * direction through `aria-sort` instead of relying on the arrow alone.
  */
 export function MessageList({ messages, read, selectedId, sort, onSelect, onSort }: MessageListProps) {
+  const t = useTranslations("mail");
   return (
     <div className="mail-grid-scroll">
-      <table className="mail-grid" role="grid" aria-label="Messages">
+      <table className="mail-grid" role="grid" aria-label={t("gridLabel")}>
         <thead>
           <tr>
             <th scope="col" className="mail-col-state" aria-sort={ariaSortFor("importance", sort)}>
               <span className="mail-glyph-slot">
-                <SortHeader column="importance" label="Importance" sort={sort} onSort={onSort} compact />
+                <SortHeader column="importance" label={t("columnImportance")} sort={sort} onSort={onSort} compact />
                 {/* Visible mark so the column is identifiable, not only sortable. */}
                 <span className="mail-header-importance" aria-hidden="true">!</span>
               </span>
@@ -44,7 +46,7 @@ export function MessageList({ messages, read, selectedId, sort, onSelect, onSort
             </th>
             {COLUMNS.map((column) => (
               <th key={column.id} scope="col" className={column.className} aria-sort={ariaSortFor(column.id, sort)}>
-                <SortHeader column={column.id} label={column.label} sort={sort} onSort={onSort} />
+                <SortHeader column={column.id} label={t(column.key)} sort={sort} onSort={onSort} />
               </th>
             ))}
           </tr>
@@ -65,22 +67,22 @@ export function MessageList({ messages, read, selectedId, sort, onSelect, onSort
                 {/* One fixed slot per glyph, so the marks line up down the column. */}
                 <td className="mail-col-state">
                   <span className="mail-glyph-slot">
-                    {message.importance === "high" && <span className="mail-importance" data-level="high" title="High importance">!</span>}
-                    {message.importance === "low" && <span className="mail-importance" data-level="low" title="Low importance">↓</span>}
+                    {message.importance === "high" && <span className="mail-importance" data-level="high" title={t("highImportance")}>!</span>}
+                    {message.importance === "low" && <span className="mail-importance" data-level="low" title={t("lowImportance")}>↓</span>}
                   </span>
                   <span className="mail-glyph-slot">
                     {unread
-                      ? <Mail className="mail-glyph" aria-label="Unread" />
-                      : <MailOpen className="mail-glyph mail-glyph-read" aria-label="Read" />}
+                      ? <Mail className="mail-glyph" aria-label={t("markUnread")} />
+                      : <MailOpen className="mail-glyph mail-glyph-read" aria-label={t("markRead")} />}
                   </span>
                   <span className="mail-glyph-slot">
-                    {message.attachments?.length ? <Paperclip className="mail-glyph" aria-label="Has an attachment" /> : null}
+                    {message.attachments?.length ? <Paperclip className="mail-glyph" aria-label={t("markAttachment")} /> : null}
                   </span>
                 </td>
                 <td className="mail-col-from">{message.from.name}</td>
                 <td className="mail-col-subject">
                   {message.subject}
-                  {message.returned && <span className="mail-returned"> returned</span>}
+                  {message.returned && <span className="mail-returned"> {t("returnedSuffix")}</span>}
                 </td>
                 <td className="mail-col-received font-mono">{message.received}</td>
               </tr>
@@ -89,7 +91,7 @@ export function MessageList({ messages, read, selectedId, sort, onSelect, onSort
         </tbody>
       </table>
       {messages.length === 0 && (
-        <p className="mail-grid-empty">This folder has nothing matching the current view.</p>
+        <p className="mail-grid-empty">{t("emptyGrid")}</p>
       )}
     </div>
   );

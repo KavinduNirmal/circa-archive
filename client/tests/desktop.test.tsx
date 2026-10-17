@@ -1,14 +1,28 @@
-import { render, screen, waitFor, within } from "@testing-library/react";
+import { screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
-// The shell directly: the /desktop route now posts first, and these tests are about the shell.
-import { DesktopShell as Home } from "@/components/desktop-shell";
-import { explorerTitle } from "@/components/files/files-identity";
+// The shell directly: the locale desktop route now posts first, and these tests are about the shell.
+import { DesktopShell } from "@/components/desktop-shell";
 import { FILE_TREE, nodeById } from "@/components/files/files-index";
+import { catalogFor, renderWithIntl } from "./intl";
 
-/** The file browser is named for the folder it shows, so every folder window has its own title. */
-const ARCHIVE_WINDOW_TITLE = explorerTitle("Archive");
-const MY_PC_WINDOW_TITLE = explorerTitle("My Computer");
+const english = catalogFor("en");
+
+/**
+ * The file browser is named for the folder it shows, so every folder window has
+ * its own title. The titles are composed from the shipped catalog rather than
+ * written out, because the shell builds them from messages now.
+ */
+const ARCHIVE_WINDOW_TITLE = `${english.shell.archiveLabel} - ${english.shell.explorerSuffix}`;
+const MY_PC_WINDOW_TITLE = `${english.shell.explorerMyComputer} - ${english.shell.explorerSuffix}`;
+
+/**
+ * The shell always mounts inside the message provider, the way the language
+ * layout mounts it: a shell rendered without one has no copy to read.
+ */
+function renderShell() {
+  return renderWithIntl(<DesktopShell />);
+}
 
 function desktopIconIn(button: HTMLElement) {
   const icon = button.querySelector<HTMLElement>(".desktop-icon");
@@ -19,7 +33,7 @@ function desktopIconIn(button: HTMLElement) {
 describe("desktop navigation", () => {
   it("explains a desktop destination with the redesigned tooltip instead of a native title", async () => {
     const user = userEvent.setup();
-    render(<Home />);
+    renderShell();
     const organizations = screen.getByRole("button", { name: "Organizations" });
     expect(organizations).not.toHaveAttribute("title");
     expect(screen.queryByRole("tooltip")).not.toBeInTheDocument();
@@ -35,7 +49,7 @@ describe("desktop navigation", () => {
 
   it("keeps the Start menu free of redundant hints", async () => {
     const user = userEvent.setup();
-    render(<Home />);
+    renderShell();
     await user.click(screen.getByRole("button", { name: "Start" }));
     const startNavigation = screen.getByRole("navigation", { name: "Start applications" });
     await user.hover(within(startNavigation).getByRole("button", { name: "Archive" }));
@@ -43,7 +57,7 @@ describe("desktop navigation", () => {
   });
 
   it("maps each destination to its requested icon and shortcut marker", () => {
-    render(<Home />);
+    renderShell();
     const navigation = screen.getByRole("navigation", { name: "Desktop folders" });
     const expected = {
       "My PC": { glyph: "my-pc", shortcut: false },
@@ -67,7 +81,7 @@ describe("desktop navigation", () => {
   });
 
   it("renders the supplied Windows 98 artwork for every destination", () => {
-    render(<Home />);
+    renderShell();
     const navigation = screen.getByRole("navigation", { name: "Desktop folders" });
     const artwork: Record<string, string> = {
       "My PC": "/icons/computer-4.png",
@@ -90,7 +104,7 @@ describe("desktop navigation", () => {
   });
   it("shows the workstation root in My PC and keeps System off the desktop", async () => {
     const user = userEvent.setup();
-    render(<Home />);
+    renderShell();
     expect(screen.queryByRole("button", { name: "System" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "WRITE.exe" })).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "CIRCA Word" })).toBeVisible();
@@ -113,7 +127,7 @@ describe("desktop navigation", () => {
 
   it("opens System from the folder tree and lists the workstation files", async () => {
     const user = userEvent.setup();
-    render(<Home />);
+    renderShell();
     await user.click(screen.getByRole("button", { name: "My PC" }));
     const myPc = screen.getByRole("dialog", { name: MY_PC_WINDOW_TITLE });
     // System lives inside My PC, so it is one tree row down from the root.
@@ -136,7 +150,7 @@ describe("desktop navigation", () => {
   });
 
   it("keeps Settings pinned left of the tray and the clock", () => {
-    render(<Home />);
+    renderShell();
     const taskbar = screen.getByRole("contentinfo", { name: "Taskbar" });
     const settings = screen.getByRole("button", { name: "Settings" });
     expect(settings).toHaveClass("taskbar-task");
@@ -156,7 +170,7 @@ describe("desktop navigation", () => {
 
   it("opens taskbar notifications and changes the screen setting", async () => {
     const user = userEvent.setup();
-    render(<Home />);
+    renderShell();
     await user.click(screen.getByRole("button", { name: "Notifications" }));
     expect(screen.getByText("Notifications are not connected yet.")).toBeVisible();
     await user.keyboard("{Escape}");
@@ -166,7 +180,7 @@ describe("desktop navigation", () => {
   });
   it("opens a folder from the desktop and returns to the wallpaper", async () => {
     const user = userEvent.setup();
-    render(<Home />);
+    renderShell();
     const navigation = screen.getByRole("navigation", { name: "Desktop folders" });
     expect(navigation).toBeVisible();
     await user.click(screen.getByRole("button", { name: "Archive" }));
@@ -180,7 +194,7 @@ describe("desktop navigation", () => {
 
   it("lets an open overlay consume Escape before it closes the focused window", async () => {
     const user = userEvent.setup();
-    render(<Home />);
+    renderShell();
     await user.click(screen.getByRole("button", { name: "Archive" }));
     expect(screen.getByRole("dialog", { name: ARCHIVE_WINDOW_TITLE })).toBeVisible();
     await user.click(screen.getByRole("button", { name: "Start" }));
@@ -193,7 +207,7 @@ describe("desktop navigation", () => {
 
   it("opens and closes the start launcher", async () => {
     const user = userEvent.setup();
-    render(<Home />);
+    renderShell();
     await user.click(screen.getByRole("button", { name: "Start" }));
     expect(screen.getByRole("navigation", { name: "Start applications" })).toBeVisible();
     await user.click(screen.getByRole("button", { name: "Start" }));
@@ -202,11 +216,12 @@ describe("desktop navigation", () => {
 
   it("keeps a way back out of the fiction from the start launcher", async () => {
     const user = userEvent.setup();
-    render(<Home />);
+    renderShell();
     await user.click(screen.getByRole("button", { name: "Start" }));
     // The landing page is how anyone arrives, so leaving the workstation is a control and not a guess.
+    // The link keeps the reader's language, so it lands on the localized home rather than on a bare path.
     const leave = screen.getByRole("link", { name: /public archive site/i });
-    expect(leave).toHaveAttribute("href", "/");
+    expect(leave).toHaveAttribute("href", "/en");
     expect(leave).toHaveClass("start-public");
   });
 });
@@ -214,7 +229,7 @@ describe("desktop navigation", () => {
 describe("the record reader as a workstation window", () => {
   /** Opens the archive, then a record from the index's recently-filed list. */
   async function openRecord(user: ReturnType<typeof userEvent.setup>) {
-    render(<Home />);
+    renderShell();
     await user.click(screen.getByRole("button", { name: "Search" }));
     const browser = screen.getByRole("dialog", { name: "Titan Browser - CIRCA Archive" });
     await user.click(within(browser).getByRole("button", { name: "INC-00907" }));
