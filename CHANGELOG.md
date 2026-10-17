@@ -19,6 +19,7 @@ All notable changes to CIRCA Archive are documented here. The format follows [Ke
 - The README and contributor, security, and conduct policies were rewritten for public contributors.
 - Repository checks now reject `.github/README.md` and document its replacement in `.github/ABOUT.md`.
 - Local-only scratch and planning files are excluded from the published tree and ignored per clone.
+- Documented the solo-maintainer administrator bypass and linked the asset licensing work to its tracking issue.
 
 ### Fixed
 
