@@ -23,7 +23,8 @@ This is the living checklist for the public repository. Checked items are config
 - [x] Default branch is `develop`; `main` is the release branch.
 - [x] Issues enabled; wiki disabled so documentation stays in the repository.
 - [x] Squash and merge-commit merges enabled; rebase merges disabled; merged head branches are deleted.
-- [x] Rulesets on `main` and `develop` require a pull request, passing checks, and resolved conversations; an administrator bypass covers self-review while solo. Force pushes and deletion are blocked.
+- [x] Rulesets on `main` and `develop` require a pull request, passing checks, and resolved conversations; force pushes and deletion are blocked.
+- [x] A conflicting default "Development" ruleset was removed, so the project rulesets are the single source of truth.
 - [x] Tag ruleset prevents updating or deleting `v*` release tags.
 - [x] Secret scanning and push protection enabled. Validity checks and non-provider patterns remain disabled; see owner actions.
 - [x] Private vulnerability reporting enabled.
@@ -41,7 +42,7 @@ This is the living checklist for the public repository. Checked items are config
 - [ ] Confirm the provenance and redistribution rights of the supplied wallpaper, or replace it ([tracking issue #2](https://github.com/KavinduNirmal/circa-archive/issues/2)).
 - [ ] Confirm that the copyright notice in `LICENSE` names the intended rights holder.
 - [ ] Publish the first tagged release and verify the Release workflow on a real tag.
-- [ ] Remove the administrator bypass and keep the review requirement when a second maintainer joins.
+- [ ] Raise the required approval count to one when a second maintainer joins.
 - [ ] Enable secret scanning validity checks and non-provider patterns if GitHub makes them available for this repository.
 - [ ] Review Bun advisories manually: Dependabot covers Bun version updates, not Bun security updates.
 - [ ] Consider GitHub Discussions or a project board only if the issue tracker stops being sufficient.
