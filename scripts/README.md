@@ -2,7 +2,7 @@
 
 ## Responsibility and structure
 
-`check-repository.ts` enforces a `README.md` in every authored folder and ancestor. It uses null-delimited Git paths, excludes generated folders, and runs Git's whitespace check. `repositoryPaths` takes the environment it reads the index with: the command line inherits its own, so a hook sees the index of the commit in progress, while a caller that owns a scratch repository passes an environment with git's variables removed.
+`check-repository.ts` enforces a `README.md` in every authored folder and ancestor. It uses null-delimited Git paths, excludes generated folders, and runs Git's whitespace check. It exempts `.github` itself, whose folder notes live in `ABOUT.md`, and rejects `.github/README.md` because GitHub would render that file as the repository README ahead of the root file. `repositoryPaths` takes the environment it reads the index with: the command line inherits its own, so a hook sees the index of the commit in progress, while a caller that owns a scratch repository passes an environment with git's variables removed.
 
 ## Usage
 

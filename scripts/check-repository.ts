@@ -5,6 +5,17 @@ const generatedDirectories = new Set([
   ".git", "node_modules", ".next", "dist", "out", "coverage", "bin", "obj", "TestResults",
 ]);
 
+/**
+ * `.github/README.md` is the repository README as far as GitHub is concerned:
+ * it takes precedence over the root file and hides the project introduction.
+ * The folder documents itself in `.github/ABOUT.md` instead.
+ */
+const readmeExemptDirectories = new Set([".github"]);
+
+export function findShadowingRepositoryReadme(paths: string[]): string[] {
+  return paths.filter((path) => path === ".github/README.md");
+}
+
 export function findMissingReadmes(paths: string[]): string[] {
   const authored = paths.filter((path) =>
     !path.startsWith(".husky/_/") &&
@@ -20,7 +31,10 @@ export function findMissingReadmes(paths: string[]): string[] {
       directory = posix.dirname(directory);
     }
   }
-  return [...required].filter((path) => !files.has(path)).sort((a, b) => {
+  return [...required].filter((path) => {
+    if (files.has(path)) return false;
+    return !readmeExemptDirectories.has(posix.dirname(path));
+  }).sort((a, b) => {
     if (a === "README.md") return -1;
     if (b === "README.md") return 1;
     return a.split("/").length - b.split("/").length || a.localeCompare(b);
@@ -51,7 +65,15 @@ export function repositoryPaths(
 if (import.meta.main) {
   const staged = process.argv.includes("--staged");
   const root = execFileSync("git", ["rev-parse", "--show-toplevel"], { encoding: "utf8" }).trim();
-  const missing = findMissingReadmes(repositoryPaths(staged, root));
+  const paths = repositoryPaths(staged, root);
+  const shadowing = findShadowingRepositoryReadme(paths);
+  if (shadowing.length) {
+    console.error(
+      `Move ${shadowing.join(", ")} to .github/ABOUT.md: GitHub renders .github/README.md as the repository README.`,
+    );
+    process.exit(1);
+  }
+  const missing = findMissingReadmes(paths);
   if (missing.length) {
     console.error(`Missing folder documentation${staged ? " in the Git index" : ""}:\n${missing.join("\n")}`);
     process.exit(1);

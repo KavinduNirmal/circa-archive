@@ -71,4 +71,4 @@ the same namespace files in both languages, identical key sets, no empty values,
 the same ICU `{placeholders}` and rich-text tags. Run it with `bun run test`.
 
 A Korean webfont has not been added, so Hangul falls back to the reader's own Korean
-face — see the open question in `../../.agents/brain/DESIGN.md`.
+face; bundling a Korean webfont remains an open interface decision.

@@ -20,7 +20,7 @@ The four client components in this folder read copy from props, not from the cat
 
 Two things deliberately did not translate. The archive codes, document numbers, dates, and the circular number are identifiers — `PA–01` is the same document in either language — so they are carried through the catalogs unchanged and a test holds them. The logo is an image and carries no translatable text; the accessible name of the institution is the `h1` beside it.
 
-Neither bundled face carries Hangul. `:lang(ko)` in `globals.css` names the Korean faces to fall back to so the three platforms agree; the portal's own stacks end in generic `serif`, `sans-serif`, and `monospace` fallbacks and already degrade that way. Korean prose also sets `word-break: keep-all`, because Hangul breaks between syllables by default and a word like "마십시오" should not be split across two lines. Bundling a Korean webfont, and whether the uppercase micro-label tracking should be relaxed for Hangul, are open questions recorded in `../../../.agents/brain/DESIGN.md`.
+Neither bundled face carries Hangul. `:lang(ko)` in `globals.css` names the Korean faces to fall back to so the three platforms agree; the portal's own stacks end in generic `serif`, `sans-serif`, and `monospace` fallbacks and already degrade that way. Korean prose also sets `word-break: keep-all`, because Hangul breaks between syllables by default and a word like "마십시오" should not be split across two lines. Bundling a Korean webfont, and whether the uppercase micro-label tracking should be relaxed for Hangul, remain open interface questions.
 
 ## Design decision — 2026-10-17: an agency site left running
 
