@@ -1,22 +1,22 @@
-import { ArrowDown, ArrowRight, ArrowUpRight, Check, GitFork, Heart, Scale, Wrench } from "lucide-react";
+import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
-import { EXTERNAL, ISSUES, LICENCES, PROJECT_LINKS } from "./meta-links";
+import { EXTERNAL, PROJECT_LINKS } from "./meta-links";
 import { EditionCards, RECORD_COUNT, SectionBand, SpecimenCard } from "./meta-parts";
+import { CopyCode } from "./docs/copy-code";
 import { DOC_GROUPS, DOC_TOPICS, docHref, docTopic } from "./docs/docs-topics";
 
 /**
- * The project's front page, composed as a filed report rather than a stack of
- * landing-page modules.
+ * The project's front page: a report, not a sales page.
  *
- * The reading order is the argument: a hero that states what this is, a premise
- * with one record as evidence, the two editions, the manual, the machinery, the
- * way to contribute, and the questions. Every section is a row inside the
- * frame; the folio number in the left rail is the only ornament, and the single
- * dot field belongs to the plate in the hero.
+ * Six sections, in the order a reader needs them: what this is, the two
+ * editions, the manual, the machinery, the way in, and the questions. Every
+ * section opens with the same band — folio number, kicker, title, lede — so the
+ * page teaches its own rhythm and nothing has to be boxed twice. There is no
+ * closing pitch: the record ends, and the footer answers what is left.
  */
 
-const STACK = ["Next.js 16", "React 19", "TypeScript", "Tailwind CSS 4", "next-intl", "remark", "Vitest", "Playwright"];
+const STACK = ["Next.js 16", "React 19", "TypeScript", "Tailwind CSS 4", "next-intl", "remark", "Vitest"];
 
 /** The documentation's contents, numbered once and used as the landing index. */
 const DOC_MANUAL = (() => {
@@ -44,11 +44,17 @@ const FLOW = [
   { step: "04", title: "flowEditions", note: "flowEditionsNote" },
 ] as const;
 
-const OPEN_SOURCE = [
-  { icon: Scale, term: "homeLicenceTerm", value: "homeLicenceValue" },
-  { icon: Wrench, term: "homeMaintainerTerm", value: "homeMaintainerValue" },
-  { icon: GitFork, term: "homeRepoTerm", value: "homeRepoValue" },
-  { icon: Heart, term: "homeSponsorTerm", value: "homeSponsorValue" },
+const FACTS = [
+  ["factRecordsTerm", "factRecordsDetail"],
+  ["factPagesTerm", "factPagesDetail"],
+  ["factLanguageTerm", "factLanguageDetail"],
+  ["factTestsTerm", "factTestsDetail"],
+] as const;
+
+const CONTRIBUTE_STEPS = [
+  { index: "01", title: "stepGuideTitle", body: "stepGuideBody" },
+  { index: "02", title: "stepChangeTitle", body: "stepChangeBody" },
+  { index: "03", title: "stepChecksTitle", body: "stepChecksBody" },
 ] as const;
 
 const LANDING_FAQ = [
@@ -58,23 +64,29 @@ const LANDING_FAQ = [
   ["faqRoadmapQ", "faqRoadmapA"],
 ] as const;
 
+const QUICKSTART = `bun install --frozen-lockfile
+bun run --cwd=client dev`;
+
 export function MetaHome() {
   const t = useTranslations("meta");
 
   return (
     <>
       <section className="meta-hero" aria-labelledby="meta-hero-title">
+        {/*
+          The header's field: a dot screen and the seal, faded into it. This is
+          the whole of the ornament on the landing page — no plate, no figure
+          number, no frame — so the headline is the only thing competing for the
+          reader's attention.
+        */}
+        <div className="meta-hero-field" aria-hidden="true">
+          <span className="meta-hero-dots meta-hero-dots-fine" />
+          <span className="meta-hero-dots meta-hero-dots-coarse" />
+          <img className="meta-hero-eye" src="/circa_snake_with_eye.svg" alt="" />
+        </div>
+
         <div className="meta-shell meta-hero-grid">
           <div className="meta-hero-copy">
-            <p className="meta-status-rail">
-              <span className="meta-status-dot" aria-hidden="true" />
-              <span>{t("heroStatus")}</span>
-              <span className="meta-rail-sep" aria-hidden="true">
-                /
-              </span>
-              <span>{t("heroStatusValue")}</span>
-            </p>
-
             <h1 className="meta-display" id="meta-hero-title">
               <span>{t("heroTitleA")}</span>{" "}
               <span className="meta-display-dim">{t("heroTitleB")}</span>
@@ -99,33 +111,6 @@ export function MetaHome() {
 
             <p className="meta-fineprint">{t("heroNote")}</p>
           </div>
-
-          <figure className="meta-hero-plate">
-            <div className="meta-plate-bar">
-              <span className="meta-plate-bar-label">{t("plateLabel")}</span>
-              <span className="meta-plate-bar-status">
-                <span className="meta-status-dot" aria-hidden="true" />
-                {t("plateStatus")}
-              </span>
-            </div>
-
-            <div className="meta-halftone" aria-hidden="true">
-              <span className="meta-halftone-layer meta-halftone-a" />
-              <span className="meta-halftone-layer meta-halftone-b" />
-              <img className="meta-halftone-mark" src="/circa_snake_with_eye.svg" alt="" />
-              <span className="meta-cross meta-cross-tl" />
-              <span className="meta-cross meta-cross-tr" />
-              <span className="meta-cross meta-cross-bl" />
-              <span className="meta-cross meta-cross-br" />
-              <span className="meta-halftone-grid" />
-              <span className="meta-halftone-axis" />
-            </div>
-
-            <figcaption className="meta-plate-caption">
-              <span className="meta-plate-figure">{t("plateFigure")}</span>
-              <span>{t("plateCaptionHome")}</span>
-            </figcaption>
-          </figure>
         </div>
 
         <div className="meta-shell meta-hero-foot">
@@ -135,26 +120,14 @@ export function MetaHome() {
               <dd>{RECORD_COUNT}</dd>
             </div>
             <div>
-              <dt>{t("statEditions")}</dt>
-              <dd>02</dd>
-            </div>
-            <div>
               <dt>{t("statLanguages")}</dt>
-              <dd className="meta-stat-words">{t("statLanguagesValue")}</dd>
+              <dd>{t("statLanguagesValue")}</dd>
             </div>
             <div>
               <dt>{t("statBackend")}</dt>
-              <dd className="meta-stat-dim">{t("statNone")}</dd>
-            </div>
-            <div>
-              <dt>{t("statLicence")}</dt>
-              <dd className="meta-stat-words">{t("statLicenceValue")}</dd>
+              <dd>{t("statNone")}</dd>
             </div>
           </dl>
-          <a className="meta-scroll" href="#premise">
-            {t("scroll")}
-            <ArrowDown aria-hidden="true" size={14} />
-          </a>
         </div>
       </section>
 
@@ -200,11 +173,11 @@ export function MetaHome() {
             lede={t("editionsLede")}
           />
           <EditionCards />
-          <p className="meta-note meta-editions-note">{t("editionsNote")}</p>
         </div>
       </section>
 
-      <section className="meta-section" id="documentation" aria-labelledby="meta-docs-title">
+      <section className="meta-section meta-docs-section" id="documentation" aria-labelledby="meta-docs-title">
+        <span className="meta-spotlight" aria-hidden="true" />
         <div className="meta-shell">
           <SectionBand
             id="meta-docs-title"
@@ -220,63 +193,43 @@ export function MetaHome() {
             }
           />
 
-          <div className="meta-manual">
-            <nav className="meta-manual-index" aria-label={t("docsContents")}>
-              {DOC_MANUAL.map((group) => (
-                <div className="meta-manual-group" key={group.labelKey}>
-                  <p className="meta-manual-group-title">{t(group.labelKey)}</p>
-                  <ol>
-                    {group.items.map((item) => (
-                      <li key={item.href}>
-                        <Link className="meta-manual-link" href={item.href}>
-                          <span className="meta-manual-number">{item.number}</span>
-                          <span className="meta-manual-name">{t(item.titleKey)}</span>
-                          <ArrowRight className="meta-manual-arrow" aria-hidden="true" size={14} />
-                        </Link>
-                      </li>
-                    ))}
-                  </ol>
-                </div>
-              ))}
-            </nav>
+          <nav className="meta-manual" aria-label={t("docsContents")}>
+            {DOC_MANUAL.map((group) => (
+              <div className="meta-manual-group" key={group.labelKey}>
+                <p className="meta-manual-group-title">
+                  <span>{t(group.labelKey)}</span>
+                  <span className="meta-manual-range">{group.range}</span>
+                </p>
+                <ol>
+                  {group.items.map((item) => (
+                    <li key={item.href}>
+                      <Link className="meta-manual-link" href={item.href}>
+                        <span className="meta-manual-number">{item.number}</span>
+                        <span className="meta-manual-name">{t(item.titleKey)}</span>
+                      </Link>
+                    </li>
+                  ))}
+                </ol>
+              </div>
+            ))}
+          </nav>
 
-            <div className="meta-manual-terminal">
-              <div className="meta-terminal-bar">
-                <span>
-                  <span className="meta-terminal-prompt" aria-hidden="true">
-                    $
-                  </span>
-                  {t("quickstartTitle")}
-                </span>
-                <span>{t("quickstartMeta")}</span>
-              </div>
-              <pre className="meta-terminal-code">
-                <code>{`bun install --frozen-lockfile
-bun run --cwd=client dev
-# http://localhost:3001/en/meta`}</code>
-              </pre>
-              <pre className="meta-terminal-tree" aria-label={t("docsStructureTreeLabel")}>
-                <code>{`client/
-├── messages/
-├── src/app/[lang]/
-└── src/components/meta/`}</code>
-              </pre>
-              <ul className="meta-terminal-map" aria-label={t("docsContents")}>
-                {DOC_MANUAL.map((group) => (
-                  <li key={group.labelKey}>
-                    <span>{group.range}</span>
-                    {t(group.labelKey)}
-                  </li>
-                ))}
-              </ul>
-              <div className="meta-terminal-foot">
-                <p>{t("quickstartNote")}</p>
-                <Link className="meta-text-link" href={docHref("getting-started")}>
-                  {t("docsStartCard1Link")}
-                  <ArrowRight aria-hidden="true" size={13} />
-                </Link>
-              </div>
-            </div>
+          <div className="meta-quickstart">
+            <CopyCode
+              code={QUICKSTART}
+              language="sh"
+              label={t("quickstartTitle")}
+              copyLabel={t("docsCopy")}
+              copiedLabel={t("docsCopied")}
+              failedLabel={t("docsCopyFailed")}
+            />
+            <p className="meta-quickstart-foot">
+              <span>{t("quickstartMeta")}</span>
+              <Link className="meta-text-link" href={docHref("getting-started")}>
+                {t("docsStartCard1Link")}
+                <ArrowRight aria-hidden="true" size={13} />
+              </Link>
+            </p>
           </div>
         </div>
       </section>
@@ -301,34 +254,24 @@ bun run --cwd=client dev
             ))}
           </ol>
 
-          <div className="meta-build-grid">
-            <dl className="meta-ledger">
-              {[
-                ["factPipelineTerm", "factPipelineDetail"],
-                ["factPagesTerm", "factPagesDetail"],
-                ["factLanguageTerm", "factLanguageDetail"],
-                ["factTestsTerm", "factTestsDetail"],
-              ].map(([term, detail]) => (
-                <div className="meta-ledger-row" key={term}>
-                  <dt>{t(term)}</dt>
-                  <dd>{t(detail)}</dd>
-                </div>
-              ))}
-            </dl>
+          <dl className="meta-facts">
+            {FACTS.map(([term, detail]) => (
+              <div className="meta-fact" key={term}>
+                <dt>{t(term)}</dt>
+                <dd>{t(detail)}</dd>
+              </div>
+            ))}
+          </dl>
 
-            <aside className="meta-build-aside">
-              <p className="meta-kicker">{t("stackLabel")}</p>
-              <ul className="meta-stack">
-                {STACK.map((item) => (
-                  <li key={item}>{item}</li>
-                ))}
-              </ul>
-              <Link className="meta-text-link" href={docHref("rendering")}>
-                {t("builtDocsLink")}
-                <ArrowRight aria-hidden="true" size={14} />
-              </Link>
-            </aside>
-          </div>
+          <p className="meta-colophon">
+            <span className="meta-colophon-label">{t("stackLabel")}</span>
+            {STACK.join(" · ")}
+          </p>
+
+          <Link className="meta-text-link meta-section-link" href={docHref("rendering")}>
+            {t("builtDocsLink")}
+            <ArrowRight aria-hidden="true" size={14} />
+          </Link>
         </div>
       </section>
 
@@ -343,11 +286,7 @@ bun run --cwd=client dev
           />
 
           <ol className="meta-steps">
-            {[
-              { index: "01", title: "stepGuideTitle", body: "stepGuideBody" },
-              { index: "02", title: "stepChangeTitle", body: "stepChangeBody" },
-              { index: "03", title: "stepChecksTitle", body: "stepChecksBody" },
-            ].map((step) => (
+            {CONTRIBUTE_STEPS.map((step) => (
               <li className="meta-step" key={step.index}>
                 <p className="meta-step-index" aria-hidden="true">
                   {step.index}
@@ -371,29 +310,6 @@ bun run --cwd=client dev
               {t("homeOpenLink")}
               <ArrowRight aria-hidden="true" size={14} />
             </Link>
-          </div>
-
-          <div className="meta-open">
-            <div className="meta-open-head">
-              <p className="meta-kicker">{t("homeOpenKicker")}</p>
-              <h3>{t("homeOpenTitle")}</h3>
-              <p>{t("homeOpenBody")}</p>
-            </div>
-
-            <dl className="meta-open-ledger">
-              {OPEN_SOURCE.map((item) => {
-                const Icon = item.icon;
-                return (
-                  <div className="meta-open-row" key={item.term}>
-                    <dt>
-                      <Icon aria-hidden="true" size={14} strokeWidth={1.5} />
-                      {t(item.term)}
-                    </dt>
-                    <dd>{t(item.value)}</dd>
-                  </div>
-                );
-              })}
-            </dl>
           </div>
         </div>
       </section>
@@ -421,46 +337,6 @@ bun run --cwd=client dev
                 <p>{t(answer)}</p>
               </details>
             ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="meta-cta" aria-labelledby="meta-cta-title">
-        <div className="meta-shell meta-cta-inner">
-          <div className="meta-cta-copy">
-            <p className="meta-kicker">{t("homeCtaKicker")}</p>
-            <h2 id="meta-cta-title">{t("homeCtaTitle")}</h2>
-            <p className="meta-cta-body">{t("homeCtaBody")}</p>
-          </div>
-
-          <div className="meta-cta-actions">
-            <div className="meta-actions">
-              <Link className="meta-button" href="/meta/documentation">
-                {t("homeCtaPrimary")}
-                <ArrowRight aria-hidden="true" size={15} />
-              </Link>
-              <a className="meta-button-outline" href={PROJECT_LINKS.repository} {...EXTERNAL}>
-                {t("homeCtaSecondary")}
-                <ArrowUpRight aria-hidden="true" size={14} />
-              </a>
-            </div>
-            <p className="meta-cta-foot">
-              <span className="meta-cta-note">
-                <Check aria-hidden="true" size={13} />
-                {t("homeCtaFoot")}
-              </span>
-              <span className="meta-cta-links">
-                <a href={ISSUES.bug} {...EXTERNAL}>
-                  {t("footerBug")}
-                </a>
-                <a href={PROJECT_LINKS.sponsor} {...EXTERNAL}>
-                  {t("footerSponsor")}
-                </a>
-                <a href={LICENCES.content.href} {...EXTERNAL}>
-                  {LICENCES.content.name}
-                </a>
-              </span>
-            </p>
           </div>
         </div>
       </section>

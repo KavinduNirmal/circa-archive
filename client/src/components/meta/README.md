@@ -10,13 +10,14 @@ it answers a different question.
 | --- | --- |
 | `meta-chrome.tsx` | The frame shared by every project route: skip link, top status line, navigation, framed `<main>`, and footer. A server component; the two client islands are `MetaNav` and the language switcher. |
 | `meta-nav.tsx` | The shadcn NavigationMenu (documentation panel) and the mobile Sheet, with a restyled project header. Client component. |
-| `meta-home.tsx` | The landing report: hero with its plate, premise and specimen, editions, the documentation manual, the machinery, contribution, the questions, and the inverted closing band. |
+| `meta-home.tsx` | The landing report: the hero field with its faded seal, premise and specimen, editions, the documentation manual with its quickstart, the machinery, contribution, and the questions. Six sections and no closing pitch. |
 | `meta-about.tsx` | The dossier: the register, the nine-section index, and the long-form premise, editions, build, contribution, roster, support, questions, contact, and licence. |
-| `meta-sections.tsx` | The dossier's nine sections, each a landmark with its own heading. |
+| `meta-sections.tsx` | The dossier's nine sections, each an open band and a landmark with its own heading. |
 | `meta-parts.tsx` | The shared section band, specimen card, and two edition panels. |
-| `meta-plate.tsx` | The seal as a character plate, pasted as a string. Generated from `public/circa_eye.png`, never at request time. |
+| `../ui/avatar.tsx` | The shadcn avatar primitive and its group, used for the contributor profiles. |
+| `meta-plate.tsx` | The dossier's seal as a character plate, pasted as a string. Generated from `public/circa_eye.png`, never at request time. The landing hero uses the same artwork as a faded silhouette instead. |
 | `meta-links.ts` | The addresses the project points at: repository, funding, the three issue destinations, and the two licence deeds. |
-| `meta.css` | The system: palette, the framed composition, the band, the manual, the plate, the dossier, the docs surface, the footer, and the responsive rules. |
+| `meta.css` | The system: palette, the framed composition, the hero field, the band, the manual, the dossier, the docs surface, the footer, and the responsive rules. |
 | `docs/` | The documentation registry, prose, sidebar, pager, and copy key. See its [README](docs/README.md). |
 
 Everything is server-rendered except the navigation drawer, the docs filter, the
@@ -25,12 +26,27 @@ argument and every document.
 
 ## Composition
 
-The page is a framed ledger: one continuous 1280px measure with side rules, rows
-separated by hairlines, and folio numbers in a left rail. The only texture is the
-hero plate's dot screen; the field is deliberately not repeated behind other
-sections. Borders connect cells — the hero and its plate share a frame, the stats
-are one ruled strip, the editions share a division, and the manual is one bordered
-spread — rather than wrapping each group in its own card.
+The page is a filed report: one continuous 1280px measure with side rules and
+sections separated by hairlines on a generous block rhythm. Every section — on
+the landing page and in the dossier alike — opens with the same band: folio and
+kicker, then the title, then the lede or action, closed by a rule. The label sits
+above the title rather than in a left rail, so nothing indents away from the
+page's left edge. The only hero ornament is a dot field with the seal faded into it; the
+documentation section carries one low dotted spotlight, and no other section
+repeats the texture.
+
+Borders connect cells — the stats are one ruled strip of three, the editions
+share a division, the manual is one ruled spread, the build facts are one
+ledger, the contributor profiles share one division — rather than wrapping each
+group in its own card. Section titles are
+set below the hero's display size on purpose: one display, then a repeating
+smaller title, then the reading copy. A lone section action sits under its
+title; an action that has a lede sits beside it.
+
+The documentation section is the one place where the hero's dot screen returns:
+a dotted spotlight bleeds in from its upper corner, behind the text and never
+bright enough to read through. It is decoration, hidden from assistive
+technology, and it is the only other texture on the surface.
 
 The project layer is also allowed the shadcn primitives in `../ui/` (navigation
 menu, sheet, input, button). Its palette is re-declared inside `.meta-page`, so
@@ -47,7 +63,7 @@ It asserts no capability the project does not have. There is no backend, so
 notes, drafts, and replies are described as living in the browser tab; there is
 no mail service, so the three contact doors are repository issues.
 
-## Regenerating the plate
+## Regenerating the dossier's plate
 
 `meta-plate.tsx` holds the output, not a renderer. To regenerate it, sample
 `public/circa_eye.png` at 72 columns of alpha onto the ten-step ramp in the file's

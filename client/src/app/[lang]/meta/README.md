@@ -6,18 +6,21 @@ The project layer outside the fiction: the landing report at `/{lang}/meta`, the
 dossier at `/{lang}/meta/about`, and the documentation at
 `/{lang}/meta/documentation` and `/{lang}/meta/documentation/[slug]`.
 
-The landing page makes the argument and the five doorways (premise, editions,
-documentation, machinery, contribution). The dossier is the long account and the
-terms. The documentation is the code manual: setup, record format, renderer,
-routes, contribution, tests, and design systems.
+The landing page makes the argument in six sections (premise, editions,
+documentation, machinery, contribution, questions) and stops there; the footer
+holds the doors. The dossier is the long account and the terms. The documentation
+is the code manual: setup, record format, renderer, routes, contribution, tests,
+and design systems.
 
 ## Structure
 
 - `layout.tsx`: the one chrome for all three surfaces. It imports the project
   fonts and `components/meta/meta.css`, sets the request locale, and renders
   `MetaChrome` around the page. The chrome supplies the skip link, the top status
-  line, the shadcn navigation, the framed `<main>`, and the footer.
-- `page.tsx`: the landing report; metadata from `metadata.metaHome*`.
+  line, the shadcn navigation (whose first item is Home, pointing at `/{lang}/meta`
+  rather than the language root), the framed `<main>`, and a three-column footer.
+- `page.tsx`: the landing report; metadata from `metadata.metaHome*`. No closing
+  call to action: after the questions, the chrome's footer is the next thing.
 - `about/page.tsx`: the dossier; metadata from `metadata.metaAbout*`.
 - `documentation/page.tsx`: the documentation overview at its short address.
 - `documentation/[slug]/page.tsx`: one topic, statically generated for every

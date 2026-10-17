@@ -175,42 +175,63 @@ are — a different system.
 
 - **Surface.** Near-black canvas (`#0a0b0d`, footer `#07080a`), bone text
   (`#f2eee5`), muted mist (`#a2a6ac`, `#7e848c`), one accent: the stamp colour,
-  warmed (`#c9762f`). Paper appears exactly three times, as the specimen record,
-  the workstation edition cell, and the closing band, so that the fiction's
-  material is a contrast rather than a texture.
+  warmed (`#c9762f`). Paper appears exactly twice, as the specimen record and the
+  workstation edition cell, so that the fiction's material is a contrast rather
+  than a texture.
 - **Type.** Instrument Serif carries the argument — the display headline, section
   titles, the pull quote, licence names — and Noto Serif KR carries it in Korean.
   DM Sans carries reading copy at 16–17px, and IBM Plex Mono carries every label,
   index, caption, and command. This is the reverse allocation of the archive,
   where sans is the instrument and the serif is reserved for statements; on the
-  project surface the statement is the whole point.
-- **Composition: a framed ledger.** One continuous 1280px measure with side
-  hairlines, rows separated by rules, and folio numbers in a left rail. Borders
-  connect information rather than wrapping it: the hero and its plate share the
-  frame, the stats are one ruled strip of five cells, the two editions share a
-  division, the manual is one bordered spread with its index and terminal, and
-  the build rows are a single ledger. The landing's opening bands run the index
-  (`01`–`06`) against a section title and its lede.
-- **One field, one plate.** The only background texture is the hero plate's dot
-  screen, masked around the plotted seal, with edge rulers, corner crosses, and
-  the grid inside the plate. There is no page-wide grid and no repeating dot
+  project surface the statement is the whole point. A section title is set at
+  1.8–2.4rem, deliberately below the hero: inside a report the headline is the
+  only display type, and nine competing displays would flatten the page.
+- **Composition: a filed report.** One continuous 1280px measure with side
+  hairlines, and sections separated by rules on a generous block rhythm
+  (`clamp(72px, 8.2vw, 124px)`). Borders connect information rather than wrapping
+  it: the hero and its plate share the frame, the stats are one ruled strip of
+  three cells whose values sit on the cell borders, the two editions share a
+  division, the manual is one ruled spread, and the build rows are a single
+  ledger. There is no closing call to action: the report ends on its questions
+  and the footer answers what is left.
+- **The band.** Every section, on both the landing page and the dossier, opens
+  the same way: the folio number and kicker on one line, then the title, then the
+  lede or action on the right, closed by a hairline. The label sits above the
+  title rather than in a left rail, so the title begins at the page's left edge
+  and the section has no dead column.
+- **One field, one seal.** The landing hero is a dotted field with the seal
+  faded into it — no plate, no figure number, no caption, no corner crosses.
+  The seal is the logo and is allowed to be large, but only as a fade: the
+  artwork's own black knocks the dots out, so it reads as a silhouette rather
+  than a watermark. The documentation section carries the only echo, a low
+  dotted spotlight bleeding in from its upper corner, behind the text. The
+  dossier keeps the ASCII seal plate for the thesis quotation, which is the one
+  place a figure is numbered. There is no page-wide grid and no repeating dot
   wash; the frame's rules do the structural work.
 - **The manual.** The landing's documentation section is not three feature cards:
-  it is an index of all nine topics, numbered and grouped, beside a terminal
-  plate holding the quickstart and the three group ranges. It is the project's
-  most specific object and the clearest door into the docs.
-- **Dossier.** `/meta/about` opens with a two-column register: the argument and
-  its keys on the left, and a ruled fact table plus the nine-section index on the
-  right. Sections below use a four/eight split with a continuous vertical rule,
-  so the title and the evidence read as one row.
+  it is an index of all nine topics, numbered and grouped into their three
+  chapters, over one full-measure quickstart block with a copy key. The chapter
+  ranges are stated once, in the index headers, and the tree and terminal chrome
+  are gone.
+- **Dossier.** `/meta/about` opens with a two-column register: the argument on the
+  left, and a ruled fact table plus the nine-section index on the right. There is
+  no repeated action row; the landing page owns the three doors. Sections below
+  are the same band as the landing's, so the two pages cannot drift apart. The
+  contributors section uses the shadcn avatar group — overlapping monograms with
+  an open place — over two profile cards; no avatar loads an image, because a
+  third-party profile picture is a request the site promises not to make.
 - **Documentation.** `/meta/documentation` is a three-column manual: a filterable
   numbered index, the article, and an on-page contents rail, divided by vertical
-  rules. Section headings carry anchors; code blocks carry a labelled copy key
-  with a visible failure state; the pager follows the registry's reading order.
+  rules. The band carries the breadcrumb, the title, and the lede only — the
+  version and the topic count belong to the overview, not to every page. Section
+  headings carry anchors; code blocks carry a labelled copy key with a visible
+  failure state; the pager follows the registry's reading order.
 - **Navigation.** A restyled shadcn NavigationMenu on desktop, with a solid
   documentation panel; a shadcn Sheet on mobile, portalled to `<body>` and
-  carrying its own token block. Mono labels, slash prefixes, one outlined
-  archive key. The drawer traps focus, closes on Escape, and returns focus.
+  carrying its own token block. The first item is Home, which returns to
+  `/{lang}/meta` rather than to the language root, and the archive remains one
+  outlined key. The drawer traps focus, closes on Escape, returns focus, and
+  scrolls its own list so the archive key stays pinned.
 - **Motion.** One 700ms arrival on the hero copy, plate, and stat rail, and a
   240ms drawer slide. No section is hidden behind a scroll reveal, so a print, a
   capture, and a reduced-motion reader all receive the whole page.

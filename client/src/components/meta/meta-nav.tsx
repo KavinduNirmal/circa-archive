@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { ArrowUpRight, BookOpen, Menu } from "lucide-react";
+import { ArrowUpRight, Menu } from "lucide-react";
 import { Link, usePathname } from "@/i18n/navigation";
 import { LanguageSwitcher } from "../language-switcher";
 import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
@@ -30,7 +30,6 @@ export type MetaNavLabels = Readonly<{
   close: string;
   home: string;
   docs: string;
-  docsHint: string;
   about: string;
   archive: string;
   workstation: string;
@@ -66,10 +65,40 @@ export function MetaNav({ labels, groups, repositoryUrl }: MetaNavProps) {
     : pathname.startsWith("/desktop") ? "workstation"
     : "home";
 
-  const topLinks = [
+  type TopLink = Readonly<{ key: string; label: string; href: string; current: boolean }>;
+
+  /* Home lives at the language root's meta page, not at the locale root, which
+     is the fiction's portal; the reader must be able to come back here. */
+  const homeLink: TopLink = { key: "home", label: labels.home, href: "/meta", current: current === "home" };
+  const sectionLinks: readonly TopLink[] = [
     { key: "about", label: labels.about, href: "/meta/about", current: current === "about" },
     { key: "workstation", label: labels.workstation, href: "/desktop", current: current === "workstation" },
-  ] as const;
+  ];
+
+  const sheetLinks: readonly TopLink[] = [
+    homeLink,
+    sectionLinks[0],
+    { key: "archive", label: labels.archive, href: "/site", current: current === "archive" },
+    sectionLinks[1],
+  ];
+
+  const navLink = (link: TopLink) => (
+    <NavigationMenuItem key={link.key}>
+      <NavigationMenuLink asChild>
+        <Link
+          className="meta-nav-link"
+          href={link.href}
+          data-active={link.current ? "true" : undefined}
+          aria-current={link.current ? "page" : undefined}
+        >
+          <span className="meta-nav-slash" aria-hidden="true">
+            /
+          </span>
+          {link.label}
+        </Link>
+      </NavigationMenuLink>
+    </NavigationMenuItem>
+  );
 
   return (
     <header className="meta-header">
@@ -82,6 +111,8 @@ export function MetaNav({ labels, groups, repositoryUrl }: MetaNavProps) {
 
         <NavigationMenu className="meta-nav-desktop" aria-label={labels.menuLabel} viewport={false}>
           <NavigationMenuList className="meta-nav-list">
+            {navLink(homeLink)}
+
             <NavigationMenuItem>
               <NavigationMenuTrigger className="meta-nav-link" data-active={current === "docs" ? "true" : undefined}>
                 <span className="meta-nav-slash" aria-hidden="true">
@@ -114,12 +145,6 @@ export function MetaNav({ labels, groups, repositoryUrl }: MetaNavProps) {
                     ))}
                   </div>
                   <div className="meta-nav-panel-foot">
-                    <NavigationMenuLink asChild>
-                      <Link className="meta-nav-panel-cta" href="/meta/documentation">
-                        <BookOpen aria-hidden="true" size={14} />
-                        {labels.docsHint}
-                      </Link>
-                    </NavigationMenuLink>
                     <a className="meta-nav-panel-source" href={repositoryUrl} target="_blank" rel="noreferrer">
                       {labels.sourceCta}
                       <ArrowUpRight aria-hidden="true" size={12} />
@@ -129,23 +154,7 @@ export function MetaNav({ labels, groups, repositoryUrl }: MetaNavProps) {
               </NavigationMenuContent>
             </NavigationMenuItem>
 
-            {topLinks.map((link) => (
-              <NavigationMenuItem key={link.key}>
-                <NavigationMenuLink asChild>
-                  <Link
-                    className="meta-nav-link"
-                    href={link.href}
-                    data-active={link.current ? "true" : undefined}
-                    aria-current={link.current ? "page" : undefined}
-                  >
-                    <span className="meta-nav-slash" aria-hidden="true">
-                      /
-                    </span>
-                    {link.label}
-                  </Link>
-                </NavigationMenuLink>
-              </NavigationMenuItem>
-            ))}
+            {sectionLinks.map(navLink)}
           </NavigationMenuList>
         </NavigationMenu>
 
@@ -176,10 +185,23 @@ export function MetaNav({ labels, groups, repositoryUrl }: MetaNavProps) {
 
               <nav className="meta-sheet-nav" aria-label={labels.menuLabel}>
                 <div className="meta-sheet-group">
+                  <p className="meta-sheet-title">{labels.menuLabel}</p>
+                  {sheetLinks.map((link) => (
+                    <Link
+                      key={link.key}
+                      className="meta-sheet-link"
+                      href={link.href}
+                      onClick={() => setOpen(false)}
+                      data-active={link.current ? "true" : undefined}
+                      aria-current={link.current ? "page" : undefined}
+                    >
+                      {link.label}
+                    </Link>
+                  ))}
+                </div>
+
+                <div className="meta-sheet-group">
                   <p className="meta-sheet-title">{labels.docs}</p>
-                  <Link className="meta-sheet-link" href="/meta/documentation" onClick={() => setOpen(false)}>
-                    {labels.docsHint}
-                  </Link>
                   {groups.map((group) =>
                     group.items.map((item) => (
                       <Link
@@ -193,19 +215,6 @@ export function MetaNav({ labels, groups, repositoryUrl }: MetaNavProps) {
                       </Link>
                     )),
                   )}
-                </div>
-
-                <div className="meta-sheet-group">
-                  <p className="meta-sheet-title">{labels.menuLabel}</p>
-                  <Link className="meta-sheet-link" href="/meta/about" onClick={() => setOpen(false)}>
-                    {labels.about}
-                  </Link>
-                  <Link className="meta-sheet-link" href="/site" onClick={() => setOpen(false)}>
-                    {labels.archive}
-                  </Link>
-                  <Link className="meta-sheet-link" href="/desktop" onClick={() => setOpen(false)}>
-                    {labels.workstation}
-                  </Link>
                 </div>
               </nav>
 

@@ -4,7 +4,7 @@ import { Link } from "@/i18n/navigation";
 import { LanguageSwitcher } from "../language-switcher";
 import { EXTERNAL, ISSUES, LICENCES, PROJECT_LINKS } from "./meta-links";
 import { MetaNav, type MetaNavGroup, type MetaNavLabels } from "./meta-nav";
-import { DOC_GROUPS, DOC_TOPICS, docHref, docTopic } from "./docs/docs-topics";
+import { DOC_GROUPS, docHref, docTopic } from "./docs/docs-topics";
 
 /**
  * The frame shared by every page outside the fiction: the instrument strip, the
@@ -28,7 +28,6 @@ export async function MetaChrome({
     close: t("navClose"),
     home: t("navHome"),
     docs: t("navDocs"),
-    docsHint: t("navDocsOverview"),
     about: t("navAbout"),
     archive: t("navArchiveLink"),
     workstation: t("navWorkstation"),
@@ -44,8 +43,6 @@ export async function MetaChrome({
       return { label: t(topic.navKey), href: docHref(slug) };
     }),
   }));
-
-  const footerDocs = DOC_TOPICS.filter((topic) => ["overview", "getting-started", "records", "contributing"].includes(topic.slug));
 
   return (
     <div className="meta-page" id="top">
@@ -87,10 +84,6 @@ export async function MetaChrome({
               <span>Archive</span>
             </p>
             <p className="meta-footer-tagline">{t("footerTagline")}</p>
-            <p className="meta-footer-status">
-              <span className="meta-status-dot" aria-hidden="true" />
-              {t("statusLine")}
-            </p>
             <LanguageSwitcher className="meta-language meta-footer-language" />
           </div>
 
@@ -99,35 +92,16 @@ export async function MetaChrome({
               <p className="meta-footer-title">{t("footerProjectTitle")}</p>
               <ul>
                 <li>
-                  <Link href="/meta">{t("footerHome")}</Link>
-                </li>
-                <li>
                   <Link href="/meta/about">{t("footerAbout")}</Link>
                 </li>
                 <li>
-                  <Link href="/meta/about#premise">{t("footerPremise")}</Link>
+                  <Link href="/meta/documentation">{t("footerDocsTitle")}</Link>
                 </li>
                 <li>
-                  <Link href="/meta/about#contributors">{t("footerContributors")}</Link>
+                  <Link href={docHref("contributing")}>{t("docsContributingNav")}</Link>
                 </li>
                 <li>
-                  <Link href="/meta/about#licence">{t("footerLicence")}</Link>
-                </li>
-              </ul>
-            </div>
-
-            <div>
-              <p className="meta-footer-title">{t("footerDocsTitle")}</p>
-              <ul>
-                {footerDocs.map((topic) => (
-                  <li key={topic.slug}>
-                    <Link href={docHref(topic.slug)}>{t(topic.navKey)}</Link>
-                  </li>
-                ))}
-                <li>
-                  <a href={PROJECT_LINKS.repository} {...EXTERNAL}>
-                    {t("footerSource")}
-                  </a>
+                  <Link href="/meta/about#questions">{t("footerQuestions")}</Link>
                 </li>
               </ul>
             </div>
@@ -151,8 +125,13 @@ export async function MetaChrome({
             </div>
 
             <div>
-              <p className="meta-footer-title">{t("footerHelpTitle")}</p>
+              <p className="meta-footer-title">{t("footerElsewhereTitle")}</p>
               <ul>
+                <li>
+                  <a href={PROJECT_LINKS.repository} {...EXTERNAL}>
+                    {t("footerSource")}
+                  </a>
+                </li>
                 <li>
                   <a href={ISSUES.bug} {...EXTERNAL}>
                     {t("footerBug")}
@@ -161,11 +140,6 @@ export async function MetaChrome({
                 <li>
                   <a href={ISSUES.feature} {...EXTERNAL}>
                     {t("footerFeature")}
-                  </a>
-                </li>
-                <li>
-                  <a href={ISSUES.contact} {...EXTERNAL}>
-                    {t("footerContactLink")}
                   </a>
                 </li>
                 <li>

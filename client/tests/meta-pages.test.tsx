@@ -6,7 +6,7 @@ import { DocsPage } from "@/components/meta/docs/docs-page";
 import { DOC_GROUPS, DOC_TOPICS, docHref, docNeighbours, docTopic } from "@/components/meta/docs/docs-topics";
 import { MetaHome } from "@/components/meta/meta-home";
 import { MetaNav, type MetaNavGroup, type MetaNavLabels } from "@/components/meta/meta-nav";
-import { ISSUES } from "@/components/meta/meta-links";
+import { PROJECT_LINKS } from "@/components/meta/meta-links";
 import { catalogFor, renderWithIntl } from "./intl";
 
 /**
@@ -28,7 +28,6 @@ const navLabels: MetaNavLabels = {
   close: meta.navClose,
   home: meta.navHome,
   docs: meta.navDocs,
-  docsHint: meta.navDocsOverview,
   about: meta.navAbout,
   archive: meta.navArchiveLink,
   workstation: meta.navWorkstation,
@@ -88,11 +87,15 @@ describe("the project landing page", () => {
     );
   });
 
-  it("ends with the work and a way to report a defect", () => {
+  it("ends on the questions, with the repository one link away", () => {
     renderWithIntl(<MetaHome />);
 
-    expect(screen.getByRole("heading", { name: meta.homeCtaTitle })).toBeVisible();
-    expect(screen.getByRole("link", { name: meta.footerBug })).toHaveAttribute("href", ISSUES.bug);
+    const sections = screen.getAllByRole("heading", { level: 2 });
+    expect(sections.at(-1)).toHaveTextContent(meta.faqTitle);
+    expect(screen.getByRole("link", { name: new RegExp(meta.contributeRepository) })).toHaveAttribute(
+      "href",
+      PROJECT_LINKS.repository,
+    );
   });
 });
 
@@ -101,6 +104,7 @@ describe("the project navigation", () => {
     renderWithIntl(<MetaNav labels={navLabels} groups={navGroups} repositoryUrl="https://github.com/example" />);
 
     expect(screen.getByRole("button", { name: new RegExp(meta.navDocs) })).toBeVisible();
+    expect(screen.getByRole("link", { name: new RegExp(meta.navHome) })).toHaveAttribute("href", "/en/meta");
     expect(screen.getByRole("link", { name: new RegExp(meta.navAbout) })).toHaveAttribute("href", "/en/meta/about");
     expect(screen.getByRole("link", { name: new RegExp(meta.navWorkstation) })).toHaveAttribute("href", "/en/desktop");
     expect(screen.getByRole("link", { name: new RegExp(meta.navOpenArchive) })).toHaveAttribute("href", "/en/site");

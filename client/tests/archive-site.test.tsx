@@ -7,7 +7,7 @@ import { ArchiveOrganizations } from "@/components/archive-site/archive-organiza
 import { ArchiveRecord } from "@/components/archive-site/archive-record";
 import { ArchiveRecords } from "@/components/archive-site/archive-records";
 import { MetaAbout } from "@/components/meta/meta-about";
-import { ISSUES, LICENCES } from "@/components/meta/meta-links";
+import { ISSUES, LICENCES, PROJECT_LINKS } from "@/components/meta/meta-links";
 import { RecordProse } from "@/components/archive-site/record-prose";
 import { mostConsulted, randomRecordCode } from "@/components/archive-site/archive-data";
 import { ARCHIVE_INDEX, recentFilings } from "@/components/browser/archive-index";
@@ -494,19 +494,21 @@ describe("the record's tools and notes", () => {
 describe("the project page", () => {
   const meta = english.meta;
 
-  it("opens on the dossier premise and offers the docs and the archive", () => {
+  it("opens on the dossier premise, its three facts, and an index of the account", () => {
     renderWithIntl(<MetaAbout />);
 
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
       `${meta.aboutPageTitleA} ${meta.aboutPageTitleB}`,
     );
-    expect(screen.getByText(meta.outside)).toBeVisible();
     expect(screen.getByText(meta.aboutPageLede)).toBeVisible();
-    expect(screen.getByRole("link", { name: new RegExp(meta.heroPrimary) })).toHaveAttribute(
-      "href",
-      "/en/meta/documentation",
-    );
-    expect(screen.getByRole("link", { name: new RegExp(meta.heroSecondary) })).toHaveAttribute("href", "/en/site");
+    expect(screen.getByRole("link", { name: meta.brand })).toHaveAttribute("href", "/en/meta");
+    const register = screen.getAllByRole("definition")[0].closest("dl")!;
+    expect(within(register).getByText(meta.aboutFactStatusValue)).toBeVisible();
+    expect(within(register).getByText(meta.aboutFactLicenceTerm)).toBeVisible();
+
+    const index = screen.getByRole("navigation", { name: meta.aboutIndexLabel });
+    expect(within(index).getAllByRole("link")).toHaveLength(9);
+    expect(within(index).getByRole("link", { name: new RegExp(meta.navLicence) })).toHaveAttribute("href", "#licence");
   });
 
   it("shows a real record as evidence, not as a claim", () => {
@@ -540,13 +542,23 @@ describe("the project page", () => {
     expect(screen.getByText(meta.supportPromise)).toBeVisible();
   });
 
-  it("credits the maintainer and leaves the next place open", () => {
+  it("credits the maintainer, with an avatar group and the next place open", () => {
     renderWithIntl(<MetaAbout />);
 
-    const roster = screen.getByRole("table");
-    expect(within(roster).getByRole("rowheader", { name: meta.contributorsOpenName })).toBeVisible();
-    expect(within(roster).getByRole("rowheader", { name: /KavinduNirmal/ })).toBeVisible();
-    expect(within(roster).getByText(meta.contributorsMaintainerRole)).toBeVisible();
+    const section = screen.getByRole("region", { name: meta.contributorsTitle });
+    const group = within(section).getByRole("group", { name: meta.contributorsOnFile });
+    expect(group.querySelectorAll('[data-slot="avatar"]')).toHaveLength(2);
+    expect(within(section).getByRole("heading", { name: /KavinduNirmal/ })).toBeVisible();
+    expect(within(section).getByRole("heading", { name: meta.contributorsOpenName })).toBeVisible();
+    expect(within(section).getAllByText(meta.contributorsMaintainerRole).length).toBeGreaterThan(0);
+    expect(within(section).getByRole("link", { name: new RegExp(meta.contributorsProfile) })).toHaveAttribute(
+      "href",
+      PROJECT_LINKS.repository,
+    );
+    expect(within(section).getByRole("link", { name: new RegExp(meta.contributorsLink) })).toHaveAttribute(
+      "href",
+      "#contribute",
+    );
   });
 
   it("separates the code licence from the fiction's licence", () => {

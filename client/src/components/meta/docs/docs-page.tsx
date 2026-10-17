@@ -13,6 +13,10 @@ import { DocsSidebar, type DocsSidebarGroup, type DocsSidebarLabels } from "./do
  * "where else can I go"; the right rail answers "what is on this page". At
  * 1100px the rail is dropped because the headings are close enough to scroll
  * back to; at 900px the sidebar becomes a disclosure above the article.
+ *
+ * The band carries the breadcrumb, the title, and the lede, and nothing else:
+ * the version and the topic count are facts about the documentation as a whole,
+ * and they are stated once, on the overview, rather than stamped on every page.
  */
 export function DocsPage({ topic }: Readonly<{ topic: DocTopic }>) {
   const t = useTranslations("meta");
@@ -55,35 +59,8 @@ export function DocsPage({ topic }: Readonly<{ topic: DocTopic }>) {
             <span aria-current="page">{groupLabel}</span>
           </nav>
 
-          <div className="meta-docs-band-grid">
-            <div>
-              <p className="meta-status-rail">
-                <span className="meta-status-dot" aria-hidden="true" />
-                <span>{t("docsVersion")}</span>
-                <span className="meta-rail-sep" aria-hidden="true">
-                  /
-                </span>
-                <span>{groupLabel}</span>
-              </p>
-              <h1 id="meta-doc-title">{t(topic.titleKey)}</h1>
-              <p className="meta-docs-lede">{t(topic.ledeKey)}</p>
-            </div>
-
-            <dl className="meta-docs-facts">
-              <div>
-                <dt>{t("docsFactPagesTerm")}</dt>
-                <dd>{t("docsFactPagesValue")}</dd>
-              </div>
-              <div>
-                <dt>{t("docsFactLanguagesTerm")}</dt>
-                <dd>{t("docsFactLanguagesValue")}</dd>
-              </div>
-              <div>
-                <dt>{t("docsFactStatusTerm")}</dt>
-                <dd>{t("docsFactStatusValue")}</dd>
-              </div>
-            </dl>
-          </div>
+          <h1 id="meta-doc-title">{t(topic.titleKey)}</h1>
+          <p className="meta-docs-lede">{t(topic.ledeKey)}</p>
         </div>
       </section>
 
@@ -93,11 +70,6 @@ export function DocsPage({ topic }: Readonly<{ topic: DocTopic }>) {
         </aside>
 
         <article className="meta-doc">
-          <header className="meta-doc-head">
-            <p className="meta-kicker">{groupLabel}</p>
-            <p className="meta-doc-version">{t("docsVersion")}</p>
-          </header>
-
           <DocsBody topic={topic} />
 
           <nav className="meta-doc-pager" aria-label={t("docsPager")}>

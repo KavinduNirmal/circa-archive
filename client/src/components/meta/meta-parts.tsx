@@ -11,36 +11,11 @@ import { ARCHIVE_INDEX } from "../browser/archive-index";
  * string still comes from the `meta` catalog.
  */
 
-export function SectionHead({
-  id,
-  index,
-  kicker,
-  title,
-  children,
-}: Readonly<{
-  id: string;
-  index: string;
-  kicker: string;
-  title: string;
-  children?: React.ReactNode;
-}>) {
-  return (
-    <header className="meta-sechead">
-      <p className="meta-sechead-meta">
-        <span className="meta-index">{index}</span>
-        <span className="meta-rule" aria-hidden="true" />
-        <span className="meta-kicker">{kicker}</span>
-      </p>
-      <h2 id={id}>{title}</h2>
-      {children}
-    </header>
-  );
-}
-
 /**
  * A section opening: the folio number and kicker on the left rail, the title
  * and its lede sharing one band. The band is the page's repeating unit, so the
- * eye learns where a section begins without a card or an icon saying so.
+ * eye learns where a section begins without a card or an icon saying so. Both
+ * the landing page and the dossier open every section this way.
  */
 export function SectionBand({
   id,
@@ -65,10 +40,15 @@ export function SectionBand({
         <span className="meta-kicker">{kicker}</span>
       </p>
       <div className="meta-band-body">
-        <h2 id={id}>{title}</h2>
-        {lede || action ? (
+        <div className="meta-band-lead">
+          <h2 id={id}>{title}</h2>
+          {/* With no lede there is nothing to sit beside, so the door belongs
+              under the title rather than floating at the far right. */}
+          {action && !lede ? <div className="meta-band-action">{action}</div> : null}
+        </div>
+        {lede ? (
           <div className="meta-band-aside">
-            {lede ? <p>{lede}</p> : null}
+            <p>{lede}</p>
             {action}
           </div>
         ) : null}

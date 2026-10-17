@@ -1,19 +1,17 @@
 import { useTranslations } from "next-intl";
 import { ArrowRight, ArrowUpRight, Bug, Lightbulb, Mail } from "lucide-react";
-import { Link } from "@/i18n/navigation";
+import { Avatar, AvatarFallback, AvatarGroup } from "../ui/avatar";
 import { EXTERNAL, ISSUES, LICENCES, MAINTAINER, PROJECT_LINKS } from "./meta-links";
 import { SEAL_PLATE } from "./meta-plate";
-import { EditionCards, SectionHead } from "./meta-parts";
+import { EditionCards, SectionBand, SpecimenCard } from "./meta-parts";
 
 /**
- * The body of the project page, in the order the argument is made.
+ * The body of the dossier, in the order the argument is made.
  *
- * The page answers a reader who arrived from a record and a visitor who arrived
- * from nowhere: first the fiction it is selling, then the two editions it
- * actually ships, then how it is built, then how to join in, then who is already
- * here, then how to keep it running, and finally the licences and the terms. Each
- * section is a landmark with its own heading, so the header nav and a screen
- * reader's outline agree.
+ * Every section is the same band as the landing page's — folio, kicker, title,
+ * lede — with the long-form content underneath it. That one shape is what keeps
+ * nine sections from reading as nine different pages. The specimen, the quote,
+ * and the seal are printed once, here, where a reader has arrived on purpose.
  */
 
 const FACTS = [
@@ -75,11 +73,22 @@ export function MetaPremise() {
 
   return (
     <section className="meta-section" id="premise" aria-labelledby="meta-premise-title">
-      <div className="meta-shell meta-split">
-        <SectionHead id="meta-premise-title" index={t("premiseIndex")} kicker={t("premiseKicker")} title={t("premiseTitle")} />
-        <div className="meta-prose">
-          <p>{t("premiseBody")}</p>
-          <p>{t("premiseBodyTwo")}</p>
+      <div className="meta-shell">
+        <SectionBand id="meta-premise-title" index={t("premiseIndex")} kicker={t("premiseKicker")} title={t("premiseTitle")} />
+
+        <div className="meta-premise-grid">
+          <div className="meta-prose">
+            <p>{t("premiseBody")}</p>
+            <p>{t("premiseBodyTwo")}</p>
+          </div>
+
+          <aside className="meta-premise-evidence">
+            <p className="meta-evidence-label">
+              <span className="meta-kicker">{t("specimenLabel")}</span>
+              <span className="meta-note-inline">{t("specimenNote")}</span>
+            </p>
+            <SpecimenCard />
+          </aside>
         </div>
       </div>
 
@@ -104,29 +113,6 @@ export function MetaPremise() {
           </figure>
         </div>
       </div>
-
-      <div className="meta-shell meta-specimen-row">
-        <div className="meta-specimen-caption">
-          <p className="meta-kicker">{t("specimenLabel")}</p>
-          <p className="meta-note">{t("specimenNote")}</p>
-        </div>
-        <article className="meta-specimen">
-          <div className="meta-specimen-top">
-            <p className="meta-specimen-code">{t("specimenCode")}</p>
-            <p className="meta-specimen-status">{t("specimenMeta")}</p>
-          </div>
-          <h3 className="meta-specimen-title">{t("specimenTitle")}</h3>
-          <blockquote className="meta-specimen-text">
-            <p>{t("specimenText")}</p>
-          </blockquote>
-          <footer className="meta-specimen-foot">
-            <Link className="meta-specimen-link" href="/site/records/CIRCA-S-03007">
-              {t("specimenLink")}
-              <ArrowRight size={15} aria-hidden="true" />
-            </Link>
-          </footer>
-        </article>
-      </div>
     </section>
   );
 }
@@ -136,14 +122,16 @@ export function MetaEditions() {
 
   return (
     <section className="meta-section" id="editions" aria-labelledby="meta-editions-title">
-      <div className="meta-shell meta-split">
-        <SectionHead id="meta-editions-title" index={t("editionsIndex")} kicker={t("editionsKicker")} title={t("editionsTitle")} />
-        <p className="meta-lede-small">{t("editionsLede")}</p>
-      </div>
-
       <div className="meta-shell">
+        <SectionBand
+          id="meta-editions-title"
+          index={t("editionsIndex")}
+          kicker={t("editionsKicker")}
+          title={t("editionsTitle")}
+          lede={t("editionsLede")}
+        />
         <EditionCards />
-        <p className="meta-note meta-editions-note">{t("editionsNote")}</p>
+        <p className="meta-note">{t("editionsNote")}</p>
       </div>
     </section>
   );
@@ -154,20 +142,24 @@ export function MetaBuilt() {
 
   return (
     <section className="meta-section" id="built" aria-labelledby="meta-built-title">
-      <div className="meta-shell meta-split">
-        <SectionHead id="meta-built-title" index={t("builtIndex")} kicker={t("builtKicker")} title={t("builtTitle")} />
-        <div>
-          <p className="meta-lede-small">{t("builtLede")}</p>
-          <dl className="meta-ledger">
-            {FACTS.map(([term, detail]) => (
-              <div className="meta-ledger-row" key={term}>
-                <dt>{t(term)}</dt>
-                <dd>{t(detail)}</dd>
-              </div>
-            ))}
-          </dl>
-          <p className="meta-note">{t("builtNote")}</p>
-        </div>
+      <div className="meta-shell">
+        <SectionBand
+          id="meta-built-title"
+          index={t("builtIndex")}
+          kicker={t("builtKicker")}
+          title={t("builtTitle")}
+          lede={t("builtLede")}
+        />
+
+        <dl className="meta-ledger">
+          {FACTS.map(([term, detail]) => (
+            <div className="meta-ledger-row" key={term}>
+              <dt>{t(term)}</dt>
+              <dd>{t(detail)}</dd>
+            </div>
+          ))}
+        </dl>
+        <p className="meta-note">{t("builtNote")}</p>
       </div>
     </section>
   );
@@ -178,17 +170,15 @@ export function MetaContribute() {
 
   return (
     <section className="meta-section" id="contribute" aria-labelledby="meta-contribute-title">
-      <div className="meta-shell meta-split">
-        <SectionHead
+      <div className="meta-shell">
+        <SectionBand
           id="meta-contribute-title"
           index={t("contributeIndex")}
           kicker={t("contributeKicker")}
           title={t("contributeTitle")}
+          lede={t("contributeLede")}
         />
-        <p className="meta-lede-small">{t("contributeLede")}</p>
-      </div>
 
-      <div className="meta-shell meta-contribute-body">
         <ol className="meta-steps">
           {STEPS.map((step) => (
             <li className="meta-step" key={step.index}>
@@ -219,56 +209,67 @@ export function MetaContribute() {
   );
 }
 
+/** A handle reads as two names only when the reader can see the split. */
+function initialsOf(handle: string): string {
+  return handle
+    .replace(/([a-z])([A-Z])/g, "$1 $2")
+    .split(/[^A-Za-z]+/)
+    .filter(Boolean)
+    .map((part) => part[0]!.toUpperCase())
+    .slice(0, 2)
+    .join("");
+}
+
 export function MetaContributors() {
   const t = useTranslations("meta");
 
   return (
     <section className="meta-section" id="contributors" aria-labelledby="meta-contributors-title">
-      <div className="meta-shell meta-split">
-        <SectionHead
+      <div className="meta-shell">
+        <SectionBand
           id="meta-contributors-title"
           index={t("contributorsIndex")}
           kicker={t("contributorsKicker")}
           title={t("contributorsTitle")}
+          lede={t("contributorsLede")}
         />
-        <div>
-          <p className="meta-lede-small">{t("contributorsLede")}</p>
 
-          <table className="meta-roster">
-            <caption className="meta-sr">{t("contributorsKicker")}</caption>
-            <thead>
-              <tr>
-                <th scope="col">{t("contributorsNameHead")}</th>
-                <th scope="col">{t("contributorsRoleHead")}</th>
-                <th scope="col">{t("contributorsWorkHead")}</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <th scope="row">
-                  <a href={PROJECT_LINKS.repository} {...EXTERNAL}>
-                    {MAINTAINER}
-                  </a>
-                </th>
-                <td>{t("contributorsMaintainerRole")}</td>
-                <td>{t("contributorsMaintainerWork")}</td>
-              </tr>
-              <tr data-open="true">
-                <th scope="row">{t("contributorsOpenName")}</th>
-                <td>{t("contributorsOpenRole")}</td>
-                <td>{t("contributorsOpenWork")}</td>
-              </tr>
-            </tbody>
-          </table>
+        <div className="meta-people">
+          <div className="meta-people-index" role="group" aria-label={t("contributorsOnFile")}>
+            <AvatarGroup className="meta-avatar-group">
+              <Avatar className="meta-avatar">
+                <AvatarFallback>{initialsOf(MAINTAINER)}</AvatarFallback>
+              </Avatar>
+              <Avatar className="meta-avatar meta-avatar-open" aria-hidden="true">
+                <AvatarFallback>+</AvatarFallback>
+              </Avatar>
+            </AvatarGroup>
+            <p className="meta-people-caption">{t("contributorsOnFile")}</p>
+          </div>
 
-          <p className="meta-aside-link">
-            <a href="#contribute">
-              {t("contributorsLink")}
-              <ArrowRight size={15} aria-hidden="true" />
-            </a>
-          </p>
-          <p className="meta-note">{t("contributorsNote")}</p>
+          <ul className="meta-profiles">
+            <li className="meta-profile">
+              <p className="meta-profile-role">{t("contributorsMaintainerRole")}</p>
+              <h3>{MAINTAINER}</h3>
+              <p className="meta-profile-body">{t("contributorsMaintainerWork")}</p>
+              <a className="meta-profile-link" href={PROJECT_LINKS.repository} {...EXTERNAL}>
+                {t("contributorsProfile")}
+                <ArrowUpRight size={14} aria-hidden="true" />
+              </a>
+            </li>
+            <li className="meta-profile" data-open="true">
+              <p className="meta-profile-role">{t("contributorsOpenRole")}</p>
+              <h3>{t("contributorsOpenName")}</h3>
+              <p className="meta-profile-body">{t("contributorsOpenWork")}</p>
+              <a className="meta-profile-link" href="#contribute">
+                {t("contributorsLink")}
+                <ArrowRight size={14} aria-hidden="true" />
+              </a>
+            </li>
+          </ul>
         </div>
+
+        <p className="meta-note">{t("contributorsNote")}</p>
       </div>
     </section>
   );
@@ -279,26 +280,31 @@ export function MetaSupport() {
 
   return (
     <section className="meta-section" id="support" aria-labelledby="meta-support-title">
-      <div className="meta-shell meta-split">
-        <SectionHead id="meta-support-title" index={t("supportIndex")} kicker={t("supportKicker")} title={t("supportTitle")} />
-        <div>
-          <p className="meta-lede-small">{t("supportBody")}</p>
-          <div className="meta-support-card">
-            <h3>{t("supportSponsorTitle")}</h3>
-            <p>{t("supportSponsorBody")}</p>
-            <a className="meta-button meta-button-ember" href={PROJECT_LINKS.sponsor} {...EXTERNAL}>
-              {t("supportSponsorLink")}
-              <ArrowUpRight size={15} aria-hidden="true" />
-            </a>
-            <p className="meta-note">{t("supportPromise")}</p>
-          </div>
-          <p className="meta-aside-link">
-            <a href="#contribute">
-              {t("supportContribute")}
-              <ArrowRight size={15} aria-hidden="true" />
-            </a>
-          </p>
+      <div className="meta-shell">
+        <SectionBand
+          id="meta-support-title"
+          index={t("supportIndex")}
+          kicker={t("supportKicker")}
+          title={t("supportTitle")}
+          lede={t("supportBody")}
+        />
+
+        <div className="meta-support-card">
+          <h3>{t("supportSponsorTitle")}</h3>
+          <p>{t("supportSponsorBody")}</p>
+          <a className="meta-button meta-button-ember" href={PROJECT_LINKS.sponsor} {...EXTERNAL}>
+            {t("supportSponsorLink")}
+            <ArrowUpRight size={15} aria-hidden="true" />
+          </a>
+          <p className="meta-note">{t("supportPromise")}</p>
         </div>
+
+        <p className="meta-aside-link">
+          <a href="#contribute">
+            {t("supportContribute")}
+            <ArrowRight size={15} aria-hidden="true" />
+          </a>
+        </p>
       </div>
     </section>
   );
@@ -309,23 +315,22 @@ export function MetaQuestions() {
 
   return (
     <section className="meta-section" id="questions" aria-labelledby="meta-questions-title">
-      <div className="meta-shell meta-split">
-        <SectionHead
+      <div className="meta-shell">
+        <SectionBand
           id="meta-questions-title"
           index={t("faqIndex")}
           kicker={t("faqKicker")}
           title={t("faqTitle")}
+          lede={t("faqLede")}
         />
-        <div>
-          <p className="meta-lede-small">{t("faqLede")}</p>
-          <div className="meta-faq">
-            {QUESTIONS.map(([question, answer]) => (
-              <details className="meta-faq-item" name="meta-questions" key={question}>
-                <summary>{t(question)}</summary>
-                <p>{t(answer)}</p>
-              </details>
-            ))}
-          </div>
+
+        <div className="meta-faq">
+          {QUESTIONS.map(([question, answer]) => (
+            <details className="meta-faq-item" name="meta-questions" key={question}>
+              <summary>{t(question)}</summary>
+              <p>{t(answer)}</p>
+            </details>
+          ))}
         </div>
       </div>
     </section>
@@ -337,12 +342,15 @@ export function MetaContact() {
 
   return (
     <section className="meta-section" id="contact" aria-labelledby="meta-contact-title">
-      <div className="meta-shell meta-split">
-        <SectionHead id="meta-contact-title" index={t("contactIndex")} kicker={t("contactKicker")} title={t("contactTitle")} />
-        <p className="meta-lede-small">{t("contactLede")}</p>
-      </div>
-
       <div className="meta-shell">
+        <SectionBand
+          id="meta-contact-title"
+          index={t("contactIndex")}
+          kicker={t("contactKicker")}
+          title={t("contactTitle")}
+          lede={t("contactLede")}
+        />
+
         <div className="meta-channels">
           {CHANNELS.map((channel) => {
             const Icon = channel.icon;
@@ -372,48 +380,46 @@ export function MetaLicence() {
 
   return (
     <section className="meta-section" id="licence" aria-labelledby="meta-licence-title">
-      <div className="meta-shell meta-split">
-        <SectionHead
+      <div className="meta-shell">
+        <SectionBand
           id="meta-licence-title"
           index={t("licenceIndex")}
           kicker={t("licenceKicker")}
           title={t("licenceTitle")}
+          lede={t("licenceLede")}
         />
-        <div>
-          <p className="meta-lede-small">{t("licenceLede")}</p>
 
-          <div className="meta-licences">
-            <article className="meta-licence">
-              <p className="meta-kicker">{t("licenceCodeLabel")}</p>
-              <p className="meta-licence-name">
-                <a href={LICENCES.code.href} {...EXTERNAL}>
-                  {LICENCES.code.name}
-                  <ArrowUpRight size={14} aria-hidden="true" />
-                </a>
-              </p>
-              <p className="meta-licence-body">{t("licenceCodeBody")}</p>
-            </article>
-            <article className="meta-licence">
-              <p className="meta-kicker">{t("licenceContentLabel")}</p>
-              <p className="meta-licence-name">
-                <a href={LICENCES.content.href} {...EXTERNAL}>
-                  {LICENCES.content.name}
-                  <ArrowUpRight size={14} aria-hidden="true" />
-                </a>
-              </p>
-              <p className="meta-licence-body">{t("licenceContentBody")}</p>
-            </article>
-          </div>
+        <div className="meta-licences">
+          <article className="meta-licence">
+            <p className="meta-kicker">{t("licenceCodeLabel")}</p>
+            <p className="meta-licence-name">
+              <a href={LICENCES.code.href} {...EXTERNAL}>
+                {LICENCES.code.name}
+                <ArrowUpRight size={14} aria-hidden="true" />
+              </a>
+            </p>
+            <p className="meta-licence-body">{t("licenceCodeBody")}</p>
+          </article>
+          <article className="meta-licence">
+            <p className="meta-kicker">{t("licenceContentLabel")}</p>
+            <p className="meta-licence-name">
+              <a href={LICENCES.content.href} {...EXTERNAL}>
+                {LICENCES.content.name}
+                <ArrowUpRight size={14} aria-hidden="true" />
+              </a>
+            </p>
+            <p className="meta-licence-body">{t("licenceContentBody")}</p>
+          </article>
+        </div>
 
-          <div className="meta-terms" id="terms">
-            <p className="meta-kicker">{t("licenceTermsLabel")}</p>
-            <ul>
-              {TERMS.map((term) => (
-                <li key={term}>{t(term)}</li>
-              ))}
-            </ul>
-            <p className="meta-note">{t("licenceFootnote")}</p>
-          </div>
+        <div className="meta-terms" id="terms">
+          <p className="meta-kicker">{t("licenceTermsLabel")}</p>
+          <ul>
+            {TERMS.map((term) => (
+              <li key={term}>{t(term)}</li>
+            ))}
+          </ul>
+          <p className="meta-note">{t("licenceFootnote")}</p>
         </div>
       </div>
     </section>

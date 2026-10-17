@@ -86,9 +86,6 @@ export function DocsSidebar({
 
   const search = (id: string) => (
     <div className="meta-docs-search">
-      <label className="meta-docs-search-label" htmlFor={id}>
-        {labels.search}
-      </label>
       <div className="meta-docs-search-field">
         <Search className="meta-docs-search-icon" aria-hidden="true" size={14} />
         <Input
@@ -97,11 +94,12 @@ export function DocsSidebar({
           value={query}
           onChange={(event) => setQuery(event.target.value)}
           placeholder={labels.searchPlaceholder}
+          aria-label={labels.search}
           autoComplete="off"
           className="meta-docs-search-input"
         />
       </div>
-      <p className="meta-docs-search-status" aria-live="polite">
+      <p className="meta-docs-search-status meta-sr" aria-live="polite">
         {labels.results.replace("%count%", String(count))}
       </p>
     </div>
