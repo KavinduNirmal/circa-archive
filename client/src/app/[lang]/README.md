@@ -15,12 +15,21 @@ it renders `<html lang>`, `<body>`, the fonts, and the message provider.
 - `page.tsx`: the public landing page, with the locale's title, description, and
   `openGraph.locale`.
 - `desktop/`: the workstation route and its [design decisions](desktop/README.md).
+- `site/`: the public archive as a full-page website — index, record pages,
+  search, organizations, guide, and a random door. See its [README](site/README.md).
+- `meta/about/`: the project page outside the fiction, reached from the archive's
+  "About the site" button. See its [README](meta/README.md).
 
 ## Boundaries
 
 This folder composes; it does not hold copy or layout. The portal itself is in
 `../../components/site/`, the workstation in `../../components/`, and every
 translated string in `../../../../messages/`.
+
+The archive is server-rendered and needs no client JavaScript to read; its
+search is a GET form on the index, and its download links are route handlers
+serving the authored Markdown. The project page is the only route that speaks
+outside the fiction.
 
 The segment is named `lang` rather than `locale` because that is the name the
 product asked for. next-intl does not care: it resolves the locale from the

@@ -39,15 +39,15 @@ export default async function LanguageLayout({ children, params }: LanguageLayou
   const messages = await getMessages();
 
   /*
-   * Everything except the portal's prose crosses to the browser. `landing` is the
-   * one namespace rendered on the server, so leaving it out is what keeps the whole
-   * public portal out of the client bundle. Every other namespace is read by a
-   * client component somewhere in the workstation, so listing them individually
-   * would only be a list to forget to update.
+   * Everything except the public pages' prose crosses to the browser. `landing`
+   * and `site` are rendered on the server — the agency portal and the public
+   * archive — so leaving them out is what keeps those pages out of the client
+   * bundle. Every other namespace is read by a client component somewhere in the
+   * workstation, so listing them individually would only be a list to forget.
    */
   const clientMessages: typeof messages = {};
   for (const [namespace, catalog] of Object.entries(messages)) {
-    if (namespace !== "landing") clientMessages[namespace] = catalog;
+    if (namespace !== "landing" && namespace !== "site" && namespace !== "meta") clientMessages[namespace] = catalog;
   }
 
   return (

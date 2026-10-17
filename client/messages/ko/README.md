@@ -11,6 +11,8 @@ One file per namespace: the Korean catalog, for the Commission's correspondents 
 - `boot.json`: the workstation post screen.
 - `shell.json`: workstation chrome — shortcuts, Start, taskbar, Settings, window titles.
 - `landing.json`: the public portal, rendered on the server.
+- `site.json`: the public archive — search, index, record tools, notes, and the reading guide, rendered on the server.
+- `meta.json`: the project page outside the fiction, rendered on the server.
 - `browser.json`, `mail.json`, `files.json`, `word.json`, `reader.json`: the interior of each application window.
 
 ## Boundaries

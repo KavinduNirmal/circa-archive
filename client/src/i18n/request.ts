@@ -19,12 +19,14 @@ export default getRequestConfig(async ({ requestLocale }) => {
   const requested = await requestLocale;
   const locale = hasLocale(routing.locales, requested) ? requested : routing.defaultLocale;
 
-  const [metadata, switcher, boot, shell, landing, files, mail, word, browser, reader] = await Promise.all([
+  const [metadata, switcher, boot, shell, landing, site, meta, files, mail, word, browser, reader] = await Promise.all([
     import(`../../messages/${locale}/metadata.json`),
     import(`../../messages/${locale}/switcher.json`),
     import(`../../messages/${locale}/boot.json`),
     import(`../../messages/${locale}/shell.json`),
     import(`../../messages/${locale}/landing.json`),
+    import(`../../messages/${locale}/site.json`),
+    import(`../../messages/${locale}/meta.json`),
     import(`../../messages/${locale}/files.json`),
     import(`../../messages/${locale}/mail.json`),
     import(`../../messages/${locale}/word.json`),
@@ -40,6 +42,8 @@ export default getRequestConfig(async ({ requestLocale }) => {
       boot: boot.default,
       shell: shell.default,
       landing: landing.default,
+      site: site.default,
+      meta: meta.default,
       files: files.default,
       mail: mail.default,
       word: word.default,

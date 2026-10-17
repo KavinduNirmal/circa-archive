@@ -5,5 +5,15 @@
   "homeTitle": "Public Registry | Commission for Incident Review and Corrective Action",
   "homeDescription": "Public access statements, filing procedures, administrative notices, and the released incident registry.",
   "desktopTitle": "Workstation",
-  "desktopDescription": "CIRCA/OS 4.12 workstation preview: the archive browser, the mail client, the file browser, and the record editor, with no backend connected yet."
+  "desktopDescription": "CIRCA/OS 4.12 workstation preview: the archive browser, the mail client, the file browser, and the record editor, with no backend connected yet.",
+  "siteHomeTitle": "Public archive | Commission for Incident Review and Corrective Action",
+  "siteHomeDescription": "The released record index, read as plain pages, with no workstation required.",
+  "siteRecordsTitle": "Index of records | Public archive",
+  "siteRecordsDescription": "Every entry the Commission has released, in archive order.",
+  "siteOrganizationsTitle": "Organizations | Public archive",
+  "siteOrganizationsDescription": "Bodies that hold filings in the released index.",
+  "siteAboutTitle": "About the archive | Public archive",
+  "siteAboutDescription": "What the public archive is, and how to read it.",
+  "metaAboutTitle": "About this project | CIRCA Archive",
+  "metaAboutDescription": "What CIRCA Archive is, what is invented, and how the public archive is built."
 }

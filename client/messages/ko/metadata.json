@@ -5,5 +5,15 @@
   "homeTitle": "공개 등록부 | 사건 심의 및 시정 조치 위원회",
   "homeDescription": "공개 열람 안내문, 등록 절차, 행정 공고 및 공개된 사건 등록부",
   "desktopTitle": "워크스테이션",
-  "desktopDescription": "CIRCA/OS 4.12 워크스테이션 미리보기: 기록보관소 브라우저, 메일 클라이언트, 파일 브라우저 및 기록 편집기로 구성되며, 백엔드는 아직 연결되어 있지 않습니다."
+  "desktopDescription": "CIRCA/OS 4.12 워크스테이션 미리보기: 기록보관소 브라우저, 메일 클라이언트, 파일 브라우저 및 기록 편집기로 구성되며, 백엔드는 아직 연결되어 있지 않습니다.",
+  "siteHomeTitle": "공개 기록보관소 | 사건 심의 및 시정 조치 위원회",
+  "siteHomeDescription": "공개된 기록 색인을 워크스테이션 없이 평범한 페이지로 제공합니다.",
+  "siteRecordsTitle": "기록 색인 | 공개 기록보관소",
+  "siteRecordsDescription": "위원회가 공개한 모든 항목을 등록 순서대로 수록합니다.",
+  "siteOrganizationsTitle": "단체 | 공개 기록보관소",
+  "siteOrganizationsDescription": "공개 색인에 기록을 보유한 단체 목록입니다.",
+  "siteAboutTitle": "기록보관소 소개 | 공개 기록보관소",
+  "siteAboutDescription": "공개 기록보관소의 성격과 이용 방법을 안내합니다.",
+  "metaAboutTitle": "이 프로젝트에 관하여 | CIRCA 기록보관소",
+  "metaAboutDescription": "CIRCA 기록보관소의 성격과 허구의 범위, 공개 기록보관소의 구성을 안내합니다."
 }

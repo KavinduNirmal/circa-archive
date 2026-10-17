@@ -24,6 +24,8 @@ against, so a key is added there first.
 | `boot` | the workstation post screen |
 | `shell` | workstation chrome — shortcuts, Start, taskbar, Settings, window titles |
 | `landing` | the whole public portal |
+| `site` | the public archive: chrome, index, records, tools, notes, and guide |
+| `meta` | the project page outside the fiction |
 | `files` | the file browser window |
 | `mail` | the mail client window |
 | `word` | the record editor window |

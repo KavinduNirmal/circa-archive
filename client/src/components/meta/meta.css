@@ -1,0 +1,103 @@
+/*
+ * The project page.
+ *
+ * It sits outside the archive and is set deliberately apart from it: the same
+ * steel and paper, no fiction chrome, and a single measured column. A reader who
+ * chose "About the site" asked a question about the thing they were reading, so
+ * the answer should look like an answer and not like another record.
+ */
+.meta-page {
+  min-height: 100dvh;
+  background: var(--circa-paper-sunken);
+  color: var(--circa-ink);
+  font-family: Verdana, Geneva, Arial, sans-serif;
+  font-size: 12px;
+  line-height: 1.55;
+  color-scheme: light;
+}
+
+.meta-page :where(a) { color: var(--circa-link); text-decoration: underline; text-underline-offset: 2px; }
+.meta-page :where(a):hover { color: var(--circa-ink); background: #becbd8; }
+.meta-page :is(a, button):focus-visible { outline: 2px dotted var(--circa-ink); outline-offset: 2px; }
+
+.meta-skip {
+  position: fixed;
+  top: -100px;
+  left: 12px;
+  z-index: 100;
+  padding: 9px 12px;
+  background: var(--circa-paper-sunken);
+  border: 1px solid var(--circa-rule);
+  color: var(--circa-ink);
+}
+.meta-skip:focus { top: 8px; }
+
+.meta-topbar { background: #1b2636; border-bottom: 3px solid #3a4f6d; color: #c8d6e5; }
+
+.meta-topbar-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 16px;
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 11px 18px;
+}
+
+.meta-page .meta-brand { color: #dce9f5; font-family: Georgia, 'Times New Roman', serif; font-size: 18px; text-decoration: none; }
+.meta-page .meta-brand:hover { background: none; color: #ffffff; }
+.meta-kicker { margin: 0; color: #8fa3b6; font-size: 9px; letter-spacing: .1em; text-transform: uppercase; }
+.meta-tools { display: flex; align-items: center; gap: 12px; margin-left: auto; color: #c8d6e5; }
+.meta-page .meta-tools a { color: #c8d6e5; }
+.meta-page .meta-tools a:hover { background: #24334a; color: #ffffff; }
+.meta-page .meta-back { font-size: 9px; letter-spacing: .04em; text-transform: uppercase; }
+
+.meta-main { max-width: 860px; margin: 0 auto; padding: 22px 18px 34px; }
+
+.meta-outside { margin: 0 0 6px; color: var(--circa-stamp); font-family: 'Courier New', monospace; font-size: 9px; letter-spacing: .08em; text-transform: uppercase; }
+
+.meta-title {
+  margin: 0 0 8px;
+  color: #101d2b;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 30px;
+  font-weight: normal;
+  line-height: 1.1;
+}
+
+.meta-lede { margin: 0 0 10px; max-width: 68ch; font-family: Georgia, 'Times New Roman', serif; font-size: 15.5px; line-height: 1.5; }
+
+.meta-links { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 0 0 14px; padding: 9px 0; border-block: 1px solid var(--circa-rule); font-size: 11px; }
+
+.meta-section { margin: 0 0 16px; max-width: 72ch; }
+.meta-section h2 {
+  margin: 0 0 5px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--circa-rule);
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 17px;
+  font-weight: normal;
+}
+.meta-section p { margin: 0; font-size: 12.5px; line-height: 1.65; }
+
+.meta-footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px 16px;
+  padding: 12px 18px;
+  background: #151d27;
+  border-top: 3px solid #3a4f6d;
+  color: #a4b7ca;
+  font-family: 'Courier New', monospace;
+  font-size: 9px;
+}
+.meta-footer p { margin: 0; }
+.meta-footer a { color: #c8d6e5; }
+
+@media (max-width: 620px) {
+  .meta-title { font-size: 25px; }
+  .meta-main { padding: 18px 14px 28px; }
+  .meta-topbar-inner, .meta-footer { padding-inline: 14px; }
+  .meta-tools { margin-left: 0; }
+}
