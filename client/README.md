@@ -6,11 +6,12 @@ Next.js frontend serving a public landing page, a full-page public archive, and 
 
 ## Structure and boundaries
 
-- `src/app/`: routes under the `[lang]` segment, the global theme, and [desktop design decisions](src/app/[lang]/desktop/README.md).
+- `src/app/`: routes under the `[lang]` segment, the global theme, the `(workspace)` group that keeps the workstation shell mounted across desktop URLs, and [desktop design decisions](<src/app/[lang]/(workspace)/desktop/README.md>).
 - `src/i18n/`: locale routing, catalog loading, and locale-aware navigation; see its [README](src/i18n/README.md).
 - `messages/`: one catalog per language; see its [README](messages/README.md).
 - `src/components/`: desktop shell, the shared language switcher, the public [site](src/components/site/README.md) and post screen, the public [archive](src/components/archive-site/README.md), the [project surface](src/components/meta/README.md), the archive [browser](src/components/browser/README.md), the [mail client](src/components/mail/README.md), the [file browser](src/components/files/README.md), the record [editor](src/components/word/README.md) and [reader](src/components/reader/README.md), reusable navigation and icons, and shadcn/ui primitives.
-- `src/lib/`: shared class-composition helper and the record [Markdown renderer](src/lib/markdown/README.md) the reader and the `.txt` export share.
+- `src/lib/`: shared class-composition helper, the record [Markdown renderer](src/lib/markdown/README.md) the reader and the `.txt` export share, and the workstation's pure destination, window, and trail contracts.
+- `src/stores/`: the workstation [store](src/stores/README.md) and its provider — open windows, focus, geometry, the reader trail, and the CRT preference.
 - `src/proxy.ts`: the request-time language decision — path prefix, then cookie, then `Accept-Language`, then English.
 - `tests/`: Vitest interaction and utility tests.
 - `e2e/`: responsive Playwright desktop and language tests.

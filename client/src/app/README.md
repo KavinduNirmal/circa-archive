@@ -10,7 +10,9 @@
 
 There is no `layout.tsx`, `page.tsx`, or `desktop/` at this level any more. Both
 routes moved under the language segment when the client became bilingual, so the
-segment's layout is the root layout.
+segment's layout is the root layout. The workstation itself lives in the
+`(workspace)` route group under `[lang]/`: a group keeps the shell mounted across
+`/{lang}/desktop` URLs without adding a segment to them.
 
 ## Boundaries and verification
 
@@ -18,7 +20,9 @@ Routes compose reusable components from `../components/` and hold no copy: every
 sentence they render comes from the catalogs in `../../messages/`. `/{lang}`
 renders the agency portal with its scoped stylesheet in `../components/site/`,
 public procedures, and diegetic route metadata. `/{lang}/desktop` plays the post
-screen before the shell, so the workstation is entered rather than merely loaded.
+screen before the shell, so the workstation is entered rather than merely loaded;
+the post screen and the shell live in the `(workspace)` layout so a deep link or
+Back does not replay the post or discard the open windows.
 Backend integration is not implemented; the application screens are the archive
 browser behind Search, the mail client behind Inbox, the file browser behind every
 folder destination, and the record editor behind CIRCA Word.
