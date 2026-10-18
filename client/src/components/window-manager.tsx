@@ -1,8 +1,9 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
-import { CASCADE_STEP, CASCADE_WRAP, WINDOW_MIN_SIZE, type DesktopArea, type WindowGeometry, type WorkstationWindowState } from "@/lib/desktop-types";
-import { DesktopIcon, type DesktopIconSpec } from "./desktop-icons";
+import { useRef } from "react";
+import { WINDOW_MIN_SIZE, type DesktopArea, type WindowGeometry, type WorkstationWindowState } from "@/lib/desktop-types";
+import { useWorkstationStore } from "@/stores/workstation-store-provider";
+import { DesktopIcon } from "./desktop-icons";
 
 /*
  * The frame's state contracts live in `src/lib/desktop-types.ts` so the store
@@ -12,88 +13,22 @@ import { DesktopIcon, type DesktopIconSpec } from "./desktop-icons";
 export type { DesktopArea, WindowGeometry, WorkstationWindowState } from "@/lib/desktop-types";
 
 /**
- * Central window registry for the shell: creation, focus, stacking,
- * minimization, and maximize/restore. Geometry stays here rather than in the
- * window component so a maximized window can restore its previous frame, and
- * so the taskbar sees one source of truth.
+ * Central window registry for the shell, read from the workstation store.
+ *
+ * This is the shell's compatibility face: the store owns creation, focus,
+ * stacking, minimization, and maximize/restore, and this hook exposes them
+ * through the same names the shell already used. Components rendered outside a
+ * `WorkstationStoreProvider` get a clear error rather than an empty desktop.
  */
 export function useWorkstationWindows() {
-  const [windows, setWindows] = useState<WorkstationWindowState[]>([]);
-  const [lastFocused, setLastFocused] = useState<string | null>(null);
-
-  // The active window is always the top visible one, which keeps a stale id from
-  // surviving a close or a minimize and handing focus to a window that is gone.
-  const activeId = (list: WorkstationWindowState[]) =>
-    [...list].filter((item) => !item.minimized).sort((a, b) => b.z - a.z)[0]?.id ?? null;
-
-  const focus = useCallback((id: string) => {
-    setLastFocused(id);
-    setWindows((current) => {
-      const target = current.find((item) => item.id === id);
-      if (!target) return current;
-      const top = current.reduce((max, item) => Math.max(max, item.z), 0);
-      // Already on top and visible: leave the list untouched so a drag does not re-render.
-      if (target.z === top && !target.minimized) return current;
-      return current.map((item) => (item.id === id ? { ...item, z: top + 1, minimized: false } : item));
-    });
-  }, []);
-
-  const open = useCallback((entry: { id: string; title: string; status: string | null; icon: DesktopIconSpec }, area: DesktopArea, maximized = false) => {
-    setLastFocused(entry.id);
-    setWindows((current) => {
-      const existing = current.find((item) => item.id === entry.id);
-      const top = current.reduce((max, item) => Math.max(max, item.z), 0);
-      if (existing) {
-        // A window that opens full screen still does on a second request, but a
-        // frame the operator restored by hand is not overridden by another open.
-        return current.map((item) => (item.id === entry.id ? { ...item, z: top + 1, minimized: false, maximized: item.maximized || maximized } : item));
-      }
-      const step = (current.length % CASCADE_WRAP) * CASCADE_STEP;
-      return [...current, {
-        id: entry.id,
-        title: entry.title,
-        status: entry.status,
-        icon: entry.icon,
-        geometry: {
-          x: 90 + step,
-          y: 70 + step,
-          // Wide enough for the file browser's tree pane and a four-column
-          // details listing side by side, which is the widest default window.
-          width: Math.max(WINDOW_MIN_SIZE.width, Math.min(640, area.width - 180 - step)),
-          height: Math.max(WINDOW_MIN_SIZE.height, Math.min(460, area.height - 140 - step)),
-        },
-        maximized,
-        minimized: false,
-        z: top + 1,
-      }];
-    });
-  }, []);
-
-  const close = useCallback((id: string) => {
-    setWindows((current) => {
-      const next = current.filter((item) => item.id !== id);
-      setLastFocused((active) => (active === id ? activeId(next) : active));
-      return next;
-    });
-  }, []);
-
-  const minimize = useCallback((id: string) => {
-    setWindows((current) => {
-      const next = current.map((item) => (item.id === id ? { ...item, minimized: true } : item));
-      setLastFocused((active) => (active === id ? activeId(next) : active));
-      return next;
-    });
-  }, []);
-
-  const toggleMaximize = useCallback((id: string) => {
-    setWindows((current) => current.map((item) => (item.id === id ? { ...item, maximized: !item.maximized, minimized: false } : item)));
-  }, []);
-
-  const setGeometry = useCallback((id: string, geometry: WindowGeometry) => {
-    setWindows((current) => current.map((item) => (item.id === id
-      ? { ...item, geometry: { ...geometry, width: Math.max(WINDOW_MIN_SIZE.width, geometry.width), height: Math.max(WINDOW_MIN_SIZE.height, geometry.height) } }
-      : item)));
-  }, []);
+  const windows = useWorkstationStore((state) => state.windows);
+  const lastFocused = useWorkstationStore((state) => state.lastFocused);
+  const open = useWorkstationStore((state) => state.open);
+  const close = useWorkstationStore((state) => state.close);
+  const focus = useWorkstationStore((state) => state.focus);
+  const minimize = useWorkstationStore((state) => state.minimize);
+  const toggleMaximize = useWorkstationStore((state) => state.toggleMaximize);
+  const setGeometry = useWorkstationStore((state) => state.setGeometry);
 
   return { windows, lastFocused, open, close, focus, minimize, toggleMaximize, setGeometry };
 }

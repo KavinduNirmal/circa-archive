@@ -3,6 +3,9 @@ import { resolve } from "node:path";
 import { NextIntlClientProvider, createTranslator } from "next-intl";
 import type { AbstractIntlMessages } from "next-intl";
 import { render, type RenderOptions } from "@testing-library/react";
+import type { StoreApi } from "zustand/vanilla";
+import type { WorkstationStore } from "@/stores/workstation-store";
+import { WorkstationStoreProvider } from "@/stores/workstation-store-provider";
 
 /**
  * Client components read their copy from `NextIntlClientProvider`, so a test that
@@ -67,6 +70,35 @@ export function renderWithIntl(ui: React.ReactElement, options: RenderOptions & 
     wrapper: ({ children }) => <IntlProvider locale={locale}>{children}</IntlProvider>,
     ...rest,
   });
+}
+
+/**
+ * The wrapper a workstation subject needs: messages plus its own store.
+ *
+ * The shell reads windows, the reader trail, the screen preference, and the
+ * measured area from the store, so a test that rendered it without a provider
+ * would be asserting on a crash. A store can be injected to assert on or drive
+ * the exact state the shell is showing.
+ */
+export function workstationWrapper(options: { locale?: TestLocale; store?: StoreApi<WorkstationStore> } = {}) {
+  const { locale = "en", store } = options;
+  function WorkstationTestWrapper({ children }: { children: React.ReactNode }) {
+    return (
+      <IntlProvider locale={locale}>
+        <WorkstationStoreProvider store={store}>{children}</WorkstationStoreProvider>
+      </IntlProvider>
+    );
+  }
+  return WorkstationTestWrapper;
+}
+
+/** `renderWorkstation` for the shell; `renderWithIntl` stays store-free for single components. */
+export function renderWorkstation(
+  ui: React.ReactElement,
+  options: RenderOptions & { locale?: TestLocale; store?: StoreApi<WorkstationStore> } = {},
+) {
+  const { locale = "en", store, ...rest } = options;
+  return render(ui, { wrapper: workstationWrapper({ locale, store }), ...rest });
 }
 
 /**

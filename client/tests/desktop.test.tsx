@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 // The shell directly: the locale desktop route now posts first, and these tests are about the shell.
 import { DesktopShell } from "@/components/desktop-shell";
 import { FILE_TREE, nodeById } from "@/components/files/files-index";
-import { catalogFor, renderWithIntl } from "./intl";
+import { catalogFor, renderWorkstation } from "./intl";
 
 const english = catalogFor("en");
 
@@ -21,7 +21,7 @@ const MY_PC_WINDOW_TITLE = `${english.shell.explorerMyComputer} - ${english.shel
  * layout mounts it: a shell rendered without one has no copy to read.
  */
 function renderShell() {
-  return renderWithIntl(<DesktopShell />);
+  return renderWorkstation(<DesktopShell />);
 }
 
 function desktopIconIn(button: HTMLElement) {

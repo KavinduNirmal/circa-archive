@@ -2,7 +2,7 @@ import { screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 import { DesktopShell } from "@/components/desktop-shell";
-import { catalogFor, renderWithIntl } from "./intl";
+import { catalogFor, renderWorkstation } from "./intl";
 
 /**
  * The shell was localized first and the application windows after it, so this is
@@ -33,7 +33,7 @@ const shell = catalogFor("ko").shell;
 describe("every application window speaks the reader's language", () => {
   it("opens the file browser with Korean chrome", async () => {
     const user = userEvent.setup();
-    renderWithIntl(<DesktopShell />, { locale: "ko" });
+    renderWorkstation(<DesktopShell />, { locale: "ko" });
     await user.click(screen.getByRole("button", { name: shell.archiveLabel }));
 
     const frame = screen.getByRole("dialog", { name: `${shell.archiveLabel} - ${shell.explorerSuffix}` });
@@ -43,7 +43,7 @@ describe("every application window speaks the reader's language", () => {
 
   it("opens the mail client with Korean chrome, folders and all", async () => {
     const user = userEvent.setup();
-    renderWithIntl(<DesktopShell />, { locale: "ko" });
+    renderWorkstation(<DesktopShell />, { locale: "ko" });
     await user.click(screen.getByRole("button", { name: shell.inboxLabel }));
 
     const frame = screen.getByRole("dialog", { name: shell.mailTitle });
@@ -57,7 +57,7 @@ describe("every application window speaks the reader's language", () => {
 
   it("opens the record editor with Korean chrome", async () => {
     const user = userEvent.setup();
-    renderWithIntl(<DesktopShell />, { locale: "ko" });
+    renderWorkstation(<DesktopShell />, { locale: "ko" });
     await user.click(screen.getByRole("button", { name: shell.wordLabel }));
 
     const frame = screen.getByRole("dialog", { name: shell.wordTitle });
@@ -67,7 +67,7 @@ describe("every application window speaks the reader's language", () => {
 
   it("opens the archive browser with Korean chrome", async () => {
     const user = userEvent.setup();
-    renderWithIntl(<DesktopShell />, { locale: "ko" });
+    renderWorkstation(<DesktopShell />, { locale: "ko" });
     await user.click(screen.getByRole("button", { name: shell.searchLabel }));
 
     const frame = screen.getByRole("dialog", { name: shell.browserTitle });
@@ -77,7 +77,7 @@ describe("every application window speaks the reader's language", () => {
 
   it("opens the record reader with the reviewer's own Korean vocabulary", async () => {
     const user = userEvent.setup();
-    renderWithIntl(<DesktopShell />, { locale: "ko" });
+    renderWorkstation(<DesktopShell />, { locale: "ko" });
     await user.click(screen.getByRole("button", { name: shell.searchLabel }));
     const browser = screen.getByRole("dialog", { name: shell.browserTitle });
     await user.click(within(browser).getByRole("button", { name: "INC-00907" }));
