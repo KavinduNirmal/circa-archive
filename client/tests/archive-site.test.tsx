@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 import { ArchiveHome } from "@/components/archive-site/archive-home";
 import { ArchiveAbout } from "@/components/archive-site/archive-about";
+import { ArchiveExplorations } from "@/components/archive-site/archive-explorations";
 import { ArchiveOrganizations } from "@/components/archive-site/archive-organizations";
 import { ArchiveRecord } from "@/components/archive-site/archive-record";
 import { ArchiveRecords } from "@/components/archive-site/archive-records";
@@ -198,6 +199,51 @@ describe("a released record", () => {
       const href = link.getAttribute("href")!;
       expect(container.querySelector(href), href).not.toBeNull();
     }
+  });
+
+  it("keeps a record's status updates in their own collapsed sidebar section", () => {
+    renderWithIntl(<ArchiveRecord code="CIRCA-S-03007" />);
+    const summary = screen.getByText("3 updates", { selector: "summary" });
+    const disclosure = summary.closest("details");
+    expect(disclosure).not.toBeNull();
+    expect(disclosure).not.toHaveAttribute("open");
+    // The history is its own rail section, not a row squeezed into the particulars.
+    expect(disclosure!.closest("dl")).toBeNull();
+    const section = disclosure!.closest("section");
+    expect(section).not.toBeNull();
+    expect(within(section!).getByRole("heading", { name: site.recordUpdates })).toBeVisible();
+    expect(within(disclosure!).getByText("The severity has been changed from A to S.")).toBeInTheDocument();
+    expect(within(disclosure!).getByText("[Daydream Inc.] has claimed this record was erased.")).toBeInTheDocument();
+    // Every card carries the tone its sentence reports, so the rail can colour it.
+    expect([...disclosure!.querySelectorAll("li[data-tone]")].map((card) => card.getAttribute("data-tone")))
+      .toEqual(["changed", "claimed", "neutral"]);
+    // The history exists once, in the aside, and never as a second copy in the sheet.
+    expect(screen.getAllByText("The severity has been changed from A to S.")).toHaveLength(1);
+  });
+
+  it("links a record's exploration count to its exploration list", () => {
+    renderWithIntl(<ArchiveRecord code="INC-00027" />);
+    const link = screen.getByRole("link", { name: "Open the explorations of INC-00027" });
+    expect(link).toHaveAttribute("href", "/en/site/records/INC-00027/explorations");
+    expect(link).toHaveTextContent("1 exploration");
+  });
+});
+
+describe("the explorations list", () => {
+  it("lists the exploration records filed against a record", () => {
+    renderWithIntl(<ArchiveExplorations code="INC-00027" />);
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
+      "Explorations of Signal repeat interval, eleven hours",
+    );
+    const table = screen.getByRole("region", { name: "Explorations filed against INC-00027" });
+    expect(within(table).getByRole("link", { name: "Open INC-00907" })).toHaveAttribute(
+      "href",
+      "/en/site/records/INC-00907",
+    );
+    expect(screen.getByRole("link", { name: "Return to INC-00027" })).toHaveAttribute(
+      "href",
+      "/en/site/records/INC-00027",
+    );
   });
 });
 

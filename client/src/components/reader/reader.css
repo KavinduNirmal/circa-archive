@@ -683,6 +683,26 @@
 .reader-status-text { flex: 1; min-width: 0; padding: 4px 8px; color: #a4c2e6; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .reader-status-cell { display: flex; align-items: center; padding: 4px 8px; border-left: 1px solid #0d131a; color: #8fa3b6; white-space: nowrap; }
 .reader-status-fixture { color: #7f97ab; font-style: italic; }
+/* The count stays in the bar; the history opens above it, never on the sheet. */
+.reader-status-action { border: 0; border-left: 1px solid #0d131a; background: none; color: #a4c2e6; font: inherit; letter-spacing: inherit; text-transform: inherit; cursor: pointer; }
+.reader-status-action:hover { background: #24334a; color: #dbe7f5; }
+.reader-status-action:focus-visible { outline: 1px solid var(--ring); outline-offset: -2px; }
+.reader-status-panel { z-index: 30; width: min(332px, calc(100vw - 28px)); max-height: min(360px, 60vh); overflow: auto; padding: 0; background: #1b2636; border: 1px solid #0d131a; color: #dbe7f5; box-shadow: 0 8px 22px rgb(8 17 25 / 55%); }
+.reader-status-panel-title { margin: 0; padding: 7px 10px; border-bottom: 1px solid #3d5064; color: #8fa3b6; font-size: 9px; letter-spacing: .12em; text-transform: uppercase; }
+.reader-status-updates { display: grid; gap: 6px; margin: 0; padding: 8px; list-style: none; }
+.reader-status-updates li { display: grid; grid-template-columns: 66px minmax(0, 1fr); gap: 10px; padding: 6px 8px; border: 1px solid rgb(61 80 100 / 55%); border-left: 3px solid #526e94; background: #22303f; font-size: 10px; line-height: 1.45; }
+.reader-status-updates li[data-tone="changed"] { border-color: #8d6a2b; background: #2b2820; }
+.reader-status-updates li[data-tone="claimed"] { border-color: #7d4d4d; background: #2e2226; }
+.reader-status-updates time { color: #a9b8c8; font-family: var(--font-mono); font-size: 9px; letter-spacing: .04em; }
+.reader-status-updates span { color: #dbe7f5; }
+.reader-status-explorations { margin: 0; padding: 0; list-style: none; }
+.reader-status-explorations li + li { border-top: 1px solid rgb(61 80 100 / 45%); }
+.reader-status-record { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 3px 10px; width: 100%; padding: 7px 10px; border: 0; background: none; color: inherit; text-align: left; cursor: pointer; }
+.reader-status-record:hover, .reader-status-record:focus-visible { background: #24334a; outline: none; }
+.reader-status-record:focus-visible { box-shadow: inset 0 0 0 1px var(--ring); }
+.reader-status-record-code { color: #a4c2e6; font-size: 10px; }
+.reader-status-record-org { color: #8fa3b6; font-size: 8px; letter-spacing: .06em; text-transform: uppercase; }
+.reader-status-record-preview { grid-column: 1 / -1; color: #b9cbdd; font-size: 10px; line-height: 1.4; }
 .reader-enter {
   min-width: 74px;
   padding: 4px 10px;

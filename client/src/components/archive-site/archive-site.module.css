@@ -1185,6 +1185,16 @@
 .particulars > div:first-child { border-top: 0; }
 .particulars dt { color: var(--circa-ink-soft); font-family: 'Courier New', monospace; font-size: 9px; letter-spacing: .03em; text-transform: uppercase; }
 .particulars dd { margin: 0; overflow-wrap: anywhere; }
+/* The status history is its own rail section: a folded accordion of coloured cards. */
+.recordUpdatesLog > summary { color: var(--circa-link); cursor: pointer; text-decoration: underline dotted; text-underline-offset: 2px; }
+.recordUpdatesLog > summary:hover { color: var(--circa-ink); }
+.recordUpdatesLog > summary:focus-visible { outline: 2px dotted var(--circa-ink); outline-offset: 2px; }
+.recordUpdatesCards { display: grid; gap: 6px; margin: 8px 0 0; padding: 0; list-style: none; }
+.recordUpdateCard { padding: 7px 9px 8px; border: 1px solid #96a6b7; border-left-width: 3px; background: #e2e9ef; }
+.recordUpdateCard[data-tone="changed"] { border-color: #b08a3e; background: #f3e8cf; }
+.recordUpdateCard[data-tone="claimed"] { border-color: #a87575; background: #f0dede; }
+.recordUpdateCard time { display: block; color: var(--circa-ink-soft); font-family: 'Courier New', monospace; font-size: 9px; }
+.recordUpdateCard p { margin: 3px 0 0; font-size: 10.5px; line-height: 1.5; overflow-wrap: anywhere; }
 
 .asideNote { margin: 0; color: var(--circa-ink-soft); font-size: 10.5px; line-height: 1.5; }
 .asideBody { margin: 0 0 9px; font-size: 10.5px; line-height: 1.55; }

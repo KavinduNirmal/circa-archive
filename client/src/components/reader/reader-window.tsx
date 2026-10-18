@@ -9,6 +9,7 @@ import { FONT_STACKS, READER_MATCH_HIGHLIGHT, SCALE_DEFAULT, clampScale, describ
 import { AnnotationRail, SectionRail, type RailState } from "./reader-rails";
 import { FollowUpStrip } from "./reader-references";
 import { isReviewer, sessionNotes, type ReaderSession, type ReaderVerdict } from "./reader-session";
+import { RecordStatusCells } from "./record-status-menu";
 import { recordDocument } from "./record-filings";
 import "./reader.css";
 
@@ -356,6 +357,7 @@ export function RecordReader({ trail, session, onOpenRecord, onTravel, onCloseWi
 
       <div className="reader-statusbar">
         <span className="reader-status-text" role="status">{status}</span>
+        {code ? <RecordStatusCells key={code} code={code} onOpenRecord={onOpenRecord} /> : null}
         <span className="reader-status-cell circa-mono">{formatScale(scale)}</span>
         <span className="reader-status-cell">{viewLabel(view, t)}</span>
         <span className="reader-status-cell circa-mono">{t("followUpCount", { count: total })}</span>
