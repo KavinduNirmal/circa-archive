@@ -136,3 +136,37 @@ test("the workstation addresses are noindex and the Korean route is Korean", asy
   // Filed content stays as filed; only the chrome follows the reader's language.
   await expect(reader.getByRole("heading", { level: 1 })).toContainText("Unlogged freight car, northbound");
 });
+
+test("a refresh restores the workspace and focuses the URL's window", async ({ page }) => {
+  await enterWorkstation(page, "/en/desktop");
+  const rail = page.getByRole("navigation", { name: "Desktop folders" });
+  await rail.getByRole("button", { name: "Archive", exact: true }).click();
+  await expect(page).toHaveURL(/\/en\/desktop\/archive$/);
+  await rail.getByRole("button", { name: "Inbox", exact: true }).click();
+  await expect(page).toHaveURL(/\/en\/desktop\/inbox$/);
+
+  await page.reload();
+  await page.keyboard.press("a");
+
+  // Both frames come back from the tab's session storage, and the address,
+  // which names Inbox, is what holds focus.
+  await expect(page.getByRole("dialog", { name: ARCHIVE })).toBeVisible();
+  await expect(page.getByRole("dialog", { name: /Titan Mail/ })).toBeVisible();
+  const taskbar = page.locator("footer[aria-label='Taskbar']");
+  await expect(taskbar.getByRole("button", { name: /Titan Mail/, exact: true })).toHaveAttribute("data-active", "true");
+});
+
+test("a new tab starts with an empty workspace", async ({ page, context }) => {
+  await enterWorkstation(page, "/en/desktop");
+  await page.getByRole("navigation", { name: "Desktop folders" }).getByRole("button", { name: "Archive", exact: true }).click();
+  await expect(page.getByRole("dialog", { name: ARCHIVE })).toBeVisible();
+
+  // sessionStorage is per tab: a second tab is a second workspace, not a copy.
+  const second = await context.newPage();
+  try {
+    await enterWorkstation(second, "/en/desktop");
+    await expect(second.getByRole("dialog")).toHaveCount(0);
+  } finally {
+    await second.close();
+  }
+});

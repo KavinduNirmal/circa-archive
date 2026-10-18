@@ -1,9 +1,8 @@
 "use client";
 
-import { createContext, useContext, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { useStore } from "zustand";
-import type { StoreApi } from "zustand/vanilla";
-import { createWorkstationStore, type WorkstationStore } from "./workstation-store";
+import { createPersistedWorkstationStore, type WorkstationStore, type WorkstationStoreApi } from "./workstation-store";
 
 /**
  * One workstation store per mounted workspace.
@@ -14,18 +13,46 @@ import { createWorkstationStore, type WorkstationStore } from "./workstation-sto
  * created lazily on first render, never at module scope, because a server render
  * must not share one store between requests.
  *
- * A store can be injected for tests, which is what lets a component test assert
- * on the exact state a shell rendered from.
+ * A store can be injected, which is what lets a test render the shell over a
+ * known workspace: the shell tests inject a plain store, the persistence tests a
+ * store backed by storage they control.
  */
-const WorkstationStoreContext = createContext<StoreApi<WorkstationStore> | null>(null);
+const WorkstationStoreContext = createContext<WorkstationStoreApi | null>(null);
 
 export function WorkstationStoreProvider({ children, store }: {
   children: ReactNode;
-  store?: StoreApi<WorkstationStore>;
+  store?: WorkstationStoreApi;
 }) {
-  const [created] = useState(createWorkstationStore);
+  const [created] = useState<WorkstationStoreApi>(() => store ?? createPersistedWorkstationStore());
+
+  /*
+   * Rehydration happens after mount, never during render, and validation is the
+   * last step before `hydrated` turns true. Both matter: a stored workspace is
+   * untrusted input, and the URL adapter waits for this flag before it adopts an
+   * address into the desktop.
+   */
+  useEffect(() => {
+    const persistApi = created.persist;
+    // A store without persistence is already hydrated; nothing to restore.
+    if (!persistApi) return;
+    let cancelled = false;
+    const finish = () => {
+      if (!cancelled) created.getState().validateRestored();
+    };
+    if (persistApi.hasHydrated()) {
+      finish();
+      return () => { cancelled = true; };
+    }
+    const unsubscribe = persistApi.onFinishHydration(finish);
+    void persistApi.rehydrate();
+    return () => {
+      cancelled = true;
+      unsubscribe();
+    };
+  }, [created]);
+
   return (
-    <WorkstationStoreContext.Provider value={store ?? created}>
+    <WorkstationStoreContext.Provider value={created}>
       {children}
     </WorkstationStoreContext.Provider>
   );

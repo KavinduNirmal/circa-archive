@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
+import type { PersistStorage, StorageValue } from "zustand/middleware";
 import type { DesktopIconSpec } from "@/components/desktop-icons";
-import { createWorkstationStore } from "@/stores/workstation-store";
+import { createPersistedWorkstationStore, createWorkstationStore, STORAGE_KEY, type PersistedWorkstationState } from "@/stores/workstation-store";
 
 /**
  * The workstation store is the single owner of the window list and the reader's
@@ -223,5 +224,126 @@ describe("workstation store", () => {
     expect(store.getState().screenFilter).toBe(true);
     store.getState().setScreenFilter(false);
     expect(store.getState().screenFilter).toBe(false);
+  });
+});
+
+/**
+ * Persistence is per tab, so the tests own the storage rather than the browser.
+ * The payload is what an older tab could have written: unknown ids, a `z` that
+ * does not start at one, duplicate visits in the trail, and no promise of being
+ * valid JSON at all.
+ */
+function memoryStorage(seed?: StorageValue<PersistedWorkstationState>) {
+  let value: StorageValue<PersistedWorkstationState> | null = seed ?? null;
+  const storage: PersistStorage<PersistedWorkstationState> = {
+    getItem: async () => value,
+    setItem: async (_name, next) => { value = next; },
+    removeItem: async () => { value = null; },
+  };
+  return { storage, read: () => value };
+}
+
+const persisted = (state: Partial<PersistedWorkstationState>): StorageValue<PersistedWorkstationState> => ({
+  state: {
+    windows: [],
+    lastFocused: null,
+    readerTrail: { codes: [], at: 0 },
+    screenFilter: true,
+    area,
+    ...state,
+  },
+  version: 1,
+});
+
+describe("a persisted workstation", () => {
+  it("starts empty until it is told to rehydrate", async () => {
+    const { storage } = memoryStorage(persisted({ windows: [{ ...spec("archive"), geometry: { x: 90, y: 70, width: 640, height: 460 }, maximized: false, minimized: false, z: 1 }], lastFocused: "archive" }));
+    const store = createPersistedWorkstationStore({ storage });
+    expect(store.getState().hydrated).toBe(false);
+    expect(store.getState().windows).toEqual([]);
+
+    await store.persist?.rehydrate();
+    // The merge restores the windows but does not claim they are valid yet:
+    // validation is what normalises them and opens the desktop.
+    expect(store.getState().windows).toHaveLength(1);
+    expect(store.getState().hydrated).toBe(false);
+
+    store.getState().validateRestored();
+    expect(store.getState().hydrated).toBe(true);
+  });
+
+  it("drops what no longer resolves and repairs the rest on restore", async () => {
+    const { storage } = memoryStorage(persisted({
+      windows: [
+        { ...spec("archive"), geometry: { x: 0, y: 0, width: 400, height: 300 }, maximized: false, minimized: false, z: 7 },
+        { ...spec("gone"), geometry: { x: 0, y: 0, width: 400, height: 300 }, maximized: false, minimized: false, z: 9 },
+        { ...spec("reader"), geometry: { x: 0, y: 0, width: 400, height: 300 }, maximized: true, minimized: false, z: 4 },
+      ],
+      lastFocused: "gone",
+      readerTrail: { codes: ["A", "B", "A"], at: 2 },
+      screenFilter: false,
+    }));
+    const store = createPersistedWorkstationStore({ storage });
+    await store.persist?.rehydrate();
+    store.getState().validateRestored();
+
+    expect(store.getState().windows.map((item) => item.id)).toEqual(["reader", "archive"]);
+    expect(store.getState().windows.map((item) => item.z)).toEqual([1, 2]);
+    expect(store.getState().lastFocused).toBe("archive");
+    expect(store.getState().readerTrail).toEqual({ codes: ["A", "B"], at: 0 });
+    expect(store.getState().screenFilter).toBe(false);
+    expect(store.getState().historyIntent).toBeNull();
+  });
+
+  it("persists the workspace but not the transient write intent", async () => {
+    const { storage, read } = memoryStorage();
+    const store = createPersistedWorkstationStore({ storage });
+    store.getState().setArea(area);
+    store.getState().open(spec("archive"), "push");
+    await Promise.resolve();
+
+    expect(store.getState().historyIntent).toBe("push");
+    expect(read()?.state.windows.map((item) => item.id)).toEqual(["archive"]);
+    // Neither the one-shot intent nor the hydration flag is part of the workspace.
+    expect(read()?.state).not.toHaveProperty("historyIntent");
+    expect(read()?.state).not.toHaveProperty("hydrated");
+    expect(read()?.version).toBe(1);
+  });
+
+  it("does not overwrite the stored workspace before it has been read", async () => {
+    // The shell publishes the measured desktop area on mount, before rehydration
+    // finishes. That write must not replace the saved workspace with the empty
+    // one being restored, or a refresh loses every window but the URL's.
+    window.sessionStorage.setItem(STORAGE_KEY, JSON.stringify(persisted({
+      windows: [{ ...spec("archive"), geometry: { x: 90, y: 70, width: 640, height: 460 }, maximized: false, minimized: false, z: 1 }],
+      lastFocused: "archive",
+    })));
+    try {
+      const store = createPersistedWorkstationStore();
+      store.getState().setArea(area);
+      await Promise.resolve();
+      const untouched = JSON.parse(window.sessionStorage.getItem(STORAGE_KEY)!);
+      expect(untouched.state.windows.map((item: { id: string }) => item.id)).toEqual(["archive"]);
+
+      await store.persist?.rehydrate();
+      store.getState().validateRestored();
+      expect(store.getState().windows.map((item) => item.id)).toEqual(["archive"]);
+      expect(store.getState().lastFocused).toBe("archive");
+    } finally {
+      window.sessionStorage.removeItem(STORAGE_KEY);
+    }
+  });
+
+  it("survives a corrupted payload rather than crashing the desktop", async () => {
+    window.sessionStorage.setItem(STORAGE_KEY, "{ this is not json");
+    try {
+      const store = createPersistedWorkstationStore();
+      await store.persist?.rehydrate();
+      store.getState().validateRestored();
+      expect(store.getState().hydrated).toBe(true);
+      expect(store.getState().windows).toEqual([]);
+    } finally {
+      window.sessionStorage.removeItem(STORAGE_KEY);
+    }
   });
 });

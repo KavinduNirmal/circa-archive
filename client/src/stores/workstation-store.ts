@@ -1,4 +1,5 @@
 import { createStore, type StoreApi } from "zustand/vanilla";
+import { persist, type PersistStorage, type StorageValue } from "zustand/middleware";
 import { isDestinationId } from "@/lib/desktop-destinations";
 import {
   CASCADE_STEP,
@@ -62,10 +63,25 @@ export type WorkstationStore = {
   validateRestored(): void;
 };
 
-/**
- * The active window is always the top visible one, so focus can never name a
- * window that a close or a minimize has already taken away.
- */
+/** The part of the workspace that survives a tab reload. */
+export type PersistedWorkstationState = Pick<
+  WorkstationStore,
+  "windows" | "lastFocused" | "readerTrail" | "screenFilter" | "area"
+>;
+
+/** The slice of zustand's persist API the provider needs. */
+export type WorkstationPersistApi = {
+  hasHydrated: () => boolean;
+  rehydrate: () => Promise<void> | void;
+  onFinishHydration: (listener: () => void) => () => void;
+};
+
+/** A store, with the persistence API present only when the store was persisted. */
+export type WorkstationStoreApi = StoreApi<WorkstationStore> & { persist?: WorkstationPersistApi };
+
+export const STORAGE_KEY = "circa.workstation.v1";
+
+/** The active window is always the top visible one, so focus never names a window that is gone. */
 function activeId(windows: readonly WorkstationWindowState[]): string | null {
   return [...windows]
     .filter((item) => !item.minimized)
@@ -84,6 +100,19 @@ function usableArea(area: DesktopArea): DesktopArea {
   if (area.width && area.height) return area;
   if (typeof window === "undefined") return { width: 1024, height: 700 };
   return { width: window.innerWidth, height: Math.max(240, window.innerHeight - 80) };
+}
+
+/** Keeps a frame inside the measured layer without shrinking it below its usable size. */
+function clampToArea(geometry: WindowGeometry, area: DesktopArea): WindowGeometry {
+  const min = clampGeometrySize(geometry);
+  const width = Math.min(min.width, Math.max(WINDOW_MIN_SIZE.width, area.width));
+  const height = Math.min(min.height, Math.max(WINDOW_MIN_SIZE.height, area.height));
+  return {
+    width,
+    height,
+    x: Math.min(Math.max(0, geometry.x), Math.max(0, area.width - width)),
+    y: Math.min(Math.max(0, geometry.y), Math.max(0, area.height - height)),
+  };
 }
 
 /**
@@ -152,19 +181,24 @@ function restoredWindows(windows: readonly WorkstationWindowState[]): Workstatio
   return kept.reverse().map((item, index) => ({ ...item, z: index + 1 }));
 }
 
-const initialState = () => ({
-  windows: [] as WorkstationWindowState[],
-  lastFocused: null as string | null,
-  readerTrail: EMPTY_TRAIL,
-  screenFilter: true,
-  area: { width: 0, height: 0 } as DesktopArea,
-  historyIntent: null as HistoryIntent,
-  hydrated: true,
-});
+type SetState = (partial: Partial<WorkstationStore> | ((state: WorkstationStore) => Partial<WorkstationStore>)) => void;
 
-export function createWorkstationStore(): StoreApi<WorkstationStore> {
-  return createStore<WorkstationStore>()((set) => ({
-    ...initialState(),
+/**
+ * The state and every action, shared by the plain and persisted factories.
+ *
+ * `hydrated` is a parameter because it is the one field that differs: a store
+ * without persistence is ready immediately, and a persisted one must not let the
+ * URL adapter or the shell act until the stored workspace has been validated.
+ */
+function createWorkstationState(set: SetState, hydrated: boolean): WorkstationStore {
+  return {
+    windows: [],
+    lastFocused: null,
+    readerTrail: EMPTY_TRAIL,
+    screenFilter: true,
+    area: { width: 0, height: 0 },
+    historyIntent: null,
+    hydrated,
 
     open: (spec, intent) => set((state) => openPartial(state, spec, intent)),
 
@@ -226,7 +260,18 @@ export function createWorkstationStore(): StoreApi<WorkstationStore> {
 
     setScreenFilter: (next) => set({ screenFilter: next }),
 
-    setArea: (area) => set({ area }),
+    /*
+     * The desktop layer's first measurement is what makes restored geometry
+     * trustworthy, so every frame is pulled back inside the new bounds. This is
+     * also the clamp that runs after a window resize.
+     */
+    setArea: (next) => set((state) => {
+      const measured = next.width > 0 && next.height > 0;
+      const windows = measured
+        ? state.windows.map((item) => ({ ...item, geometry: clampToArea(item.geometry, next) }))
+        : state.windows;
+      return { area: next, windows };
+    }),
 
     clearHistoryIntent: () => set({ historyIntent: null }),
 
@@ -234,15 +279,119 @@ export function createWorkstationStore(): StoreApi<WorkstationStore> {
       const readerTrail = normaliseTrail(state.readerTrail);
       // The reader's resource is the record the trail points at, so a reader with
       // no record has nothing to show and is dropped with the rest.
+      const measured = state.area.width > 0 && state.area.height > 0;
       const windows = restoredWindows(state.windows)
         .filter((item) => item.id !== "reader" || readerTrail.codes.length > 0)
-        .map((item, index) => ({ ...item, z: index + 1 }));
+        .map((item, index) => ({
+          ...item,
+          geometry: measured ? clampToArea(item.geometry, state.area) : item.geometry,
+          z: index + 1,
+        }));
       const focusedSurvives = windows.some((item) => item.id === state.lastFocused && !item.minimized);
       return {
         windows,
         readerTrail,
         lastFocused: focusedSurvives ? state.lastFocused : activeId(windows),
+        // The stored workspace is now the desktop's workspace.
+        hydrated: true,
       };
     }),
-  }));
+  };
+}
+
+/** A workstation store with no persistence. The shell tests use this. */
+export function createWorkstationStore(): WorkstationStoreApi {
+  return createStore<WorkstationStore>()((set) => createWorkstationState(set, true));
+}
+
+/**
+ * Per-tab session storage, written defensively.
+ *
+ * `sessionStorage` is partitioned by tab and cleared when the tab closes, which
+ * matches a workspace rather than a saved profile. It can throw (private mode,
+ * quota) and it can hold a payload written by an older build, so reads and
+ * writes are guarded and a malformed value is treated as "nothing stored".
+ */
+function sessionStorageBacked(): PersistStorage<PersistedWorkstationState> {
+  const storage = () => (typeof window === "undefined" ? null : window.sessionStorage);
+  /*
+   * No write is accepted until the stored payload has been read. The shell
+   * publishes the measured desktop area on mount, which is a store write, and
+   * a write before hydration would overwrite the saved workspace with the empty
+   * one that is being restored. Reading is the point after which overwriting is
+   * the correct thing to do.
+   */
+  let read = false;
+  return {
+    getItem: (name) => {
+      try {
+        const raw = storage()?.getItem(name) ?? null;
+        if (raw === null) return null;
+        return JSON.parse(raw) as StorageValue<PersistedWorkstationState>;
+      } catch {
+        return null;
+      } finally {
+        read = true;
+      }
+    },
+    setItem: (name, value) => {
+      if (!read) return;
+      try {
+        storage()?.setItem(name, JSON.stringify(value));
+      } catch {
+        // A tab that refuses storage still gets a working desktop.
+      }
+    },
+    removeItem: (name) => {
+      try {
+        storage()?.removeItem(name);
+      } catch {
+        // Nothing to clean up.
+      }
+    },
+  };
+}
+
+/**
+ * The workstation that survives a refresh.
+ *
+ * `skipHydration` keeps the first client render identical to the server's: the
+ * provider rehydrates after mount and then validates what arrived. Nothing here
+ * runs at module scope, so a server render never touches storage.
+ */
+export function createPersistedWorkstationStore(
+  options: { storage?: PersistStorage<PersistedWorkstationState> } = {},
+): WorkstationStoreApi {
+  const store = createStore<WorkstationStore>()(
+    persist(
+      (set) => createWorkstationState(set, false),
+      {
+        name: STORAGE_KEY,
+        version: 1,
+        storage: options.storage ?? sessionStorageBacked(),
+        skipHydration: true,
+        partialize: (state): PersistedWorkstationState => ({
+          windows: state.windows,
+          lastFocused: state.lastFocused,
+          readerTrail: state.readerTrail,
+          screenFilter: state.screenFilter,
+          area: state.area,
+        }),
+        /*
+         * A restore must never erase something that happened before it landed.
+         * The boot screen makes that window of time tiny, but a deep link or a
+         * fast click owns the desktop if it got there first.
+         */
+        merge: (persisted, current) => {
+          const live = current as WorkstationStore;
+          if (live.windows.length > 0 || live.lastFocused !== null || live.readerTrail.codes.length > 0) {
+            return current;
+          }
+          return { ...current, ...(persisted as PersistedWorkstationState) };
+        },
+      },
+    ),
+  );
+  // The persist middleware adds `persist` to the store's API at runtime.
+  return store as unknown as WorkstationStoreApi;
 }
