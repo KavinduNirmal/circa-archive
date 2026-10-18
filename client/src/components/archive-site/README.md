@@ -11,7 +11,7 @@ never opens it downloads no Markdown parser and runs no state.
 - `archive-chrome.tsx`: the full-bleed frame — the classification notice above the
   masthead, the masthead with the search box, the section bar, the announcement
   bar, breadcrumbs, and the foot. It also carries the one link out of the fiction,
-  "About the site", which goes to `/[lang]/meta/about`.
+  "About the site", which goes to `/[lang]/meta`.
 - `site-search.tsx`: the search form and its filters. A plain GET form to the
   index, so a query and a filter set survive a bookmark and work without
   JavaScript. The masthead puts the filters behind a `<details>`; the pages show

@@ -8,7 +8,7 @@ statuses, clearance, and a way to the workstation and the public portal.
 ## Boundaries
 
 This is the in-world guide, not the project page. The project page is
-`../../../../meta/about/` and is linked from the archive chrome as "About the
+`../../../../meta/` and is linked from the archive chrome as "About the
 site". Copy lives in the `site` namespace.
 
 ## Usage

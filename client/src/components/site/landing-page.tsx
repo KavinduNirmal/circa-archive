@@ -184,9 +184,14 @@ export function LandingPage() {
 
             <div className={styles.entry}>
               <div className={styles.entryBody}>
-                <Link href="/desktop" className={styles.enter}>
-                  <span>{t("enterArchive")}</span><span aria-hidden="true">»</span>
-                </Link>
+                <div className={styles.entryActions}>
+                  <Link href="/desktop" className={styles.enter}>
+                    <span>{t("enterArchive")}</span><span aria-hidden="true">»</span>
+                  </Link>
+                  <Link href="/site" className={styles.enterSecondary}>
+                    <span>{t("enterPublicSite")}</span><span aria-hidden="true">»</span>
+                  </Link>
+                </div>
                 <p className={styles.entryNote}>{t("enterNote")}</p>
               </div>
               <span className={styles.entryCode}>{t("accessPoint")}<br />{t("readingRoom")}</span>

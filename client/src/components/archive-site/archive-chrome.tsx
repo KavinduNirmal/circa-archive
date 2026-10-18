@@ -77,7 +77,7 @@ export function ArchiveChrome({ active, trail, children }: {
 
           <div className={styles.topbarTools}>
             <LanguageSwitcher className={styles.language} />
-            <ArchiveButton href="/meta/about">{t("aboutSite")}</ArchiveButton>
+            <ArchiveButton href="/meta">{t("aboutSite")}</ArchiveButton>
           </div>
         </div>
       </header>
@@ -155,7 +155,7 @@ export function ArchiveChrome({ active, trail, children }: {
             <Link href="/site/about">{t("navAbout")}</Link>
             <Link href="/site/random">{t("randomTitle")}</Link>
             <Link href="/desktop">{t("navWorkstation")}</Link>
-            <Link href="/meta/about">{t("aboutSite")}</Link>
+            <Link href="/meta">{t("aboutSite")}</Link>
             <Link href="/">{t("navPublic")}</Link>
           </nav>
 

@@ -33,7 +33,11 @@ kicker, then the title, then the lede or action, closed by a rule. The label sit
 above the title rather than in a left rail, so nothing indents away from the
 page's left edge. The only hero ornament is a dot field with the seal faded into it; the
 documentation section carries one low dotted spotlight, and no other section
-repeats the texture.
+repeats the texture. The hero copy takes the wider share of the frame — 64%,
+with an 18ch display measure — so the English title sets in two lines instead of
+breaking to a third, and the hero stands 82vh tall so the field has room to be a
+field rather than a strip. The dossier's opening title keeps its own 22ch
+measure instead of inheriting the hero's.
 
 Borders connect cells — the stats are one ruled strip of three, the editions
 share a division, the manual is one ruled spread, the build facts are one

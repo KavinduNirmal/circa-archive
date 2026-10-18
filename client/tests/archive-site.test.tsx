@@ -49,7 +49,7 @@ describe("the archive home", () => {
       expect(within(nav).getByRole("link", { name })).toHaveAttribute("href", href);
     }
     // The project page is reachable from the masthead and says that it is the project page.
-    expect(screen.getAllByRole("link", { name: site.aboutSite })[0]).toHaveAttribute("href", "/en/meta/about");
+    expect(screen.getAllByRole("link", { name: site.aboutSite })[0]).toHaveAttribute("href", "/en/meta");
   });
 
   it("puts the search in the masthead and again in the page, as a plain form", () => {
@@ -339,7 +339,7 @@ describe("every link on the plain site", () => {
         }
         const url = new URL(href, "https://archive.invalid");
         expect(url.pathname, href).toMatch(
-          /^\/(en|ko)(\/site(\/records(\/[A-Z0-9/-]+)?(\/download)?|\/organizations|\/about|\/random)?|\/meta\/about|\/desktop)?$/,
+          /^\/(en|ko)(\/site(\/records(\/[A-Z0-9/-]+)?(\/download)?|\/organizations|\/about|\/random)?|\/meta(\/about)?|\/desktop)?$/,
         );
         // A query is a filter, and only the index and the directory take one.
         for (const key of url.searchParams.keys()) {

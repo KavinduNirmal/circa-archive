@@ -21,6 +21,6 @@ sets the request locale, builds route metadata, and renders a component from
 ## Boundaries
 
 The archive is reached at `/{lang}/site`; the public portal stays at `/{lang}`
-and the workstation at `/{lang}/desktop`. The project page is `/{lang}/meta/about`
+and the workstation at `/{lang}/desktop`. The project page is `/{lang}/meta`
 and is the only route here that leaves the fiction. Record content is not
 translated — the filings are English documents and stay so in Korean.
