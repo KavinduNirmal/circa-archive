@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { DesktopShell } from "@/components/desktop-shell";
+import { DesktopUrlSync } from "@/components/desktop-url-sync";
 import { WorkstationBoot } from "@/components/site/boot-sequence";
 import { WorkstationStoreProvider } from "@/stores/workstation-store-provider";
 
@@ -44,6 +45,8 @@ export default async function WorkspaceLayout({ params }: WorkspaceLayoutProps) 
     <WorkstationStoreProvider>
       <WorkstationBoot>
         <DesktopShell />
+        {/* Null-rendering, and the only routing surface in the workspace. */}
+        <DesktopUrlSync />
       </WorkstationBoot>
     </WorkstationStoreProvider>
   );

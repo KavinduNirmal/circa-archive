@@ -20,7 +20,7 @@ through this layout.
 The shell lives here rather than in a page because a page unmounts on navigation:
 putting it in the layout is what keeps open windows and the reader's trail across
 an in-workspace route change, and what stops the post screen replaying on every
-deep link. `DesktopUrlSync` joins the layout when URL synchronisation lands.
+deep link. `DesktopUrlSync` is mounted beside the shell as the group's only routing surface.
 
 The pages under this group are URL markers only. They exist to match a path, to
 hold `generateStaticParams` and the `notFound()` guard, and to prerender both
