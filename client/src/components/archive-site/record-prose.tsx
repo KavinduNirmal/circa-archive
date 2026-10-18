@@ -6,6 +6,7 @@ import { useLocale } from "next-intl";
 import { useId } from "react";
 import { Fragment, jsx, jsxs } from "react/jsx-runtime";
 import { parseRecord } from "@/lib/markdown/pipeline";
+import { RecordImage } from "../reader/record-image";
 import styles from "./archive-site.module.css";
 
 /**
@@ -152,7 +153,7 @@ export function RecordProse({ source, redactionLabel, imageNotHeld }: {
   if (!tree) return null;
   return (
     <div className={styles.prose}>
-      {toJsxRuntime(tree, { Fragment, jsx, jsxs, development: false })}
+      {toJsxRuntime(tree, { Fragment, jsx, jsxs, development: false, components: { img: RecordImage } })}
     </div>
   );
 }

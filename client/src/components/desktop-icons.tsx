@@ -1,4 +1,5 @@
 import { Bell, Cog } from "lucide-react";
+import Image from "next/image";
 import type { ComponentProps } from "react";
 
 /**
@@ -62,11 +63,10 @@ export function DesktopIcon({ icon, className, ...props }: { icon: DesktopIconSp
 }
 
 /**
- * Raw bitmap element for icon artwork. `next/image` is deliberately avoided:
- * these are already tiny, and its re-encoding and layout wrapper defeat the
- * nearest-neighbour scaling the 1998 pixel grid relies on.
+ * Bitmap element for icon artwork. The image still goes through `next/image`,
+ * but optimisation is off: these assets are already tiny, and re-encoding them
+ * would defeat the nearest-neighbour scaling the 1998 pixel grid relies on.
  */
-function Bitmap({ src, className, size }: { src: string; className: string; size?: number }) {
-  // eslint-disable-next-line @next/next/no-img-element
-  return <img className={className} src={src} alt="" width={size} height={size} draggable={false} />;
+function Bitmap({ src, className, size = 32 }: { src: string; className: string; size?: number }) {
+  return <Image className={className} src={src} alt="" width={size} height={size} draggable={false} unoptimized />;
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { Fragment } from "react";
+import Image from "next/image";
 import { useTranslations } from "next-intl";
 import {
   ARCHIVE_CLASSES,
@@ -141,8 +142,7 @@ export function ArchivePage(props: ArchivePageProps) {
     <div className="archive-page" data-testid="archive-page" data-text-size={textSize}>
       <header className="archive-masthead">
         <div className="archive-masthead-id">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img className="archive-seal" src={ARCHIVE_SEAL} alt="" width={56} height={56} />
+          <Image className="archive-seal" src={ARCHIVE_SEAL} alt="" width={56} height={56} />
           <div className="archive-masthead-text">
             <p className="archive-kicker">{t("archiveKicker")}</p>
             <p className="archive-title">{t("archiveTitle")}</p>

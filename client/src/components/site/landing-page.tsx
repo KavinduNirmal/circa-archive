@@ -1,4 +1,5 @@
 import { useTranslations } from "next-intl";
+import Image from "next/image";
 import { Link } from "@/i18n/navigation";
 import { LanguageSwitcher } from "../language-switcher";
 import { Attendance, PortalSigns, RegisterRefresh, UnavailableLink } from "./portal-signs";
@@ -69,8 +70,7 @@ export function LandingPage() {
         <header className={styles.masthead}>
           <div className={styles.seal} aria-hidden="true">
             {/* The Commission's mark, supplied as SVG: a printed logo pasted into the banner. */}
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img className={styles.sealLogo} src="/circa_full_logo.svg" alt="" width={92} height={100} draggable={false} />
+            <Image className={styles.sealLogo} src="/circa_full_logo.svg" alt="" width={92} height={100} draggable={false} unoptimized />
           </div>
           <div className={styles.mastheadCopy}>
             <p className={styles.eyebrow}>{t("eyebrow")}</p>

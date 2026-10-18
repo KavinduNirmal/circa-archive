@@ -1,6 +1,7 @@
 "use client";
 
 import { ChevronDown, ChevronUp, ChevronsUpDown } from "lucide-react";
+import Image from "next/image";
 import { useTranslations } from "next-intl";
 import {
   FILE_TYPES,
@@ -102,8 +103,7 @@ export function FileList({ view, nodes, sort, direction, selected, openFolder, o
             <li key={node.id}>
               <button type="button" className="files-icon" data-node={node.id} aria-pressed={isSelected(node.id)}
                 onDoubleClick={() => openFolder(node)} onClick={() => onToggleSelected(node, !isSelected(node.id))} onKeyDown={keyOpen(node)}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img className="files-icon-art" src={iconUrl(nodeIcon(node))} alt="" width={32} height={32} draggable={false} />
+                <Image className="files-icon-art" src={iconUrl(nodeIcon(node))} alt="" width={32} height={32} draggable={false} unoptimized />
                 <span className="files-icon-label">{node.name}</span>
               </button>
             </li>
@@ -121,8 +121,7 @@ export function FileList({ view, nodes, sort, direction, selected, openFolder, o
             <li key={node.id}>
               <button type="button" className="files-row" data-node={node.id} aria-pressed={isSelected(node.id)}
                 onDoubleClick={() => openFolder(node)} onClick={() => onToggleSelected(node, !isSelected(node.id))} onKeyDown={keyOpen(node)}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img className="files-row-art" src={iconUrl(nodeIcon(node))} alt="" width={16} height={16} draggable={false} />
+                <Image className="files-row-art" src={iconUrl(nodeIcon(node))} alt="" width={16} height={16} draggable={false} unoptimized />
                 <span className="files-row-name">{node.name}</span>
               </button>
             </li>
@@ -179,8 +178,7 @@ export function FileList({ view, nodes, sort, direction, selected, openFolder, o
                     if (isFolder(node)) openFolder(node);
                     else onToggleSelected(node, !isSelected(node.id));
                   }}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img className="files-row-art" src={iconUrl(nodeIcon(node))} alt="" width={16} height={16} draggable={false} />
+                  <Image className="files-row-art" src={iconUrl(nodeIcon(node))} alt="" width={16} height={16} draggable={false} unoptimized />
                   <span className="files-row-name">{node.name}</span>
                 </span>
               </td>
