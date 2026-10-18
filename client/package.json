@@ -15,7 +15,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "sync:corpus": "bun scripts/sync-corpus.ts"
   },
   "dependencies": {
     "@fontsource/dm-sans": "5.3.0",

@@ -1488,7 +1488,7 @@
 .redactionToggle:checked ~ .redactionText { display: inline; }
 
 .figure { margin: 8px 0 12px; padding: 5px; border: 1px solid var(--circa-rule); background: var(--circa-paper-raised); }
-.figureFull { width: 100%; }
+.figureFull { width: 100%; clear: both; }
 .figureLeft { float: left; width: 44%; margin: 2px 12px 8px 0; }
 .figureRight { float: right; width: 44%; margin: 2px 0 8px 12px; }
 .figure img { display: block; width: 100%; height: auto; }

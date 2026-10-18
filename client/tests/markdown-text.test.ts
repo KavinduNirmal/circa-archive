@@ -64,7 +64,9 @@ describe("plain-text export", () => {
   it("keeps an image's caption and drops its path and its alignment prefix", () => {
     expect(text).toContain("Figure 1. The door, photographed from the south approach, 2004.");
     expect(text).toContain("Figure 3. Registry discrepancy notice, 2004.");
-    expect(text).not.toContain("door-south-2004.jpg");
+    for (const url of [...CORPUS.matchAll(/!\[(?:right|full|left)\|Figure[^\]]*\]\(([^)]+)\)/g)].map((match) => match[1])) {
+      expect(text, url).not.toContain(url);
+    }
     expect(text).not.toMatch(/(right|left|full)\|Figure/);
   });
 

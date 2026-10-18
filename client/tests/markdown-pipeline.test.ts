@@ -70,12 +70,10 @@ describe("record pipeline", () => {
 
   it("turns the three alignment directives into figures and strips the prefix from the caption", () => {
     const figures = collect<Figure>(parsed.output, "figure");
+    // The source is the assertion, so replacing a test image does not fail the pipeline.
+    const written = [...CORPUS.matchAll(/!\[(?:right|full|left)\|Figure[^\]]*\]\(([^)]+)\)/g)].map((match) => match[1]);
     expect(figures.map((figure) => figure.align)).toEqual(["right", "full", "left"]);
-    expect(figures.map((figure) => figure.url)).toEqual([
-      "./evidence/door-south-2004.jpg",
-      "./evidence/door-interior-2004.jpg",
-      "./evidence/registry-notice-2004.jpg",
-    ]);
+    expect(figures.map((figure) => figure.url)).toEqual(written);
     for (const figure of figures) {
       expect(figure.caption).toMatch(/^Figure \d\./);
       expect(figure.caption).not.toMatch(/^(right|left|full)\|/);
@@ -132,9 +130,14 @@ describe("record pipeline", () => {
   });
 
   it("numbers image paths against an asset base when one is supplied", () => {
-    const hosted = parseRecord({ markdown: CORPUS, assetBaseUrl: "https://archive.example/records/CIRCA-S-03007/" });
+    // The corpus's images are absolute test URLs, so the base behaviour is
+    // exercised with a document-relative path rather than by the corpus.
+    const hosted = parseRecord({
+      markdown: "![right|Figure 1. A door.](./evidence/door.jpg)\n",
+      assetBaseUrl: "https://archive.example/records/CIRCA-S-03007/",
+    });
     const figures = collect<Figure>(hosted.output, "figure");
-    expect(figures[0].url).toBe("https://archive.example/records/CIRCA-S-03007/evidence/door-south-2004.jpg");
+    expect(figures[0].url).toBe("https://archive.example/records/CIRCA-S-03007/evidence/door.jpg");
     expect(hosted.warnings.map((warning) => warning.code)).not.toContain("relative-image");
   });
 });
