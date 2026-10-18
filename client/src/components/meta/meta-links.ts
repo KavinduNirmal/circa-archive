@@ -4,17 +4,19 @@
  * The project page is the only page allowed to point at the repository, at the
  * funding page, or at a licence deed, so those addresses are declared once here
  * instead of being repeated in the markup. Each can be overridden by a deployment
- * without editing a component; the repository and the funding page fall back to
- * the maintainer's GitHub account, which is the one address that is certain to
- * exist before the project publishes a repository of its own.
+ * without editing a component; the repository and the funding page default to
+ * the maintainer's published repository and sponsorship page.
  */
 const HANDLE = "KavinduNirmal";
 
 /** The one account credited as maintainer until someone else is on file. */
 export const MAINTAINER = HANDLE;
 
+/** The published repository. A deployment can point at a mirror instead. */
+const REPOSITORY = `https://github.com/${HANDLE}/circa-archive`;
+
 export const PROJECT_LINKS = {
-  repository: process.env.PROJECT_REPOSITORY_URL ?? `https://github.com/${HANDLE}`,
+  repository: process.env.PROJECT_REPOSITORY_URL ?? REPOSITORY,
   sponsor: process.env.PROJECT_SPONSOR_URL ?? `https://github.com/sponsors/${HANDLE}`,
 };
 

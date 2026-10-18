@@ -32,6 +32,7 @@
   "accessAlter": "문의인은 예약 없이 공개된 기록을 열람할 수 있습니다. 기록의 존재는 귀하의 접수 사실을 확인할 뿐이며, 기록에 기술된 사건을 확인하지는 않습니다.",
   "accessAbsence": "부재 또한 마찬가지입니다.",
   "enterArchive": "기록보관소 열람",
+  "enterPublicSite": "공개 기록보관소 열기",
   "enterNote": "공개 열람에는 신분 증명이 필요하지 않습니다.",
   "accessPoint": "열람 지점 01",
   "readingRoom": "열람실",

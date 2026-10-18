@@ -14,11 +14,12 @@ function metadataFor(lang: "en" | "ko") {
 }
 
 describe("public access portal", () => {
-  it("offers one prominent archive entry and a skip link into the public notice", () => {
+  it("offers the workstation and the public archive as entries, and a skip link into the public notice", () => {
     renderWithIntl(<LandingPage />);
     expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
-    // The archive link carries the reader's language, because it is built by the locale-aware Link.
+    // Both entries carry the reader's language, because they are built by the locale-aware Link.
     expect(screen.getByRole("link", { name: english.landing.enterArchive })).toHaveAttribute("href", "/en/desktop");
+    expect(screen.getByRole("link", { name: english.landing.enterPublicSite })).toHaveAttribute("href", "/en/site");
     const main = screen.getByRole("main");
     expect(screen.getByRole("link", { name: english.landing.skipToAccess })).toHaveAttribute("href", `#${main.id}`);
   });
@@ -48,9 +49,10 @@ describe("public access portal", () => {
       const href = link.getAttribute("href")!;
       if (href.startsWith("#")) expect(container.querySelector(href), href).not.toBeNull();
       // Every outward link stays inside the reader's language: the archive links
-      // point at that language's desktop, and the switcher at the other language's
-      // copy of this page. A bare path would bounce the reader through the proxy.
-      else expect(href, href).toMatch(/^\/(en|ko)(\/desktop)?$/);
+      // point at that language's desktop or reading edition, and the switcher at
+      // the other language's copy of this page. A bare path would bounce the
+      // reader through the proxy.
+      else expect(href, href).toMatch(/^\/(en|ko)(\/(desktop|site))?$/);
     }
     expect(screen.getByRole("table", { name: english.landing.revisionLabel })).toBeVisible();
     expect(screen.getByRole("table", { name: english.landing.contactsLabel })).toBeVisible();
@@ -67,6 +69,7 @@ describe("public access portal", () => {
     renderWithIntl(<LandingPage />, { locale: "ko" });
     const korean = catalogFor("ko");
     expect(screen.getByRole("link", { name: korean.landing.enterArchive })).toHaveAttribute("href", "/ko/desktop");
+    expect(screen.getByRole("link", { name: korean.landing.enterPublicSite })).toHaveAttribute("href", "/ko/site");
     // The institution's own name, not a translated stub of the English one.
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(korean.landing.agencyLineOne);
     // The archive's codes are identifiers and must survive translation untouched.
