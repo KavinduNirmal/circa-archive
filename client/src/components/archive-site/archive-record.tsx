@@ -11,7 +11,8 @@ import {
 } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { ARCHIVE_INDEX } from "../browser/archive-index";
-import { ANNOTATIONS, followUpsFor, notesFor } from "../reader/reader-correspondence";
+import { ANNOTATIONS, explorationsFor, followUpsFor, notesFor } from "../reader/reader-correspondence";
+import { updatesFor } from "../reader/record-updates";
 import { recordDocument } from "../reader/record-filings";
 import { sectionAnchor, type ReaderBlock } from "../reader/reader-model";
 import { ArchiveChrome } from "./archive-chrome";
@@ -55,6 +56,8 @@ export function ArchiveRecord({ code }: { code: string }) {
   const { inbound, outbound } = followUpsFor(code);
   const { previous, next } = neighboursOf(code);
   const notes = notesFor(ANNOTATIONS, code, document.sections);
+  const updates = updatesFor(code);
+  const explorations = explorationsFor(code);
   const held = document.source === "held";
   const consultations = CONSULTATIONS[code] ?? 0;
   const citations = inbound.length + outbound.length;
@@ -322,8 +325,49 @@ export function ArchiveRecord({ code }: { code: string }) {
               <div><dt>{t("recordHolder")}</dt><dd className="circa-mono">{document.organization}</dd></div>
               <div><dt>{t("recordClearance")}</dt><dd>{document.clearance}</dd></div>
               <div><dt>{t("recordStatus")}</dt><dd>{t(STATUS_MESSAGE_KEY[entry.status])}</dd></div>
+              {explorations.length > 0 ? (
+                <div>
+                  <dt>{t("recordExplorations")}</dt>
+                  <dd>
+                    <Link
+                      href={`/site/records/${document.code}/explorations`}
+                      aria-label={t("openExplorations", { code: document.code })}
+                    >
+                      {t("explorationsCount", { count: explorations.length })}
+                    </Link>
+                  </dd>
+                </div>
+              ) : null}
             </dl>
           </section>
+
+          {/*
+            The record's history, in its own rail section. It is folded into one
+            accordion and drawn as coloured cards so the changes can be read at a
+            glance without becoming a second sheet of prose.
+          */}
+          {updates.length > 0 ? (
+            <section className={styles.asideBlock} aria-labelledby="updates-title">
+              <h2 className={styles.asideTitle} id="updates-title">{t("recordUpdates")}</h2>
+              <details className={styles.recordUpdatesLog}>
+                <summary className={styles.recordUpdatesSummary}>
+                  {t("updatesCount", { count: updates.length })}
+                </summary>
+                <ol className={styles.recordUpdatesCards}>
+                  {updates.map((update) => (
+                    <li
+                      key={`${update.filed}-${update.text}`}
+                      className={styles.recordUpdateCard}
+                      data-tone={update.tone}
+                    >
+                      <time dateTime={update.filed}>{update.filed}</time>
+                      <p>{update.text}</p>
+                    </li>
+                  ))}
+                </ol>
+              </details>
+            </section>
+          ) : null}
 
           {/* The reading room's own count: how often the record has been asked for. */}
           <section className={styles.asideBlock} aria-labelledby="readership-title">

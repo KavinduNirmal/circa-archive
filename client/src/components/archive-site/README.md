@@ -22,7 +22,12 @@ never opens it downloads no Markdown parser and runs no state.
 - `archive-record.tsx`: one record as a work page. The name and its code share a
   line, the tools that act on the whole record sit in one band, the sheet carries
   a printed margin of section numerals, and the foot repeats the step through the
-  register as two large leaves.
+  register as two large leaves. Its particulars carry the exploration count when
+  records have been filed against it, and the status updates have their own rail
+  section: an accordion of coloured cards.
+- `archive-explorations.tsx`: the exploration list filed against one record. It
+  reuses the ordinary record table and links every row to the ordinary record
+  page; it is a filter over the citation web, not a second record template.
 - `archive-organizations.tsx`: the organizations directory — a ledger leaf with the
   totals above, a directory search, and one numbered entry per body carrying its
   holdings as a margin tally.
@@ -76,6 +81,21 @@ crimson for contested, amber for sealed and restricted, struck for erased. Lucid
 icons mark the section headings and the primary keys only; they are decorative and
 always `aria-hidden`.
 
+## Status history and explorations
+
+A record's status updates are filed sentences, not Markdown: a severity change, a
+claim, a sealing. The reading edition gives them their own rail section, full
+width in the aside, as a native `<details>` accordion of coloured cards. The
+section is closed by default, so the history is available without becoming a
+section of the filing and without client JavaScript. The card's tone — neutral,
+changed, or claimed — is part of the filed update, not inferred from its wording.
+
+The exploration count beside them links to
+`/{lang}/site/records/{code}/explorations`. That page lists the records whose
+filing type is `EXPLORATION` and whose citation points at this record; each row
+opens the ordinary record page. Exploration records do not carry status updates
+of their own, because the parent's count is the account of them.
+
 ## Boundaries
 
 The archive is fiction; the project page is not. This folder never explains that
@@ -90,6 +110,7 @@ pipeline as the reader, and a held filing has no download at all.
 Run `bun run --cwd=client test`, `lint`, `typecheck`, and `build`.
 `tests/archive-site.test.tsx` covers the chrome and its search, the front page
 sections, the index and server search, record pages (including a sealed section
-and a held filing), the action bar, the annotations list and its composer,
-downloads and the refused download, the organizations and guide, the project page,
-and link integrity in both languages. The routes live in `../../app/[lang]/site/`.
+and a held filing), the status-update accordion and its card tones, the exploration link and list,
+the action bar, the annotations list and its composer, downloads and the refused
+download, the organizations and guide, the project page, and link integrity in
+both languages. The routes live in `../../app/[lang]/site/`.

@@ -3,6 +3,7 @@ import { ARCHIVE_INDEX } from "@/components/browser/archive-index";
 import {
   ANNOTATIONS,
   FOLLOW_UP_LABELS,
+  explorationsFor,
   followUpsFor,
   notesFor,
 } from "@/components/reader/reader-correspondence";
@@ -105,6 +106,33 @@ describe("follow-up records", () => {
 
   it("has no follow-ups at all for a code the index does not carry", () => {
     expect(followUpsFor("INC-99999")).toEqual({ inbound: [], outbound: [] });
+  });
+});
+
+describe("exploration records", () => {
+  it("lists the records filed against a record whose filing type is exploration", () => {
+    const explorations = explorationsFor("INC-00027");
+    expect(explorations.map((item) => item.code)).toContain("INC-00907");
+    expect(explorations.every((item) => item.type === "EXPLORATION")).toBe(true);
+  });
+
+  it("does not call a record's own citations its explorations", () => {
+    // INC-00907 names INC-00027, but the inbound direction is what was filed on it.
+    expect(explorationsFor("CIRCA-S-03007")).toEqual([]);
+  });
+
+  it("never lists a discovery or a rumor as an exploration", () => {
+    for (const entry of ARCHIVE_INDEX) {
+      for (const item of explorationsFor(entry.code)) {
+        expect(item.type, `${entry.code} -> ${item.code}`).toBe("EXPLORATION");
+        expect(codes.has(item.code), `${entry.code} -> ${item.code}`).toBe(true);
+      }
+    }
+  });
+
+  it("keeps the parent's count and the row's record in agreement", () => {
+    const explorations = explorationsFor("ORG-C-005102");
+    expect(explorations.map((item) => item.code)).toEqual(["ORG-C-005102/C1", "ORG-U-000011"]);
   });
 });
 

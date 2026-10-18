@@ -649,3 +649,38 @@ describe("record reader renders the filed Markdown", () => {
     expect(sheet.querySelector(".reader-sections")!.compareDocumentPosition(foot!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 });
+
+describe("record status accounts", () => {
+  it("keeps the status history off the sheet and opens it from the status bar", async () => {
+    const user = userEvent.setup();
+    const { reader, sheet } = mount("CIRCA-S-03007");
+    expect(sheet()).not.toHaveTextContent("The severity has been changed");
+
+    await user.click(within(reader).getByRole("button", { name: /^3 updates$/i }));
+
+    expect(await screen.findByText("The severity has been changed from A to S.")).toBeVisible();
+    const claimed = screen.getByText("[Daydream Inc.] has claimed this record was erased.");
+    expect(claimed).toBeVisible();
+    expect(claimed.closest("li")).toHaveAttribute("data-tone", "claimed");
+    // The history is chrome, not prose: opening it never adds a word to the sheet.
+    expect(sheet()).not.toHaveTextContent("The severity has been changed");
+  });
+
+  it("opens an exploration as an ordinary record from the status bar", async () => {
+    const user = userEvent.setup();
+    const { reader } = mount("INC-00027");
+
+    await user.click(within(reader).getByRole("button", { name: /^1 exploration$/i }));
+    await user.click(await screen.findByRole("button", { name: "Open INC-00907" }));
+
+    expect(await screen.findByRole("heading", { level: 1 })).toHaveTextContent(
+      "Tide gauge disagreement, two stations",
+    );
+  });
+
+  it("shows no status account for a record with neither updates nor explorations", () => {
+    const { reader } = mount("INC-00014");
+    expect(within(reader).queryByRole("button", { name: /^\d+ updates?$/i })).toBeNull();
+    expect(within(reader).queryByRole("button", { name: /^\d+ explorations?$/i })).toBeNull();
+  });
+});

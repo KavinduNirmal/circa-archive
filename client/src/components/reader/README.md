@@ -17,13 +17,15 @@ That split is enforced, not just described. `RecordReader` renders each section 
 - `record-markdown.tsx`: the viewer. The same remark plugin list the exports use, handed to `react-markdown`, plus the two handlers that turn a `redaction` and a `figure` into elements instead of the default `<div>`.
 - `paper-redaction.tsx`: the redaction, held behind paper and opened on request, labelled either way.
 - `paper-figure.tsx`: a figure with the alignment its directive asked for.
-- `reader-correspondence.ts`: the annotations filed against a record and the citations between records, both read from the archive index rather than restated.
+- `reader-correspondence.ts`: the annotations filed against a record, the citations between records, and `explorationsFor`, the exploration filter over that citation web, all read from the archive index rather than restated.
+- `record-updates.ts`: the filed status updates, one plain sentence per entry plus the day it was filed and the tone its card carries. It is data, not Markdown: nothing here runs through the renderer.
+- `record-status-menu.tsx`: the two status-bar accounts — a count of updates and a count of explorations — and the popovers that open them. An exploration row uses the reader's record opener.
 - `reader-session.ts`: the reviewer's session. Who is at the terminal, notes filed, endorsements, assessments, and votes, plus the merge that folds all of it into the margin for one record.
 - `reader-chrome.tsx`: the toolbar and its two zones, the page-arrangement menu, and the credentials prompt.
 - `reader-rails.tsx`: the left rail of section previews and the right rail of marginalia, with its composer.
 - `reader-references.tsx`: the follow-up strip.
-- `reader-window.tsx`: the composition, the view and scale state, the search pass, and the body slot.
-- `reader.css`: the frame's chrome, the sheet and its drawn printed edge, both rails, the follow-up strip, and the reader's one-shot motion. It also carries the registered `reader-match` search highlight, which cannot be scoped because the custom highlight API paints it by name. Imported by `reader-window.tsx`.
+- `reader-window.tsx`: the composition, the view and scale state, the search pass, the status bar, and the body slot.
+- `reader.css`: the frame's chrome, the sheet and its drawn printed edge, both rails, the follow-up strip, the status accounts, and the reader's one-shot motion. It also carries the registered `reader-match` search highlight, which cannot be scoped because the custom highlight API paints it by name. Imported by `reader-window.tsx`.
 
 ## The reader as a window
 
@@ -44,6 +46,25 @@ The record trail lives in the shell, because the shell is what opens a record. A
 | What sets the typeface? | The reader, from the Text menu: Courier (the default, because a record is a typed document), sans serif, serif, or the terminal's own mono. It is a reading preference rather than a property of the record, so switching records keeps it, and the machine values on the sheet — codes, field values, inline code — keep the terminal face whatever is chosen. The menu's sizes are presets over the same value the scale buttons step through: one number, two ways to reach it. |
 | Where is the search read from? | The sheet's own DOM, not the document model. The host's renderer may emit anything, so matches are found by walking what was rendered and painted with the custom highlight API, which never rewrites the renderer's output. The count is written into its own node by that effect rather than held in React state, because React cannot know it either. |
 | How many follow-ups does the strip list? | Ten per direction, and it says how many it is holding back. A record can be cited hundreds of times and a reading surface is the wrong place to work through a hundred of anything, so the remainder are named in a message box and go no further. It is not a navigation: a hundred records belong in a file browser, and this screen is not one. |
+
+## Status accounts
+
+A record's status updates and the explorations filed against it are accounts *of*
+the record, not parts of its text, so neither enters the sheet. Each is a count in
+the status bar: `3 updates` opens a popover of the filed sentences with their days,
+and `1 exploration` opens the records that cite this one with the filing type
+`EXPLORATION`. An exploration row calls the reader's own record opener, so it
+opens as a record and not as a second reading surface. The public edition gives
+the same update history its own sidebar section: a native accordion of coloured
+cards, with the exploration count linked to the list route instead of opening a
+panel.
+
+The updates are plain sentences held in `record-updates.ts`; nothing parses them.
+Exploration records do not carry status updates at all: the parent's count is the
+account of them, and a test holds the fixture to that line. A cell is absent when
+its count is zero, so a record with neither account has no extra chrome. The
+popovers are Radix surfaces, which is what lets Escape close the panel before the
+window handler sees the key and what returns focus to the count when it closes.
 
 ## Three controls that do nothing
 
@@ -96,6 +117,7 @@ Each direction lists the ten most recently filed. Past that the group's head car
 Three materials, and the split is the argument of the screen. The chrome is the workstation's steel. The sheet is the brightest paper in the system, because it is the document itself rather than a page about one. The margin is cream, ruled, and dark-inked, with a red margin rule and a punched hole on each slip: it is the only warm surface in CIRCA/OS, and it is warm because marginalia is written on paper made for writing on.
 
 - **Composition.** Toolbar across the top; section rail, sheet, and margin across the middle; follow-ups along the bottom; status bar last. The sheet loses width before it loses its measure.
+- **Status accounts.** The update and exploration counts are status-bar cells, not sheet content: the bar's engraved divider, a hover fill, and a dark popover that opens upward. The update history is a stack of full-width cards whose left rule and ground carry the tone — steel for a filing, amber for a change, crimson for a claim — with the day in the terminal mono and the sentence in chrome type. Each exploration row is a full-width button with a pressed hover and a visible focus ring.
 - **Toolbar.** Document actions left, engagement right, separated by engraved dividers. Tools are a glyph over an 8px label, or a glyph alone where the icon already says the word. The scale readout is a control, not a readout.
 - **Hierarchy.** The leaf is the loudest thing on the sheet: code, designation at 1.8em, then one metadata line separated by hairlines rather than a table, because a table is what the record view this replaced used and a reader should read as a document header.
 - **The withheld body.** Drawn as three redaction bars under a stamp, matching how the index draws a withheld name; the rail's preview for that section turns from paper to hazard. A redaction inside filed prose is the same idea at word scale: a bar, opened on request, never colour alone.
@@ -122,7 +144,7 @@ The preview rail shows a section that is not in the record and then corrects its
 
 Reading, and only the record in front of it. Notes, endorsements, and votes are session state: they are not persisted, not authorized, and not sent anywhere, and the reviewer credential is a fixed handle rather than an authentication. There is no filing, no rating aggregate, and no backend.
 
-Run `bun run test` for the model, the filings, the record sources, the correspondence, the frame's slot, the three silent controls, the scale limits, the arrangements, the search count, the session gate, the two engagement signals, the trail, the strip's cap and collapse, the box that explains the cap, and the rendered sheet — the repaired table, the three figure alignments, the labelled and openable redactions, and raw HTML left inert; `bun run lint` and `bun run typecheck` for the rest.
+Run `bun run test` for the model, the filings, the record sources, the status accounts, the correspondence, the frame's slot, the three silent controls, the scale limits, the arrangements, the search count, the session gate, the two engagement signals, the trail, the strip's cap and collapse, the box that explains the cap, and the rendered sheet — the repaired table, the three figure alignments, the labelled and openable redactions, and raw HTML left inert; `bun run lint` and `bun run typecheck` for the rest.
 
 The Markdown renderer's own contract is held in [`../../lib/markdown/README.md`](../../lib/markdown/README.md) and the `markdown-*.test.*` files: the corpus's table must parse to seven rows of four cells, its six redactions must resolve in document order, and no target may print a withheld word.
 
