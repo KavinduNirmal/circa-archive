@@ -224,3 +224,16 @@ export function followUpsFor(code: string): { inbound: ReaderFollowUp[]; outboun
   const newestFirst = (a: ReaderFollowUp, b: ReaderFollowUp) => filedOn(b.code).localeCompare(filedOn(a.code));
   return { inbound: inbound.sort(newestFirst), outbound: outbound.sort(newestFirst) };
 }
+
+/**
+ * The records filed against this one that are explorations.
+ *
+ * An exploration is not a new class: it is the filing type of a record that
+ * cites this one. The citation web already says which records were filed
+ * against which, so the exploration list is a filter over that web rather than
+ * a second relationship kept in step by hand. A discovery is the first contact
+ * and a rumor is not an exploration, so neither belongs here.
+ */
+export function explorationsFor(code: string): ReaderFollowUp[] {
+  return followUpsFor(code).inbound.filter((item) => item.type === "EXPLORATION");
+}

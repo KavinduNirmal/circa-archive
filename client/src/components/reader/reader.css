@@ -61,6 +61,16 @@
   --reader-margin-rule: rgb(150 66 60 / 30%);
   --reader-redact: #26333f;
   /*
+   * An instant print. The stock is brighter than the sheet and only faintly
+   * warm, so a figure reads as a photograph lying on the filing rather than as
+   * another ruled panel. The band under the photo carries the caption, which is
+   * what makes the frame a print instead of a border.
+   */
+  --reader-print: #fbfbf6;
+  --reader-print-edge: rgb(22 32 43 / 14%);
+  --reader-print-well: #dbe3ea;
+  --reader-print-ink: #3c4954;
+  /*
    * The record is a typed document, not interface chrome, so the sheet is set
    * in one typewriter face while the frame around it stays in the workstation's
    * sans. Courier New is a system face and will not be present everywhere, so
@@ -363,15 +373,45 @@
 .reader-markdown th, .reader-markdown td { padding: 4px 7px; border: 1px solid var(--reader-sheet-edge); text-align: left; vertical-align: top; }
 .reader-markdown th { background: rgb(22 32 43 / 5%); font-weight: 700; letter-spacing: .04em; }
 .reader-markdown tbody tr:nth-child(even) { background: rgb(22 32 43 / 3%); }
-/* Images: three alignments, and a plate shaped like a photograph when the file
-   is not on the desk. The alt text is the caption, which the figcaption prints
-   below, so it must not also be set at body size inside the frame. */
-.reader-figure { margin: 0 0 16px; padding: 0; }
-.reader-figure img { display: block; width: 100%; height: auto; aspect-ratio: auto 4 / 3; object-fit: cover; background: var(--reader-sheet-edge); border: 1px solid var(--reader-sheet-edge); color: transparent; }
-.reader-figure figcaption { margin-top: 5px; color: var(--reader-sheet-soft); font-size: .74em; line-height: 1.45; }
-.reader-figure-right { float: right; width: min(42%, 240px); margin: 4px 0 14px 20px; }
-.reader-figure-left { float: left; width: min(42%, 240px); margin: 4px 20px 14px 0; }
-.reader-figure-full { width: 100%; }
+/* --- Figures: instant prints lying on the sheet --- */
+/*
+ * A record's figures are photographs, so each one is framed as an instant
+ * print: a white border with the deep band that carries the caption, and a
+ * soft cast shadow that lifts the print off the filing. The frame is drawn
+ * here rather than by the renderer, so a figure stays one plain node in every
+ * target and only the sheet decides what paper it is printed on.
+ */
+.reader-figure {
+  margin: 0 0 20px;
+  padding: 8px 8px 0;
+  background: var(--reader-print);
+  border: 1px solid var(--reader-print-edge);
+  box-shadow: 0 1px 2px rgb(13 19 26 / 12%), 0 8px 18px -10px rgb(13 19 26 / 40%);
+  break-inside: avoid;
+}
+.reader-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: auto 4 / 3;
+  object-fit: cover;
+  background: var(--reader-print-well);
+  border: 1px solid var(--reader-print-edge);
+  color: transparent;
+}
+/* The band under the photo is the print's own label: centred, typed, and part
+   of the object rather than a note set beneath it. */
+.reader-figure figcaption {
+  margin: 0;
+  padding: 9px 4px 14px;
+  color: var(--reader-print-ink);
+  font-size: .68em;
+  line-height: 1.4;
+  text-align: center;
+}
+.reader-figure-right { float: right; width: min(46%, 252px); margin: 4px 0 18px 22px; }
+.reader-figure-left { float: left; width: min(46%, 252px); margin: 4px 22px 18px 0; }
+.reader-figure-full { width: 100%; clear: both; }
 /* A redaction: held behind paper until the reader opens it, and labelled either way. */
 .reader-redaction-inline { padding: 0 2px; border: 0; background: var(--reader-redact); color: transparent; font: inherit; cursor: pointer; }
 .reader-redaction-inline[data-revealed="false"] { user-select: none; }
@@ -643,6 +683,26 @@
 .reader-status-text { flex: 1; min-width: 0; padding: 4px 8px; color: #a4c2e6; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .reader-status-cell { display: flex; align-items: center; padding: 4px 8px; border-left: 1px solid #0d131a; color: #8fa3b6; white-space: nowrap; }
 .reader-status-fixture { color: #7f97ab; font-style: italic; }
+/* The count stays in the bar; the history opens above it, never on the sheet. */
+.reader-status-action { border: 0; border-left: 1px solid #0d131a; background: none; color: #a4c2e6; font: inherit; letter-spacing: inherit; text-transform: inherit; cursor: pointer; }
+.reader-status-action:hover { background: #24334a; color: #dbe7f5; }
+.reader-status-action:focus-visible { outline: 1px solid var(--ring); outline-offset: -2px; }
+.reader-status-panel { z-index: 30; width: min(332px, calc(100vw - 28px)); max-height: min(360px, 60vh); overflow: auto; padding: 0; background: #1b2636; border: 1px solid #0d131a; color: #dbe7f5; box-shadow: 0 8px 22px rgb(8 17 25 / 55%); }
+.reader-status-panel-title { margin: 0; padding: 7px 10px; border-bottom: 1px solid #3d5064; color: #8fa3b6; font-size: 9px; letter-spacing: .12em; text-transform: uppercase; }
+.reader-status-updates { display: grid; gap: 6px; margin: 0; padding: 8px; list-style: none; }
+.reader-status-updates li { display: grid; grid-template-columns: 66px minmax(0, 1fr); gap: 10px; padding: 6px 8px; border: 1px solid rgb(61 80 100 / 55%); border-left: 3px solid #526e94; background: #22303f; font-size: 10px; line-height: 1.45; }
+.reader-status-updates li[data-tone="changed"] { border-color: #8d6a2b; background: #2b2820; }
+.reader-status-updates li[data-tone="claimed"] { border-color: #7d4d4d; background: #2e2226; }
+.reader-status-updates time { color: #a9b8c8; font-family: var(--font-mono); font-size: 9px; letter-spacing: .04em; }
+.reader-status-updates span { color: #dbe7f5; }
+.reader-status-explorations { margin: 0; padding: 0; list-style: none; }
+.reader-status-explorations li + li { border-top: 1px solid rgb(61 80 100 / 45%); }
+.reader-status-record { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 3px 10px; width: 100%; padding: 7px 10px; border: 0; background: none; color: inherit; text-align: left; cursor: pointer; }
+.reader-status-record:hover, .reader-status-record:focus-visible { background: #24334a; outline: none; }
+.reader-status-record:focus-visible { box-shadow: inset 0 0 0 1px var(--ring); }
+.reader-status-record-code { color: #a4c2e6; font-size: 10px; }
+.reader-status-record-org { color: #8fa3b6; font-size: 8px; letter-spacing: .06em; text-transform: uppercase; }
+.reader-status-record-preview { grid-column: 1 / -1; color: #b9cbdd; font-size: 10px; line-height: 1.4; }
 .reader-enter {
   min-width: 74px;
   padding: 4px 10px;
@@ -706,6 +766,9 @@
   /* The sheet loses its padding before it loses its measure, and the printed
      edge pulls in with it so a hole never lands on the text. */
   .reader-sheet { padding: 22px 20px 34px; --reader-perf-x: 9px; --reader-perf-r: 2.6px; }
+  /* A floated print would leave too little measure beside it, so a narrow
+     sheet gives the figure the whole column and drops the float. */
+  .reader-figure-left, .reader-figure-right { float: none; width: 100%; margin: 0 0 20px; }
   .reader-leaf-title { font-size: 1.4em; }
   .reader-stamp { margin-left: 0; }
   .reader-point { min-width: 28px; padding: 0 3px; }
