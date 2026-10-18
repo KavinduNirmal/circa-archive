@@ -1,4 +1,5 @@
 import { ArrowRight, ArrowUpRight } from "lucide-react";
+import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { EXTERNAL, PROJECT_LINKS } from "./meta-links";
@@ -82,7 +83,7 @@ export function MetaHome() {
         <div className="meta-hero-field" aria-hidden="true">
           <span className="meta-hero-dots meta-hero-dots-fine" />
           <span className="meta-hero-dots meta-hero-dots-coarse" />
-          <img className="meta-hero-eye" src="/circa_snake_with_eye.svg" alt="" />
+          <Image className="meta-hero-eye" src="/circa_snake_with_eye.svg" alt="" width={710} height={755} unoptimized />
         </div>
 
         <div className="meta-shell meta-hero-grid">

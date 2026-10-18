@@ -1,6 +1,7 @@
 "use client";
 
 import { Plus, Minus } from "lucide-react";
+import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { childrenOf, isFolder, type FileNode } from "./files-index";
 import { folderIconUrl } from "./file-list";
@@ -71,8 +72,7 @@ function TreeLevel({ id, currentId, expanded, onToggle, onSelect, tree }: {
         ) : <span className="files-twisty-spacer" aria-hidden="true" />}
         <button type="button" className="files-treebutton" aria-current={id === currentId ? "true" : undefined}
           onClick={() => onSelect(id)}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img className="files-treeart" src={folderIconUrl(open)} alt="" width={16} height={16} draggable={false} />
+          <Image className="files-treeart" src={folderIconUrl(open)} alt="" width={16} height={16} draggable={false} unoptimized />
           <span className="files-treelabel">{node.name}</span>
           {node.clearance && <span className="files-treeclearance">{node.clearance.replace("LEVEL ", "L")}</span>}
         </button>

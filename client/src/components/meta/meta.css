@@ -3140,6 +3140,7 @@
   top: 46%;
   right: clamp(-6%, -4vw, -2%);
   width: min(48%, 680px);
+  height: auto;
   transform: translateY(-50%);
   opacity: 0.55;
   -webkit-mask-image: radial-gradient(closest-side, #000 30%, transparent 76%);

@@ -1,6 +1,7 @@
 "use client";
 
 import { ArrowLeft, ArrowRight, Home, Lock, Plus, RotateCw, Square } from "lucide-react";
+import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { Menubar } from "radix-ui";
 import { TEXT_SIZE_MESSAGE_KEYS, type ArchiveTextSize } from "./archive-page";
@@ -160,8 +161,7 @@ export function BrowserTabs({ onOpenHome, onNewTab }: { onOpenHome: () => void; 
       <div className="browser-tablist" role="tablist" aria-label={t("tabsLabel")}>
         <button type="button" role="tab" id="browser-tab-archive" className="browser-tab"
           aria-selected="true" aria-controls="browser-page" onClick={onOpenHome}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img className="browser-tab-icon" src="/icons/directory_open_cabinet_fc-2.png" alt="" width={16} height={16} draggable={false} />
+          <Image className="browser-tab-icon" src="/icons/directory_open_cabinet_fc-2.png" alt="" width={16} height={16} draggable={false} unoptimized />
           <span>{t("internalArchive")}</span>
           <Lock className="browser-tab-lock" aria-hidden="true" />
         </button>

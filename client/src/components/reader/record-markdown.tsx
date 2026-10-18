@@ -8,6 +8,7 @@ import { RECORD_REMARK_PLUGINS } from "@/lib/markdown/pipeline";
 import type { RedactionMode } from "@/lib/markdown/types";
 import { PaperFigure } from "./paper-figure";
 import { PaperRedaction } from "./paper-redaction";
+import { RecordImage } from "./record-image";
 
 /**
  * A record's Markdown, rendered onto the sheet.
@@ -80,6 +81,7 @@ function recordHandlers(mode: RedactionMode = "labelled"): Handlers {
 const COMPONENTS: Components = {
   mark: ({ children }) => <PaperRedaction>{children}</PaperRedaction>,
   figure: ({ className, children }) => <PaperFigure className={className}>{children}</PaperFigure>,
+  img: RecordImage,
 };
 
 export function RecordMarkdown({ source, redactionMode = "labelled" }: {

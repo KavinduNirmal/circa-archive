@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { ArrowUpRight, Menu } from "lucide-react";
+import Image from "next/image";
 import { Link, usePathname } from "@/i18n/navigation";
 import { LanguageSwitcher } from "../language-switcher";
 import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
@@ -104,7 +105,7 @@ export function MetaNav({ labels, groups, repositoryUrl }: MetaNavProps) {
     <header className="meta-header">
       <div className="meta-shell meta-header-inner">
         <Link className="meta-brand" href="/meta" aria-label={labels.brand}>
-          <img className="meta-brand-mark" src="/circa_eye.svg" alt="" width={26} height={24} />
+          <Image className="meta-brand-mark" src="/circa_eye.svg" alt="" width={26} height={24} unoptimized />
           <span className="meta-brand-word">CIRCA</span>
           <span className="meta-brand-tail">{labels.brandTail}</span>
         </Link>
@@ -177,7 +178,7 @@ export function MetaNav({ labels, groups, repositoryUrl }: MetaNavProps) {
             >
               <div className="meta-sheet-head">
                 <Link className="meta-brand" href="/meta" onClick={() => setOpen(false)}>
-                  <img className="meta-brand-mark" src="/circa_eye.svg" alt="" width={26} height={24} />
+                  <Image className="meta-brand-mark" src="/circa_eye.svg" alt="" width={26} height={24} unoptimized />
                   <span className="meta-brand-word">CIRCA</span>
                   <span className="meta-brand-tail">{labels.brandTail}</span>
                 </Link>

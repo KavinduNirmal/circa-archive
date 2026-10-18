@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import Image from "next/image";
 import { Forward, MailPlus, RefreshCw, Reply, ReplyAll, Search, Trash2 } from "lucide-react";
 import { Menubar } from "radix-ui";
 import { MAIL_FOLDERS, type MailFolderId } from "./mailbox-index";
@@ -236,8 +237,7 @@ export function MailFolders({ folderId, unread, onSelect }: {
               // The badge is part of the label, so the count is not only visible.
               aria-label={waiting > 0 ? t("unreadBadge", { label, count: waiting }) : label}
               onClick={() => onSelect(folder.id)}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img className="mail-folder-icon" src={folder.icon} alt="" width={32} height={32} draggable={false} />
+              <Image className="mail-folder-icon" src={folder.icon} alt="" width={32} height={32} draggable={false} unoptimized />
               <span className="mail-folder-label" aria-hidden="true">{label}</span>
               {waiting > 0 && <span className="mail-folder-badge" aria-hidden="true">{waiting}</span>}
             </button>

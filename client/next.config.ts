@@ -4,6 +4,15 @@ import { fileURLToPath } from "node:url";
 
 const nextConfig: NextConfig = {
   devIndicators: false,
+  images: {
+    /**
+     * The record corpus's test photographs are the one remote source on the
+     * sheet. A document can name any absolute URL, so a new image host has to be
+     * added here before Next can optimise it; the allowlist keeps the optimiser
+     * from being a proxy for arbitrary addresses.
+     */
+    remotePatterns: [{ protocol: "https", hostname: "i.pinimg.com" }],
+  },
   turbopack: {
     root: dirname(fileURLToPath(import.meta.url)),
     /**
