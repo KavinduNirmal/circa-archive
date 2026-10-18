@@ -26,7 +26,7 @@ Use lower-case, hyphenated topic names: `feature/record-search`, `fix/mail-sort`
 - Review conversations must be resolved before merging.
 - Required status checks must pass: **Repository checks**, **Client checks**, and **Dependency review**.
 - `main` requires the branch to be up to date with its base before merging. `develop` does not, so parallel work is not serialized behind every merge.
-- The approval count is currently zero because the project has one maintainer. Raise it to one when a second maintainer joins.
+- The project has one maintainer, so the required approval count is zero. Review conversations must still be resolved and every required check must pass. Raise the approval count to one when a second maintainer joins.
 
 CodeQL analysis and the Playwright end-to-end suite run on every pull request. They are advisory while the browser suite stabilizes; inspect both before merging. Releases are protected by a tag ruleset: tags matching `v*` cannot be updated or deleted.
 

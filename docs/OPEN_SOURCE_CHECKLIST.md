@@ -24,6 +24,7 @@ This is the living checklist for the public repository. Checked items are config
 - [x] Issues enabled; wiki disabled so documentation stays in the repository.
 - [x] Squash and merge-commit merges enabled; rebase merges disabled; merged head branches are deleted.
 - [x] Rulesets on `main` and `develop` require a pull request, passing checks, and resolved conversations; force pushes and deletion are blocked.
+- [x] A conflicting default "Development" ruleset was removed, so the project rulesets are the single source of truth.
 - [x] Tag ruleset prevents updating or deleting `v*` release tags.
 - [x] Secret scanning and push protection enabled. Validity checks and non-provider patterns remain disabled; see owner actions.
 - [x] Private vulnerability reporting enabled.
@@ -37,8 +38,8 @@ This is the living checklist for the public repository. Checked items are config
 
 ## Owner actions
 
-- [ ] Replace the Windows 98 icon set with original or properly licensed artwork before distributing any release.
-- [ ] Confirm the provenance and redistribution rights of the supplied wallpaper, or replace it.
+- [ ] Replace the Windows 98 icon set with original or properly licensed artwork before distributing any release ([tracking issue #2](https://github.com/KavinduNirmal/circa-archive/issues/2)).
+- [ ] Confirm the provenance and redistribution rights of the supplied wallpaper, or replace it ([tracking issue #2](https://github.com/KavinduNirmal/circa-archive/issues/2)).
 - [ ] Confirm that the copyright notice in `LICENSE` names the intended rights holder.
 - [ ] Publish the first tagged release and verify the Release workflow on a real tag.
 - [ ] Raise the required approval count to one when a second maintainer joins.
