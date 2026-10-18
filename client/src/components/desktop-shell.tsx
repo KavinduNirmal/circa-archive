@@ -14,59 +14,22 @@ import { RecordReader, type RecordTrail } from "./reader/reader-window";
 import { RecordFilingBody } from "./reader/record-filings";
 import { TaskbarWindows, WindowLayer, useWorkstationWindows } from "./window-manager";
 import { DesktopIcon, notificationGlyph, settingsGlyph, type DesktopIconSpec } from "./desktop-icons";
+import { DesktopNavigation } from "./desktop-navigation";
 import {
-  DesktopNavigation,
-  allDestinations,
-  desktopLabel,
+  EXPLORER_SCOPES,
+  destinationById,
+  explorerTitle,
   type DesktopCopy,
   type DesktopDestination,
-  type DesktopEntry,
-} from "./desktop-navigation";
+} from "@/lib/desktop-destinations";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
 import "./workstation.css";
 
 const NotificationIcon = notificationGlyph;
 const SettingsIcon = settingsGlyph;
 
-type ShellTranslate = (key: string, values?: Record<string, string>) => string;
-
 /** A destination opened as a window, plus the copy its own status strip shows. */
 type DestinationWindow = { id: string; title: string; status: string | null; icon: DesktopIconSpec; detail: string | null };
-
-/**
- * Destinations the file browser hosts.
- *
- * One explorer serves all of them. Each scope is the destination's own id,
- * because the explorer roots its tree at the shortcut that opened it, and this
- * set is what separates a folder from the three applications that bring their own
- * window. Membership is structural, not copy, so it is the same in every
- * language.
- */
-const EXPLORER_SCOPES = new Set([
-  "my-pc", "records", "my-work", "archive", "organizations", "expunged", "recycle", "system",
-]);
-
-/**
- * The name the file browser gives a folder.
- *
- * Two destinations are named differently by the explorer than by the desktop:
- * the workstation root is a computer rather than "My PC", and System is a folder
- * of files rather than a place. Everything else keeps its shortcut name.
- */
-function explorerFolderName(t: ShellTranslate, entry: DesktopEntry): string {
-  if (entry.id === "my-pc") return t("explorerMyComputer");
-  if (entry.id === "system") return t("explorerSystemFiles");
-  return desktopLabel(t, entry);
-}
-
-/** Explorer is named for the folder it is showing, so the title is composed per destination. */
-function explorerTitle(t: ShellTranslate, entry: DesktopEntry): string {
-  return `${explorerFolderName(t, entry)} - ${t("explorerSuffix")}`;
-}
-
-function destinationFor(id: string): DesktopEntry | undefined {
-  return allDestinations.find((entry) => entry.id === id);
-}
 
 function WorkstationClock() {
   const t = useTranslations("shell");
@@ -223,7 +186,7 @@ export function DesktopShell() {
       inbox: t("mailTitle"),
       write: t("wordTitle"),
     };
-    const entry = destinationFor(folder.id);
+    const entry = destinationById(folder.id);
     const title = applicationTitles[folder.id] ?? (entry ? explorerTitle(t, entry) : undefined);
     openWindow({
       id: folder.id,

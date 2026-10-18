@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore, type CSSProperties, type ReactNode } from "react";
 import { useTranslations } from "next-intl";
+import type { RecordTrail } from "@/lib/record-trail";
 import { CLASS_LABELS, STATUS_LABELS, type ArchiveStatus } from "../browser/archive-index";
 import { ReaderCredentials, ReaderToolbar, type ReaderActions } from "./reader-chrome";
 import { followUpsFor } from "./reader-correspondence";
@@ -33,13 +34,16 @@ import "./reader.css";
 /**
  * The records open in the reader, and where in that list the reader is standing.
  *
- * The trail lives in the shell rather than in the viewer, because the shell is
+ * The trail lives in the store rather than in the viewer, because the shell is
  * what opens a record in the first place. One owner for "which record is on the
  * screen" means a code arriving from the archive and a code chosen from a
  * follow-up strip take exactly the same path, and the viewer needs no effect to
  * notice that it has been handed something.
+ *
+ * The type and its arithmetic live in `src/lib/record-trail.ts`; re-exported
+ * here because this is still the viewer's public face.
  */
-export type RecordTrail = { codes: readonly string[]; at: number };
+export type { RecordTrail } from "@/lib/record-trail";
 
 /** The states a section's status earns it. An ordinary filing is not stamped. */
 const STATUS_STAMPS: Partial<Record<ArchiveStatus, "stampContested" | "stampSealed" | "stampRestricted" | "stampErased">> = {

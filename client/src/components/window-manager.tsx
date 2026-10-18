@@ -1,37 +1,15 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
+import { CASCADE_STEP, CASCADE_WRAP, WINDOW_MIN_SIZE, type DesktopArea, type WindowGeometry, type WorkstationWindowState } from "@/lib/desktop-types";
 import { DesktopIcon, type DesktopIconSpec } from "./desktop-icons";
 
-/** Pixel geometry of a workstation window, in desktop-layer coordinates. */
-export type WindowGeometry = { x: number; y: number; width: number; height: number };
-
-/** Bounds of the desktop area, excluding the status strip and the taskbar. */
-export type DesktopArea = { width: number; height: number };
-
-export type WorkstationWindowState = {
-  /** Stable key: the destination id, so reopening focuses instead of duplicating. */
-  id: string;
-  title: string;
-  /**
-   * Uppercase status shown in the window's own status strip. Applications that
-   * carry their own status bar (the archive browser) leave this null so the
-   * frame does not stack a second, duplicate strip above them.
-   */
-  status: string | null;
-  icon: DesktopIconSpec;
-  /** Geometry used when not maximized. */
-  geometry: WindowGeometry;
-  maximized: boolean;
-  minimized: boolean;
-  /** Monotonic counter that decides paint order. */
-  z: number;
-};
-
-const WINDOW_MIN_SIZE = { width: 260, height: 180 };
-/** Cascading offsets so a new window never lands exactly under the previous one. */
-const CASCADE_STEP = 26;
-const CASCADE_WRAP = 6;
+/*
+ * The frame's state contracts live in `src/lib/desktop-types.ts` so the store
+ * and the pure route mapper can use them without importing a client component.
+ * Re-exported here because this file is still the window manager's public face.
+ */
+export type { DesktopArea, WindowGeometry, WorkstationWindowState } from "@/lib/desktop-types";
 
 /**
  * Central window registry for the shell: creation, focus, stacking,
