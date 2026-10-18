@@ -14,7 +14,8 @@ Next.js frontend serving a public landing page, a full-page public archive, and 
 - `src/proxy.ts`: the request-time language decision — path prefix, then cookie, then `Accept-Language`, then English.
 - `tests/`: Vitest interaction and utility tests.
 - `e2e/`: responsive Playwright desktop and language tests.
-- `public/`: supplied emblem wallpaper and the Windows 98 shortcut [icon set](public/icons/README.md).
+- `scripts/`: generators that write tracked files, currently the record corpus; see its [README](scripts/README.md).
+- `public/`: supplied emblem wallpaper, the published [record corpus](public/Ghost_story.md), and the Windows 98 shortcut [icon set](public/icons/README.md).
 
 ## Localization
 
@@ -42,9 +43,12 @@ bun run typecheck
 bun run test
 bun run build
 bun run test:e2e
+bun run sync:corpus
 ```
 
 In this sandbox Bun's own cache and temp directories fall outside the writable workspace, so a plain `bun install` fails; prefix it with `BUN_TMPDIR=/tmp` and add `--cache-dir=<workspace>/.dsh-scratch/bun-cache` if the global cache is read-only.
+
+`public/Ghost_story.md` is the published record corpus and the file to edit. The reader cannot read a file from the browser bundle, so `src/components/reader/ghost-story.ts` carries the same bytes as data; run `bun run sync:corpus` after editing the published copy. `bun run test` fails if the two drift apart.
 
 Development serves http://localhost:3001. `bun run start` serves a production build. Browser tests require Chromium (`bunx playwright install chromium`; set `PLAYWRIGHT_BROWSERS_PATH` to a writable directory when the default cache is read-only) and use port 3001.
 
