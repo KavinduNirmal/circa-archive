@@ -5,12 +5,14 @@ using Circa.Auth.Infrastructure.Endpoints;
 using Circa.Auth.Infrastructure.Options;
 using Circa.Auth.Infrastructure.Persistence;
 using Circa.Auth.Infrastructure.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace Circa.Auth.Infrastructure;
 
@@ -54,10 +56,65 @@ public static class AuthModuleExtensions
 
         services.Configure<AuthOptions>(configuration.GetSection(AuthOptions.SectionName));
 
+        services.AddScoped<IAccessTokenService, AccessTokenService>();
         services.AddScoped<RegisterHandler>();
         services.AddScoped<LoginHandler>();
         services.AddScoped<IUserDirectory, UserDirectory>();
         services.AddScoped<ISessionService, SessionService>();
+
+        services.AddOptions<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme)
+            .Configure<IOptions<AuthOptions>>((jwtOptions, authOptions) =>
+            {
+                var opts = authOptions.Value;
+                jwtOptions.MapInboundClaims = false;
+                var keyBytes = !string.IsNullOrEmpty(opts.SigningKey)
+                    ? System.Text.Encoding.UTF8.GetBytes(opts.SigningKey)
+                    : new byte[32];
+
+                jwtOptions.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidIssuer = opts.Issuer,
+                    ValidateAudience = true,
+                    ValidAudience = opts.Audience,
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(keyBytes),
+                    ValidateLifetime = true,
+                    ClockSkew = TimeSpan.Zero,
+                    NameClaimType = "sub",
+                    RoleClaimType = "role"
+                };
+
+                jwtOptions.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        var authHeader = context.Request.Headers.Authorization.ToString();
+                        if (!string.IsNullOrEmpty(authHeader) && authHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+                        {
+                            return Task.CompletedTask;
+                        }
+
+                        if (context.Request.Cookies.TryGetValue(AuthEndpoints.AccessTokenCookieName, out var cookieToken) &&
+                            !string.IsNullOrWhiteSpace(cookieToken))
+                        {
+                            context.Token = cookieToken;
+                        }
+
+                        return Task.CompletedTask;
+                    }
+                };
+            });
+
+        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer();
+
+        services.AddAuthorization(options =>
+        {
+            options.FallbackPolicy = new Microsoft.AspNetCore.Authorization.AuthorizationPolicyBuilder()
+                .RequireAuthenticatedUser()
+                .Build();
+        });
 
         return services;
     }

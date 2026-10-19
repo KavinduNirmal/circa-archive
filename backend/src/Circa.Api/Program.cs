@@ -17,6 +17,9 @@ builder.Services.AddApiVersioning(options =>
 
 var app = builder.Build();
 
+app.UseAuthentication();
+app.UseAuthorization();
+
 ApiVersionSet versionSet = app.NewApiVersionSet()
     .HasApiVersion(new ApiVersion(1, 0))
     .ReportApiVersions()
@@ -25,8 +28,12 @@ ApiVersionSet versionSet = app.NewApiVersionSet()
 var api = app.MapGroup("/api/v{version:apiVersion}")
     .WithApiVersionSet(versionSet);
 
-api.MapGet("/", () => "CIRCA API").HasApiVersion(1, 0);
+api.MapGet("/", () => "CIRCA API").HasApiVersion(1, 0).AllowAnonymous();
 api.MapAuthEndpoints();
+
+var records = api.MapGroup("/records").HasApiVersion(1, 0);
+records.MapGet("/", () => Results.Ok(Array.Empty<object>())).AllowAnonymous();
+records.MapPost("/", () => Results.Created("/api/v1/records/1", new { id = 1 }));
 
 app.Run();
 

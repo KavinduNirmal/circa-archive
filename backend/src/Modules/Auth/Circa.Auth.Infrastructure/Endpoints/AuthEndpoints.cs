@@ -1,9 +1,12 @@
+using System.Security.Claims;
 using Asp.Versioning;
 using Circa.Auth.Application;
+using Circa.Auth.Domain;
 using Circa.Auth.Infrastructure.Options;
 using Circa.Auth.Infrastructure.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Options;
 
@@ -11,6 +14,7 @@ namespace Circa.Auth.Infrastructure.Endpoints;
 
 public static class AuthEndpoints
 {
+    public const string AccessTokenCookieName = "circa_at";
     public const string RefreshTokenCookieName = "circa_rt";
 
     public static IEndpointRouteBuilder MapAuthEndpoints(this IEndpointRouteBuilder endpoints)
@@ -22,7 +26,9 @@ public static class AuthEndpoints
         group.MapPost("/register", async (
             RegisterRequest request,
             RegisterHandler handler,
+            UserManager<AppUser> userManager,
             ISessionService sessionService,
+            IAccessTokenService accessTokenService,
             IOptions<AuthOptions> authOptions,
             HttpContext httpContext,
             CancellationToken ct) =>
@@ -43,12 +49,19 @@ public static class AuthEndpoints
             var ip = httpContext.Connection.RemoteIpAddress?.ToString();
             var userAgent = httpContext.Request.Headers.UserAgent.ToString();
 
-            var (_, rawRefreshToken) = await sessionService.CreateSessionAsync(
+            var (session, rawRefreshToken) = await sessionService.CreateSessionAsync(
                 result.Value!.Id,
                 now,
                 ip,
                 userAgent,
                 ct);
+
+            var user = await userManager.FindByIdAsync(result.Value.Id.ToString());
+            if (user is not null)
+            {
+                var accessToken = accessTokenService.Issue(user, session, now);
+                SetAccessTokenCookie(httpContext, accessToken, authOptions.Value);
+            }
 
             SetRefreshTokenCookie(httpContext, rawRefreshToken, authOptions.Value);
 
@@ -58,7 +71,9 @@ public static class AuthEndpoints
         group.MapPost("/login", async (
             LoginRequest request,
             LoginHandler handler,
+            UserManager<AppUser> userManager,
             ISessionService sessionService,
+            IAccessTokenService accessTokenService,
             IOptions<AuthOptions> authOptions,
             HttpContext httpContext,
             CancellationToken ct) =>
@@ -82,12 +97,19 @@ public static class AuthEndpoints
             var ip = httpContext.Connection.RemoteIpAddress?.ToString();
             var userAgent = httpContext.Request.Headers.UserAgent.ToString();
 
-            var (_, rawRefreshToken) = await sessionService.CreateSessionAsync(
+            var (session, rawRefreshToken) = await sessionService.CreateSessionAsync(
                 result.Value!.Id,
                 now,
                 ip,
                 userAgent,
                 ct);
+
+            var user = await userManager.FindByIdAsync(result.Value.Id.ToString());
+            if (user is not null)
+            {
+                var accessToken = accessTokenService.Issue(user, session, now);
+                SetAccessTokenCookie(httpContext, accessToken, authOptions.Value);
+            }
 
             SetRefreshTokenCookie(httpContext, rawRefreshToken, authOptions.Value);
 
@@ -96,6 +118,8 @@ public static class AuthEndpoints
 
         group.MapPost("/refresh", async (
             ISessionService sessionService,
+            IAccessTokenService accessTokenService,
+            UserManager<AppUser> userManager,
             IOptions<AuthOptions> authOptions,
             HttpContext httpContext,
             CancellationToken ct) =>
@@ -109,13 +133,25 @@ public static class AuthEndpoints
             var now = DateTimeOffset.UtcNow;
             var refreshResult = await sessionService.RefreshAsync(rawRefreshToken, now, ct);
 
-            if (!refreshResult.Succeeded)
+            if (!refreshResult.Succeeded || refreshResult.Session is null)
             {
+                DeleteAccessTokenCookie(httpContext, authOptions.Value);
                 DeleteRefreshTokenCookie(httpContext, authOptions.Value);
                 return Results.Unauthorized();
             }
 
+            var user = await userManager.FindByIdAsync(refreshResult.Session.UserId.ToString());
+            if (user is null)
+            {
+                DeleteAccessTokenCookie(httpContext, authOptions.Value);
+                DeleteRefreshTokenCookie(httpContext, authOptions.Value);
+                return Results.Unauthorized();
+            }
+
+            var accessToken = accessTokenService.Issue(user, refreshResult.Session, now);
+            SetAccessTokenCookie(httpContext, accessToken, authOptions.Value);
             SetRefreshTokenCookie(httpContext, refreshResult.ReplacementToken!, authOptions.Value);
+
             return Results.NoContent();
         });
 
@@ -134,10 +170,45 @@ public static class AuthEndpoints
                     await sessionService.RevokeSessionAsync(session.Id, DateTimeOffset.UtcNow, "manual_logout", ct);
                 }
             }
+            else if (httpContext.User.Identity?.IsAuthenticated == true)
+            {
+                var sidStr = httpContext.User.FindFirst("sid")?.Value;
+                if (Guid.TryParse(sidStr, out var sid))
+                {
+                    await sessionService.RevokeSessionAsync(sid, DateTimeOffset.UtcNow, "manual_logout", ct);
+                }
+            }
 
+            DeleteAccessTokenCookie(httpContext, authOptions.Value);
             DeleteRefreshTokenCookie(httpContext, authOptions.Value);
             return Results.NoContent();
         });
+
+        group.MapGet("/me", async (
+            ClaimsPrincipal principal,
+            UserManager<AppUser> userManager,
+            CancellationToken ct) =>
+        {
+            var userIdStr = principal.FindFirst("sub")?.Value;
+            if (!Guid.TryParse(userIdStr, out var userId))
+            {
+                return Results.Unauthorized();
+            }
+
+            var user = await userManager.FindByIdAsync(userIdStr);
+            if (user is null)
+            {
+                return Results.Unauthorized();
+            }
+
+            return Results.Ok(new
+            {
+                id = user.Id,
+                username = user.UserName,
+                role = user.Role,
+                createdAt = user.CreatedAt
+            });
+        }).RequireAuthorization();
 
         group.MapGet("/sessions", async (
             ISessionService sessionService,
@@ -183,6 +254,7 @@ public static class AuthEndpoints
 
             if (currentSession.Id == id)
             {
+                DeleteAccessTokenCookie(httpContext, authOptions.Value);
                 DeleteRefreshTokenCookie(httpContext, authOptions.Value);
             }
 
@@ -190,6 +262,43 @@ public static class AuthEndpoints
         });
 
         return endpoints;
+    }
+
+    public static void SetAccessTokenCookie(HttpContext context, string token, AuthOptions options)
+    {
+        var cookieOptions = new CookieOptions
+        {
+            Path = "/",
+            HttpOnly = true,
+            SameSite = SameSiteMode.Lax,
+            MaxAge = options.AccessTokenLifetime,
+            Secure = options.RequireSecureCookies
+        };
+
+        if (!string.IsNullOrEmpty(options.CookieDomain))
+        {
+            cookieOptions.Domain = options.CookieDomain;
+        }
+
+        context.Response.Cookies.Append(AccessTokenCookieName, token, cookieOptions);
+    }
+
+    public static void DeleteAccessTokenCookie(HttpContext context, AuthOptions options)
+    {
+        var cookieOptions = new CookieOptions
+        {
+            Path = "/",
+            HttpOnly = true,
+            SameSite = SameSiteMode.Lax,
+            Secure = options.RequireSecureCookies
+        };
+
+        if (!string.IsNullOrEmpty(options.CookieDomain))
+        {
+            cookieOptions.Domain = options.CookieDomain;
+        }
+
+        context.Response.Cookies.Delete(AccessTokenCookieName, cookieOptions);
     }
 
     public static void SetRefreshTokenCookie(HttpContext context, string token, AuthOptions options)

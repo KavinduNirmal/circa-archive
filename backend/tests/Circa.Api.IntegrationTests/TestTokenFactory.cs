@@ -33,9 +33,9 @@ public static class TestTokenFactory
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
 
-        var iat = DateTime.UtcNow;
+        var exp = expiresAt ?? DateTime.UtcNow.AddMinutes(10);
+        var iat = exp < DateTime.UtcNow ? exp.AddMinutes(-10) : DateTime.UtcNow;
         var nbf = notBefore ?? iat;
-        var exp = expiresAt ?? iat.AddMinutes(10);
 
         var descriptor = new SecurityTokenDescriptor
         {
