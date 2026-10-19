@@ -19,7 +19,7 @@ public sealed class RecordsContractTests : IClassFixture<ApiFactory>
     {
         using var client = _factory.CreateClient();
 
-        var response = await client.GetAsync("/api/records");
+        var response = await client.GetAsync("/api/v1/records");
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
@@ -30,7 +30,7 @@ public sealed class RecordsContractTests : IClassFixture<ApiFactory>
         using var client = _factory.CreateClient();
         using var content = new StringContent("{\"title\":\"Test\"}", Encoding.UTF8, "application/json");
 
-        var response = await client.PostAsync("/api/records", content);
+        var response = await client.PostAsync("/api/v1/records", content);
 
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
     }
@@ -43,7 +43,7 @@ public sealed class RecordsContractTests : IClassFixture<ApiFactory>
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         using var content = new StringContent("{\"title\":\"Test\"}", Encoding.UTF8, "application/json");
 
-        var response = await client.PostAsync("/api/records", content);
+        var response = await client.PostAsync("/api/v1/records", content);
 
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
     }

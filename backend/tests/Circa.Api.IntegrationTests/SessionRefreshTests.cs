@@ -48,14 +48,14 @@ public sealed class SessionRefreshTests : IClassFixture<PostgresFixture>
     {
         using var client = CreateClient();
         var unique = Guid.NewGuid().ToString("N")[..8];
-        var registerResponse = await client.PostAsJsonAsync("/api/auth/register",
+        var registerResponse = await client.PostAsJsonAsync("/api/v1/auth/register",
             new RegisterRequest($"ref_{unique}", $"ref_{unique}@example.com", "Password123!"));
         Assert.Equal(HttpStatusCode.Created, registerResponse.StatusCode);
 
         var originalCookie = ExtractCookie(registerResponse, "circa_rt");
         Assert.NotNull(originalCookie);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, "/api/auth/refresh");
+        var request = new HttpRequestMessage(HttpMethod.Post, "/api/v1/auth/refresh");
         request.Headers.Add("Cookie", $"circa_rt={originalCookie}");
 
         var refreshResponse = await client.SendAsync(request);
@@ -71,7 +71,7 @@ public sealed class SessionRefreshTests : IClassFixture<PostgresFixture>
     {
         using var client = CreateClient();
         var unique = Guid.NewGuid().ToString("N")[..8];
-        var regResponse = await client.PostAsJsonAsync("/api/auth/register",
+        var regResponse = await client.PostAsJsonAsync("/api/v1/auth/register",
             new RegisterRequest($"grace_{unique}", $"grace_{unique}@example.com", "Password123!"));
         Assert.Equal(HttpStatusCode.Created, regResponse.StatusCode);
 
@@ -79,7 +79,7 @@ public sealed class SessionRefreshTests : IClassFixture<PostgresFixture>
         Assert.NotNull(originalCookie);
 
         // First rotation
-        var req1 = new HttpRequestMessage(HttpMethod.Post, "/api/auth/refresh");
+        var req1 = new HttpRequestMessage(HttpMethod.Post, "/api/v1/auth/refresh");
         req1.Headers.Add("Cookie", $"circa_rt={originalCookie}");
         var res1 = await client.SendAsync(req1);
         Assert.Equal(HttpStatusCode.NoContent, res1.StatusCode);
@@ -87,7 +87,7 @@ public sealed class SessionRefreshTests : IClassFixture<PostgresFixture>
         Assert.NotNull(replacement1);
 
         // Second rotation attempt with OLD token inside grace period
-        var req2 = new HttpRequestMessage(HttpMethod.Post, "/api/auth/refresh");
+        var req2 = new HttpRequestMessage(HttpMethod.Post, "/api/v1/auth/refresh");
         req2.Headers.Add("Cookie", $"circa_rt={originalCookie}");
         var res2 = await client.SendAsync(req2);
         Assert.Equal(HttpStatusCode.NoContent, res2.StatusCode);
@@ -109,7 +109,7 @@ public sealed class SessionRefreshTests : IClassFixture<PostgresFixture>
     {
         using var client = CreateClient();
         var unique = Guid.NewGuid().ToString("N")[..8];
-        var regResponse = await client.PostAsJsonAsync("/api/auth/register",
+        var regResponse = await client.PostAsJsonAsync("/api/v1/auth/register",
             new RegisterRequest($"replay_{unique}", $"replay_{unique}@example.com", "Password123!"));
         Assert.Equal(HttpStatusCode.Created, regResponse.StatusCode);
 
@@ -117,7 +117,7 @@ public sealed class SessionRefreshTests : IClassFixture<PostgresFixture>
         Assert.NotNull(originalCookie);
 
         // First rotation
-        var req1 = new HttpRequestMessage(HttpMethod.Post, "/api/auth/refresh");
+        var req1 = new HttpRequestMessage(HttpMethod.Post, "/api/v1/auth/refresh");
         req1.Headers.Add("Cookie", $"circa_rt={originalCookie}");
         var res1 = await client.SendAsync(req1);
         Assert.Equal(HttpStatusCode.NoContent, res1.StatusCode);
@@ -134,7 +134,7 @@ public sealed class SessionRefreshTests : IClassFixture<PostgresFixture>
         }
 
         // Second rotation with old token after grace window expired -> Replay!
-        var req2 = new HttpRequestMessage(HttpMethod.Post, "/api/auth/refresh");
+        var req2 = new HttpRequestMessage(HttpMethod.Post, "/api/v1/auth/refresh");
         req2.Headers.Add("Cookie", $"circa_rt={originalCookie}");
         var res2 = await client.SendAsync(req2);
         Assert.Equal(HttpStatusCode.Unauthorized, res2.StatusCode);
@@ -155,7 +155,7 @@ public sealed class SessionRefreshTests : IClassFixture<PostgresFixture>
     {
         using var client = CreateClient();
         var unique = Guid.NewGuid().ToString("N")[..8];
-        var regResponse = await client.PostAsJsonAsync("/api/auth/register",
+        var regResponse = await client.PostAsJsonAsync("/api/v1/auth/register",
             new RegisterRequest($"concurrent_{unique}", $"concurrent_{unique}@example.com", "Password123!"));
         Assert.Equal(HttpStatusCode.Created, regResponse.StatusCode);
 
@@ -166,7 +166,7 @@ public sealed class SessionRefreshTests : IClassFixture<PostgresFixture>
         var task1 = Task.Run(async () =>
         {
             using var c = CreateClient();
-            var req = new HttpRequestMessage(HttpMethod.Post, "/api/auth/refresh");
+            var req = new HttpRequestMessage(HttpMethod.Post, "/api/v1/auth/refresh");
             req.Headers.Add("Cookie", $"circa_rt={cookie}");
             return await c.SendAsync(req);
         });
@@ -174,7 +174,7 @@ public sealed class SessionRefreshTests : IClassFixture<PostgresFixture>
         var task2 = Task.Run(async () =>
         {
             using var c = CreateClient();
-            var req = new HttpRequestMessage(HttpMethod.Post, "/api/auth/refresh");
+            var req = new HttpRequestMessage(HttpMethod.Post, "/api/v1/auth/refresh");
             req.Headers.Add("Cookie", $"circa_rt={cookie}");
             return await c.SendAsync(req);
         });
@@ -204,7 +204,7 @@ public sealed class SessionRefreshTests : IClassFixture<PostgresFixture>
     {
         using var client = CreateClient();
         var unique = Guid.NewGuid().ToString("N")[..8];
-        var regResponse = await client.PostAsJsonAsync("/api/auth/register",
+        var regResponse = await client.PostAsJsonAsync("/api/v1/auth/register",
             new RegisterRequest($"exp_{unique}", $"exp_{unique}@example.com", "Password123!"));
         Assert.Equal(HttpStatusCode.Created, regResponse.StatusCode);
 
@@ -221,7 +221,7 @@ public sealed class SessionRefreshTests : IClassFixture<PostgresFixture>
                 $"UPDATE auth.sessions SET expires_at = {DateTimeOffset.UtcNow.AddMinutes(-5)} WHERE id = {session.Id}");
         }
 
-        var req = new HttpRequestMessage(HttpMethod.Post, "/api/auth/refresh");
+        var req = new HttpRequestMessage(HttpMethod.Post, "/api/v1/auth/refresh");
         req.Headers.Add("Cookie", $"circa_rt={cookie}");
         var res = await client.SendAsync(req);
 
@@ -233,7 +233,7 @@ public sealed class SessionRefreshTests : IClassFixture<PostgresFixture>
     {
         using var client = CreateClient();
         var unique = Guid.NewGuid().ToString("N")[..8];
-        var regResponse = await client.PostAsJsonAsync("/api/auth/register",
+        var regResponse = await client.PostAsJsonAsync("/api/v1/auth/register",
             new RegisterRequest($"logout_{unique}", $"logout_{unique}@example.com", "Password123!"));
         Assert.Equal(HttpStatusCode.Created, regResponse.StatusCode);
 
@@ -241,13 +241,13 @@ public sealed class SessionRefreshTests : IClassFixture<PostgresFixture>
         Assert.NotNull(cookie);
 
         // Call Logout
-        var logoutReq = new HttpRequestMessage(HttpMethod.Post, "/api/auth/logout");
+        var logoutReq = new HttpRequestMessage(HttpMethod.Post, "/api/v1/auth/logout");
         logoutReq.Headers.Add("Cookie", $"circa_rt={cookie}");
         var logoutRes = await client.SendAsync(logoutReq);
         Assert.Equal(HttpStatusCode.NoContent, logoutRes.StatusCode);
 
         // Subsequent refresh with that token must return 401
-        var refreshReq = new HttpRequestMessage(HttpMethod.Post, "/api/auth/refresh");
+        var refreshReq = new HttpRequestMessage(HttpMethod.Post, "/api/v1/auth/refresh");
         refreshReq.Headers.Add("Cookie", $"circa_rt={cookie}");
         var refreshRes = await client.SendAsync(refreshReq);
         Assert.Equal(HttpStatusCode.Unauthorized, refreshRes.StatusCode);

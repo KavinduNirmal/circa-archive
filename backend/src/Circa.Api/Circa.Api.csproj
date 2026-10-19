@@ -6,4 +6,8 @@
     <ProjectReference Include="..\Common\Circa.Common.Infrastructure\Circa.Common.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Asp.Versioning.Http" />
+  </ItemGroup>
+
 </Project>

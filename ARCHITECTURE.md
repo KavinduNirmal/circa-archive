@@ -329,74 +329,78 @@ CREATE TABLE Folders (
 
 ## 4. API Specification
 
+### 4.0 Versioning
+
+All endpoints are versioned via the URL path segment (`/api/v{version}/...`). The current version is **v1**. Each response includes an `api-supported-versions` header advertising all active versions. New versions are additive; breaking changes require a new version number.
+
 ### 4.1 Authentication
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| POST | `/api/auth/register` | Create account |
-| POST | `/api/auth/login` | Login, returns JWT |
-| POST | `/api/auth/refresh` | Refresh JWT |
-| GET | `/api/auth/me` | Current user profile |
+| POST | `/api/v1/auth/register` | Create account |
+| POST | `/api/v1/auth/login` | Login, returns JWT |
+| POST | `/api/v1/auth/refresh` | Refresh JWT |
+| GET | `/api/v1/auth/me` | Current user profile |
 
 ### 4.2 Records
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET | `/api/records` | List records with filters (incident, org, type, author, status) |
-| GET | `/api/records/{id}` | Get record by ID |
-| GET | `/api/records/by-code/{circaCode}` | Get record by CIRCA code |
-| POST | `/api/records` | Create new record |
-| PATCH | `/api/records/{id}` | Update record (author only, limited fields) |
-| DELETE | `/api/records/{id}` | Soft-delete (move to Recycle Bin) |
-| POST | `/api/records/{id}/fork` | Fork record |
-| POST | `/api/records/{id}/vote` | Vote +1/-1 |
-| POST | `/api/records/{id}/report` | Report meta violation |
+| GET | `/api/v1/records` | List records with filters (incident, org, type, author, status) |
+| GET | `/api/v1/records/{id}` | Get record by ID |
+| GET | `/api/v1/records/by-code/{circaCode}` | Get record by CIRCA code |
+| POST | `/api/v1/records` | Create new record |
+| PATCH | `/api/v1/records/{id}` | Update record (author only, limited fields) |
+| DELETE | `/api/v1/records/{id}` | Soft-delete (move to Recycle Bin) |
+| POST | `/api/v1/records/{id}/fork` | Fork record |
+| POST | `/api/v1/records/{id}/vote` | Vote +1/-1 |
+| POST | `/api/v1/records/{id}/report` | Report meta violation |
 
 ### 4.3 Incidents
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET | `/api/incidents` | List incidents |
-| GET | `/api/incidents/{id}` | Get incident with aggregated records |
-| POST | `/api/incidents` | Create incident (INCIDENT record) |
-| PATCH | `/api/incidents/{id}/primary-claim` | Set primary claim org (originator, 30-day window) |
-| GET | `/api/incidents/{id}/designations` | Get org designations |
+| GET | `/api/v1/incidents` | List incidents |
+| GET | `/api/v1/incidents/{id}` | Get incident with aggregated records |
+| POST | `/api/v1/incidents` | Create incident (INCIDENT record) |
+| PATCH | `/api/v1/incidents/{id}/primary-claim` | Set primary claim org (originator, 30-day window) |
+| GET | `/api/v1/incidents/{id}/designations` | Get org designations |
 
 ### 4.4 Organizations
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET | `/api/orgs` | List orgs (filter by status, code) |
-| GET | `/api/orgs/{id}` | Get org with dossier |
-| POST | `/api/orgs` | Submit org identification (Brief, Voice, Seed) |
-| POST | `/api/orgs/{id}/vote` | Vote +1/-1 |
-| POST | `/api/orgs/{id}/appeal` | Submit Reclassification Petition |
-| GET | `/api/orgs/{id}/dossier` | Get dossier |
-| PATCH | `/api/orgs/{id}/dossier` | Edit dossier (community wiki) |
-| GET | `/api/orgs/{id}/mentions` | Get records mentioning org |
+| GET | `/api/v1/orgs` | List orgs (filter by status, code) |
+| GET | `/api/v1/orgs/{id}` | Get org with dossier |
+| POST | `/api/v1/orgs` | Submit org identification (Brief, Voice, Seed) |
+| POST | `/api/v1/orgs/{id}/vote` | Vote +1/-1 |
+| POST | `/api/v1/orgs/{id}/appeal` | Submit Reclassification Petition |
+| GET | `/api/v1/orgs/{id}/dossier` | Get dossier |
+| PATCH | `/api/v1/orgs/{id}/dossier` | Edit dossier (community wiki) |
+| GET | `/api/v1/orgs/{id}/mentions` | Get records mentioning org |
 
 ### 4.5 Emails
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET | `/api/emails` | List emails (filter by type, folder) |
-| GET | `/api/emails/{id}` | Get email |
-| POST | `/api/emails/{id}/file` | File email into case folder |
-| PATCH | `/api/emails/{id}/read` | Mark read |
+| GET | `/api/v1/emails` | List emails (filter by type, folder) |
+| GET | `/api/v1/emails/{id}` | Get email |
+| POST | `/api/v1/emails/{id}/file` | File email into case folder |
+| PATCH | `/api/v1/emails/{id}/read` | Mark read |
 
 ### 4.6 Moderation
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET | `/api/moderation/log` | Public moderation log (anonymized) |
-| POST | `/api/moderation/tombstone` | Tombstone record (moderator only) |
-| GET | `/api/moderation/expunged/count` | Count of expunged records |
+| GET | `/api/v1/moderation/log` | Public moderation log (anonymized) |
+| POST | `/api/v1/moderation/tombstone` | Tombstone record (moderator only) |
+| GET | `/api/v1/moderation/expunged/count` | Count of expunged records |
 
 ### 4.7 Search
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET | `/api/search` | Full-text search across records, incidents, orgs |
+| GET | `/api/v1/search` | Full-text search across records, incidents, orgs |
 
 ### 4.8 Real-time (SignalR)
 

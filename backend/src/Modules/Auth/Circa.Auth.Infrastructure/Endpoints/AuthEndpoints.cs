@@ -1,3 +1,4 @@
+using Asp.Versioning;
 using Circa.Auth.Application;
 using Circa.Auth.Infrastructure.Options;
 using Circa.Auth.Infrastructure.Services;
@@ -14,7 +15,9 @@ public static class AuthEndpoints
 
     public static IEndpointRouteBuilder MapAuthEndpoints(this IEndpointRouteBuilder endpoints)
     {
-        var group = endpoints.MapGroup("/api/auth").AllowAnonymous();
+        var group = endpoints.MapGroup("/auth")
+            .AllowAnonymous()
+            .HasApiVersion(new ApiVersion(1, 0));
 
         group.MapPost("/register", async (
             RegisterRequest request,
@@ -49,7 +52,7 @@ public static class AuthEndpoints
 
             SetRefreshTokenCookie(httpContext, rawRefreshToken, authOptions.Value);
 
-            return Results.Created($"/api/auth/users/{result.Value.Id}", result.Value);
+            return Results.Created($"/api/v1/auth/users/{result.Value.Id}", result.Value);
         });
 
         group.MapPost("/login", async (
@@ -193,7 +196,7 @@ public static class AuthEndpoints
     {
         var cookieOptions = new CookieOptions
         {
-            Path = "/api/auth",
+            Path = "/api/v1/auth",
             HttpOnly = true,
             SameSite = SameSiteMode.Strict,
             MaxAge = options.SessionLifetime,
@@ -212,7 +215,7 @@ public static class AuthEndpoints
     {
         var cookieOptions = new CookieOptions
         {
-            Path = "/api/auth",
+            Path = "/api/v1/auth",
             HttpOnly = true,
             SameSite = SameSiteMode.Strict,
             Secure = options.RequireSecureCookies

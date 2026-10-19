@@ -21,7 +21,7 @@ public sealed class AuthEndpointsTests : IClassFixture<PostgresFixture>
         var unique = Guid.NewGuid().ToString("N")[..8];
         var request = new RegisterRequest($"user_{unique}", $"user_{unique}@example.com", "Password123!");
 
-        var response = await client.PostAsJsonAsync("/api/auth/register", request);
+        var response = await client.PostAsJsonAsync("/api/v1/auth/register", request);
 
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         var body = await response.Content.ReadFromJsonAsync<RegisterResponse>();
@@ -38,11 +38,11 @@ public sealed class AuthEndpointsTests : IClassFixture<PostgresFixture>
         var unique = Guid.NewGuid().ToString("N")[..8];
         var request = new RegisterRequest($"dup_{unique}", $"dup_{unique}@example.com", "Password123!");
 
-        var response1 = await client.PostAsJsonAsync("/api/auth/register", request);
+        var response1 = await client.PostAsJsonAsync("/api/v1/auth/register", request);
         Assert.Equal(HttpStatusCode.Created, response1.StatusCode);
 
         var request2 = new RegisterRequest($"dup_{unique}", $"other_{unique}@example.com", "Password123!");
-        var response2 = await client.PostAsJsonAsync("/api/auth/register", request2);
+        var response2 = await client.PostAsJsonAsync("/api/v1/auth/register", request2);
 
         Assert.Equal(HttpStatusCode.Conflict, response2.StatusCode);
     }
@@ -54,7 +54,7 @@ public sealed class AuthEndpointsTests : IClassFixture<PostgresFixture>
         var unique = Guid.NewGuid().ToString("N")[..8];
         var request = new RegisterRequest($"weak_{unique}", $"weak_{unique}@example.com", "short");
 
-        var response = await client.PostAsJsonAsync("/api/auth/register", request);
+        var response = await client.PostAsJsonAsync("/api/v1/auth/register", request);
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
@@ -66,11 +66,11 @@ public sealed class AuthEndpointsTests : IClassFixture<PostgresFixture>
         var unique = Guid.NewGuid().ToString("N")[..8];
         var registerRequest = new RegisterRequest($"login_{unique}", $"login_{unique}@example.com", "Password123!");
 
-        var regResponse = await client.PostAsJsonAsync("/api/auth/register", registerRequest);
+        var regResponse = await client.PostAsJsonAsync("/api/v1/auth/register", registerRequest);
         Assert.Equal(HttpStatusCode.Created, regResponse.StatusCode);
 
         var loginRequest = new LoginRequest($"login_{unique}", "Password123!");
-        var loginResponse = await client.PostAsJsonAsync("/api/auth/login", loginRequest);
+        var loginResponse = await client.PostAsJsonAsync("/api/v1/auth/login", loginRequest);
 
         Assert.Equal(HttpStatusCode.OK, loginResponse.StatusCode);
         var body = await loginResponse.Content.ReadFromJsonAsync<LoginResponse>();
@@ -86,11 +86,11 @@ public sealed class AuthEndpointsTests : IClassFixture<PostgresFixture>
         var unique = Guid.NewGuid().ToString("N")[..8];
         var registerRequest = new RegisterRequest($"wrong_{unique}", $"wrong_{unique}@example.com", "Password123!");
 
-        var regResponse = await client.PostAsJsonAsync("/api/auth/register", registerRequest);
+        var regResponse = await client.PostAsJsonAsync("/api/v1/auth/register", registerRequest);
         Assert.Equal(HttpStatusCode.Created, regResponse.StatusCode);
 
         var loginRequest = new LoginRequest($"wrong_{unique}", "WrongPassword123!");
-        var loginResponse = await client.PostAsJsonAsync("/api/auth/login", loginRequest);
+        var loginResponse = await client.PostAsJsonAsync("/api/v1/auth/login", loginRequest);
 
         Assert.Equal(HttpStatusCode.Unauthorized, loginResponse.StatusCode);
         var str = await loginResponse.Content.ReadAsStringAsync();
@@ -104,19 +104,19 @@ public sealed class AuthEndpointsTests : IClassFixture<PostgresFixture>
         var unique = Guid.NewGuid().ToString("N")[..8];
         var registerRequest = new RegisterRequest($"lock_{unique}", $"lock_{unique}@example.com", "Password123!");
 
-        var regResponse = await client.PostAsJsonAsync("/api/auth/register", registerRequest);
+        var regResponse = await client.PostAsJsonAsync("/api/v1/auth/register", registerRequest);
         Assert.Equal(HttpStatusCode.Created, regResponse.StatusCode);
 
         for (int i = 0; i < 10; i++)
         {
-            var failedLogin = await client.PostAsJsonAsync("/api/auth/login", new LoginRequest($"lock_{unique}", "WrongPassword!"));
+            var failedLogin = await client.PostAsJsonAsync("/api/v1/auth/login", new LoginRequest($"lock_{unique}", "WrongPassword!"));
             if (i < 9)
             {
                 Assert.Equal(HttpStatusCode.Unauthorized, failedLogin.StatusCode);
             }
         }
 
-        var lockedResponse = await client.PostAsJsonAsync("/api/auth/login", new LoginRequest($"lock_{unique}", "WrongPassword!"));
+        var lockedResponse = await client.PostAsJsonAsync("/api/v1/auth/login", new LoginRequest($"lock_{unique}", "WrongPassword!"));
         Assert.Equal((HttpStatusCode)423, lockedResponse.StatusCode);
     }
 }
