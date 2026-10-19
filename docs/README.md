@@ -2,11 +2,14 @@
 
 ## Responsibility and structure
 
+- [documentation/](documentation/README.md): English and Korean Markdown sources for the website developer manual.
 - [GITFLOW.md](GITFLOW.md): branch model, protection rules, release checklist, and hotfix procedure.
+- [adr/](adr/README.md): architecture decision records — what was decided, why, and what it costs.
 - [OPEN_SOURCE_CHECKLIST.md](OPEN_SOURCE_CHECKLIST.md): verified repository settings and remaining owner actions.
 - `portal.webp`: preview of the public archive portal used by the root README.
 - `workstation.webp`: preview of the CIRCA/OS workstation used by the root README.
-- `lore/`: reserved for original fictional setting documentation.
+- [AUTHOR_GUIDE.md](AUTHOR_GUIDE.md): platform collaboration rules for story authors, protected constraints, character permissions, and continuity adoption; implementation remains pending.
+- [lore/](lore/README.md): original fictional setting, archival voice, and linked reference notes for Incidents and their records.
 
 ## Boundaries and verification
 

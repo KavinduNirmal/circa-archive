@@ -1,3 +1,4 @@
+import { loadDocumentation, loadDocumentUpdatedAt } from "@/components/meta/docs/docs-source";
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { DocsPage } from "@/components/meta/docs/docs-page";
@@ -22,5 +23,7 @@ export async function generateMetadata({ params }: DocsOverviewPageProps): Promi
 export default async function DocsOverviewPage({ params }: DocsOverviewPageProps) {
   const { lang } = await params;
   setRequestLocale(lang);
-  return <DocsPage topic={docTopic("overview")!} />;
+  const topic = docTopic("overview")!;
+  const [documents, updatedAt] = await Promise.all([loadDocumentation(lang), loadDocumentUpdatedAt(topic, lang)]);
+  return <DocsPage topic={topic} documents={documents} locale={lang} updatedAt={updatedAt} />;
 }

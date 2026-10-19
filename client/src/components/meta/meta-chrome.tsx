@@ -21,6 +21,7 @@ export async function MetaChrome({
   const t = await getTranslations({ locale: lang, namespace: "meta" });
 
   const navLabels: MetaNavLabels = {
+    search: t("docsSearchLabel"),
     brand: t("brand"),
     brandTail: "Archive",
     menu: t("navMenu"),

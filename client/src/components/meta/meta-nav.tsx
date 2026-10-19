@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { ArrowUpRight, Menu } from "lucide-react";
+import { ArrowUpRight, Menu, Search } from "lucide-react";
 import Image from "next/image";
 import { Link, usePathname } from "@/i18n/navigation";
 import { LanguageSwitcher } from "../language-switcher";
@@ -24,6 +24,7 @@ export type MetaNavGroup = Readonly<{
 }>;
 
 export type MetaNavLabels = Readonly<{
+  search: string;
   brand: string;
   brandTail: string;
   menu: string;
@@ -54,6 +55,7 @@ type MetaNavProps = Readonly<{
  * navigation itself, not the catalog behind it.
  */
 export function MetaNav({ labels, groups, repositoryUrl }: MetaNavProps) {
+  const searchLink = React.useRef<HTMLAnchorElement>(null);
   const pathname = usePathname() ?? "/meta";
   const [open, setOpen] = React.useState(false);
 
@@ -65,6 +67,16 @@ export function MetaNav({ labels, groups, repositoryUrl }: MetaNavProps) {
     : pathname.startsWith("/site") ? "archive"
     : pathname.startsWith("/desktop") ? "workstation"
     : "home";
+
+  React.useEffect(() => {
+    function openSearch(event: KeyboardEvent) {
+      if (current === "docs" || !(event.ctrlKey || event.metaKey) || event.key.toLowerCase() !== "k") return;
+      event.preventDefault();
+      searchLink.current?.click();
+    }
+    window.addEventListener("keydown", openSearch);
+    return () => window.removeEventListener("keydown", openSearch);
+  }, [current]);
 
   type TopLink = Readonly<{ key: string; label: string; href: string; current: boolean }>;
 
@@ -101,6 +113,11 @@ export function MetaNav({ labels, groups, repositoryUrl }: MetaNavProps) {
     </NavigationMenuItem>
   );
 
+  // Strip documentation dropdown links to important ones only (primary 3 groups),
+  // with secondary groups (such as author guide and world lore) rendered as focused cards.
+  const primaryGroups = groups.length > 3 ? groups.slice(0, 3) : groups;
+  const extraGroups = groups.length > 3 ? groups.slice(3) : [];
+
   return (
     <header className="meta-header">
       <div className="meta-shell meta-header-inner">
@@ -124,7 +141,7 @@ export function MetaNav({ labels, groups, repositoryUrl }: MetaNavProps) {
               <NavigationMenuContent className="meta-nav-panel-wrap">
                 <div className="meta-nav-panel">
                   <div className="meta-nav-panel-groups">
-                    {groups.map((group) => (
+                    {primaryGroups.map((group) => (
                       <div className="meta-nav-panel-group" key={group.label}>
                         <p className="meta-nav-panel-title">{group.label}</p>
                         <ul>
@@ -145,7 +162,45 @@ export function MetaNav({ labels, groups, repositoryUrl }: MetaNavProps) {
                       </div>
                     ))}
                   </div>
+
+                  {extraGroups.length > 0 && (
+                    <div className="meta-nav-panel-extras">
+                      {extraGroups.map((group) => {
+                        const firstItem = group.items[0];
+                        if (!firstItem) return null;
+                        const isMulti = group.items.length > 1;
+                        return (
+                          <NavigationMenuLink key={group.label} asChild>
+                            <Link
+                              className="meta-nav-extra-card"
+                              href={firstItem.href}
+                              aria-current={pathname === firstItem.href ? "page" : undefined}
+                            >
+                              <div className="meta-nav-extra-card-head">
+                                <span className="meta-nav-extra-card-title">{group.label}</span>
+                                {isMulti && (
+                                  <span className="meta-nav-extra-badge">
+                                    {group.items.length} topics
+                                  </span>
+                                )}
+                              </div>
+                              <span className="meta-nav-extra-card-desc">
+                                {firstItem.label}
+                                {isMulti && " · Complete codex & world lore"}
+                              </span>
+                            </Link>
+                          </NavigationMenuLink>
+                        );
+                      })}
+                    </div>
+                  )}
+
                   <div className="meta-nav-panel-foot">
+                    <NavigationMenuLink asChild>
+                      <Link className="meta-nav-panel-overview" href="/meta/documentation">
+                        {labels.docs} →
+                      </Link>
+                    </NavigationMenuLink>
                     <a className="meta-nav-panel-source" href={repositoryUrl} target="_blank" rel="noreferrer">
                       {labels.sourceCta}
                       <ArrowUpRight aria-hidden="true" size={12} />
@@ -160,14 +215,29 @@ export function MetaNav({ labels, groups, repositoryUrl }: MetaNavProps) {
         </NavigationMenu>
 
         <div className="meta-header-tools">
-          <LanguageSwitcher className="meta-language" />
+          <Link
+            ref={searchLink}
+            className="meta-doc-search-trigger"
+            href="/meta/documentation#documentation-search"
+            aria-label={labels.search}
+            title={`${labels.search} (Ctrl / ⌘ K)`}
+          >
+            <Search aria-hidden="true" size={14} />
+            <span className="meta-doc-search-placeholder" aria-hidden="true">
+              {labels.search}
+            </span>
+            <kbd className="meta-doc-search-kbd" aria-hidden="true">
+              ⌘K
+            </kbd>
+          </Link>
+          <LanguageSwitcher className="meta-language" short />
           <Link className="meta-nav-cta" href="/site">
             {labels.archiveCta}
             <ArrowUpRight aria-hidden="true" size={13} />
           </Link>
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger className="meta-menu-button" aria-label={labels.menu}>
-              <Menu aria-hidden="true" size={20} />
+              <Menu aria-hidden="true" size={18} />
             </SheetTrigger>
             <SheetContent
               side="right"
@@ -203,24 +273,40 @@ export function MetaNav({ labels, groups, repositoryUrl }: MetaNavProps) {
 
                 <div className="meta-sheet-group">
                   <p className="meta-sheet-title">{labels.docs}</p>
-                  {groups.map((group) =>
-                    group.items.map((item) => (
-                      <Link
-                        key={item.href}
-                        className="meta-sheet-link"
-                        href={item.href}
-                        onClick={() => setOpen(false)}
-                        aria-current={pathname === item.href ? "page" : undefined}
-                      >
-                        {item.label}
-                      </Link>
-                    )),
-                  )}
+                  {groups.map((group) => {
+                    const isCompact = group.items.length > 4;
+                    const itemsToShow = isCompact ? group.items.slice(0, 3) : group.items;
+                    return (
+                      <div key={group.label} className="meta-sheet-subgroup">
+                        <p className="meta-sheet-title">{group.label}</p>
+                        {itemsToShow.map((item) => (
+                          <Link
+                            key={item.href}
+                            className="meta-sheet-link"
+                            href={item.href}
+                            onClick={() => setOpen(false)}
+                            aria-current={pathname === item.href ? "page" : undefined}
+                          >
+                            {item.label}
+                          </Link>
+                        ))}
+                        {isCompact && (
+                          <Link
+                            className="meta-sheet-link meta-sheet-more-link"
+                            href={group.items[0]?.href ?? "/meta/documentation"}
+                            onClick={() => setOpen(false)}
+                          >
+                            + {group.items.length - itemsToShow.length} more in {group.label} →
+                          </Link>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               </nav>
 
               <div className="meta-sheet-foot">
-                <LanguageSwitcher className="meta-sheet-language" />
+                <LanguageSwitcher className="meta-sheet-language" short />
                 <Link className="meta-button meta-sheet-cta" href="/site" onClick={() => setOpen(false)}>
                   {labels.archiveCta}
                   <ArrowUpRight aria-hidden="true" size={14} />

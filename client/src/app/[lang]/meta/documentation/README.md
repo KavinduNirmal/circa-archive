@@ -14,11 +14,15 @@ The documentation's front door and its topic pages.
 
 This folder resolves routes and metadata; it holds no prose and no layout. The
 topic registry is `components/meta/docs/docs-topics.ts`; the prose is
-`docs-content.tsx`; the copy is the `meta` namespace.
+`docs/documentation/{en,ko}/*.md` fetched from GitHub; UI copy is the `meta` namespace.
 
 ## Usage and verification
 
 `/{lang}/meta/documentation` and `/{lang}/meta/documentation/{getting-started,
 project-structure,records,rendering,routes,contributing,testing,design}`. Covered
-by `tests/meta-pages.test.tsx`. `generateStaticParams` prerenders every topic in
-both languages; check the build route table after adding a topic.
+by `tests/meta-pages.test.tsx`. `generateStaticParams` enumerates topic slugs. The GitHub-backed pages render on
+demand with cached fetches; check the build route table after adding a topic.
+
+`loading.tsx` supplies a localized loading status. Both routes load the registered
+locale documents through `docs-source.ts`; `DocsPage` handles upstream failures
+with retry/source links. See the component README for caching and source settings.

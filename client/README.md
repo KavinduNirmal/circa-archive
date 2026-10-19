@@ -2,7 +2,7 @@
 
 ## Responsibility
 
-Next.js frontend serving a public landing page, a full-page public archive, and the CIRCA/OS workstation in English and Korean. Every page lives under a language segment — `/{lang}`, `/{lang}/site`, `/{lang}/meta`, `/{lang}/meta/about`, `/{lang}/meta/documentation`, and `/{lang}/desktop` — and a bare path is redirected to the reader's language. The landing page is a dense institutional portal: public notices, filing procedures, organization particulars, credential status, and a prominent archive entry. The archive is the reading edition of the same records: search-first, server-rendered, and readable without JavaScript, with record pages, an organizations directory, a guide, notes, and downloadable copies. The project layer outside the fiction describes what the archive is: a landing report, a dossier, and a documentation set. Its copy and metadata remain in the Commission's voice, in whichever language the request resolved to. The workstation answers the arrival with a post screen, then runs shortcut navigation, draggable and resizable destination windows, a Start launcher, taskbar, emblem wallpaper, and a switchable CRT overlay. Every desktop destination opens a real screen over illustrative preview data: Search the archive browser, Inbox the mail client, each folder the file browser, CIRCA Word the Markdown record editor, and a record the record [reader](src/components/reader/README.md). Backend integration remains unimplemented, so every screen reads from its own index rather than a service.
+Next.js frontend serving a public landing page, a full-page public archive, and the CIRCA/OS workstation in English and Korean. Every page lives under a language segment — `/{lang}`, `/{lang}/site`, `/{lang}/meta`, `/{lang}/meta/about`, `/{lang}/meta/documentation`, `/{lang}/desktop`, `/{lang}/desktop/{destination}`, and `/{lang}/desktop/record/{code}` — and a bare path is redirected to the reader's language. The landing page is a dense institutional portal: public notices, filing procedures, organization particulars, credential status, and a prominent archive entry. The archive is the reading edition of the same records: search-first, server-rendered, and readable without JavaScript, with record pages, an organizations directory, a guide, notes, and downloadable copies. The project layer outside the fiction describes what the archive is: a landing report, a dossier, and a documentation set. Its copy and metadata remain in the Commission's voice, in whichever language the request resolved to. The workstation answers the arrival with a post screen, then runs shortcut navigation, draggable and resizable destination windows, a Start launcher, taskbar, emblem wallpaper, and a switchable CRT overlay. Its desktop URLs are workspace positions — a destination or a record can be linked, Back and Forward move focus, and a refresh restores the tab's windows from session storage — while `/{lang}/site/records/{code}` stays the canonical public address. Every desktop destination opens a real screen over illustrative preview data: Search the archive browser, Inbox the mail client, each folder the file browser, CIRCA Word the Markdown record editor, and a record the record [reader](src/components/reader/README.md). Backend integration remains unimplemented, so every screen reads from its own index rather than a service.
 
 ## Structure and boundaries
 
@@ -12,8 +12,8 @@ Next.js frontend serving a public landing page, a full-page public archive, and 
 - `src/components/`: desktop shell, the shared language switcher, the public [site](src/components/site/README.md) and post screen, the public [archive](src/components/archive-site/README.md), the [project surface](src/components/meta/README.md), the archive [browser](src/components/browser/README.md), the [mail client](src/components/mail/README.md), the [file browser](src/components/files/README.md), the record [editor](src/components/word/README.md) and [reader](src/components/reader/README.md), reusable navigation and icons, and shadcn/ui primitives.
 - `src/lib/`: shared class-composition helper and the record [Markdown renderer](src/lib/markdown/README.md) the reader and the `.txt` export share.
 - `src/proxy.ts`: the request-time language decision — path prefix, then cookie, then `Accept-Language`, then English.
-- `tests/`: Vitest interaction and utility tests.
-- `e2e/`: responsive Playwright desktop and language tests.
+- `tests/`: Vitest interaction and utility tests, including the store, the URL mapper, and the URL adapter.
+- `e2e/`: responsive Playwright desktop, deep-link and history, and language tests.
 - `scripts/`: generators that write tracked files, currently the record corpus; see its [README](scripts/README.md).
 - `public/`: supplied emblem wallpaper, the published [record corpus](public/Ghost_story.md), and the Windows 98 shortcut [icon set](public/icons/README.md).
 
@@ -57,3 +57,10 @@ Development serves http://localhost:3001. `bun run start` serves a production bu
 The interface uses steel-blue surfaces, hard corners, and bevels. The supplied image controls desktop composition. The global screen overlay is pointer-transparent and can be disabled using CRT in the taskbar. DM Sans and IBM Plex Mono are bundled locally, plus Libre Baskerville for the archive masthead's wordmark alone; none carries Hangul, so `:lang(ko)` names the Korean faces to fall back to rather than letting each platform choose. Whether to bundle a Korean webfont instead remains an open question.
 
 See [third-party notices](THIRD_PARTY_NOTICES.md) and the root [asset notice](../NOTICE) for copied component and asset licensing. Every new authored folder needs a README.
+
+## Repository documentation
+
+The project manual reads English and Korean Markdown from the public GitHub
+repository with five-minute Next.js caching. See
+[the source guide](../docs/documentation/README.md) for authoring, Git ref
+overrides, publishing, global search, and source actions.

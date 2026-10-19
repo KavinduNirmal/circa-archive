@@ -4,39 +4,19 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { EXTERNAL, PROJECT_LINKS } from "./meta-links";
 import { EditionCards, RECORD_COUNT, SectionBand, SpecimenCard } from "./meta-parts";
-import { CopyCode } from "./docs/copy-code";
-import { DOC_GROUPS, DOC_TOPICS, docHref, docTopic } from "./docs/docs-topics";
+import { docHref } from "./docs/docs-topics";
 
 /**
  * The project's front page: a report, not a sales page.
  *
  * Six sections, in the order a reader needs them: what this is, the two
- * editions, the manual, the machinery, the way in, and the questions. Every
+ * editions, the specifications, the machinery, the way in, and the questions. Every
  * section opens with the same band — folio number, kicker, title, lede — so the
  * page teaches its own rhythm and nothing has to be boxed twice. There is no
  * closing pitch: the record ends, and the footer answers what is left.
  */
 
 const STACK = ["Next.js 16", "React 19", "TypeScript", "Tailwind CSS 4", "next-intl", "remark", "Vitest"];
-
-/** The documentation's contents, numbered once and used as the landing index. */
-const DOC_MANUAL = (() => {
-  const numbered = DOC_TOPICS.map((topic, index) => ({
-    slug: topic.slug,
-    titleKey: topic.navKey,
-    href: docHref(topic.slug),
-    number: String(index + 1).padStart(2, "0"),
-  }));
-
-  return DOC_GROUPS.map((group) => {
-    const items = numbered.filter((item) => docTopic(item.slug)!.group === group.id);
-    return {
-      labelKey: group.labelKey,
-      items,
-      range: `${items[0].number}–${items[items.length - 1].number}`,
-    };
-  });
-})();
 
 const FLOW = [
   { step: "01", title: "flowSource", note: "flowSourceNote" },
@@ -64,9 +44,6 @@ const LANDING_FAQ = [
   ["faqReuseQ", "faqReuseA"],
   ["faqRoadmapQ", "faqRoadmapA"],
 ] as const;
-
-const QUICKSTART = `bun install --frozen-lockfile
-bun run --cwd=client dev`;
 
 export function MetaHome() {
   const t = useTranslations("meta");
@@ -178,7 +155,6 @@ export function MetaHome() {
       </section>
 
       <section className="meta-section meta-docs-section" id="documentation" aria-labelledby="meta-docs-title">
-        <span className="meta-spotlight" aria-hidden="true" />
         <div className="meta-shell">
           <SectionBand
             id="meta-docs-title"
@@ -194,43 +170,45 @@ export function MetaHome() {
             }
           />
 
-          <nav className="meta-manual" aria-label={t("docsContents")}>
-            {DOC_MANUAL.map((group) => (
-              <div className="meta-manual-group" key={group.labelKey}>
-                <p className="meta-manual-group-title">
-                  <span>{t(group.labelKey)}</span>
-                  <span className="meta-manual-range">{group.range}</span>
-                </p>
-                <ol>
-                  {group.items.map((item) => (
-                    <li key={item.href}>
-                      <Link className="meta-manual-link" href={item.href}>
-                        <span className="meta-manual-number">{item.number}</span>
-                        <span className="meta-manual-name">{t(item.titleKey)}</span>
-                      </Link>
-                    </li>
-                  ))}
-                </ol>
+          <div className="meta-docs-pillars">
+            <article className="meta-docs-pillar">
+              <div className="meta-docs-pillar-head">
+                <span className="meta-docs-pillar-folio">01</span>
+                <span className="meta-docs-pillar-tag">System Specs</span>
               </div>
-            ))}
-          </nav>
-
-          <div className="meta-quickstart">
-            <CopyCode
-              code={QUICKSTART}
-              language="sh"
-              label={t("quickstartTitle")}
-              copyLabel={t("docsCopy")}
-              copiedLabel={t("docsCopied")}
-              failedLabel={t("docsCopyFailed")}
-            />
-            <p className="meta-quickstart-foot">
-              <span>{t("quickstartMeta")}</span>
-              <Link className="meta-text-link" href={docHref("getting-started")}>
-                {t("docsStartCard1Link")}
+              <h3 className="meta-docs-pillar-title">{t("docsPillarArchTitle")}</h3>
+              <p className="meta-docs-pillar-body">{t("docsPillarArchBody")}</p>
+              <Link className="meta-docs-pillar-link" href={docHref("architecture")}>
+                <span>{t("docsPillarArchLink")}</span>
                 <ArrowRight aria-hidden="true" size={13} />
               </Link>
-            </p>
+            </article>
+
+            <article className="meta-docs-pillar">
+              <div className="meta-docs-pillar-head">
+                <span className="meta-docs-pillar-folio">02</span>
+                <span className="meta-docs-pillar-tag">Field Guide</span>
+              </div>
+              <h3 className="meta-docs-pillar-title">{t("docsPillarAuthorTitle")}</h3>
+              <p className="meta-docs-pillar-body">{t("docsPillarAuthorBody")}</p>
+              <Link className="meta-docs-pillar-link" href={docHref("author-guide")}>
+                <span>{t("docsPillarAuthorLink")}</span>
+                <ArrowRight aria-hidden="true" size={13} />
+              </Link>
+            </article>
+
+            <article className="meta-docs-pillar">
+              <div className="meta-docs-pillar-head">
+                <span className="meta-docs-pillar-folio">03</span>
+                <span className="meta-docs-pillar-tag">Universe Canon</span>
+              </div>
+              <h3 className="meta-docs-pillar-title">{t("docsPillarLoreTitle")}</h3>
+              <p className="meta-docs-pillar-body">{t("docsPillarLoreBody")}</p>
+              <Link className="meta-docs-pillar-link" href={docHref("lore")}>
+                <span>{t("docsPillarLoreLink")}</span>
+                <ArrowRight aria-hidden="true" size={13} />
+              </Link>
+            </article>
           </div>
         </div>
       </section>

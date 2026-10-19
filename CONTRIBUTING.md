@@ -2,6 +2,12 @@
 
 Contributions to the archive, the workstation, documentation, design, and the draft architecture are welcome. Read the [Code of Conduct](CODE_OF_CONDUCT.md) before participating.
 
+## Writing stories
+
+For Incident and Exploration Record contributions, read the [Author guide](docs/AUTHOR_GUIDE.md). It separates protected Core Rules, challengeable observations, character permissions, independent publication, and continuity adoption. This pre-release framework describes intended platform policy; the current client does not implement these workflows.
+
+Repository changes follow the development process below. Fictional procedures and platform collaboration permissions are documented separately.
+
 ## Before starting
 
 1. Read the [README](README.md), [ARCHITECTURE.md](ARCHITECTURE.md), and the relevant [client documentation](client/README.md).
@@ -87,6 +93,8 @@ Every authored folder needs a `README.md` explaining:
 4. **Usage and verification:** real commands and data flow where relevant.
 
 Generated, dependency, ignored, and Git metadata folders are excluded. `.github` uses `ABOUT.md` instead because GitHub renders `.github/README.md` as the repository README, ahead of the root file. Stage documentation alongside the code it describes; an unstaged README does not satisfy the commit hook.
+
+Architecture decisions are recorded as ADRs in [docs/adr](docs/adr/README.md). Copy the template, take the next number, and write the context, the decision, its consequences, and the alternatives that lost. An accepted ADR is not rewritten; a later ADR supersedes it.
 
 ## Commits and pull requests
 

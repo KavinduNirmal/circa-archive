@@ -17,7 +17,13 @@ import "./language-switcher.css";
  * control sits on the landing page's dark utility bar and in the workstation's
  * taskbar, and neither context should have to style it.
  */
-export function LanguageSwitcher({ className }: { className?: string }) {
+export function LanguageSwitcher({
+  className,
+  short,
+}: {
+  className?: string;
+  short?: boolean;
+}) {
   const active = useLocale();
   /*
    * The router can be absent — a unit test renders this outside the App Router,
@@ -40,7 +46,7 @@ export function LanguageSwitcher({ className }: { className?: string }) {
           data-active={locale === active ? "true" : undefined}
           aria-current={locale === active ? "true" : undefined}
         >
-          {t(locale)}
+          {short ? locale.toUpperCase() : t(locale)}
         </Link>
       ))}
     </nav>

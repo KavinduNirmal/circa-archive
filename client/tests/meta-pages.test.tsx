@@ -1,3 +1,5 @@
+import { documentationHeadings } from "@/components/meta/docs/docs-markdown";
+import { readFileSync } from "node:fs";
 import { screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
@@ -21,6 +23,7 @@ const korean = catalogFor("ko");
 const meta = english.meta;
 
 const navLabels: MetaNavLabels = {
+  search: meta.docsSearchLabel,
   brand: meta.brand,
   brandTail: "Archive",
   menu: meta.navMenu,
@@ -69,12 +72,16 @@ describe("the project landing page", () => {
     expect(within(stats).getByText(meta.statNone)).toBeVisible();
   });
 
-  it("lists every documentation topic in the manual", () => {
+  it("introduces the documentation pillars and links to the full index", () => {
     renderWithIntl(<MetaHome />);
 
-    for (const topic of DOC_TOPICS) {
-      expect(screen.getAllByRole("link", { name: new RegExp(meta[topic.navKey]) }).length).toBeGreaterThan(0);
-    }
+    expect(screen.getByRole("heading", { name: meta.docsPillarArchTitle })).toBeVisible();
+    expect(screen.getByRole("heading", { name: meta.docsPillarAuthorTitle })).toBeVisible();
+    expect(screen.getByRole("heading", { name: meta.docsPillarLoreTitle })).toBeVisible();
+    expect(screen.getByRole("link", { name: new RegExp(meta.docsAllLink) })).toHaveAttribute(
+      "href",
+      "/en/meta/documentation",
+    );
   });
 
   it("shows one record as evidence and links to the full filing", () => {
@@ -110,6 +117,15 @@ describe("the project navigation", () => {
     expect(screen.getByRole("link", { name: new RegExp(meta.navOpenArchive) })).toHaveAttribute("href", "/en/site");
   });
 
+  it("offers documentation search and keeps mobile topics grouped", async () => {
+    const user = userEvent.setup();
+    renderWithIntl(<MetaNav labels={navLabels} groups={navGroups} repositoryUrl="https://github.com/example" />);
+    expect(screen.getByRole("link", { name: /Search all documentation/ })).toHaveAttribute("href", "/en/meta/documentation#documentation-search");
+    await user.click(screen.getByRole("button", { name: meta.navMenu }));
+    const drawer = screen.getByRole("dialog");
+    for (const group of navGroups) expect(within(drawer).getByText(group.label)).toBeVisible();
+  });
+
   it("opens the documentation panel with its grouped topics", async () => {
     const user = userEvent.setup();
     renderWithIntl(<MetaNav labels={navLabels} groups={navGroups} repositoryUrl="https://github.com/example" />);
@@ -118,18 +134,34 @@ describe("the project navigation", () => {
 
     const overview = await screen.findByRole("link", { name: meta.docsOverviewNav });
     expect(overview).toHaveAttribute("href", "/en/meta/documentation");
+
+    // Primary groups are displayed
+    expect(screen.getByText(navGroups[0].label)).toBeVisible();
+    expect(screen.getByText(navGroups[1].label)).toBeVisible();
+    expect(screen.getByText(navGroups[2].label)).toBeVisible();
+
+    // Secondary codices (Author guide & Lore) are shown as featured entry cards
+    expect(screen.getByRole("link", { name: new RegExp(navGroups[3].label) })).toBeVisible();
+    expect(screen.getByRole("link", { name: new RegExp(navGroups[4].label) })).toBeVisible();
+
+    // Detailed lore items are stripped from the dropdown to keep it uncluttered
+    expect(screen.queryByRole("link", { name: meta.docsLoreAnatomyNav })).not.toBeInTheDocument();
   });
 });
 
 describe("the documentation", () => {
   const records = docTopic("records")!;
+  const docLocalPath = (topic: (typeof DOC_TOPICS)[number], locale: string) =>
+    topic.sourceFile ? `../${topic.sourceFile}` : `../docs/documentation/${locale}/${topic.slug}.md`;
+  const documents = (locale = "en") =>
+    DOC_TOPICS.map((topic) => ({ slug: topic.slug, markdown: readFileSync(docLocalPath(topic, locale), "utf8") }));
 
   it("renders the topic, its sections, and its sidebar order", () => {
-    renderWithIntl(<DocsPage topic={records} />);
+    renderWithIntl(<DocsPage topic={records} documents={documents()} locale="en" />);
 
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(meta.docsRecordsTitle);
-    for (const section of records.sections) {
-      expect(screen.getByRole("heading", { level: 2, name: new RegExp(meta[section.titleKey]) })).toBeVisible();
+    for (const section of documentationHeadings(documents().find(entry => entry.slug === "records")!.markdown)) {
+      expect(screen.getByRole("heading", { level: 2, name: section.title })).toBeVisible();
     }
 
     for (const topic of DOC_TOPICS) {
@@ -139,11 +171,11 @@ describe("the documentation", () => {
 
   it("filters the sidebar without leaving the page", async () => {
     const user = userEvent.setup();
-    const { container } = renderWithIntl(<DocsPage topic={records} />);
+    const { container } = renderWithIntl(<DocsPage topic={records} documents={documents()} locale="en" />);
 
     const desktop = container.querySelector(".meta-docs-sidebar-inner") as HTMLElement;
     const input = within(desktop).getByRole("searchbox");
-    await user.type(input, "rendering");
+    await user.type(input, "Rendering pipeline");
 
     expect(within(desktop).queryByRole("link", { name: /Writing a record/ })).toBeNull();
     expect(within(desktop).getByRole("link", { name: /Rendering pipeline/ })).toBeVisible();
@@ -155,7 +187,7 @@ describe("the documentation", () => {
 
   it("moves to the previous and next topic in reading order", () => {
     const { previous, next } = docNeighbours("records");
-    renderWithIntl(<DocsPage topic={records} />);
+    renderWithIntl(<DocsPage topic={records} documents={documents()} locale="en" />);
 
     expect(screen.getByRole("link", { name: new RegExp(meta.docsPrevious) })).toHaveAttribute(
       "href",
@@ -168,18 +200,18 @@ describe("the documentation", () => {
   });
 
   it("labels the copy key and the on-page contents", () => {
-    renderWithIntl(<DocsPage topic={records} />);
+    renderWithIntl(<DocsPage topic={records} documents={documents()} locale="en" />);
 
     expect(screen.getAllByRole("button", { name: new RegExp(meta.docsCopy) }).length).toBeGreaterThan(0);
     expect(screen.getByRole("navigation", { name: meta.docsOnThisPage })).toBeVisible();
   });
 
   it("answers in Korean with translated section headings", () => {
-    renderWithIntl(<DocsPage topic={records} />, { locale: "ko" });
+    renderWithIntl(<DocsPage topic={records} documents={documents("ko")} locale="ko" />, { locale: "ko" });
 
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(korean.meta.docsRecordsTitle);
-    for (const section of records.sections) {
-      expect(screen.getByRole("heading", { level: 2, name: new RegExp(korean.meta[section.titleKey]) })).toBeVisible();
+    for (const section of documentationHeadings(documents("ko").find(entry => entry.slug === "records")!.markdown)) {
+      expect(screen.getByRole("heading", { level: 2, name: section.title })).toBeVisible();
     }
   });
 });
@@ -193,13 +225,18 @@ describe("the documentation index", () => {
     expect(docHref("records")).toBe("/meta/documentation/records");
   });
 
-  it("has a title, a lede, and at least three sections for every topic", () => {
+  it("has a title, a lede, and sections for every topic", () => {
     for (const topic of DOC_TOPICS) {
       expect(meta[topic.titleKey]).toBeTruthy();
       expect(meta[topic.ledeKey]).toBeTruthy();
-      expect(topic.sections.length).toBeGreaterThanOrEqual(3);
-      for (const section of topic.sections) {
-        expect(meta[section.titleKey], `${topic.slug}.${section.id}`).toBeTruthy();
+      if (!topic.sourceFile) {
+        for (const locale of ["en", "ko"]) {
+          const markdown = readFileSync(`../docs/documentation/${locale}/${topic.slug}.md`, "utf8");
+          expect(documentationHeadings(markdown).length).toBeGreaterThanOrEqual(3);
+        }
+      } else {
+        const markdown = readFileSync(`../${topic.sourceFile}`, "utf8");
+        expect(documentationHeadings(markdown).length).toBeGreaterThanOrEqual(1);
       }
     }
   });
