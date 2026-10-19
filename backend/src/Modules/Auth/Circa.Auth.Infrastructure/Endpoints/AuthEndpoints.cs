@@ -379,7 +379,7 @@ public static class AuthEndpoints
     {
         var cookieOptions = new CookieOptions
         {
-            Path = "/api/v1/auth",
+            Path = "/",
             HttpOnly = true,
             SameSite = SameSiteMode.Strict,
             MaxAge = options.SessionLifetime,
@@ -398,7 +398,7 @@ public static class AuthEndpoints
     {
         var cookieOptions = new CookieOptions
         {
-            Path = "/api/v1/auth",
+            Path = "/",
             HttpOnly = true,
             SameSite = SameSiteMode.Strict,
             Secure = options.RequireSecureCookies

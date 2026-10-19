@@ -338,8 +338,8 @@ All endpoints are versioned via the URL path segment (`/api/v{version}/...`). Th
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | POST | `/api/v1/auth/register` | Create account |
-| POST | `/api/v1/auth/login` | Login, returns JWT |
-| POST | `/api/v1/auth/refresh` | Refresh JWT |
+| POST | `/api/v1/auth/login` | Login, sets HttpOnly access and refresh cookies; returns user summary |
+| POST | `/api/v1/auth/refresh` | Rotate refresh cookie and issue access cookie (204) |
 | GET | `/api/v1/auth/me` | Current user profile |
 
 ### 4.2 Records
@@ -856,3 +856,11 @@ This older organization-code scheme is distinct from the newer [Incident classif
 ---
 
 *This document is a living specification. All decisions are subject to revision as the project evolves.*
+
+### Implemented authentication transport (phases 5–6)
+
+Auth routes are under `/api/v1/auth`. Login/register return a user summary and set HttpOnly cookies; no response body contains tokens. Access JWTs last 600 seconds with zero validation clock skew (`SameSite=Lax; Path=/`). Refresh cookies use `SameSite=Strict; Path=/` so page requests reach the Next.js refresh proxy; the server session still expires seven days after sign-in. Production requires Secure cookies. `/me` checks the live session; session deletion checks ownership. Logout revokes the session and clears both cookies.
+
+Unsafe browser requests require an exact allowed Origin when supplied. Limits are 5 login attempts/minute per IP+normalized identifier, 3 registrations/hour per IP, and 30 refreshes/minute per session across rotations. Limits are process-local. Rejections return ProblemDetails with stable codes, including `invalid_credentials`, `locked`, `session_expired`, `refresh_reuse`, and `rate_limit_exceeded`. Auth audit events exclude credentials.
+
+Next's locale proxy refreshes missing/near-expiry access cookies, forwards Set-Cookie, and passes fresh cookies into the current render. Browser API calls use same-origin credentials and single-flight refresh with one retry. Server account helpers forward cookies without caching. `API_ORIGIN` is server-only; development rewrites `/api`, while production requires the shared reverse proxy to route API traffic. These helpers establish authentication transport; sign-in/account UI and archive data integration remain separate work.

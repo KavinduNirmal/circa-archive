@@ -38,3 +38,5 @@
 ## Usage and boundaries
 
 Run `bun run test` or `bun run test:watch` from `client/`. Browser interaction and responsive checks belong in `../e2e/`; repository tooling tests remain separate.
+
+`auth-client.test.ts` covers refresh single-flight, request replay, retry limits, credential endpoints, and destination isolation. `auth-proxy.test.ts` covers refresh scheduling, locale preservation, cookie propagation to the current render and browser, session expiry, and outages. `auth-session.test.ts` covers uncached server cookie forwarding and anonymous/error distinctions.

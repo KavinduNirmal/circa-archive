@@ -146,7 +146,7 @@ public sealed class AccessTokenTests : IClassFixture<PostgresFixture>
         var rtCookieHeader = ExtractRawCookieHeader(regResponse, "circa_rt");
         Assert.NotNull(rtCookieHeader);
         Assert.Contains("httponly", rtCookieHeader, StringComparison.OrdinalIgnoreCase);
-        Assert.Contains("path=/api/v1/auth", rtCookieHeader, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("path=/;", rtCookieHeader, StringComparison.OrdinalIgnoreCase);
         Assert.Contains("samesite=strict", rtCookieHeader, StringComparison.OrdinalIgnoreCase);
     }
 

@@ -41,3 +41,5 @@ Limits are 5 login attempts per minute per connection IP and normalized identifi
 Auth audit events record login success/failure, refresh, reuse, logout, and revocation without passwords or credentials. Restrict audit log access and retention; hash IPs before exporting to long-term storage. Error responses use ProblemDetails with stable `code` fields.
 
 To rotate the single signing key, deploy a new random key on every instance together, revoke active `auth.sessions` through an operational database procedure, and require sign-in again. Replacing the JWT signing key alone invalidates access JWTs but does not revoke opaque refresh sessions. Persist Data Protection keys across host restarts for refresh grace retries.
+
+The Next.js integration uses `Path=/` for the Strict, HttpOnly refresh cookie so it reaches page navigations. The previous auth-only path cannot support proxy refresh. Clear pre-release local auth cookies and sign in again after this change. See the [client transport guide](../client/src/lib/auth/README.md).

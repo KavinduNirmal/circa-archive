@@ -2,6 +2,7 @@
 
 ## Responsibility and structure
 
+- `auth/`: [browser and server authentication transport](auth/README.md), refresh retries, and navigation cookie propagation.
 - `utils.ts`: shadcn's `cn` helper, combining conditional class names and resolving conflicting Tailwind utilities.
 - `markdown/`: the record [Markdown renderer](markdown/README.md) — one parse pipeline shared by the sheet and the exports, with no React and no DOM.
 - `desktop-destinations.ts`: the workstation's destination list, copy lookups, explorer naming, and the file-browser scope set. Server routes and the URL mapper derive from it, so a shortcut and its address cannot drift apart.
@@ -12,6 +13,6 @@
 
 ## Boundaries and verification
 
-Keep framework-independent shared helpers here; component presentation belongs in `../components/` and stateful orchestration in `../stores/`. These modules carry no translated copy and no React; they take a translator when they compose a title. `desktop-types.ts` imports `DesktopIconSpec` as a type only, so no component enters the store's module graph.
+Keep shared helpers here; framework-specific authentication is isolated in `auth/`; component presentation belongs in `../components/` and stateful orchestration in `../stores/`. These modules carry no translated copy and no React; they take a translator when they compose a title. `desktop-types.ts` imports `DesktopIconSpec` as a type only, so no component enters the store's module graph.
 
 Add meaningful tests before changing utility or renderer behavior. Run `bun run test` and `bun run typecheck` from the client root; `tests/workstation-store.test.ts` covers the trail operations through the store's public actions, and `tests/desktop-route.test.ts` holds every destination and archive code to a path round-trip.

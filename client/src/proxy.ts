@@ -1,3 +1,5 @@
+import type { NextRequest } from "next/server";
+import { refreshNavigation } from "./lib/auth/navigation";
 import createMiddleware from "next-intl/middleware";
 import { routing } from "./i18n/routing";
 
@@ -15,7 +17,12 @@ import { routing } from "./i18n/routing";
  * convention from `middleware.ts` to `proxy.ts`, and the middleware export to
  * `proxy`. The default export below is that function.
  */
-export default createMiddleware(routing);
+const resolveLocale = createMiddleware(routing);
+
+export default async function proxy(request: NextRequest) {
+  const response = resolveLocale(request);
+  return refreshNavigation(request, response);
+}
 
 export const config = {
   /**
