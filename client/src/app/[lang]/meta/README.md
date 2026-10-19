@@ -35,9 +35,10 @@ The archive links here only through labelled buttons. All copy lives in the
 `meta` namespace; the docs topics and their section keys live in
 `components/meta/docs/docs-topics.ts`, and their bodies in `docs-content.tsx`.
 
-The pages assert no capability the project does not have. There is no backend,
-so notes and drafts are described as living in the browser tab; there is no mail
-service, so the contact doors are repository issues.
+The pages assert no capability the project does not have. While the backend
+solution is scaffolded, frontend integration is pending, so notes and drafts are
+described as living in the browser tab; there is no mail service, so the contact
+doors are repository issues.
 
 ## Usage and verification
 

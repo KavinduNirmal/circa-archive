@@ -19,6 +19,7 @@ against, so a key is added there first.
 
 | Namespace | Owner |
 | --- | --- |
+| `auth` | sign-up, sign-in, personal access, session links, and authentication errors |
 | `metadata` | page titles, descriptions, and the registry's own names |
 | `switcher` | the language control, including each language's endonym |
 | `boot` | the workstation post screen |

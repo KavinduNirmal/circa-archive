@@ -6,6 +6,7 @@
 - [GITFLOW.md](GITFLOW.md): branch model, protection rules, release checklist, and hotfix procedure.
 - [adr/](adr/README.md): architecture decision records — what was decided, why, and what it costs.
 - [OPEN_SOURCE_CHECKLIST.md](OPEN_SOURCE_CHECKLIST.md): verified repository settings and remaining owner actions.
+- `auth-sign-in-desktop.png` and `auth-sign-up-mobile-ko.png`: reviewed English desktop and Korean mobile previews of the personal access forms, captured by the auth browser suite with an isolated test API.
 - `portal.webp`: preview of the public archive portal used by the root README.
 - `workstation.webp`: preview of the CIRCA/OS workstation used by the root README.
 - [AUTHOR_GUIDE.md](AUTHOR_GUIDE.md): platform collaboration rules for story authors, protected constraints, character permissions, and continuity adoption; implementation remains pending.

@@ -19,3 +19,5 @@ Run integration tests:
 ```sh
 dotnet test tests/Circa.Api.IntegrationTests
 ```
+
+`HardeningTests` covers rate-limit boundaries, stable refresh partitions, CSRF origins, credential-free audit logs, security headers, error codes, and session ownership. `ApiFactory.Overrides` adjusts limits for isolated tests (the lockout test allows enough attempts to exercise Identity independently).

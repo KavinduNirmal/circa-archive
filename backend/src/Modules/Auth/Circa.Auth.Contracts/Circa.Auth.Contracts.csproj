@@ -4,4 +4,8 @@
     <ProjectReference Include="..\..\..\Common\Circa.Common.Application\Circa.Common.Application.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
 </Project>

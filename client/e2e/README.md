@@ -19,3 +19,9 @@ From `client/`, install Chromium with `bunx playwright install chromium`, then r
 The suite passes 27/27 against a production build. The CI browser job builds the client and starts `next start`, because a fresh development server hydrates the workstation too slowly for the boot handover window these specs allow; the production build is both representative and stable in that window.
 
 Boot timing is worth knowing: `WorkstationBoot` schedules its handover from a line count rather than from the translated lines, because the translator is a new value on every render and depending on it restarted the schedule at each reveal, holding the operator at the post screen for twice the intended time. That regression is invisible to the unit suite, which drives fake timers, and is caught only by running the browser suite.
+
+## Authentication integration
+
+`auth.spec.ts` runs separately with `bun run test:e2e:auth` using `playwright.auth.config.ts`. It uses the real API and an isolated Testcontainers PostgreSQL database; Docker, .NET 10, and Chromium are required. It verifies cookie-based browser login, account lookup after reload, HttpOnly privacy, navigation refresh after access-cookie expiry, and logout denying the next write. It starts Next on port 3101 with a separate build directory and does not reuse an existing server. The regular frontend-only suite excludes this spec.
+
+The auth suite now uses the actual sign-up and sign-in forms in English and Korean. It covers account details, the portal/archive access links, the moved project link, redirects, reload/expiry, credential privacy, logout success/failure, error feedback, keyboard submission, and invalid fields. It captures access pages at 390px and 1440px in `/tmp/circa-auth-*.png`. It runs one browser worker and bounds Next/.NET concurrency; run it separately from builds and unit suites on low-resource machines.

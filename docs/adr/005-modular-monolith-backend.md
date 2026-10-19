@@ -1,6 +1,6 @@
 # 005: The backend is a .NET modular monolith
 
-- **Status:** Accepted — implementation pending
+- **Status:** Accepted — scaffolded, implementation pending
 - **Date:** 2026-10-18
 - **Deciders:** Maintainers
 - **Supersedes:** —
@@ -12,7 +12,7 @@ The archive's domain has clear seams: records, incidents, organizations, dossier
 
 At the same time the domain must not become a single layer where every table can reach every other table. Tombstoned records, vote uniqueness, and author-only visibility are the kind of rules that erode when modules can join across each other's data. The first module to be built is authentication and authorization ([ADR 006](006-session-tokens-in-http-only-cookies.md)), which every later module must consume without depending on its internals.
 
-[`ARCHITECTURE.md`](../../ARCHITECTURE.md) already selects .NET 10 Minimal APIs, EF Core, PostgreSQL, and SignalR, and [`backend/README.md`](../../backend/README.md) reserves the folder. Nothing has been implemented.
+[`ARCHITECTURE.md`](../../ARCHITECTURE.md) selects .NET 10 Minimal APIs, EF Core, PostgreSQL, and SignalR. The backend solution structure, Docker configuration, and Auth module skeleton are scaffolded under [`backend/`](../../backend/README.md); domain behavior implementation and client integration are in progress.
 
 ## Decision
 

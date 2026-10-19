@@ -16,7 +16,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
-    "sync:corpus": "bun scripts/sync-corpus.ts"
+    "sync:corpus": "bun scripts/sync-corpus.ts",
+    "test:e2e:auth": "playwright test --config playwright.auth.config.ts"
   },
   "dependencies": {
     "@fontsource/dm-sans": "5.3.0",
@@ -37,6 +38,7 @@
     "react-rnd": "10.5.3",
     "remark-frontmatter": "5.0.0",
     "remark-gfm": "4.0.1",
+    "server-only": "0.0.1",
     "tailwind-merge": "3.7.0",
     "unist-util-visit": "5.1.0",
     "vfile": "6.0.3",

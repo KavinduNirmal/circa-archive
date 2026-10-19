@@ -14,6 +14,7 @@
 - `files/`: the CIRCA Explorer file browser behind every folder destination; see its [README](files/README.md).
 - `word/`: the Markdown record editor behind CIRCA Word; see its [README](word/README.md).
 - `reader/`: the record reader that opens when a record is opened; see its [README](reader/README.md).
+- `auth/`: [sign-up, sign-in, personal access, and session-aware navigation](auth/README.md).
 - `site/`: the diegetic public agency portal and the workstation post screen; see its [README](site/README.md).
 - `ui/`: shadcn/ui primitives with CIRCA styling, including the in-world [message box](ui/message-box.tsx) both applications share.
 

@@ -9,7 +9,7 @@ The repository is a small monorepo with one built surface and two reserved ones.
 ```text
 circa/
 ├── client/           the Next.js interface
-├── backend/          reserved for .NET services
+├── backend/          scaffolded .NET 10 modular monolith services
 ├── admin/            reserved for administration
 ├── docs/             planning and the open-source checklist
 ├── scripts/          repository checks

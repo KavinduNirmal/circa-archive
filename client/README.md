@@ -2,7 +2,7 @@
 
 ## Responsibility
 
-Next.js frontend serving a public landing page, a full-page public archive, and the CIRCA/OS workstation in English and Korean. Every page lives under a language segment — `/{lang}`, `/{lang}/site`, `/{lang}/meta`, `/{lang}/meta/about`, `/{lang}/meta/documentation`, `/{lang}/desktop`, `/{lang}/desktop/{destination}`, and `/{lang}/desktop/record/{code}` — and a bare path is redirected to the reader's language. The landing page is a dense institutional portal: public notices, filing procedures, organization particulars, credential status, and a prominent archive entry. The archive is the reading edition of the same records: search-first, server-rendered, and readable without JavaScript, with record pages, an organizations directory, a guide, notes, and downloadable copies. The project layer outside the fiction describes what the archive is: a landing report, a dossier, and a documentation set. Its copy and metadata remain in the Commission's voice, in whichever language the request resolved to. The workstation answers the arrival with a post screen, then runs shortcut navigation, draggable and resizable destination windows, a Start launcher, taskbar, emblem wallpaper, and a switchable CRT overlay. Its desktop URLs are workspace positions — a destination or a record can be linked, Back and Forward move focus, and a refresh restores the tab's windows from session storage — while `/{lang}/site/records/{code}` stays the canonical public address. Every desktop destination opens a real screen over illustrative preview data: Search the archive browser, Inbox the mail client, each folder the file browser, CIRCA Word the Markdown record editor, and a record the record [reader](src/components/reader/README.md). Backend integration remains unimplemented, so every screen reads from its own index rather than a service.
+Next.js frontend serving a public landing page, a full-page public archive, and the CIRCA/OS workstation in English and Korean. Every page lives under a language segment — `/{lang}`, `/{lang}/site`, `/{lang}/meta`, `/{lang}/meta/about`, `/{lang}/meta/documentation`, `/{lang}/desktop`, `/{lang}/desktop/{destination}`, and `/{lang}/desktop/record/{code}` — and a bare path is redirected to the reader's language. The landing page is a dense institutional portal: public notices, filing procedures, organization particulars, credential status, and a prominent archive entry. The archive is the reading edition of the same records: search-first, server-rendered, and readable without JavaScript, with record pages, an organizations directory, a guide, notes, and downloadable copies. The project layer outside the fiction describes what the archive is: a landing report, a dossier, and a documentation set. Its copy and metadata remain in the Commission's voice, in whichever language the request resolved to. The workstation answers the arrival with a post screen, then runs shortcut navigation, draggable and resizable destination windows, a Start launcher, taskbar, emblem wallpaper, and a switchable CRT overlay. Its desktop URLs are workspace positions — a destination or a record can be linked, Back and Forward move focus, and a refresh restores the tab's windows from session storage — while `/{lang}/site/records/{code}` stays the canonical public address. Every desktop destination opens a real screen over illustrative preview data: Search the archive browser, Inbox the mail client, each folder the file browser, CIRCA Word the Markdown record editor, and a record the record [reader](src/components/reader/README.md). The authentication backend lives under `../backend/`; sign-up, sign-in, and personal access are integrated with the cookie API, while archive/workstation records continue to read local fixtures. See the [auth transport guide](src/lib/auth/README.md) for configuration and browser verification.
 
 ## Structure and boundaries
 
@@ -10,6 +10,7 @@ Next.js frontend serving a public landing page, a full-page public archive, and 
 - `src/i18n/`: locale routing, catalog loading, and locale-aware navigation; see its [README](src/i18n/README.md).
 - `messages/`: one catalog per language; see its [README](messages/README.md).
 - `src/components/`: desktop shell, the shared language switcher, the public [site](src/components/site/README.md) and post screen, the public [archive](src/components/archive-site/README.md), the [project surface](src/components/meta/README.md), the archive [browser](src/components/browser/README.md), the [mail client](src/components/mail/README.md), the [file browser](src/components/files/README.md), the record [editor](src/components/word/README.md) and [reader](src/components/reader/README.md), reusable navigation and icons, and shadcn/ui primitives.
+- `src/components/auth/`: the [minimal archive-themed access pages](src/components/auth/README.md) and server-verified portal/archive navigation.
 - `src/lib/`: shared class-composition helper, the record [Markdown renderer](src/lib/markdown/README.md) the reader and the `.txt` export share, and the workstation's pure destination, window, and trail contracts.
 - `src/stores/`: the workstation [store](src/stores/README.md) and its provider — open windows, focus, geometry, the reader trail, and the CRT preference.
 - `src/proxy.ts`: the request-time language decision — path prefix, then cookie, then `Accept-Language`, then English.
@@ -44,6 +45,7 @@ bun run typecheck
 bun run test
 bun run build
 bun run test:e2e
+bun run test:e2e:auth
 bun run sync:corpus
 ```
 
@@ -65,3 +67,7 @@ The project manual reads English and Korean Markdown from the public GitHub
 repository with five-minute Next.js caching. See
 [the source guide](../docs/documentation/README.md) for authoring, Git ref
 overrides, publishing, global search, and source actions.
+
+## Low-resource verification
+
+Run checks sequentially. Unit tests accept `bun run test -- --maxWorkers=1` or a selected file list. For a production build with one page worker, use `CIRCA_LOW_RESOURCE=1 RAYON_NUM_THREADS=1 bun run build`. The auth browser suite already limits worker concurrency; do not run it alongside a production build on a constrained machine.

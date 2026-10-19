@@ -1,7 +1,9 @@
 import { NextRequest } from "next/server";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import proxy from "@/proxy";
 import { routing } from "@/i18n/routing";
+
+vi.mock("server-only", () => ({}));
 
 /**
  * The proxy is the only place a reader's language is chosen, so these tests hold
@@ -24,51 +26,51 @@ describe("locale routing", () => {
     expect(routing.defaultLocale).toBe("en");
   });
 
-  it("redirects a bare path to the browser's preferred language", () => {
-    const response = proxy(requestFor("/", { acceptLanguage: "ko-KR,ko;q=0.9,en;q=0.8" }));
+  it("redirects a bare path to the browser's preferred language", async () => {
+    const response = await proxy(requestFor("/", { acceptLanguage: "ko-KR,ko;q=0.9,en;q=0.8" }));
     expect(response.status).toBe(307);
     expect(response.headers.get("location")).toMatch(/\/ko$/);
   });
 
-  it("keeps an English reader on English", () => {
-    const response = proxy(requestFor("/", { acceptLanguage: "en-GB,en;q=0.9" }));
+  it("keeps an English reader on English", async () => {
+    const response = await proxy(requestFor("/", { acceptLanguage: "en-GB,en;q=0.9" }));
     expect(response.headers.get("location")).toMatch(/\/en$/);
   });
 
-  it("prefers a remembered choice over the browser's language", () => {
-    const response = proxy(requestFor("/", { acceptLanguage: "en-GB,en;q=0.9", cookie: "NEXT_LOCALE=ko" }));
+  it("prefers a remembered choice over the browser's language", async () => {
+    const response = await proxy(requestFor("/", { acceptLanguage: "en-GB,en;q=0.9", cookie: "NEXT_LOCALE=ko" }));
     expect(response.headers.get("location")).toMatch(/\/ko$/);
   });
 
-  it("carries the bare path through the redirect, so the destination survives", () => {
-    const response = proxy(requestFor("/desktop", { acceptLanguage: "ko-KR,ko;q=0.9" }));
+  it("carries the bare path through the redirect, so the destination survives", async () => {
+    const response = await proxy(requestFor("/desktop", { acceptLanguage: "ko-KR,ko;q=0.9" }));
     expect(response.headers.get("location")).toMatch(/\/ko\/desktop$/);
   });
 
-  it("leaves an already-prefixed path alone", () => {
-    const response = proxy(requestFor("/ko/desktop", { acceptLanguage: "en-GB,en;q=0.9" }));
+  it("leaves an already-prefixed path alone", async () => {
+    const response = await proxy(requestFor("/ko/desktop", { acceptLanguage: "en-GB,en;q=0.9" }));
     expect(response.status).toBe(200);
     expect(response.headers.get("location")).toBeNull();
   });
 
-  it("holds an explicit prefix against a disagreeing cookie, because the URL is the last word", () => {
-    const response = proxy(requestFor("/ko/desktop", { cookie: "NEXT_LOCALE=en" }));
+  it("holds an explicit prefix against a disagreeing cookie, because the URL is the last word", async () => {
+    const response = await proxy(requestFor("/ko/desktop", { cookie: "NEXT_LOCALE=en" }));
     expect(response.headers.get("location")).toBeNull();
   });
 
-  it("falls back to English for an unsupported language", () => {
-    const response = proxy(requestFor("/", { acceptLanguage: "fr-FR,fr;q=0.9" }));
+  it("falls back to English for an unsupported language", async () => {
+    const response = await proxy(requestFor("/", { acceptLanguage: "fr-FR,fr;q=0.9" }));
     expect(response.headers.get("location")).toMatch(/\/en$/);
   });
 
-  it("follows the browser's stated weighting, not the order languages are listed in", () => {
+  it("follows the browser's stated weighting, not the order languages are listed in", async () => {
     // Korean is mentioned second but weighted higher, and the weighting is the request.
-    const response = proxy(requestFor("/", { acceptLanguage: "en-GB;q=0.4,ko;q=0.9" }));
+    const response = await proxy(requestFor("/", { acceptLanguage: "en-GB;q=0.4,ko;q=0.9" }));
     expect(response.headers.get("location")).toMatch(/\/ko$/);
   });
 
-  it("answers a prefixed request without redirecting, whatever the cookie says", () => {
-    const response = proxy(requestFor("/en", { acceptLanguage: "ko-KR", cookie: "NEXT_LOCALE=ko" }));
+  it("answers a prefixed request without redirecting, whatever the cookie says", async () => {
+    const response = await proxy(requestFor("/en", { acceptLanguage: "ko-KR", cookie: "NEXT_LOCALE=ko" }));
     expect(response.headers.get("location")).toBeNull();
   });
 });

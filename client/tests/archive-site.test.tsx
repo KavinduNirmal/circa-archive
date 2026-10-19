@@ -1,6 +1,6 @@
 import { screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { ArchiveHome } from "@/components/archive-site/archive-home";
 import { ArchiveAbout } from "@/components/archive-site/archive-about";
 import { ArchiveExplorations } from "@/components/archive-site/archive-explorations";
@@ -23,6 +23,12 @@ import { catalogFor, renderWithIntl, translatorFor } from "./intl";
  * is assembled here. The copy is the shipped catalog, so a test asserts the
  * sentence a reader sees rather than the key that produced it.
  */
+
+vi.mock("@/components/auth/session-access-link", async () => {
+  const { AccessLink } = await import("@/components/auth/access-link");
+  return { SessionAccessLink: (props: { variant?: "archive" | "portal"; className?: string }) =>
+    <AccessLink {...props} state={{ status: "guest" }} /> };
+});
 
 const english = catalogFor("en");
 const korean = catalogFor("ko");
@@ -48,7 +54,9 @@ describe("the archive home", () => {
     ] as const) {
       expect(within(nav).getByRole("link", { name })).toHaveAttribute("href", href);
     }
-    // The project page is reachable from the masthead and says that it is the project page.
+    expect(within(nav).getByRole("link", { name: site.navAbout }).nextElementSibling).toHaveTextContent(site.aboutSite);
+    expect(screen.getByRole("link", { name: "Sign in" })).toHaveAttribute("href", "/en/sign-in");
+    // The project page remains reachable from the section bar.
     expect(screen.getAllByRole("link", { name: site.aboutSite })[0]).toHaveAttribute("href", "/en/meta");
   });
 
@@ -339,7 +347,7 @@ describe("every link on the plain site", () => {
         }
         const url = new URL(href, "https://archive.invalid");
         expect(url.pathname, href).toMatch(
-          /^\/(en|ko)(\/site(\/records(\/[A-Z0-9/-]+)?(\/download)?|\/organizations|\/about|\/random)?|\/meta(\/about)?|\/desktop)?$/,
+          /^\/(en|ko)(\/site(\/records(\/[A-Z0-9/-]+)?(\/download)?|\/organizations|\/about|\/random)?|\/meta(\/about)?|\/desktop|\/sign-in|\/account)?$/,
         );
         // A query is a filter, and only the index and the directory take one.
         for (const key of url.searchParams.keys()) {

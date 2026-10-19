@@ -2,6 +2,7 @@ import { useTranslations } from "next-intl";
 import Image from "next/image";
 import { Link } from "@/i18n/navigation";
 import { LanguageSwitcher } from "../language-switcher";
+import { SessionAccessLink } from "../auth/session-access-link";
 import { Attendance, PortalSigns, RegisterRefresh, UnavailableLink } from "./portal-signs";
 import styles from "./landing-page.module.css";
 
@@ -91,7 +92,7 @@ export function LandingPage() {
           <a href="#documents">{t("navDocuments")}</a>
           <a href="#contacts">{t("navContacts")}</a>
           <a href="#notices">{t("navNotices")}</a>
-          <a className={styles.topnavAccess} href="#credentials">{t("navCredentials")} <span aria-hidden="true">»</span></a>
+          <SessionAccessLink variant="portal" className={styles.topnavAccess} />
         </nav>
 
         <div className={styles.crumbs}>
@@ -251,7 +252,7 @@ export function LandingPage() {
 
             <Procedure id="credentials" number="04" title={t("credentials")}>
               <p>{t("credentialsBody")}</p>
-              <Link href="/desktop" className={styles.textLink}>{t("credentialsContinue")} »</Link>
+              <Link href="/sign-up" className={styles.textLink}>{t("credentialsContinue")} »</Link>
               <p className={styles.small}>{t("credentialsSmall")}</p>
             </Procedure>
 
