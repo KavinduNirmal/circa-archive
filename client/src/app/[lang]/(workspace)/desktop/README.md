@@ -27,9 +27,34 @@ The home route is now the public landing page, so the workstation is reached rat
 
 The fiction needs one door out, since the landing page is how everyone arrives. The Start launcher's last row is **Public archive site**, a real link to the landing page in the reader's language, labelled with the archive's book mark and left outside the application list so it does not read as another destination.
 
+## Deep links and history
+
+The workstation is addressable without giving up the desktop as the thing that arranges itself:
+
+```text
+/{lang}/desktop                     the workstation, nothing focused
+/{lang}/desktop/{destination}       one of the rail shortcuts, or System
+/{lang}/desktop/record/{code}       the reader on an archive code
+```
+
+A continuity code contains a slash, so its address is one percent-encoded segment: `/desktop/record/ORG-C-005102%2FC1`. `src/lib/desktop-route.ts` owns both directions of the mapping, and `tests/desktop-route.test.ts` round-trips every destination and every released code.
+
+The history policy has one writer. `DesktopUrlSync` ([notes](../../../../components/README.md)) reads the pathname, adopts it into the store, and writes the store's focus back:
+
+- Opening a destination or a record pushes a new entry.
+- Taskbar focus, minimize, close, and the reader's own Back/Forward replace the current entry.
+- A deep link, browser Back, and browser Forward only adopt the address; they write nothing.
+- Closing the focused window replaces the address with the surviving window, or `/desktop` when none is left.
+
+Two races are named in the code because they are not obvious. A write is applied asynchronously, so the adapter must not read its own unwritten address back as a navigation; and a window closed before its push lands must not be resurrected when the address arrives. Both are covered in `tests/desktop-url.test.tsx`.
+
+An unknown destination or code is a 404, matching the public record route, and every route here is `noindex, nofollow`. The canonical, indexable address for a record remains `/{lang}/site/records/{code}`.
+
+A refresh restores the workspace from the tab's `sessionStorage` ([store notes](../../../../stores/README.md)); the URL's window takes focus. Deferred deliberately: folder paths, browser search state, mail selection, and editor drafts are not URLs, and windows do not survive a visit to the public archive.
+
 ## Verification
 
-Run `bun run test`, `bun run lint`, `bun run typecheck`, and `bun run test:e2e` from `client/`.
+Run `bun run test`, `bun run lint`, `bun run typecheck`, and `bun run test:e2e` from `client/`. The browser suite covers the deep-link matrix in `e2e/desktop-deeplink.spec.ts`.
 
 ## Visual contract
 
