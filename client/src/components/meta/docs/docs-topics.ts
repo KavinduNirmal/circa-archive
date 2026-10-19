@@ -1,21 +1,46 @@
-/**
- * The documentation's shape: groups, topics, and the section anchors that appear
- * in each page's table of contents.
- *
- * This module holds identifiers and message keys, never prose. The copy lives in
- * the `meta` catalog in both languages, which is what keeps a page and its
- * translation from drifting apart. The topic order here is also the reading
- * order: the sidebar, the previous/next pager, and `generateStaticParams` all
- * read it from this one list.
- */
+/** Localized navigation and reading order. Article content and headings live in GitHub Markdown. */
 
 export const DOC_GROUPS = [
   { id: "start", labelKey: "docsGroupStart", slugs: ["overview", "getting-started", "project-structure"] },
   { id: "archive", labelKey: "docsGroupArchive", slugs: ["records", "rendering", "routes"] },
   { id: "project", labelKey: "docsGroupProject", slugs: ["contributing", "testing", "design"] },
+  { id: "author", labelKey: "docsGroupAuthor", slugs: ["author-guide"] },
+  {
+    id: "lore",
+    labelKey: "docsGroupLore",
+    slugs: [
+      "lore",
+      "lore-anatomy",
+      "lore-rules",
+      "lore-narrative-flow",
+      "lore-nested-incidents",
+      "lore-circa",
+      "lore-anomalies",
+      "lore-phenomena",
+      "lore-independent-entities",
+      "lore-classifications",
+      "lore-anchors",
+      "lore-entry",
+      "lore-time",
+      "lore-participation",
+      "lore-outcomes",
+      "lore-archive-index",
+      "lore-explorations",
+      "lore-civilians",
+      "lore-anonymity",
+      "lore-recoveries",
+      "lore-corruption",
+      "lore-narrative-assimilation",
+      "lore-witness-sheets",
+      "lore-witness-pen",
+      "lore-lasting-bamboo",
+      "lore-recollection-projector",
+      "lore-records",
+      "lore-organizations",
+      "lore-continuities",
+    ],
+  },
 ] as const;
-
-export type DocSection = Readonly<{ id: string; titleKey: string }>;
 
 export type DocTopic = Readonly<{
   slug: string;
@@ -24,11 +49,8 @@ export type DocTopic = Readonly<{
   navKey: string;
   titleKey: string;
   ledeKey: string;
-  sections: readonly DocSection[];
+  sourceFile?: string;
 }>;
-
-const sections = (...entries: readonly [string, string][]): DocSection[] =>
-  entries.map(([id, titleKey]) => ({ id, titleKey }));
 
 export const DOC_TOPICS: readonly DocTopic[] = [
   {
@@ -37,12 +59,6 @@ export const DOC_TOPICS: readonly DocTopic[] = [
     navKey: "docsOverviewNav",
     titleKey: "docsOverviewTitle",
     ledeKey: "docsOverviewLede",
-    sections: sections(
-      ["what", "docsOverviewWhatTitle"],
-      ["editions", "docsOverviewEditionsTitle"],
-      ["status", "docsOverviewStatusTitle"],
-      ["reading", "docsOverviewReadingTitle"],
-    ),
   },
   {
     slug: "getting-started",
@@ -50,13 +66,6 @@ export const DOC_TOPICS: readonly DocTopic[] = [
     navKey: "docsGettingStartedNav",
     titleKey: "docsGettingStartedTitle",
     ledeKey: "docsGettingStartedLede",
-    sections: sections(
-      ["requirements", "docsGettingStartedRequirementsTitle"],
-      ["install", "docsGettingStartedInstallTitle"],
-      ["run", "docsGettingStartedRunTitle"],
-      ["verify", "docsGettingStartedVerifyTitle"],
-      ["trouble", "docsGettingStartedTroubleTitle"],
-    ),
   },
   {
     slug: "project-structure",
@@ -64,12 +73,6 @@ export const DOC_TOPICS: readonly DocTopic[] = [
     navKey: "docsStructureNav",
     titleKey: "docsStructureTitle",
     ledeKey: "docsStructureLede",
-    sections: sections(
-      ["tree", "docsStructureTreeTitle"],
-      ["client", "docsStructureClientTitle"],
-      ["content", "docsStructureContentTitle"],
-      ["readme", "docsStructureReadmeTitle"],
-    ),
   },
   {
     slug: "records",
@@ -77,13 +80,6 @@ export const DOC_TOPICS: readonly DocTopic[] = [
     navKey: "docsRecordsNav",
     titleKey: "docsRecordsTitle",
     ledeKey: "docsRecordsLede",
-    sections: sections(
-      ["anatomy", "docsRecordsAnatomyTitle"],
-      ["frontmatter", "docsRecordsFrontmatterTitle"],
-      ["sections", "docsRecordsSectionsTitle"],
-      ["syntax", "docsRecordsSyntaxTitle"],
-      ["where", "docsRecordsWhereTitle"],
-    ),
   },
   {
     slug: "rendering",
@@ -91,13 +87,6 @@ export const DOC_TOPICS: readonly DocTopic[] = [
     navKey: "docsRenderingNav",
     titleKey: "docsRenderingTitle",
     ledeKey: "docsRenderingLede",
-    sections: sections(
-      ["pipeline", "docsRenderingPipelineTitle"],
-      ["plugins", "docsRenderingPluginsTitle"],
-      ["warnings", "docsRenderingWarningsTitle"],
-      ["exports", "docsRenderingExportsTitle"],
-      ["boundaries", "docsRenderingBoundariesTitle"],
-    ),
   },
   {
     slug: "routes",
@@ -105,12 +94,6 @@ export const DOC_TOPICS: readonly DocTopic[] = [
     navKey: "docsRoutesNav",
     titleKey: "docsRoutesTitle",
     ledeKey: "docsRoutesLede",
-    sections: sections(
-      ["map", "docsRoutesMapTitle"],
-      ["language", "docsRoutesLanguageTitle"],
-      ["editions", "docsRoutesEditionsTitle"],
-      ["adding", "docsRoutesAddingTitle"],
-    ),
   },
   {
     slug: "contributing",
@@ -118,13 +101,6 @@ export const DOC_TOPICS: readonly DocTopic[] = [
     navKey: "docsContributingNav",
     titleKey: "docsContributingTitle",
     ledeKey: "docsContributingLede",
-    sections: sections(
-      ["before", "docsContributingBeforeTitle"],
-      ["branch", "docsContributingBranchTitle"],
-      ["checks", "docsContributingChecksTitle"],
-      ["docs", "docsContributingDocsTitle"],
-      ["pull", "docsContributingPullTitle"],
-    ),
   },
   {
     slug: "testing",
@@ -132,13 +108,6 @@ export const DOC_TOPICS: readonly DocTopic[] = [
     navKey: "docsTestingNav",
     titleKey: "docsTestingTitle",
     ledeKey: "docsTestingLede",
-    sections: sections(
-      ["rhythm", "docsTestingRhythmTitle"],
-      ["unit", "docsTestingUnitTitle"],
-      ["catalog", "docsTestingCatalogTitle"],
-      ["e2e", "docsTestingE2eTitle"],
-      ["coverage", "docsTestingCoverageTitle"],
-    ),
   },
   {
     slug: "design",
@@ -146,13 +115,246 @@ export const DOC_TOPICS: readonly DocTopic[] = [
     navKey: "docsDesignNav",
     titleKey: "docsDesignTitle",
     ledeKey: "docsDesignLede",
-    sections: sections(
-      ["systems", "docsDesignSystemsTitle"],
-      ["tokens", "docsDesignTokensTitle"],
-      ["patterns", "docsDesignPatternsTitle"],
-      ["access", "docsDesignAccessTitle"],
-      ["adding", "docsDesignAddingTitle"],
-    ),
+  },
+  {
+    slug: "author-guide",
+    group: "author",
+    navKey: "docsAuthorGuideNav",
+    titleKey: "docsAuthorGuideTitle",
+    ledeKey: "docsAuthorGuideLede",
+    sourceFile: "docs/AUTHOR_GUIDE.md",
+  },
+  {
+    slug: "lore",
+    group: "lore",
+    navKey: "docsLoreNav",
+    titleKey: "docsLoreTitle",
+    ledeKey: "docsLoreLede",
+    sourceFile: "docs/lore/README.md",
+  },
+  {
+    slug: "lore-anatomy",
+    group: "lore",
+    navKey: "docsLoreAnatomyNav",
+    titleKey: "docsLoreAnatomyTitle",
+    ledeKey: "docsLoreAnatomyLede",
+    sourceFile: "docs/lore/Anatomy.md",
+  },
+  {
+    slug: "lore-rules",
+    group: "lore",
+    navKey: "docsLoreRulesNav",
+    titleKey: "docsLoreRulesTitle",
+    ledeKey: "docsLoreRulesLede",
+    sourceFile: "docs/lore/Rules.md",
+  },
+  {
+    slug: "lore-narrative-flow",
+    group: "lore",
+    navKey: "docsLoreNarrativeFlowNav",
+    titleKey: "docsLoreNarrativeFlowTitle",
+    ledeKey: "docsLoreNarrativeFlowLede",
+    sourceFile: "docs/lore/Narrative flow.md",
+  },
+  {
+    slug: "lore-nested-incidents",
+    group: "lore",
+    navKey: "docsLoreNestedIncidentsNav",
+    titleKey: "docsLoreNestedIncidentsTitle",
+    ledeKey: "docsLoreNestedIncidentsLede",
+    sourceFile: "docs/lore/Nested incidents.md",
+  },
+  {
+    slug: "lore-circa",
+    group: "lore",
+    navKey: "docsLoreCircaNav",
+    titleKey: "docsLoreCircaTitle",
+    ledeKey: "docsLoreCircaLede",
+    sourceFile: "docs/lore/C.I.R.C.A.md",
+  },
+  {
+    slug: "lore-anomalies",
+    group: "lore",
+    navKey: "docsLoreAnomaliesNav",
+    titleKey: "docsLoreAnomaliesTitle",
+    ledeKey: "docsLoreAnomaliesLede",
+    sourceFile: "docs/lore/Anomalies.md",
+  },
+  {
+    slug: "lore-phenomena",
+    group: "lore",
+    navKey: "docsLorePhenomenaNav",
+    titleKey: "docsLorePhenomenaTitle",
+    ledeKey: "docsLorePhenomenaLede",
+    sourceFile: "docs/lore/Phenomena.md",
+  },
+  {
+    slug: "lore-independent-entities",
+    group: "lore",
+    navKey: "docsLoreIndependentEntitiesNav",
+    titleKey: "docsLoreIndependentEntitiesTitle",
+    ledeKey: "docsLoreIndependentEntitiesLede",
+    sourceFile: "docs/lore/Independent entities.md",
+  },
+  {
+    slug: "lore-classifications",
+    group: "lore",
+    navKey: "docsLoreClassificationsNav",
+    titleKey: "docsLoreClassificationsTitle",
+    ledeKey: "docsLoreClassificationsLede",
+    sourceFile: "docs/lore/Classifications.md",
+  },
+  {
+    slug: "lore-anchors",
+    group: "lore",
+    navKey: "docsLoreAnchorsNav",
+    titleKey: "docsLoreAnchorsTitle",
+    ledeKey: "docsLoreAnchorsLede",
+    sourceFile: "docs/lore/Anchors.md",
+  },
+  {
+    slug: "lore-entry",
+    group: "lore",
+    navKey: "docsLoreEntryNav",
+    titleKey: "docsLoreEntryTitle",
+    ledeKey: "docsLoreEntryLede",
+    sourceFile: "docs/lore/Entry.md",
+  },
+  {
+    slug: "lore-time",
+    group: "lore",
+    navKey: "docsLoreTimeNav",
+    titleKey: "docsLoreTimeTitle",
+    ledeKey: "docsLoreTimeLede",
+    sourceFile: "docs/lore/Time.md",
+  },
+  {
+    slug: "lore-participation",
+    group: "lore",
+    navKey: "docsLoreParticipationNav",
+    titleKey: "docsLoreParticipationTitle",
+    ledeKey: "docsLoreParticipationLede",
+    sourceFile: "docs/lore/Participation.md",
+  },
+  {
+    slug: "lore-outcomes",
+    group: "lore",
+    navKey: "docsLoreOutcomesNav",
+    titleKey: "docsLoreOutcomesTitle",
+    ledeKey: "docsLoreOutcomesLede",
+    sourceFile: "docs/lore/Outcomes.md",
+  },
+  {
+    slug: "lore-archive-index",
+    group: "lore",
+    navKey: "docsLoreArchiveIndexNav",
+    titleKey: "docsLoreArchiveIndexTitle",
+    ledeKey: "docsLoreArchiveIndexLede",
+    sourceFile: "docs/lore/Archive index.md",
+  },
+  {
+    slug: "lore-explorations",
+    group: "lore",
+    navKey: "docsLoreExplorationsNav",
+    titleKey: "docsLoreExplorationsTitle",
+    ledeKey: "docsLoreExplorationsLede",
+    sourceFile: "docs/lore/Explorations.md",
+  },
+  {
+    slug: "lore-civilians",
+    group: "lore",
+    navKey: "docsLoreCiviliansNav",
+    titleKey: "docsLoreCiviliansTitle",
+    ledeKey: "docsLoreCiviliansLede",
+    sourceFile: "docs/lore/Civilians.md",
+  },
+  {
+    slug: "lore-anonymity",
+    group: "lore",
+    navKey: "docsLoreAnonymityNav",
+    titleKey: "docsLoreAnonymityTitle",
+    ledeKey: "docsLoreAnonymityLede",
+    sourceFile: "docs/lore/Anonymity.md",
+  },
+  {
+    slug: "lore-recoveries",
+    group: "lore",
+    navKey: "docsLoreRecoveriesNav",
+    titleKey: "docsLoreRecoveriesTitle",
+    ledeKey: "docsLoreRecoveriesLede",
+    sourceFile: "docs/lore/Recoveries.md",
+  },
+  {
+    slug: "lore-corruption",
+    group: "lore",
+    navKey: "docsLoreCorruptionNav",
+    titleKey: "docsLoreCorruptionTitle",
+    ledeKey: "docsLoreCorruptionLede",
+    sourceFile: "docs/lore/Corruption.md",
+  },
+  {
+    slug: "lore-narrative-assimilation",
+    group: "lore",
+    navKey: "docsLoreNarrativeAssimilationNav",
+    titleKey: "docsLoreNarrativeAssimilationTitle",
+    ledeKey: "docsLoreNarrativeAssimilationLede",
+    sourceFile: "docs/lore/Narrative Assimilation.md",
+  },
+  {
+    slug: "lore-witness-sheets",
+    group: "lore",
+    navKey: "docsLoreWitnessSheetsNav",
+    titleKey: "docsLoreWitnessSheetsTitle",
+    ledeKey: "docsLoreWitnessSheetsLede",
+    sourceFile: "docs/lore/Witness sheets.md",
+  },
+  {
+    slug: "lore-witness-pen",
+    group: "lore",
+    navKey: "docsLoreWitnessPenNav",
+    titleKey: "docsLoreWitnessPenTitle",
+    ledeKey: "docsLoreWitnessPenLede",
+    sourceFile: "docs/lore/Witness Pen.md",
+  },
+  {
+    slug: "lore-lasting-bamboo",
+    group: "lore",
+    navKey: "docsLoreLastingBambooNav",
+    titleKey: "docsLoreLastingBambooTitle",
+    ledeKey: "docsLoreLastingBambooLede",
+    sourceFile: "docs/lore/Lasting Bamboo.md",
+  },
+  {
+    slug: "lore-recollection-projector",
+    group: "lore",
+    navKey: "docsLoreRecollectionProjectorNav",
+    titleKey: "docsLoreRecollectionProjectorTitle",
+    ledeKey: "docsLoreRecollectionProjectorLede",
+    sourceFile: "docs/lore/Recollection Projector.md",
+  },
+  {
+    slug: "lore-records",
+    group: "lore",
+    navKey: "docsLoreRecordsNav",
+    titleKey: "docsLoreRecordsTitle",
+    ledeKey: "docsLoreRecordsLede",
+    sourceFile: "docs/lore/Records.md",
+  },
+  {
+    slug: "lore-organizations",
+    group: "lore",
+    navKey: "docsLoreOrganizationsNav",
+    titleKey: "docsLoreOrganizationsTitle",
+    ledeKey: "docsLoreOrganizationsLede",
+    sourceFile: "docs/lore/Organizations.md",
+  },
+  {
+    slug: "lore-continuities",
+    group: "lore",
+    navKey: "docsLoreContinuitiesNav",
+    titleKey: "docsLoreContinuitiesTitle",
+    ledeKey: "docsLoreContinuitiesLede",
+    sourceFile: "docs/lore/Continuities.md",
   },
 ] as const;
 

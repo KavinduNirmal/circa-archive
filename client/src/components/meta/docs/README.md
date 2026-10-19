@@ -1,34 +1,34 @@
 # Documentation surface
 
-## Responsibility
+## Responsibility and structure
 
-The project documentation: its topic registry, its prose, and the three-column
-reading surface (index, article, on-page contents).
-
-| File | Owns |
-| --- | --- |
-| `docs-topics.ts` | The groups, topic order, addresses, and every section anchor. Holds message keys, never prose. |
-| `docs-content.tsx` | The body of each section, the callout/table/code primitives, and the anchor links. |
-| `docs-page.tsx` | The band, the three-column grid, the sidebar data, the pager, and the table of contents. |
-| `docs-sidebar.tsx` | The filter, the grouped index, the mobile disclosure, and the active state. Client island. |
-| `copy-code.tsx` | The code plate and its copy key, including the failed-clipboard state. Client island. |
+- `docs-topics.ts`: localized navigation keys, groups and reading order.
+- `docs-source.ts`: GitHub source/edit/asset URLs, relative-link resolution,
+  five-minute Next.js fetch caching, hourly file-history caching, and concurrent locale document loading.
+- `docs-markdown.ts`: GFM, frontmatter, GitHub alert and heading plugins; contents
+  extraction and the opening title split. No record redaction transforms run
+  here: documentation syntax examples must remain literal.
+- `docs-content.tsx`: safe Markdown rendering with relative links and assets.
+- `docs-page.tsx`: source title, article, failure recovery, pager and contents rail.
+- `docs-sidebar.tsx`: grouped index, global document text search, Ctrl/Cmd+K focus,
+  Escape clearing and mobile disclosure with the current article label.
+- `docs-actions.tsx`: compact raw Markdown/context copy actions below the title; ChatGPT opens for manual pasting.
+- `copy-code.tsx`: code block clipboard feedback, also used by the landing page.
 
 ## Boundaries
 
-All copy is in the `meta` catalog under the `docs*` keys, in both languages. The
-topic order here is the reading order: the sidebar, the pager, and
-`generateStaticParams` all read the same list, so a topic cannot be added to one
-and forgotten in the other.
-
-The docs describe the code in this repository, not the fiction. They do not
-promise an API, a database, or a deployment; `ARCHITECTURE.md` is named as a
-draft wherever the plan comes up.
+Article prose lives in [docs/documentation](../../../../../docs/documentation/README.md),
+not JSX or catalogs. Both English and Korean are fetched from the configured
+public GitHub repository and ref. UI labels remain in the `meta` catalog.
+Unknown slugs cannot select arbitrary upstream files. Fetch errors render a
+localized retry/source state; missing search content is disclosed. Raw HTML is
+inert. There is no bundled article fallback. The footer uses verified GitHub file history
+for its date and links to the corresponding GitHub editor.
 
 ## Usage and verification
 
-Served by the routes in `app/[lang]/meta/documentation/`. Covered by
-`tests/meta-pages.test.tsx` (rendering, sidebar filter, pager, copy labels,
-Korean headings) and `tests/i18n-messages.test.ts`. New topic: add an entry to
-`docs-topics.ts`, add its section bodies to `docs-content.tsx`, add the keys to
-both catalogs, then run `bun run --cwd=client test`, `lint`, `typecheck`, and
-`build`.
+The documentation routes load the locale's registered sources on the server and
+pass serializable text to the search and clipboard islands. See the source
+README for publishing and environment overrides. Run `bun run --cwd=client test`,
+`lint`, `typecheck`, and `build`. Tests include `docs-source.test.ts`,
+`docs-experience.test.tsx`, `meta-pages.test.tsx`, and catalog parity checks.

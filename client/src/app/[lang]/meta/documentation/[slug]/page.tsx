@@ -1,3 +1,4 @@
+import { loadDocumentation, loadDocumentUpdatedAt } from "@/components/meta/docs/docs-source";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
@@ -34,5 +35,6 @@ export default async function DocsTopicPage({ params }: DocsTopicPageProps) {
   const topic = docTopic(slug);
   if (!topic) notFound();
 
-  return <DocsPage topic={topic} />;
+  const [documents, updatedAt] = await Promise.all([loadDocumentation(lang), loadDocumentUpdatedAt(topic, lang)]);
+  return <DocsPage topic={topic} documents={documents} locale={lang} updatedAt={updatedAt} />;
 }

@@ -14,7 +14,7 @@
 
 CIRCA Archive is a collaborative storytelling platform where users write, explore, and expand ghost stories within a shared fictional universe. The interface mimics a desktop workstation belonging to C.I.R.C.A. (Commission for Incident Review and Corrective Action), an ancient continuity that predates governments and files records on anomalous incidents.
 
-Users interact with a diegetic desktop environment. Records are authored in Markdown and rendered as paper-like PDFs. The platform supports exploration records, organization dossiers, voting, moderation, and a complex canon system without a central authority.
+Users interact with a diegetic desktop environment. Records are authored in Markdown and rendered as paper-like PDFs. The planned platform supports exploration records, organization dossiers, voting, moderation, and multiple continuities without a single authority over fictional truth. The [Author guide](docs/AUTHOR_GUIDE.md) defines the current pre-release collaboration framework and supersedes older descriptions of unrestricted incident-rule changes or automatic continuity creation; the workflows remain unimplemented.
 
 ### 1.1 Core Principles
 
@@ -32,11 +32,11 @@ Users interact with a diegetic desktop environment. Records are authored in Mark
 | Term | Definition |
 |------|------------|
 | **CIRCA** | Commission for Incident Review and Corrective Action. Ancient continuity, not a government agency. |
-| **Incident** | A ghost story. Independent entity. Code: `INC-XXXXX`. |
+| **Incident** | An anchored supernatural system, distinct from its actors. Code: `INC-XXXXX`. |
 | **Record** | A filed artifact. Code: `CIRCA-X-XXXX`. Types: INCIDENT, DISCOVERY, EXPLORATION, RUMOR. |
 | **Org** | A recognized organization. Code: `ORG-X-XXXX`. |
 | **Dossier** | Community-editable wiki page for an org. |
-| **Continuity** | A branch of an org's story. Multiple coexist. |
+| **Continuity** | A connected sequence for an Incident or organization. Principal and divergent sequences coexist. |
 | **Primary Claim** | Display convention for an incident's master file. Singular, cedeable. |
 | **Contested** | Valid state when two orgs claim primary on an incident. |
 | **Tombstoned** | A record removed from discoverability for meta violations. |
@@ -105,9 +105,10 @@ Users interact with a diegetic desktop environment. Records are authored in Mark
 ### 3.3 Frontend Architecture
 
 - **Next.js App Router** for routing and server components.
-- **Desktop Shell** is a client component that manages window state, icons, taskbar.
-- **Window Manager:** `react-rnd` for draggable, resizable windows. Or `winbox` for a more complete windowing experience.
-- **State Management:** Zustand for desktop state (open windows, icon positions, active window).
+- **Desktop Shell** is a client component mounted by the workspace layout. The layout, not a page, is what keeps windows and the post screen alive across a desktop URL change.
+- **Window Manager:** plain absolutely-positioned frames driven by pointer gestures, because `react-rnd` always writes its own `transform` and double-applies a controlled position. The dependency is installed but unused; windows are clamped to the desktop layer and commit geometry once on release.
+- **State Management:** Zustand, implemented as a store factory plus a per-workspace provider. It owns open windows, focus, geometry, stacking, the reader trail, the CRT preference, and the measured area; `sessionStorage` restores it per tab, and the URL is written by one adapter from the store's history intent.
+- **Deep links:** `/{lang}/desktop/{destination}` and `/{lang}/desktop/record/{code}` are workspace positions, `noindex`, and never the canonical record address — `/{lang}/site/records/{code}` stays the publication edition.
 - **Markdown Rendering:** `react-markdown` with `remark-gfm`. Custom CSS to mimic paper: serif fonts, page margins, subtle texture.
 - **No PDF generation.** The `.pdf` extension is a diegetic lie; files are Markdown rendered as paper.
 
@@ -124,6 +125,8 @@ Users interact with a diegetic desktop environment. Records are authored in Mark
   - Vote threshold checks
 
 ### 3.5 Database Schema
+
+The draft schema below predates the [authoring framework](docs/AUTHOR_GUIDE.md). It does not yet model versioned foundational constraints, scoped Continuity Stewards and succession, character reuse permissions, or separate publication, evidentiary, and per-continuity adoption states. These require a later design and implementation pass; existing filing fields are not sufficient authorization or workflow support.
 
 #### 3.5.1 Users
 
@@ -535,12 +538,17 @@ The email client is a desktop app. It has four folders:
 - System tray: notifications, network, volume, clock.
 - Windows are draggable, resizable, minimizable, closable.
 - Double-click title bar to maximize.
+- One window per destination id: reopening focuses and never duplicates. The reader is one window whose trail cursor moves, not one window per record.
+- A desktop URL names the focused visible document: `/desktop` with nothing focused, `/desktop/{destination}` for a shortcut, and `/desktop/record/{code}` for the reader. Opening a document pushes history; focusing, minimizing, closing, and moving the reader's cursor replace it; a deep link, Back, and Forward write nothing and only adopt the address.
+- Only the workspace's URL adapter reads or writes the pathname. The shell and its tests stay router-free.
+- A refresh restores the open windows from per-tab `sessionStorage` and leaves the URL's window focused. Windows do not survive leaving the workstation for the public site, because the workspace layout unmounts.
+- `/desktop` unknown destinations and unknown record codes are 404s, matching the public record route. Every desktop route is `noindex, nofollow`; the public edition remains canonical.
 
 ### 5.11 Localization
 
 The interface ships in English and Korean. This is implemented, in `client/src/i18n/`, and the shape is deliberate:
 
-- **Routing.** Every page lives under a language segment — `/{lang}` and `/{lang}/desktop` — with `localePrefix: "always"`, so one document answers at exactly one address. A bare path is redirected by `client/src/proxy.ts` (Next.js 16's rename of `middleware.ts`).
+- **Routing.** Every page lives under a language segment — `/{lang}`, `/{lang}/site`, `/{lang}/meta`, and the workstation's `/{lang}/desktop`, `/{lang}/desktop/{destination}`, and `/{lang}/desktop/record/{code}` — with `localePrefix: "always"`, so one document answers at exactly one address. A bare path is redirected by `client/src/proxy.ts` (Next.js 16's rename of `middleware.ts`). The workstation's URLs are built from the locale-less pathname through next-intl, so a link or history write keeps the reader's language.
 - **Detection.** Resolution order is an explicit path prefix, then the `NEXT_LOCALE` cookie, then the browser's `Accept-Language` weighting, then English. There is no geolocation: IP country describes a connection, not a reader, and would misroute Korean speakers abroad and English speakers in Korea.
 - **Override.** A visible language switcher on the portal's utility bar and in the workstation tray writes the cookie, and each option links to the current page in the other language rather than to the site root.
 - **Messages.** One catalog file per namespace per language under `client/messages/<locale>/`, loaded by `client/src/i18n/request.ts`. The `landing` namespace is rendered on the server and is the only one held back from the client bundle.
@@ -557,7 +565,7 @@ The interface ships in English and Korean. This is implemented, in `client/src/i
 
 | Type | Description | Who can create | Constraints |
 |------|-------------|----------------|-------------|
-| **INCIDENT** | Original ghost story. Bystander POV preferred. No rules. | Originator | Once per incident. |
+| **INCIDENT** | Original ghost story. May establish or hint at foundational constraints; narrator knowledge remains distinct. | Originator | Once per incident. |
 | **DISCOVERY** | First org contact. Establishes primary claim by default. | Any author | Any org. |
 | **EXPLORATION** | Everything after. Containment, follow-ups, rule-establishment. | Any author | Any org. |
 | **RUMOR** | Propaganda, misinformation, unverified claims. | Any author | Attach to incident or org. |
@@ -578,21 +586,29 @@ The interface ships in English and Korean. This is implemented, in `client/src/i
 
 - **filed** — normal, visible.
 - **rumor** — visible, marked as rumor.
-- **apocryphal** — filed but marked non-canon for a specific continuity.
+- **apocryphal** — legacy draft label for a continuity-specific discrepancy; it must not conflate publication, evidentiary support, and adoption.
+
+The authoring framework separates those three axes. A published record can be corroborated but independent, or disputed yet adopted. Withdrawal behavior remains unresolved; none of these labels defines a working withdrawal endpoint or grants self-deletion.
 
 ### 6.4 Adoption
 
-- A record can be adopted into an org's continuity.
-- Adoption is a user action (not org action).
-- Adopted records are marked with the adopting org and continuity.
-- Original author retains credit.
+- Filing does not automatically change an Incident's principal continuity.
+- The Founding Author or an authorized Continuity Steward curates adoption into that sequence. Foundational amendment authority requires explicit delegation beyond ordinary stewardship.
+- Community votes and comments inform adoption and credibility; they do not automatically make either binding.
+- Core Rules protect an Incident's identity. Evidence-supported observations and unverified claims remain challengeable within those boundaries.
+- Versioned, authorized amendments preserve the effective constraints for earlier records.
+- Character use follows declared permissions, with Permission Required as the default.
+- Organization continuities remain a separate scope; no organizational account or owner role is introduced.
+- The original author retains credit, and non-adoption does not remove a compliant independent filing.
+- Stewardship, succession, and orphaned-Incident handling are intended workflows, not implemented permissions. See the [Author guide](docs/AUTHOR_GUIDE.md).
 
-### 6.5 Forking
+### 6.5 Forking and Branches
 
-- Any record can be forked.
-- Fork gets new `circa_code`, inherits parent lineage.
-- `parent_record_id` links to parent.
-- Fork tree rendered in `FORK_TREE.pdf`.
+- A record fork receives its own `circa_code` and preserves parent lineage through `parent_record_id` in the draft model.
+- Independent publication does not automatically create a divergent continuity.
+- A branch explicitly identifies its source sequence, divergence point, and record lineage. The current schema does not fully model that relationship.
+- Branches preserve foundational constraints and character permissions; they do not grant unrestricted amendment rights.
+- Conflicting outcomes may remain filed independently and be adopted separately. No one branch overwrites every other sequence.
 
 ### 6.6 Tombstoning
 
@@ -630,6 +646,8 @@ The interface ships in English and Korean. This is implemented, in `client/src/i
   - `C` — Few (1–9)
   - `D` — No casualties
 - Letter fixed at promotion.
+
+This older organization-code scheme is distinct from the newer [Incident classification scale](docs/lore/Classifications.md), which adds E and O/Omega and uses S for more than 1,000 confirmed deaths or comparable disaster potential. The mapping between the schemes remains unresolved; do not recalculate existing organization identifiers from Incident assessments.
 
 ### 7.3 Submission Format
 
@@ -684,7 +702,10 @@ The interface ships in English and Korean. This is implemented, in `client/src/i
 ### 8.3 Continuities
 
 - Multiple continuities per org: `ORG-A-081323/C1`, `C2`.
-- Readers subscribe to continuity.
+- Incidents also have principal and divergent continuities under the authoring framework. Their identifiers, storage, and authorization remain to be designed.
+- A single independent record is not automatically a branch.
+- Readers can follow their preferred continuity; that choice does not override character permissions or foundational constraints.
+- Continuity-specific adoption is separate from publication and evidentiary status.
 
 ### 8.4 Erased Orgs
 

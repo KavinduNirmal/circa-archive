@@ -40,7 +40,7 @@ CIRCA Archive is in pre-release development. The Next.js frontend is implemented
 | [client/](client/README.md) | Next.js application: public archive, project pages, and CIRCA/OS workstation |
 | [backend/](backend/README.md) | Reserved for the API and persistence services |
 | [admin/](admin/README.md) | Reserved for administration tooling |
-| [docs/](docs/README.md) | Branch model, publishing checklist, and setting documentation |
+| [docs/](docs/README.md) | Branch model, architecture decision records, publishing checklist, and setting documentation |
 | [scripts/](scripts/README.md) | Repository README and whitespace checks |
 | [tests/](tests/README.md) | Bun tests for repository tooling |
 | [.github/](.github/ABOUT.md) | Workflows, issue and pull request templates, and review routing |
@@ -96,6 +96,8 @@ The full branch model, protection rules, release checklist, and hotfix procedure
 ## Contributing
 
 Read [CONTRIBUTING.md](CONTRIBUTING.md) and the [Code of Conduct](CODE_OF_CONDUCT.md) before opening a pull request. Use the issue forms for bugs, proposals, and documentation gaps. Report vulnerabilities privately through [SECURITY.md](SECURITY.md), never in a public issue.
+
+Story authors can read the [Author guide](docs/AUTHOR_GUIDE.md) for the pre-release collaboration framework, including Core Rules, character consent, independent filings, and adoption.
 
 Good early contributions include clarifying conflicting requirements, refining the draft API contracts, improving accessibility, and adding reproducible application scaffolding.
 
