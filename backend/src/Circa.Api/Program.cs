@@ -1,5 +1,6 @@
 using Asp.Versioning;
 using Asp.Versioning.Builder;
+using Circa.Auth.Contracts;
 using Circa.Auth.Infrastructure;
 using Circa.Auth.Infrastructure.Endpoints;
 
@@ -33,7 +34,14 @@ api.MapAuthEndpoints();
 
 var records = api.MapGroup("/records").HasApiVersion(1, 0);
 records.MapGet("/", () => Results.Ok(Array.Empty<object>())).AllowAnonymous();
-records.MapPost("/", () => Results.Created("/api/v1/records/1", new { id = 1 }));
+records.MapPost("/", () => Results.Created("/api/v1/records/1", new { id = 1 }))
+    .RequireAuthorization(AuthPolicies.Writes);
+records.MapPost("/{id:guid}/vote", (Guid id) => Results.Ok(new { voted = true }))
+    .RequireAuthorization(AuthPolicies.Votes);
+
+var moderation = api.MapGroup("/moderation").HasApiVersion(1, 0);
+moderation.MapGet("/probe", () => Results.Ok(new { status = "moderation_active" }))
+    .RequireAuthorization(AuthPolicies.Moderator);
 
 app.Run();
 

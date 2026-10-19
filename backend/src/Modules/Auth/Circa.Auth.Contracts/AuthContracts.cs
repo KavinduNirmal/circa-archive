@@ -16,6 +16,9 @@ public static class AuthPolicies
 {
     public const string Writes = "writes";
     public const string Moderator = "moderator";
+    public const string Votes = "votes";
 }
 
 public sealed record LiveSessionRequirement : IAuthorizationRequirement;
+public sealed record CanPostRequirement : IAuthorizationRequirement;
+public sealed record StaffCannotRateRequirement : IAuthorizationRequirement;

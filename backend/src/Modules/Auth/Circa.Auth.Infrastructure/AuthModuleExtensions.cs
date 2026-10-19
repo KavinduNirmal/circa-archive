@@ -5,7 +5,10 @@ using Circa.Auth.Infrastructure.Endpoints;
 using Circa.Auth.Infrastructure.Options;
 using Circa.Auth.Infrastructure.Persistence;
 using Circa.Auth.Infrastructure.Services;
+using Circa.Auth.Infrastructure.Authorization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization.Policy;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -109,11 +112,39 @@ public static class AuthModuleExtensions
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer();
 
+        services.AddScoped<IAuthRequestContext, AuthRequestContext>();
+        services.AddScoped<IAuthorizationHandler, LiveSessionHandler>();
+        services.AddScoped<IAuthorizationHandler, CanPostHandler>();
+        services.AddScoped<IAuthorizationHandler, StaffCannotRateHandler>();
+        services.AddSingleton<IAuthorizationMiddlewareResultHandler, CircaAuthorizationMiddlewareResultHandler>();
+
         services.AddAuthorization(options =>
         {
             options.FallbackPolicy = new Microsoft.AspNetCore.Authorization.AuthorizationPolicyBuilder()
                 .RequireAuthenticatedUser()
                 .Build();
+
+            options.AddPolicy(AuthPolicies.Writes, policy =>
+            {
+                policy.RequireAuthenticatedUser();
+                policy.AddRequirements(new LiveSessionRequirement(), new CanPostRequirement());
+            });
+
+            options.AddPolicy(AuthPolicies.Moderator, policy =>
+            {
+                policy.RequireAuthenticatedUser();
+                policy.RequireRole("moderator");
+                policy.AddRequirements(new LiveSessionRequirement());
+            });
+
+            options.AddPolicy(AuthPolicies.Votes, policy =>
+            {
+                policy.RequireAuthenticatedUser();
+                policy.AddRequirements(
+                    new LiveSessionRequirement(),
+                    new CanPostRequirement(),
+                    new StaffCannotRateRequirement());
+            });
         });
 
         return services;
