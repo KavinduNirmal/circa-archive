@@ -2,6 +2,7 @@ using Circa.Auth.Application;
 using Circa.Auth.Contracts;
 using Circa.Auth.Domain;
 using Circa.Auth.Infrastructure.Endpoints;
+using Circa.Auth.Infrastructure.Options;
 using Circa.Auth.Infrastructure.Persistence;
 using Circa.Auth.Infrastructure.Services;
 using Microsoft.AspNetCore.Builder;
@@ -51,9 +52,12 @@ public static class AuthModuleExtensions
             options.IterationCount = 600_000;
         });
 
+        services.Configure<AuthOptions>(configuration.GetSection(AuthOptions.SectionName));
+
         services.AddScoped<RegisterHandler>();
         services.AddScoped<LoginHandler>();
         services.AddScoped<IUserDirectory, UserDirectory>();
+        services.AddScoped<ISessionService, SessionService>();
 
         return services;
     }
