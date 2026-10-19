@@ -6,7 +6,7 @@ How the archive is built, how a record is written, and how to change either with
 
 CIRCA Archive is two things at once. In fiction it is the public face of the Commission for Incident Review and Corrective Action: a continuity that files reports on incidents that should not have happened. In code it is a Next.js application that renders that invented archive in English and Korean, with a server-rendered reading edition and an interactive workstation preview.
 
-The records are invented. The interface, the renderer, the tests, and this documentation are real work. The site has no backend and no persistence, and nothing you type is stored.
+The records are invented. The interface, the renderer, the tests, and this documentation are real work. The site currently operates over local fixtures while backend integration is in progress; nothing you type is stored.
 
 ```brand-callout
 This is code documentation
@@ -35,9 +35,9 @@ Both editions read the same index entries and the same Markdown sources. Neither
 
 The reading edition and the workstation preview work end to end over fixtures. The boundary between what exists and what is planned is part of the interface's honesty.
 
-- **==Built== —** the public portal, the reading edition and record downloads, the workstation and its five applications, the Markdown pipeline, the project pages, and this documentation.
-- **==Not built== —** an API, a database, authentication, saved annotations, moderation, and real full-text search.
-- **==Planned== —** the .NET 10, EF Core, and SignalR platform described in ARCHITECTURE.md.
+- **==Built== —** the public portal, the reading edition and record downloads, the workstation and its five applications, the Markdown pipeline, the project pages, this documentation, and the scaffolded .NET 10 backend modular monolith solution (`backend/Circa.sln`).
+- **==In progress== —** domain module handlers, live database persistence, authentication handlers, saved annotations, moderation, and API client integration.
+- **==Planned== —** the full .NET 10, EF Core, and SignalR platform described in ARCHITECTURE.md.
 
 > [!WARNING]
 > ARCHITECTURE.md is a draft

@@ -8,6 +8,7 @@ Bun runs the root tooling and the frontend. Next.js supplies the rest; the brows
 
 - Bun 1.3.14 — packages, scripts, and the lockfiles.
 - Node.js 20.9 or newer — required by Next.js.
+- .NET 10 SDK and Docker — for the backend modular monolith and PostgreSQL database under backend/.
 - Chromium — only for the Playwright suite.
 - Git, and a clone of the repository.
 
@@ -48,6 +49,16 @@ bun run --cwd=client dev
 | `/en/desktop` | Workstation preview |
 
 A production build is bun run --cwd=client build, then bun run --cwd=client start.
+
+To build the backend solution or launch the local PostgreSQL database:
+
+```sh
+# Start local backing database
+docker compose -f backend/docker-compose.yml up -d circa-db
+
+# Build the backend solution
+dotnet build backend/Circa.sln
+```
 
 ## Verify a change
 

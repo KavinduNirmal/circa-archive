@@ -8,6 +8,7 @@ Bun이 루트 도구와 프런트엔드를 실행합니다. 나머지는 Next.js
 
 - Bun 1.3.14 — 패키지, 스크립트, 잠금 파일.
 - Node.js 20.9 이상 — Next.js가 요구합니다.
+- .NET 10 SDK 및 Docker — backend/ 아래 모듈러 모놀리스 백엔드 및 PostgreSQL 데이터베이스 빌드·실행용.
 - Chromium — Playwright 스위트에만 필요합니다.
 - Git, 그리고 저장소 클론.
 
@@ -48,6 +49,16 @@ bun run --cwd=client dev
 | `/en/desktop` | 워크스테이션 프리뷰 |
 
 프로덕션 빌드는 bun run --cwd=client build, 그다음 bun run --cwd=client start입니다.
+
+백엔드 솔루션을 빌드하거나 로컬 PostgreSQL 데이터베이스를 실행하려면:
+
+```sh
+# 로컬 데이터베이스 실행
+docker compose -f backend/docker-compose.yml up -d circa-db
+
+# 백엔드 솔루션 빌드
+dotnet build backend/Circa.sln
+```
 
 ## 변경 검증
 

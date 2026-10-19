@@ -61,9 +61,10 @@ This folder owns the only copy allowed to say the Commission is not real. UI cop
 lives in the `meta` namespace; documentation articles live in `docs/documentation/`; names that are data rather than
 copy — the maintainer's handle, licence identifiers — live in `meta-links.ts`.
 
-It asserts no capability the project does not have. There is no backend, so
-notes, drafts, and replies are described as living in the browser tab; there is
-no mail service, so the three contact doors are repository issues.
+It asserts no capability the project does not have. While the backend solution is
+scaffolded, frontend integration is pending, so notes, drafts, and replies are
+described as living in the browser tab; there is no mail service, so the three
+contact doors are repository issues.
 
 ## Regenerating the dossier's plate
 

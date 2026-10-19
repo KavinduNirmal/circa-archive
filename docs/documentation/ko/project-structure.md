@@ -9,7 +9,7 @@
 ```text
 circa/
 ├── client/           the Next.js interface
-├── backend/          reserved for .NET services
+├── backend/          골격이 구축된 .NET 10 서비스
 ├── admin/            reserved for administration
 ├── docs/             planning and the open-source checklist
 ├── scripts/          repository checks
