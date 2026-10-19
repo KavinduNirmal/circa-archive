@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { DesktopShell } from "@/components/desktop-shell";
 import { FILE_TREE } from "@/components/files/files-index";
 import { WorkstationBoot, BOOT_LINE_COUNT, BOOT_STEP_MS, bootDurationMs, bootLines } from "@/components/site/boot-sequence";
-import { catalogFor, renderWithIntl, translatorFor } from "./intl";
+import { catalogFor, renderWorkstation, translatorFor } from "./intl";
 
 /**
  * The desktop boots once per load, the way a machine does, and the screen in
@@ -30,8 +30,8 @@ const english = catalogFor("en");
 const ready = bootDurationMs();
 
 /** The workstation as the locale route mounts it: the post screen in front of the shell. */
-function renderWorkstation(locale: "en" | "ko" = "en") {
-  return renderWithIntl(
+function renderPostedWorkstation(locale: "en" | "ko" = "en") {
+  return renderWorkstation(
     <WorkstationBoot>
       <DesktopShell />
     </WorkstationBoot>,
@@ -51,7 +51,7 @@ describe("workstation boot", () => {
   });
 
   it("posts before it hands the screen over, and reports the archive it mounted", () => {
-    renderWorkstation();
+    renderPostedWorkstation();
     const boot = screen.getByRole("region", { name: english.boot.regionLabel });
     expect(boot).toBeVisible();
     // The shell is mounted behind the boot screen so the swap does not flash,
@@ -72,7 +72,7 @@ describe("workstation boot", () => {
   });
 
   it("lets the operator skip the post", () => {
-    renderWorkstation();
+    renderPostedWorkstation();
     fireEvent.keyDown(window, { key: "Enter" });
     expect(screen.queryByRole("region", { name: english.boot.regionLabel })).not.toBeInTheDocument();
     expect(screen.getByRole("navigation", { name: english.shell.foldersLabel })).toBeVisible();
@@ -80,14 +80,14 @@ describe("workstation boot", () => {
 
   it("does not hold a reduced-motion operator at the post screen", () => {
     motionAllowed(true);
-    renderWorkstation();
+    renderPostedWorkstation();
     expect(screen.queryByRole("region", { name: english.boot.regionLabel })).not.toBeInTheDocument();
     expect(screen.getByRole("navigation", { name: english.shell.foldersLabel })).toBeVisible();
   });
 
   it("prints the post in Korean when the request resolves to Korean", () => {
     motionAllowed(true); // Hand over at once; the shell's own copy is what is under test.
-    renderWorkstation("ko");
+    renderPostedWorkstation("ko");
     const korean = catalogFor("ko");
     expect(screen.getByRole("main", { name: korean.shell.desktopLabel })).toBeVisible();
     expect(screen.getByRole("navigation", { name: korean.shell.foldersLabel })).toBeVisible();

@@ -10,63 +10,24 @@ import { WordWindow } from "./word/word-window";
 import { MailWindow } from "./mail/mail-window";
 import { LanguageSwitcher } from "./language-switcher";
 import { useReaderSession } from "./reader/reader-session";
-import { RecordReader, type RecordTrail } from "./reader/reader-window";
+import { RecordReader } from "./reader/reader-window";
 import { RecordFilingBody } from "./reader/record-filings";
 import { TaskbarWindows, WindowLayer, useWorkstationWindows } from "./window-manager";
-import { DesktopIcon, notificationGlyph, settingsGlyph, type DesktopIconSpec } from "./desktop-icons";
+import { DesktopIcon, notificationGlyph, settingsGlyph } from "./desktop-icons";
+import { DesktopNavigation } from "./desktop-navigation";
 import {
-  DesktopNavigation,
-  allDestinations,
-  desktopLabel,
+  EXPLORER_SCOPES,
   type DesktopCopy,
   type DesktopDestination,
-  type DesktopEntry,
-} from "./desktop-navigation";
+} from "@/lib/desktop-destinations";
+import { specForDestination } from "@/lib/desktop-windows";
+import type { WindowSpec } from "@/lib/desktop-types";
+import { useWorkstationStore } from "@/stores/workstation-store-provider";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
 import "./workstation.css";
 
 const NotificationIcon = notificationGlyph;
 const SettingsIcon = settingsGlyph;
-
-type ShellTranslate = (key: string, values?: Record<string, string>) => string;
-
-/** A destination opened as a window, plus the copy its own status strip shows. */
-type DestinationWindow = { id: string; title: string; status: string | null; icon: DesktopIconSpec; detail: string | null };
-
-/**
- * Destinations the file browser hosts.
- *
- * One explorer serves all of them. Each scope is the destination's own id,
- * because the explorer roots its tree at the shortcut that opened it, and this
- * set is what separates a folder from the three applications that bring their own
- * window. Membership is structural, not copy, so it is the same in every
- * language.
- */
-const EXPLORER_SCOPES = new Set([
-  "my-pc", "records", "my-work", "archive", "organizations", "expunged", "recycle", "system",
-]);
-
-/**
- * The name the file browser gives a folder.
- *
- * Two destinations are named differently by the explorer than by the desktop:
- * the workstation root is a computer rather than "My PC", and System is a folder
- * of files rather than a place. Everything else keeps its shortcut name.
- */
-function explorerFolderName(t: ShellTranslate, entry: DesktopEntry): string {
-  if (entry.id === "my-pc") return t("explorerMyComputer");
-  if (entry.id === "system") return t("explorerSystemFiles");
-  return desktopLabel(t, entry);
-}
-
-/** Explorer is named for the folder it is showing, so the title is composed per destination. */
-function explorerTitle(t: ShellTranslate, entry: DesktopEntry): string {
-  return `${explorerFolderName(t, entry)} - ${t("explorerSuffix")}`;
-}
-
-function destinationFor(id: string): DesktopEntry | undefined {
-  return allDestinations.find((entry) => entry.id === id);
-}
 
 function WorkstationClock() {
   const t = useTranslations("shell");
@@ -184,19 +145,26 @@ function SettingsDialog({ open, onOpenChange, screenFilter, onToggleScreenFilter
 export function DesktopShell() {
   const t = useTranslations("shell");
   const [startOpen, setStartOpen] = useState(false);
-  const [screenFilter, setScreenFilter] = useState(true);
   const [settingsOpen, setSettingsOpen] = useState(false);
-  // The records open in the reader, and where in that stack it is standing. The
-  // shell owns this because the shell is what opens a record: a code clicked in
-  // the archive and a code clicked in a follow-up strip are the same event.
-  const [readerTrail, setReaderTrail] = useState<RecordTrail>({ codes: [], at: 0 });
   const readerSession = useReaderSession();
   const { windows, lastFocused, open, close, focus, minimize, toggleMaximize, setGeometry } = useWorkstationWindows();
+  /*
+   * The trail, the CRT preference, and the measured area live in the store
+   * rather than in this component: a URL-opened record has to move the trail
+   * cursor without the reader rendering, and a restored workspace has to arrive
+   * with both already in place.
+   */
+  const readerTrail = useWorkstationStore((state) => state.readerTrail);
+  const openRecordInStore = useWorkstationStore((state) => state.openRecord);
+  const travelRecord = useWorkstationStore((state) => state.travelRecord);
+  const screenFilter = useWorkstationStore((state) => state.screenFilter);
+  const setScreenFilter = useWorkstationStore((state) => state.setScreenFilter);
+  const area = useWorkstationStore((state) => state.area);
+  const setArea = useWorkstationStore((state) => state.setArea);
   const shellRef = useRef<HTMLElement | null>(null);
   const areaRef = useRef<HTMLDivElement | null>(null);
   const startTrigger = useRef<HTMLButtonElement | null>(null);
   const launchTriggers = useRef<Record<string, HTMLButtonElement>>({});
-  const [area, setArea] = useState<{ width: number; height: number }>({ width: 0, height: 0 });
 
   // Windows live in a layer that already excludes the status strip and taskbar,
   // so drag bounds and maximize only need the layer's own measurement.
@@ -207,66 +175,44 @@ export function DesktopShell() {
     measure();
     window.addEventListener("resize", measure);
     return () => window.removeEventListener("resize", measure);
-  }, []);
+  }, [setArea]);
 
   useEffect(() => {
     // Focusing the layer would also steal focus from the window's own controls.
     if (lastFocused) areaRef.current?.focus({ preventScroll: true });
   }, [lastFocused]);
 
-  /** Opens a desktop shortcut as a window, naming the entry for the titlebar and status strip. */
+  /**
+   * Opens a desktop shortcut as a window.
+   *
+   * The spec comes from the one shared composition, so a window opened from the
+   * rail, from Start, or from a deep link carries the same title and status strip.
+   */
   function openFolder(folder: DesktopDestination, copy: DesktopCopy, trigger?: HTMLButtonElement) {
-    // An application that names its own window and prints its own status bar
-    // drops the frame's generic strip rather than stacking a second one on it.
-    const applicationTitles: Partial<Record<string, string>> = {
-      search: t("browserTitle"),
-      inbox: t("mailTitle"),
-      write: t("wordTitle"),
-    };
-    const entry = destinationFor(folder.id);
-    const title = applicationTitles[folder.id] ?? (entry ? explorerTitle(t, entry) : undefined);
-    openWindow({
+    openWindow(specForDestination(folder.id, t) ?? {
       id: folder.id,
-      title: title ?? copy.label,
-      status: title ? null : copy.detail || t("locationStatus"),
+      title: copy.label,
+      status: copy.detail || t("locationStatus"),
       icon: folder.icon,
-      detail: copy.detail,
     }, trigger);
   }
 
-  function openWindow(entry: DestinationWindow, trigger?: HTMLButtonElement, maximized = false) {
-    if (trigger) launchTriggers.current[entry.id] = trigger;
+  function openWindow(spec: WindowSpec, trigger?: HTMLButtonElement) {
+    if (trigger) launchTriggers.current[spec.id] = trigger;
     setStartOpen(false);
-    open(
-      { id: entry.id, title: entry.title, status: entry.status, icon: entry.icon },
-      // The layer may not have been measured yet on the first click; fall back to the viewport.
-      area.width && area.height ? area : { width: window.innerWidth, height: Math.max(240, window.innerHeight - 80) },
-      maximized,
-    );
+    open(spec, "push");
   }
 
   /**
    * Opens a record in the reader, which is the only screen that reads one.
    *
-   * The viewer always comes up maximized: a record is the thing you are doing,
-   * not a window beside the thing you are doing. The taskbar stays, so the
-   * desktop is still underneath and the frame still minimizes and closes.
+   * The store appends to — or moves the cursor within — the trail and opens the
+   * single maximized reader. The viewer always comes up full screen in the
+   * desktop sense: a record is the thing you are doing, not a window beside the
+   * thing you are doing. The taskbar stays, so the frame still minimizes.
    */
   function openRecord(code: string) {
-    setReaderTrail((current) => {
-      if (current.codes[current.at] === code) return current;
-      const codes = [...current.codes.slice(0, current.at + 1), code];
-      return { codes, at: codes.length - 1 };
-    });
-    openWindow({ id: "reader", title: t("readerTitle"), status: null, icon: { glyph: "reader" }, detail: null }, undefined, true);
-  }
-
-  /** Reads along the trail the viewer already has. */
-  function travelRecord(delta: 1 | -1) {
-    setReaderTrail((current) => {
-      const at = current.at + delta;
-      return at < 0 || at >= current.codes.length ? current : { ...current, at };
-    });
+    openRecordInStore(code, t("readerTitle"), "push");
   }
 
   function closeWindow(id: string) {

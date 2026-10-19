@@ -2,13 +2,13 @@
 
 ## Responsibility and structure
 
-`page.tsx` mounts the CIRCA/OS workstation at `/{lang}/desktop`, wrapped in the `WorkstationBoot` post screen. The home route is the public landing page, which links here in the reader's own language. Reusable navigation, icons, and shell presentation live in `../../../components/`.
+`page.tsx` is a URL marker for `/{lang}/desktop`; the shell, the post screen, and the metadata live in the workspace [layout](../README.md), so they survive an in-workspace navigation. The home route is the public landing page, which links here in the reader's own language. Reusable navigation, icons, and shell presentation live in `../../../../components/`.
 
 ## Scope and design decisions
 
 The user's reference image controls composition: a left shortcut rail, open wallpaper, and compact desktop chrome. The supplied emblem is the wallpaper, dimmed without desaturating it. The detailed DESIGN.md steel palette supplies colors; ARCHITECTURE.md supplies provisional shortcut names, not binding functionality. A bottom Windows-style taskbar replaces the reference's dock, and the desktop layer runs the full height behind it. A static, pointer-transparent CRT overlay covers the whole screen.
 
-This pass implements local shortcut selection, a Start launcher, the taskbar tray, and the window manager: one draggable and resizable window per destination, with minimize, maximize/restore, stacking, and a taskbar entry for each open window. Every window is still an explicit unconnected placeholder except **Search**, which opens the archive browser ([README](../../../components/browser/README.md)), and **Inbox**, which opens the mail client ([README](../../../components/mail/README.md)). Records, filing, authentication, and the remaining application screens are outside scope. Shortcuts support single-click, touch, and keyboard activation. Escape closes the focused window or the Settings dialog, and a window's own close button returns focus to the shortcut that opened it.
+This pass implements local shortcut selection, a Start launcher, the taskbar tray, and the window manager: one draggable and resizable window per destination, with minimize, maximize/restore, stacking, and a taskbar entry for each open window. Every window is still an explicit unconnected placeholder except **Search**, which opens the archive browser ([README](../../../../components/browser/README.md)), and **Inbox**, which opens the mail client ([README](../../../../components/mail/README.md)). Records, filing, authentication, and the remaining application screens are outside scope. Shortcuts support single-click, touch, and keyboard activation. Escape closes the focused window or the Settings dialog, and a window's own close button returns focus to the shortcut that opened it.
 
 Navigation and icon decisions from the redesign request:
 
@@ -23,13 +23,38 @@ Navigation and icon decisions from the redesign request:
 
 ## Landing page and the post screen
 
-The home route is now the public landing page, so the workstation is reached rather than opened directly, and `/{lang}/desktop` answers that arrival by powering the machine on. `WorkstationBoot` ([README](../../../components/site/README.md)) mounts the shell and covers it with the post screen; the shell stays `aria-hidden` and `inert` until the last check resolves, so the handover is a reveal instead of a page load. The lines report what the shell actually mounted. Any key, or the Skip post button, hands the screen over at once, and an operator whose system asks for reduced motion never sees the post screen at all.
+The home route is now the public landing page, so the workstation is reached rather than opened directly, and `/{lang}/desktop` answers that arrival by powering the machine on. `WorkstationBoot` ([README](../../../../components/site/README.md)) mounts the shell and covers it with the post screen; the shell stays `aria-hidden` and `inert` until the last check resolves, so the handover is a reveal instead of a page load. The lines report what the shell actually mounted. Any key, or the Skip post button, hands the screen over at once, and an operator whose system asks for reduced motion never sees the post screen at all.
 
 The fiction needs one door out, since the landing page is how everyone arrives. The Start launcher's last row is **Public archive site**, a real link to the landing page in the reader's language, labelled with the archive's book mark and left outside the application list so it does not read as another destination.
 
+## Deep links and history
+
+The workstation is addressable without giving up the desktop as the thing that arranges itself:
+
+```text
+/{lang}/desktop                     the workstation, nothing focused
+/{lang}/desktop/{destination}       one of the rail shortcuts, or System
+/{lang}/desktop/record/{code}       the reader on an archive code
+```
+
+A continuity code contains a slash, so its address is one percent-encoded segment: `/desktop/record/ORG-C-005102%2FC1`. `src/lib/desktop-route.ts` owns both directions of the mapping, and `tests/desktop-route.test.ts` round-trips every destination and every released code.
+
+The history policy has one writer. `DesktopUrlSync` ([notes](../../../../components/README.md)) reads the pathname, adopts it into the store, and writes the store's focus back:
+
+- Opening a destination or a record pushes a new entry.
+- Taskbar focus, minimize, close, and the reader's own Back/Forward replace the current entry.
+- A deep link, browser Back, and browser Forward only adopt the address; they write nothing.
+- Closing the focused window replaces the address with the surviving window, or `/desktop` when none is left.
+
+Two races are named in the code because they are not obvious. A write is applied asynchronously, so the adapter must not read its own unwritten address back as a navigation; and a window closed before its push lands must not be resurrected when the address arrives. Both are covered in `tests/desktop-url.test.tsx`.
+
+An unknown destination or code is a 404, matching the public record route, and every route here is `noindex, nofollow`. The canonical, indexable address for a record remains `/{lang}/site/records/{code}`.
+
+A refresh restores the workspace from the tab's `sessionStorage` ([store notes](../../../../stores/README.md)); the URL's window takes focus. Deferred deliberately: folder paths, browser search state, mail selection, and editor drafts are not URLs, and windows do not survive a visit to the public archive.
+
 ## Verification
 
-Run `bun run test`, `bun run lint`, `bun run typecheck`, and `bun run test:e2e` from `client/`.
+Run `bun run test`, `bun run lint`, `bun run typecheck`, and `bun run test:e2e` from `client/`. The browser suite covers the deep-link matrix in `e2e/desktop-deeplink.spec.ts`.
 
 ## Visual contract
 
@@ -49,7 +74,7 @@ Finish condition: verify all shortcuts, Start, the tray controls, window drag/re
 
 ## Archive browser chrome
 
-The browser is a new surface inside an established product, so it inherits the shell's visual system and changes only its composition. Its chrome is steel, beveled, and uppercase; the document inside the tab is not, because a browser is a frame around someone else's page. Full detail, including the paper-surface decision, the reflow breakpoints, and the refusals, is in the browser's own [README](../../../components/browser/README.md).
+The browser is a new surface inside an established product, so it inherits the shell's visual system and changes only its composition. Its chrome is steel, beveled, and uppercase; the document inside the tab is not, because a browser is a frame around someone else's page. Full detail, including the paper-surface decision, the reflow breakpoints, and the refusals, is in the browser's own [README](../../../../components/browser/README.md).
 
 One shell-level change came with it: a menu, popover, or alert that handles Escape now consumes that press, so dismissing an open overlay no longer also closes the focused window. The shell's Escape handler skips an event that was already `defaultPrevented`.
 

@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 import { DesktopShell } from "@/components/desktop-shell";
 import { MAIL_WINDOW_TITLE } from "@/components/mail/mail-identity";
 import { MAILBOX_FIXTURE, DEFAULT_SORT, folderMessages, readIds, sortMessages, unreadCount } from "@/components/mail/mailbox-index";
-import { renderWithIntl } from "./intl";
+import { renderWorkstation } from "./intl";
 
 const read = readIds(MAILBOX_FIXTURE);
 const INBOX = folderMessages(MAILBOX_FIXTURE, "inbox");
@@ -18,7 +18,7 @@ const FIRST_LISTED = sortMessages(INBOX, DEFAULT_SORT)[0];
 
 /** Opens the Inbox destination, which hosts the mail client. */
 async function openMail(user: ReturnType<typeof userEvent.setup>) {
-  renderWithIntl(<DesktopShell />);
+  renderWorkstation(<DesktopShell />);
   await user.click(screen.getByRole("button", { name: "Inbox" }));
   const frame = screen.getByRole("dialog", { name: MAIL_WINDOW_TITLE });
   const status = () => within(frame).getByRole("status").textContent ?? "";

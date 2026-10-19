@@ -14,7 +14,11 @@ it renders `<html lang>`, `<body>`, the fonts, and the message provider.
   rather than a silent English page.
 - `page.tsx`: the public landing page, with the locale's title, description, and
   `openGraph.locale`.
-- `desktop/`: the workstation route and its [design decisions](desktop/README.md).
+- `(workspace)/`: the persistent workstation route group. Its layout owns the
+  shell, the post screen, and the store provider, so an in-workspace navigation
+  does not remount them; the route group itself never appears in an address. See
+  its [README](<(workspace)/README.md>) and the workstation's
+  [design decisions](<(workspace)/desktop/README.md>).
 - `site/`: the public archive as a full-page website — index, record pages,
   search, organizations, guide, and a random door. See its [README](site/README.md).
 - `meta/`: the project layer outside the fiction — the landing report, the

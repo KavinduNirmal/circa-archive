@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 // The shell directly: the locale desktop route now posts first, and these tests are about the shell.
 import { DesktopShell } from "@/components/desktop-shell";
 import { FILE_TREE, nodeById } from "@/components/files/files-index";
-import { catalogFor, renderWithIntl } from "./intl";
+import { catalogFor, renderWorkstation } from "./intl";
 
 const english = catalogFor("en");
 
@@ -21,7 +21,7 @@ const MY_PC_WINDOW_TITLE = `${english.shell.explorerMyComputer} - ${english.shel
  * layout mounts it: a shell rendered without one has no copy to read.
  */
 function renderShell() {
-  return renderWithIntl(<DesktopShell />);
+  return renderWorkstation(<DesktopShell />);
 }
 
 function desktopIconIn(button: HTMLElement) {
@@ -271,6 +271,27 @@ describe("the record reader as a workstation window", () => {
     // Minimizing is a trip to the taskbar, not a reset: the reader is where it was left.
     expect(within(restored).getByRole("heading", { level: 1 })).toHaveTextContent("Signal repeat interval");
     expect(within(restored).getByRole("button", { name: "Previous record" })).toBeEnabled();
+  });
+
+  it("revisits a record by moving the trail cursor and keeps the way forward", async () => {
+    const user = userEvent.setup();
+    const reader = await openRecord(user);
+    const strip = within(reader).getByRole("region", { name: "Subsequent Records" });
+    const inbound = within(strip).getByRole("list", { name: "Filed against this record" });
+    await user.click(within(inbound).getByRole("button", { name: /INC-00027/ }));
+    expect(within(reader).getByRole("heading", { level: 1 })).toHaveTextContent("Signal repeat interval");
+
+    // Reopening the first record is a revisit, not a third visit: the trail
+    // cursor moves back to where it already is and the record read after it
+    // stays ahead, so Forward is still available inside the viewer.
+    const browser = screen.getByRole("dialog", { name: "Titan Browser - CIRCA Archive" });
+    await user.click(within(browser).getByRole("button", { name: "INC-00907" }));
+    expect(within(reader).getByRole("heading", { level: 1 })).toHaveTextContent("Tide gauge disagreement, two stations");
+
+    const forward = within(reader).getByRole("button", { name: "Next record" });
+    expect(forward).toBeEnabled();
+    await user.click(forward);
+    expect(within(reader).getByRole("heading", { level: 1 })).toHaveTextContent("Signal repeat interval");
   });
 
   it("closes the reader from its own control and from the frame", async () => {

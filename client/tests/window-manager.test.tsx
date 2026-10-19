@@ -1,12 +1,13 @@
 import { readFileSync } from "node:fs";
-import { fireEvent, screen, waitFor, within } from "@testing-library/react";
+import { act, fireEvent, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 // The shell directly: the locale desktop route now posts first, and these tests are about the shell.
 import { DesktopShell } from "@/components/desktop-shell";
 import { BROWSER_WINDOW_TITLE } from "@/components/browser/browser-identity";
 import { MAIL_WINDOW_TITLE } from "@/components/mail/mail-identity";
-import { catalogFor, renderWithIntl } from "./intl";
+import { createWorkstationStore } from "@/stores/workstation-store";
+import { catalogFor, renderWorkstation } from "./intl";
 
 const english = catalogFor("en");
 
@@ -57,7 +58,7 @@ function stubLayout() {
 
 async function openArchive() {
   const user = userEvent.setup();
-  renderWithIntl(<DesktopShell />);
+  renderWorkstation(<DesktopShell />);
   await user.click(screen.getByRole("button", { name: "Archive" }));
   const windowFrame = screen.getByRole("dialog", { name: ARCHIVE_WINDOW_TITLE });
   return { user, windowFrame };
@@ -148,7 +149,7 @@ describe("workstation windows", () => {
   it("keeps the most recently used window on top", async () => {
     stubLayout();
     const user = userEvent.setup();
-    renderWithIntl(<DesktopShell />);
+    renderWorkstation(<DesktopShell />);
     await user.click(screen.getByRole("button", { name: "Archive" }));
     await user.click(screen.getByRole("button", { name: "Inbox" }));
     const archive = screen.getByRole("dialog", { name: ARCHIVE_WINDOW_TITLE });
@@ -161,7 +162,7 @@ describe("workstation windows", () => {
   it("marks the focused window in the taskbar", async () => {
     stubLayout();
     const user = userEvent.setup();
-    renderWithIntl(<DesktopShell />);
+    renderWorkstation(<DesktopShell />);
     const taskbar = () => within(screen.getByRole("contentinfo", { name: "Taskbar" }));
     await user.click(screen.getByRole("button", { name: "Archive" }));
     expect(taskbar().getByRole("button", { name: ARCHIVE_WINDOW_TITLE })).toHaveAttribute("data-active", "true");
@@ -182,7 +183,7 @@ describe("workstation windows", () => {
   it("remembers which window is minimized or closed across many open windows", async () => {
     stubLayout();
     const user = userEvent.setup();
-    renderWithIntl(<DesktopShell />);
+    renderWorkstation(<DesktopShell />);
     const taskbar = () => within(screen.getByRole("contentinfo", { name: "Taskbar" }));
     for (const name of ["Archive", "Inbox", "Search"]) await user.click(screen.getByRole("button", { name }));
 
@@ -224,7 +225,7 @@ describe("workstation windows", () => {
   it("places each window out of document flow so frames cannot stack", async () => {
     stubLayout();
     const user = userEvent.setup();
-    renderWithIntl(<DesktopShell />);
+    renderWorkstation(<DesktopShell />);
     for (const name of ["Archive", "Inbox"]) await user.click(screen.getByRole("button", { name }));
     const archive = screen.getByRole("dialog", { name: ARCHIVE_WINDOW_TITLE });
     const inbox = screen.getByRole("dialog", { name: MAIL_WINDOW_TITLE });
@@ -264,11 +265,44 @@ describe("workstation windows", () => {
   it("restores focus to the launching shortcut after closing", async () => {
     stubLayout();
     const user = userEvent.setup();
-    renderWithIntl(<DesktopShell />);
+    renderWorkstation(<DesktopShell />);
     const shortcut = screen.getByRole("button", { name: "Archive" });
     await user.click(shortcut);
     await user.click(within(screen.getByRole("dialog", { name: ARCHIVE_WINDOW_TITLE })).getByRole("button", { name: `Close ${ARCHIVE_WINDOW_TITLE}` }));
     expect(screen.queryByRole("dialog", { name: ARCHIVE_WINDOW_TITLE })).not.toBeInTheDocument();
     expect(shortcut).toHaveFocus();
+  });
+});
+
+describe("the shell and its store", () => {
+  it("renders the window list of the store it was given", () => {
+    stubLayout();
+    const store = createWorkstationStore();
+    store.getState().setArea({ width: 1200, height: 700 });
+    renderWorkstation(<DesktopShell />, { store });
+
+    // A window opened on the store, not through a shortcut, must appear in the
+    // shell: that is what makes a URL-opened window indistinguishable from a
+    // clicked one, and what lets a test assert on the exact state it rendered.
+    act(() => {
+      store.getState().open({ id: "archive", title: ARCHIVE_WINDOW_TITLE, status: "LOCATION", icon: { glyph: "archive" } }, "push");
+    });
+
+    expect(screen.getByRole("dialog", { name: ARCHIVE_WINDOW_TITLE })).toBeVisible();
+    expect(store.getState().windows).toHaveLength(1);
+    expect(store.getState().lastFocused).toBe("archive");
+  });
+
+  it("mounts a different store for each workstation", () => {
+    stubLayout();
+    const first = renderWorkstation(<DesktopShell />);
+    fireEvent.click(screen.getByRole("button", { name: "Archive" }));
+    expect(screen.getAllByRole("dialog", { name: ARCHIVE_WINDOW_TITLE })).toHaveLength(1);
+    first.unmount();
+
+    // A second workstation starts empty: the provider owns the lifetime, so one
+    // shell's windows can never leak into the next.
+    renderWorkstation(<DesktopShell />);
+    expect(screen.queryByRole("dialog", { name: ARCHIVE_WINDOW_TITLE })).not.toBeInTheDocument();
   });
 });

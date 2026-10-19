@@ -17,4 +17,8 @@ if (!("ResizeObserver" in globalThis)) {
   Object.defineProperty(globalThis, "ResizeObserver", { value: ResizeObserverStub, writable: true });
 }
 
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+  // A persisted workspace is per tab; a test must not inherit the previous one's.
+  window.sessionStorage.clear();
+});
