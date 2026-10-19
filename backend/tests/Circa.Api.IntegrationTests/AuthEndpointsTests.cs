@@ -100,6 +100,7 @@ public sealed class AuthEndpointsTests : IClassFixture<PostgresFixture>
     [Fact]
     public async Task Login_TenFailures_LocksOutAccountAndReturns423()
     {
+        _factory.Overrides["Auth:LoginRateLimitPermitLimit"] = "100";
         using var client = _factory.CreateClient();
         var unique = Guid.NewGuid().ToString("N")[..8];
         var registerRequest = new RegisterRequest($"lock_{unique}", $"lock_{unique}@example.com", "Password123!");

@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Hosting;
 using Circa.Auth.Application;
 using Circa.Auth.Contracts;
 using Circa.Auth.Domain;
@@ -57,13 +59,101 @@ public static class AuthModuleExtensions
             options.IterationCount = 600_000;
         });
 
-        services.Configure<AuthOptions>(configuration.GetSection(AuthOptions.SectionName));
+        services.AddOptions<AuthOptions>()
+            .Bind(configuration.GetSection(AuthOptions.SectionName))
+            .Validate(opts =>
+            {
+                if (string.IsNullOrWhiteSpace(opts.SigningKey) || System.Text.Encoding.UTF8.GetByteCount(opts.SigningKey) < 32)
+                    return false;
+                if (string.IsNullOrWhiteSpace(opts.Issuer)) return false;
+                if (string.IsNullOrWhiteSpace(opts.Audience)) return false;
+                if (opts.AccessTokenLifetimeSeconds != 600) return false;
+                if (opts.LoginRateLimitPermitLimit <= 0 || opts.RegisterRateLimitPermitLimit <= 0 ||
+                    opts.RefreshRateLimitPermitLimit <= 0) return false;
+                return true;
+            }, "AuthOptions validation failed: SigningKey >= 32 bytes, Issuer/Audience required, AccessTokenLifetimeSeconds must be 600.")
+            .Validate(opts =>
+            {
+                if (!environment.IsDevelopment() && !opts.RequireSecureCookies)
+                    return false;
+                return true;
+            }, "RequireSecureCookies must be true outside development.")
+            .ValidateOnStart();
 
+        services.AddSingleton<Logging.IAuthEventLogger, Logging.AuthEventLogger>();
         services.AddScoped<IAccessTokenService, AccessTokenService>();
         services.AddScoped<RegisterHandler>();
         services.AddScoped<LoginHandler>();
         services.AddScoped<IUserDirectory, UserDirectory>();
         services.AddScoped<ISessionService, SessionService>();
+
+        services.AddRateLimiter(options =>
+        {
+            options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+            options.OnRejected = async (context, token) =>
+            {
+                context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
+                context.HttpContext.Response.ContentType = "application/problem+json";
+                var problem = new Microsoft.AspNetCore.Mvc.ProblemDetails
+                {
+                    Status = StatusCodes.Status429TooManyRequests,
+                    Title = "Too Many Requests",
+                    Detail = "Rate limit exceeded. Please try again later."
+                };
+                problem.Extensions["code"] = "rate_limit_exceeded";
+                await context.HttpContext.Response.WriteAsJsonAsync(problem, cancellationToken: token);
+            };
+
+            options.AddPolicy("login_limit", httpContext =>
+            {
+                var authOpts = httpContext.RequestServices.GetRequiredService<IOptions<AuthOptions>>().Value;
+                var ip = httpContext.Connection.RemoteIpAddress?.ToString()
+                    ?? "default_ip";
+                var identifier = httpContext.Items["Auth_RateLimit_Identifier"] as string ?? "";
+                var key = $"{ip}:{identifier}";
+
+                return System.Threading.RateLimiting.RateLimitPartition.GetFixedWindowLimiter(
+                    key,
+                    _ => new System.Threading.RateLimiting.FixedWindowRateLimiterOptions
+                    {
+                        PermitLimit = authOpts.LoginRateLimitPermitLimit,
+                        Window = TimeSpan.FromMinutes(1),
+                        QueueLimit = 0
+                    });
+            });
+
+            options.AddPolicy("register_limit", httpContext =>
+            {
+                var authOpts = httpContext.RequestServices.GetRequiredService<IOptions<AuthOptions>>().Value;
+                var ip = httpContext.Connection.RemoteIpAddress?.ToString()
+                    ?? "default_ip";
+
+                return System.Threading.RateLimiting.RateLimitPartition.GetFixedWindowLimiter(
+                    ip,
+                    _ => new System.Threading.RateLimiting.FixedWindowRateLimiterOptions
+                    {
+                        PermitLimit = authOpts.RegisterRateLimitPermitLimit,
+                        Window = TimeSpan.FromHours(1),
+                        QueueLimit = 0
+                    });
+            });
+
+            options.AddPolicy("refresh_limit", httpContext =>
+            {
+                var authOpts = httpContext.RequestServices.GetRequiredService<IOptions<AuthOptions>>().Value;
+                var key = httpContext.Items["Auth_RateLimit_Session"] as string
+                    ?? $"ip:{httpContext.Connection.RemoteIpAddress}";
+
+                return System.Threading.RateLimiting.RateLimitPartition.GetFixedWindowLimiter(
+                    key,
+                    _ => new System.Threading.RateLimiting.FixedWindowRateLimiterOptions
+                    {
+                        PermitLimit = authOpts.RefreshRateLimitPermitLimit,
+                        Window = TimeSpan.FromMinutes(1),
+                        QueueLimit = 0
+                    });
+            });
+        });
 
         services.AddOptions<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme)
             .Configure<IOptions<AuthOptions>>((jwtOptions, authOptions) =>
@@ -105,6 +195,21 @@ public static class AuthModuleExtensions
                         }
 
                         return Task.CompletedTask;
+                    },
+                    OnChallenge = async context =>
+                    {
+                        context.HandleResponse();
+                        context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                        context.Response.Headers.Append("WWW-Authenticate", "Bearer");
+                        context.Response.ContentType = "application/problem+json";
+                        var problem = new Microsoft.AspNetCore.Mvc.ProblemDetails
+                        {
+                            Status = StatusCodes.Status401Unauthorized,
+                            Title = "Unauthorized",
+                            Detail = "Authentication required."
+                        };
+                        problem.Extensions["code"] = "unauthorized";
+                        await context.Response.WriteAsJsonAsync(problem);
                     }
                 };
             });

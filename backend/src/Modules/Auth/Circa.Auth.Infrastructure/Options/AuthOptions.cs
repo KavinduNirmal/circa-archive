@@ -13,6 +13,9 @@ public sealed class AuthOptions
     public int RefreshThresholdSeconds { get; set; } = 120;
     public string CookieDomain { get; set; } = string.Empty;
     public bool RequireSecureCookies { get; set; } = true;
+    public int LoginRateLimitPermitLimit { get; set; } = 5;
+    public int RegisterRateLimitPermitLimit { get; set; } = 3;
+    public int RefreshRateLimitPermitLimit { get; set; } = 30;
 
     public TimeSpan SessionLifetime => TimeSpan.FromDays(SessionLifetimeDays);
     public TimeSpan RefreshGrace => TimeSpan.FromSeconds(RefreshGraceSeconds);

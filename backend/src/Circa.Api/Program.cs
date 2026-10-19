@@ -7,6 +7,7 @@ using Circa.Auth.Infrastructure.Endpoints;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddAuthModule(builder.Configuration, builder.Environment);
+builder.Services.AddProblemDetails();
 
 builder.Services.AddApiVersioning(options =>
 {
@@ -18,6 +19,12 @@ builder.Services.AddApiVersioning(options =>
 
 var app = builder.Build();
 
+app.UseMiddleware<Circa.Auth.Infrastructure.Security.SecurityHeadersMiddleware>();
+app.UseMiddleware<Circa.Auth.Infrastructure.Security.OriginValidationMiddleware>();
+
+app.UseMiddleware<Circa.Auth.Infrastructure.Security.AuthRateLimitPartitionMiddleware>();
+
+app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
 

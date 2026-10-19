@@ -57,7 +57,8 @@ public sealed class AccessTokenTests : IClassFixture<PostgresFixture>
         var regUser = await regResponse.Content.ReadFromJsonAsync<RegisterResponse>();
         Assert.NotNull(regUser);
 
-        var token = TestTokenFactory.CreateToken(regUser.Id, regUser.Username, regUser.Role);
+        var token = ExtractCookie(regResponse, "circa_at");
+        Assert.NotNull(token);
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
         var response = await client.GetAsync("/api/v1/auth/me");

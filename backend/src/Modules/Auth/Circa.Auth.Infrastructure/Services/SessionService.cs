@@ -1,6 +1,7 @@
 using System.Security.Cryptography;
 using System.Text;
 using Circa.Auth.Domain;
+using Circa.Auth.Infrastructure.Logging;
 using Circa.Auth.Infrastructure.Options;
 using Circa.Auth.Infrastructure.Persistence;
 using Microsoft.AspNetCore.DataProtection;
@@ -68,17 +69,20 @@ public sealed class SessionService : ISessionService
     private readonly IDataProtector _protector;
     private readonly AuthOptions _options;
     private readonly ILogger<SessionService> _logger;
+    private readonly IAuthEventLogger _eventLogger;
 
     public SessionService(
         AuthDbContext context,
         IDataProtectionProvider dataProtectionProvider,
         IOptions<AuthOptions> options,
-        ILogger<SessionService> logger)
+        ILogger<SessionService> logger,
+        IAuthEventLogger eventLogger)
     {
         _context = context;
         _protector = dataProtectionProvider.CreateProtector("Circa.Auth.RefreshTokens");
         _options = options.Value;
         _logger = logger;
+        _eventLogger = eventLogger;
     }
 
     public static string GenerateRawToken()
@@ -175,6 +179,8 @@ public sealed class SessionService : ISessionService
             await tx.CommitAsync(ct);
 
             _logger.LogWarning("Refresh token reuse detected for session {SessionId}. Session revoked.", session.Id);
+            _eventLogger.LogRefreshReuseDetected(session.Id, session.CreatedIp?.ToString());
+            _eventLogger.LogSessionRevoked(session.Id, "refresh_reuse");
             return SessionRefreshResult.FailedResult(SessionRefreshStatus.ReuseDetected);
         }
 
@@ -188,7 +194,9 @@ public sealed class SessionService : ISessionService
     {
         if (string.IsNullOrWhiteSpace(rawRefreshToken)) return null;
         var hash = HashToken(rawRefreshToken);
-        return await _context.Sessions.FirstOrDefaultAsync(s => s.RefreshTokenHash == hash, ct);
+        var now = DateTimeOffset.UtcNow;
+        return await _context.Sessions.AsNoTracking().FirstOrDefaultAsync(s =>
+            s.RefreshTokenHash == hash || (s.PreviousTokenHash == hash && s.PreviousGraceUntil > now), ct);
     }
 
     public async Task RevokeSessionAsync(
@@ -202,6 +210,7 @@ public sealed class SessionService : ISessionService
         {
             session.Revoke(now, reason);
             await _context.SaveChangesAsync(ct);
+            _eventLogger.LogSessionRevoked(sessionId, reason);
         }
     }
 

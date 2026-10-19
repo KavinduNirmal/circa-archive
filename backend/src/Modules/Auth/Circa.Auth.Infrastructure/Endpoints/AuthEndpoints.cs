@@ -1,3 +1,4 @@
+using Circa.Auth.Infrastructure.Logging;
 using System.Security.Claims;
 using Asp.Versioning;
 using Circa.Auth.Application;
@@ -20,7 +21,6 @@ public static class AuthEndpoints
     public static IEndpointRouteBuilder MapAuthEndpoints(this IEndpointRouteBuilder endpoints)
     {
         var group = endpoints.MapGroup("/auth")
-            .AllowAnonymous()
             .HasApiVersion(new ApiVersion(1, 0));
 
         group.MapPost("/register", async (
@@ -39,9 +39,21 @@ public static class AuthEndpoints
             {
                 return result.FailureReason switch
                 {
-                    AuthFailureReason.UsernameTaken => Results.Conflict(new { error = result.ErrorMessage, code = "username_taken" }),
-                    AuthFailureReason.EmailTaken => Results.Conflict(new { error = result.ErrorMessage, code = "email_taken" }),
-                    _ => Results.BadRequest(new { error = result.ErrorMessage, code = "validation_failed" })
+                    AuthFailureReason.UsernameTaken => Results.Problem(
+                        statusCode: StatusCodes.Status409Conflict,
+                        title: "Conflict",
+                        detail: result.ErrorMessage,
+                        extensions: new Dictionary<string, object?> { ["code"] = "username_taken" }),
+                    AuthFailureReason.EmailTaken => Results.Problem(
+                        statusCode: StatusCodes.Status409Conflict,
+                        title: "Conflict",
+                        detail: result.ErrorMessage,
+                        extensions: new Dictionary<string, object?> { ["code"] = "email_taken" }),
+                    _ => Results.Problem(
+                        statusCode: StatusCodes.Status400BadRequest,
+                        title: "Bad Request",
+                        detail: result.ErrorMessage,
+                        extensions: new Dictionary<string, object?> { ["code"] = "validation_failed" })
                 };
             }
 
@@ -66,7 +78,7 @@ public static class AuthEndpoints
             SetRefreshTokenCookie(httpContext, rawRefreshToken, authOptions.Value);
 
             return Results.Created($"/api/v1/auth/users/{result.Value.Id}", result.Value);
-        });
+        }).AllowAnonymous().RequireRateLimiting("register_limit");
 
         group.MapPost("/login", async (
             LoginRequest request,
@@ -75,26 +87,34 @@ public static class AuthEndpoints
             ISessionService sessionService,
             IAccessTokenService accessTokenService,
             IOptions<AuthOptions> authOptions,
+            IAuthEventLogger authEventLogger,
             HttpContext httpContext,
             CancellationToken ct) =>
         {
             var result = await handler.HandleAsync(request, ct);
+            var ip = httpContext.Connection.RemoteIpAddress?.ToString();
 
             if (!result.Succeeded)
             {
-                return result.FailureReason switch
+                if (result.FailureReason == AuthFailureReason.LockedOut)
                 {
-                    AuthFailureReason.LockedOut => Results.Json(
-                        new { error = result.ErrorMessage, code = "locked" },
-                        statusCode: StatusCodes.Status423Locked),
-                    _ => Results.Json(
-                        new { error = "Invalid credentials.", code = "invalid_credentials" },
-                        statusCode: StatusCodes.Status401Unauthorized)
-                };
+                    authEventLogger.LogLoginFailure(request.Identifier, "locked", ip);
+                    return Results.Problem(
+                        statusCode: StatusCodes.Status423Locked,
+                        title: "Locked",
+                        detail: result.ErrorMessage,
+                        extensions: new Dictionary<string, object?> { ["code"] = "locked" });
+                }
+
+                authEventLogger.LogLoginFailure(request.Identifier, "invalid_credentials", ip);
+                return Results.Problem(
+                    statusCode: StatusCodes.Status401Unauthorized,
+                    title: "Unauthorized",
+                    detail: "Invalid credentials.",
+                    extensions: new Dictionary<string, object?> { ["code"] = "invalid_credentials" });
             }
 
             var now = DateTimeOffset.UtcNow;
-            var ip = httpContext.Connection.RemoteIpAddress?.ToString();
             var userAgent = httpContext.Request.Headers.UserAgent.ToString();
 
             var (session, rawRefreshToken) = await sessionService.CreateSessionAsync(
@@ -112,22 +132,28 @@ public static class AuthEndpoints
             }
 
             SetRefreshTokenCookie(httpContext, rawRefreshToken, authOptions.Value);
+            authEventLogger.LogLoginSuccess(result.Value.Id, result.Value.Username, ip);
 
             return Results.Ok(result.Value);
-        });
+        }).AllowAnonymous().RequireRateLimiting("login_limit");
 
         group.MapPost("/refresh", async (
             ISessionService sessionService,
             IAccessTokenService accessTokenService,
             UserManager<AppUser> userManager,
             IOptions<AuthOptions> authOptions,
+            IAuthEventLogger authEventLogger,
             HttpContext httpContext,
             CancellationToken ct) =>
         {
             if (!httpContext.Request.Cookies.TryGetValue(RefreshTokenCookieName, out var rawRefreshToken) ||
                 string.IsNullOrWhiteSpace(rawRefreshToken))
             {
-                return Results.Unauthorized();
+                return Results.Problem(
+                    statusCode: StatusCodes.Status401Unauthorized,
+                    title: "Unauthorized",
+                    detail: "Session expired or missing.",
+                    extensions: new Dictionary<string, object?> { ["code"] = "session_expired" });
             }
 
             var now = DateTimeOffset.UtcNow;
@@ -137,7 +163,16 @@ public static class AuthEndpoints
             {
                 DeleteAccessTokenCookie(httpContext, authOptions.Value);
                 DeleteRefreshTokenCookie(httpContext, authOptions.Value);
-                return Results.Unauthorized();
+
+                var code = refreshResult.Status == SessionRefreshStatus.ReuseDetected
+                    ? "refresh_reuse"
+                    : "session_expired";
+
+                return Results.Problem(
+                    statusCode: StatusCodes.Status401Unauthorized,
+                    title: "Unauthorized",
+                    detail: "Session expired or revoked.",
+                    extensions: new Dictionary<string, object?> { ["code"] = code });
             }
 
             var user = await userManager.FindByIdAsync(refreshResult.Session.UserId.ToString());
@@ -145,19 +180,26 @@ public static class AuthEndpoints
             {
                 DeleteAccessTokenCookie(httpContext, authOptions.Value);
                 DeleteRefreshTokenCookie(httpContext, authOptions.Value);
-                return Results.Unauthorized();
+                return Results.Problem(
+                    statusCode: StatusCodes.Status401Unauthorized,
+                    title: "Unauthorized",
+                    detail: "User not found.",
+                    extensions: new Dictionary<string, object?> { ["code"] = "session_expired" });
             }
 
             var accessToken = accessTokenService.Issue(user, refreshResult.Session, now);
             SetAccessTokenCookie(httpContext, accessToken, authOptions.Value);
             SetRefreshTokenCookie(httpContext, refreshResult.ReplacementToken!, authOptions.Value);
 
+            authEventLogger.LogRefreshSuccess(refreshResult.Session.Id, refreshResult.Session.UserId);
+
             return Results.NoContent();
-        });
+        }).AllowAnonymous().RequireRateLimiting("refresh_limit");
 
         group.MapPost("/logout", async (
             ISessionService sessionService,
             IOptions<AuthOptions> authOptions,
+            IAuthEventLogger authEventLogger,
             HttpContext httpContext,
             CancellationToken ct) =>
         {
@@ -168,21 +210,24 @@ public static class AuthEndpoints
                 if (session is not null)
                 {
                     await sessionService.RevokeSessionAsync(session.Id, DateTimeOffset.UtcNow, "manual_logout", ct);
+                    authEventLogger.LogLogout(session.Id, session.UserId);
                 }
             }
             else if (httpContext.User.Identity?.IsAuthenticated == true)
             {
                 var sidStr = httpContext.User.FindFirst("sid")?.Value;
-                if (Guid.TryParse(sidStr, out var sid))
+                var subStr = httpContext.User.FindFirst("sub")?.Value;
+                if (Guid.TryParse(sidStr, out var sid) && Guid.TryParse(subStr, out var sub))
                 {
                     await sessionService.RevokeSessionAsync(sid, DateTimeOffset.UtcNow, "manual_logout", ct);
+                    authEventLogger.LogLogout(sid, sub);
                 }
             }
 
             DeleteAccessTokenCookie(httpContext, authOptions.Value);
             DeleteRefreshTokenCookie(httpContext, authOptions.Value);
             return Results.NoContent();
-        });
+        }).AllowAnonymous();
 
         group.MapGet("/me", async (
             ClaimsPrincipal principal,
@@ -192,13 +237,21 @@ public static class AuthEndpoints
             var userIdStr = principal.FindFirst("sub")?.Value;
             if (!Guid.TryParse(userIdStr, out var userId))
             {
-                return Results.Unauthorized();
+                return Results.Problem(
+                    statusCode: StatusCodes.Status401Unauthorized,
+                    title: "Unauthorized",
+                    detail: "Invalid user token.",
+                    extensions: new Dictionary<string, object?> { ["code"] = "unauthorized" });
             }
 
             var user = await userManager.FindByIdAsync(userIdStr);
             if (user is null)
             {
-                return Results.Unauthorized();
+                return Results.Problem(
+                    statusCode: StatusCodes.Status401Unauthorized,
+                    title: "Unauthorized",
+                    detail: "User not found.",
+                    extensions: new Dictionary<string, object?> { ["code"] = "unauthorized" });
             }
 
             return Results.Ok(new
@@ -208,7 +261,7 @@ public static class AuthEndpoints
                 role = user.Role,
                 createdAt = user.CreatedAt
             });
-        }).RequireAuthorization();
+        }).RequireAuthorization(policy => policy.RequireAuthenticatedUser().AddRequirements(new Circa.Auth.Contracts.LiveSessionRequirement()));
 
         group.MapGet("/sessions", async (
             ISessionService sessionService,
@@ -218,18 +271,26 @@ public static class AuthEndpoints
             if (!httpContext.Request.Cookies.TryGetValue(RefreshTokenCookieName, out var rawRefreshToken) ||
                 string.IsNullOrWhiteSpace(rawRefreshToken))
             {
-                return Results.Unauthorized();
+                return Results.Problem(
+                    statusCode: StatusCodes.Status401Unauthorized,
+                    title: "Unauthorized",
+                    detail: "Session expired or missing.",
+                    extensions: new Dictionary<string, object?> { ["code"] = "session_expired" });
             }
 
             var session = await sessionService.FindSessionByRawTokenAsync(rawRefreshToken, ct);
             if (session is null || !session.IsLive(DateTimeOffset.UtcNow))
             {
-                return Results.Unauthorized();
+                return Results.Problem(
+                    statusCode: StatusCodes.Status401Unauthorized,
+                    title: "Unauthorized",
+                    detail: "Session expired or revoked.",
+                    extensions: new Dictionary<string, object?> { ["code"] = "session_expired" });
             }
 
             var sessions = await sessionService.GetUserSessionsAsync(session.UserId, session.Id, ct);
             return Results.Ok(sessions);
-        });
+        }).AllowAnonymous();
 
         group.MapDelete("/sessions/{id:guid}", async (
             Guid id,
@@ -241,14 +302,27 @@ public static class AuthEndpoints
             if (!httpContext.Request.Cookies.TryGetValue(RefreshTokenCookieName, out var rawRefreshToken) ||
                 string.IsNullOrWhiteSpace(rawRefreshToken))
             {
-                return Results.Unauthorized();
+                return Results.Problem(
+                    statusCode: StatusCodes.Status401Unauthorized,
+                    title: "Unauthorized",
+                    detail: "Session expired or missing.",
+                    extensions: new Dictionary<string, object?> { ["code"] = "session_expired" });
             }
 
             var currentSession = await sessionService.FindSessionByRawTokenAsync(rawRefreshToken, ct);
             if (currentSession is null || !currentSession.IsLive(DateTimeOffset.UtcNow))
             {
-                return Results.Unauthorized();
+                return Results.Problem(
+                    statusCode: StatusCodes.Status401Unauthorized,
+                    title: "Unauthorized",
+                    detail: "Session expired or revoked.",
+                    extensions: new Dictionary<string, object?> { ["code"] = "session_expired" });
             }
+
+            var ownSessions = await sessionService.GetUserSessionsAsync(currentSession.UserId, currentSession.Id, ct);
+            if (!ownSessions.Any(session => session.Id == id))
+                return Results.Problem(statusCode: StatusCodes.Status403Forbidden, title: "Forbidden",
+                    extensions: new Dictionary<string, object?> { ["code"] = "forbidden" });
 
             await sessionService.RevokeSessionAsync(id, DateTimeOffset.UtcNow, "user_revoked", ct);
 
@@ -259,7 +333,7 @@ public static class AuthEndpoints
             }
 
             return Results.NoContent();
-        });
+        }).AllowAnonymous();
 
         return endpoints;
     }

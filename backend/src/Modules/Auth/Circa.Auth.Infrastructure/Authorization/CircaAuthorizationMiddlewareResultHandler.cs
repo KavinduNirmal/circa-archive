@@ -1,8 +1,8 @@
 using Circa.Auth.Contracts;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authorization.Policy;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Circa.Auth.Infrastructure.Authorization;
 
@@ -26,19 +26,30 @@ public sealed class CircaAuthorizationMiddlewareResultHandler : IAuthorizationMi
 
             if (isLiveSessionFailed)
             {
-                if (policy.AuthenticationSchemes.Count > 0)
+                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                context.Response.ContentType = "application/problem+json";
+                var problem = new ProblemDetails
                 {
-                    foreach (var scheme in policy.AuthenticationSchemes)
-                    {
-                        await context.ChallengeAsync(scheme);
-                    }
-                }
-                else
-                {
-                    await context.ChallengeAsync();
-                }
+                    Status = StatusCodes.Status401Unauthorized,
+                    Title = "Unauthorized",
+                    Detail = "Session is revoked or expired."
+                };
+                problem.Extensions["code"] = "session_expired";
+                await context.Response.WriteAsJsonAsync(problem);
                 return;
             }
+
+            context.Response.StatusCode = StatusCodes.Status403Forbidden;
+            context.Response.ContentType = "application/problem+json";
+            var forbiddenProblem = new ProblemDetails
+            {
+                Status = StatusCodes.Status403Forbidden,
+                Title = "Forbidden",
+                Detail = "Access denied."
+            };
+            forbiddenProblem.Extensions["code"] = "forbidden";
+            await context.Response.WriteAsJsonAsync(forbiddenProblem);
+            return;
         }
 
         await _defaultHandler.HandleAsync(next, context, policy, authorizeResult);
