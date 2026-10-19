@@ -42,7 +42,7 @@ This supersedes the 2026-10-15 portal composition. The page is no longer a tidy 
 
 **The page acknowledges the visitor without keeping them.** The attendance box counts the time this tab has been open, and after a minute its note changes from "recorded" to "still present". The visit counter reads 412 and says one of them is present, which is true. Neither stores anything and neither identifies anyone: the acknowledgement is real and it cannot follow the reader anywhere, which is the only version of this that is not a lie.
 
-**Refreshing the register.** The register's refresh control withdraws the notices on screen, says none were received, and dates the page a day earlier. There is no backend, so this is the only refresh the page can honestly perform, and the way it runs backwards is the joke.
+**Refreshing the register.** The register's refresh control withdraws the notices on screen, says none were received, and dates the page a day earlier. The notices remain illustrative, so this is the only refresh their register performs, and the way it runs backwards is the joke.
 
 **Pages that are not held.** The rail lists four pages — a withdrawn reading-room plan, a guestbook closed in 1998, the previous circular, an index of personnel — as ordinary links. Choosing one opens the workstation's own message box with the reason and the reference. They are buttons rather than anchors because nothing navigates, which also means no address is invented for a page that does not exist.
 
@@ -52,9 +52,9 @@ This supersedes the 2026-10-15 portal composition. The page is no longer a tidy 
 
 ## Boundaries
 
-The only application destination is the workstation, reached in the reader's own language. Local links resolve to real sections, including an unavailable-document notice. Public access explains how to use Archive and Search. Submission guidance describes temporary editor drafts and does not promise transmission. Organization registration and credential verification are explicitly unconnected, with no fake form or invented authentication. The contact directory lists routing references, not operational email addresses. The page makes no claim of a network security clearance and does not break character to explain itself.
+The only application destination is the workstation, reached in the reader's own language. Local links resolve to real sections, including an unavailable-document notice. Public access explains how to use Archive and Search. Submission guidance describes temporary editor drafts and does not promise transmission. Organization registration remains unconnected. Personal account registration and sign-in use the real authentication service through the separate access pages. The portal navigation resolves the current session on the server. The contact directory lists routing references, not operational email addresses. The page makes no claim of a network security clearance and does not break character to explain itself.
 
-The uncanny behaviours are presentation, not data. Nothing on this page stores a visit, sets a cookie for the effect, or calls a network; the alterations are attributes in the markup, the attendance is a local interval, and the refresh is a state change. A future reader-facing behaviour that did any of those things would belong in a different folder with its own README.
+The uncanny behaviours are presentation, not data. The uncanny effects do not store a visit, set cookies, or call a network; the alterations are attributes in the markup, the attendance is a local interval, and the refresh is a state change. Authentication UI lives separately in `../auth/` and uses essential session cookies; it does not change these presentation effects.
 
 ## Usage and verification
 

@@ -19,6 +19,7 @@ it renders `<html lang>`, `<body>`, the fonts, and the message provider.
   does not remount them; the route group itself never appears in an address. See
   its [README](<(workspace)/README.md>) and the workstation's
   [design decisions](<(workspace)/desktop/README.md>).
+- `sign-in/`, `sign-up/`, and `account/`: localized personal access routes with non-indexable metadata; shared UI lives in `components/auth/`.
 - `site/`: the public archive as a full-page website — index, record pages,
   search, organizations, guide, and a random door. See its [README](site/README.md).
 - `meta/`: the project layer outside the fiction — the landing report, the
@@ -46,9 +47,7 @@ exactly one address.
 ## Usage and verification
 
 `generateStaticParams` builds both languages ahead of time, and `setRequestLocale`
-tells next-intl which one a build is for. Both routes therefore prerender — check
-`bun run build` and read the route table it prints for `/en`, `/ko`, `/en/desktop`,
-and `/ko/desktop`.
+tells next-intl which one a build is for. The portal and archive resolve request cookies for their access controls and therefore render per request. The workstation remains independent of personal access. Check `bun run build` for the current route table.
 
 To see the resolution rules rather than the pages, run `bun run test` and read
 `tests/i18n-routing.test.ts`, which drives the proxy directly: an explicit prefix

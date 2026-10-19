@@ -1,6 +1,7 @@
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { LanguageSwitcher } from "../language-switcher";
+import { SessionAccessLink } from "../auth/session-access-link";
 import { ArchiveButton } from "./archive-button";
 import { SITE_INDEX } from "./archive-data";
 import { SiteSearch } from "./site-search";
@@ -77,7 +78,7 @@ export function ArchiveChrome({ active, trail, children }: {
 
           <div className={styles.topbarTools}>
             <LanguageSwitcher className={styles.language} />
-            <ArchiveButton href="/meta">{t("aboutSite")}</ArchiveButton>
+            <SessionAccessLink />
           </div>
         </div>
       </header>
@@ -89,6 +90,7 @@ export function ArchiveChrome({ active, trail, children }: {
               {t(item.key)}
             </ArchiveButton>
           ))}
+          <ArchiveButton href="/meta">{t("aboutSite")}</ArchiveButton>
           <span className={styles.navSpacer} />
           <ArchiveButton href="/site/random">{t("actionRandom")}</ArchiveButton>
           <ArchiveButton href="/desktop">{t("navWorkstation")} <span aria-hidden="true">»</span></ArchiveButton>

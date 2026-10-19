@@ -11,7 +11,7 @@ never opens it downloads no Markdown parser and runs no state.
 - `archive-chrome.tsx`: the full-bleed frame — the classification notice above the
   masthead, the masthead with the search box, the section bar, the announcement
   bar, breadcrumbs, and the foot. It also carries the one link out of the fiction,
-  "About the site", which goes to `/[lang]/meta`.
+  "About the site", which goes to `/[lang]/meta` beside "About the archive" in the section bar. The masthead carries the server-verified personal access link.
 - `site-search.tsx`: the search form and its filters. A plain GET form to the
   index, so a query and a filter set survive a bookmark and work without
   JavaScript. The masthead puts the filters behind a `<details>`; the pages show
@@ -57,7 +57,7 @@ never opens it downloads no Markdown parser and runs no state.
   held and current states, tracked uppercase — and it renders the element the job
   needs: the locale-aware link, a plain anchor for `#anchors` and downloads, or a
   real `<button>`. `tone` picks the ground, `steel` on the navy chrome or `paper`
-  on the sheets. The masthead's "About the site", the search key, the section bar,
+  on the sheets. The masthead's access key, the search key, the section bar,
   the record's action bar, and the random door all use it.
 
 **Brand.** The masthead pairs the seal with the wordmark and the institution's

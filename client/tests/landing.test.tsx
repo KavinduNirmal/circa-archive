@@ -1,10 +1,16 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { screen, within } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { LandingPage } from "@/components/site/landing-page";
 import { generateMetadata } from "@/app/[lang]/page";
 import { catalogFor, renderWithIntl } from "./intl";
+
+vi.mock("@/components/auth/session-access-link", async () => {
+  const { AccessLink } = await import("@/components/auth/access-link");
+  return { SessionAccessLink: (props: { variant?: "archive" | "portal"; className?: string }) =>
+    <AccessLink {...props} state={{ status: "guest" }} /> };
+});
 
 const english = catalogFor("en");
 
@@ -38,7 +44,7 @@ describe("public access portal", () => {
       expect(section).not.toBeNull();
       expect(section).toHaveAccessibleName(new RegExp(name, "i"));
     }
-    expect(screen.getByText(/Credential verification is not connected/)).toBeVisible();
+    expect(screen.getByRole("link", { name: "Sign in" })).toHaveAttribute("href", "/en/sign-in");
     expect(screen.getByText(/Organization submissions are not being transmitted/)).toBeVisible();
     expect(screen.getByText(/Drafts remain in this browser/)).toBeVisible();
   });
@@ -52,7 +58,7 @@ describe("public access portal", () => {
       // point at that language's desktop or reading edition, and the switcher at
       // the other language's copy of this page. A bare path would bounce the
       // reader through the proxy.
-      else expect(href, href).toMatch(/^\/(en|ko)(\/(desktop|site))?$/);
+      else expect(href, href).toMatch(/^\/(en|ko)(\/(desktop|site|sign-in|sign-up|account))?$/);
     }
     expect(screen.getByRole("table", { name: english.landing.revisionLabel })).toBeVisible();
     expect(screen.getByRole("table", { name: english.landing.contactsLabel })).toBeVisible();

@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 
 const nextConfig: NextConfig = {
   devIndicators: false,
+  ...(process.env.CIRCA_LOW_RESOURCE === "1" ? { experimental: { cpus: 1 } } : {}),
   distDir: process.env.CIRCA_AUTH_E2E === "1" ? ".next/auth-e2e" : ".next",
   async rewrites() {
     if (process.env.NODE_ENV !== "development") return [];
