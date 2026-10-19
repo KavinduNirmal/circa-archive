@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using Testcontainers.PostgreSql;
 using Xunit;
 
@@ -17,6 +18,13 @@ public sealed class PostgresFixture : IAsyncLifetime
     public async Task InitializeAsync()
     {
         await _container.StartAsync();
+
+        var options = new Microsoft.EntityFrameworkCore.DbContextOptionsBuilder<Circa.Auth.Infrastructure.Persistence.AuthDbContext>()
+            .UseNpgsql(ConnectionString)
+            .Options;
+
+        await using var context = new Circa.Auth.Infrastructure.Persistence.AuthDbContext(options);
+        await context.Database.EnsureCreatedAsync();
     }
 
     public async Task DisposeAsync()
