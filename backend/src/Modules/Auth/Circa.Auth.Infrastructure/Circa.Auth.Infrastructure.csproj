@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\Circa.Auth.Application\Circa.Auth.Application.csproj" />
+    <ProjectReference Include="..\Circa.Auth.Contracts\Circa.Auth.Contracts.csproj" />
+    <ProjectReference Include="..\..\..\Common\Circa.Common.Infrastructure\Circa.Common.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>

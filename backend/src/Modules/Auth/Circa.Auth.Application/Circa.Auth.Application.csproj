@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\Circa.Auth.Domain\Circa.Auth.Domain.csproj" />
+    <ProjectReference Include="..\..\..\Common\Circa.Common.Application\Circa.Common.Application.csproj" />
+  </ItemGroup>
+
+</Project>

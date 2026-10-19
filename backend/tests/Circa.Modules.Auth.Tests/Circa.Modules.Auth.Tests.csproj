@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="coverlet.collector" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Modules\Auth\Circa.Auth.Infrastructure\Circa.Auth.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\Modules\Auth\Circa.Auth.Application\Circa.Auth.Application.csproj" />
+    <ProjectReference Include="..\..\src\Modules\Auth\Circa.Auth.Domain\Circa.Auth.Domain.csproj" />
+    <ProjectReference Include="..\..\src\Modules\Auth\Circa.Auth.Contracts\Circa.Auth.Contracts.csproj" />
+  </ItemGroup>
+
+</Project>

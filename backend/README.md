@@ -2,12 +2,30 @@
 
 ## Responsibility
 
-Reserved for domain behavior, authorized APIs, persistence, and real-time events.
+Hosts the domain behavior, authorized APIs, persistence, and real-time events for the CIRCA Archive. Built as a .NET 10 modular monolith deploying as a single service host over PostgreSQL.
 
 ## Structure and boundaries
 
-No backend project exists yet. The draft specifies .NET 10 Minimal APIs, EF Core, PostgreSQL, and SignalR; see root `ARCHITECTURE.md`. Frontend rendering belongs in `client/`. Keep transport, domain behavior, and persistence responsibilities explicit as modules are introduced.
+```text
+backend/
+  Circa.sln                   # Solution file
+  Directory.Build.props       # Central build properties (net10.0, nullable, warnings-as-errors)
+  Directory.Packages.props    # Central package version management (CPM)
+  Dockerfile                  # Multistage build and runtime container image
+  docker-compose.yml          # Local database (PostgreSQL 16) and Redis backing services
+  src/                        # Application host, shared cross-cutting layers, and domain modules
+  tests/                      # Unit and integration test suites
+```
+
+Frontend rendering and browser logic belong in `client/`. The backend exposes HTTP Minimal APIs and SignalR hubs. Domain modules maintain isolated schemas within the single PostgreSQL instance and interact across module boundaries exclusively through contract interfaces and types.
 
 ## Development
 
-Create a test runner before adding executable behavior. Document real restore, build, test, run, and migration commands with the project or solution. Add a README in every new authored folder. Do not store secrets or production data here.
+Prerequisites: .NET 10 SDK and Docker.
+
+- Restore dependencies: `dotnet restore`
+- Build solution: `dotnet build`
+- Run test suites: `dotnet test`
+- Start local backing database: `docker compose up -d circa-db`
+- Run local API host: `dotnet run --project src/Circa.Api`
+- Run full container stack: `docker compose --profile full up --build`
