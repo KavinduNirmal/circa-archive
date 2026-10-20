@@ -37,3 +37,17 @@ usual fixture schema creation. It verifies opt-in Development initialization,
 default-disabled behavior, data preservation on restart, and rejection outside
 Development. `ApiFactory.EnvironmentName` and `PostgresFixture.InitializeSchema`
 let these tests exercise real startup without changing other suites' defaults.
+
+`ForwardedAddressTests.cs` checks the IP persisted during real registration:
+trusted gateway/Next peers, spoofed and malformed headers, and the one-hop limit.
+On constrained systems, run one class at a time from the root:
+
+```sh
+DOTNET_PROCESSOR_COUNT=1 DOTNET_CLI_USE_MSBUILD_SERVER=0 MSBUILDDISABLENODEREUSE=1 \
+  dotnet test backend/tests/Circa.Api.IntegrationTests \
+  --filter FullyQualifiedName~ForwardedAddressTests --maxcpucount:1 --nodeReuse:false
+```
+
+Reuse `--no-build --no-restore` for subsequent batches only after a successful
+build. Do not run frontend checks or production builds concurrently with these
+batches.

@@ -27,3 +27,5 @@ Boot timing is worth knowing: `WorkstationBoot` schedules its handover from a li
 The auth suite now uses the actual sign-up and sign-in forms in English and Korean. It covers generated analyst-name previews and rerolls, persisted public profile details, the portal/archive access links, the moved project link, redirects, reload/expiry, credential privacy, logout success/failure, error feedback, keyboard submission, and invalid fields. It captures access pages at 390px and 1440px in `/tmp/circa-auth-*.png`. It runs one browser worker and bounds Next/.NET concurrency; run it separately from builds and unit suites on low-resource machines.
 
 For a checkout-local browser installation, prefix the auth command with `PLAYWRIGHT_BROWSERS_PATH="$PWD/.pw-browsers"` when running from the repository root.
+
+The auth browser suite also captures and dismisses the English/Korean cookie notice, checks that acknowledgement survives reload, and keeps notice preferences separate from the two HttpOnly authentication cookies.

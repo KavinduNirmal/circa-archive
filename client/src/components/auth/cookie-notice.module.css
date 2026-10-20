@@ -1,0 +1,14 @@
+.notice { position: fixed; inset: auto 0 0; z-index: 110; max-height: 70dvh; overflow-y: auto; border-top: 3px double var(--circa-rule); background: var(--background); color: var(--foreground); font-family: var(--font-sans); font-size: 13px; line-height: 1.65; }
+.inner { max-width: 1160px; margin: 0 auto; padding: 18px 28px; display: grid; grid-template-columns: 150px minmax(0, 1fr) auto; gap: 24px; align-items: start; }
+.label { margin: 0; padding-top: 2px; font-family: var(--font-mono); font-size: 11px; letter-spacing: .05em; text-transform: uppercase; }
+.copy p { margin: 0; max-width: 80ch; }
+.copy summary { display: flex; align-items: center; min-height: 44px; cursor: pointer; text-decoration: underline dotted; text-underline-offset: 4px; }
+.copy details[open] p { padding: 4px 0 12px; color: var(--foreground); }
+.copy summary:focus-visible { outline: 2px dotted var(--foreground); outline-offset: 2px; }
+.inner [data-tone] { min-height: 44px; padding: 0 18px; }
+@media (max-width: 620px) {
+  .inner { padding: 16px; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; }
+  .label { grid-column: 1 / -1; }
+  .copy { grid-column: 1 / -1; }
+  .inner [data-tone] { grid-column: 2; }
+}

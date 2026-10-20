@@ -19,6 +19,16 @@ for (const locale of ["en", "ko"] as const) {
   test(`${locale}: register, visit both access links, sign in, refresh, and sign out through the UI`, async ({ page, context }) => {
     await page.goto(`/${locale}/account`);
     await expect(page).toHaveURL(new RegExp(`/${locale}/sign-in$`));
+    const cookieNotice = page.getByRole("region", { name: locale === "en" ? "Cookie notice" : "쿠키 안내" });
+    await expect(cookieNotice).toBeVisible();
+    for (const width of [1440, 390]) {
+      await page.setViewportSize({ width, height: 900 });
+      await page.screenshot({ path: `/tmp/circa-cookie-${locale}-${width}.png`, fullPage: false });
+    }
+    await cookieNotice.getByRole("button", { name: locale === "en" ? "Understood" : "확인했습니다" }).click();
+    await expect(cookieNotice).toHaveCount(0);
+    await page.reload();
+    await expect(cookieNotice).toHaveCount(0);
     await page.getByRole("link", { name: t.signUp, exact: true }).click();
     await expect(page).toHaveURL(new RegExp(`/${locale}/sign-up$`));
     await expect(page.getByRole("search")).toHaveCount(0);
@@ -44,7 +54,7 @@ for (const locale of ["en", "ko"] as const) {
     await expect(page.locator("#account-details time")).toBeVisible();
     await inspectLayout(page, `${locale}-account`);
     expect(await page.evaluate(() => document.cookie)).not.toMatch(/circa_(at|rt)/);
-    const credentials = (await context.cookies()).filter(cookie => cookie.name.startsWith("circa_"));
+    const credentials = (await context.cookies()).filter(cookie => ["circa_at", "circa_rt"].includes(cookie.name));
     expect(credentials).toHaveLength(2);
     expect(credentials.every(cookie => cookie.httpOnly)).toBe(true);
     await page.goto(`/${locale}`);
@@ -85,7 +95,7 @@ for (const locale of ["en", "ko"] as const) {
     await page.unroute("**/api/v1/auth/logout");
     await page.getByRole("button", { name: t.signOut, exact: true }).click();
     await expect(page).toHaveURL(new RegExp(`/${locale}/site$`));
-    expect((await context.cookies()).filter(cookie => cookie.name.startsWith("circa_"))).toEqual([]);
+    expect((await context.cookies()).filter(cookie => ["circa_at", "circa_rt"].includes(cookie.name))).toEqual([]);
     expect((await page.request.post("/api/v1/records")).status()).toBe(401);
     await page.goto(`/${locale}`);
     await expect(page.getByRole("link", { name: t.signIn, exact: true })).toBeVisible();

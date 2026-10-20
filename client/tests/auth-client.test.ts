@@ -18,7 +18,7 @@ describe("browser session requests", () => {
         return new Response(null, { status: 204 });
       }
       const request = input as Request;
-      expect(request.credentials).toBe("same-origin");
+      expect(request.credentials).toBe("include");
       bodies.push(await request.text());
       return new Response(null, { status: refreshed ? 201 : 401 });
     });
@@ -63,4 +63,22 @@ describe("browser session requests", () => {
     await expect(authFetch("https://evil.test/api/v1/auth/me")).rejects.toThrow();
     expect(fetch).not.toHaveBeenCalled();
   });
+});
+
+it("removes browser-supplied IP claims before sending a cookie-authenticated request", async () => {
+  const fetch = vi.fn().mockResolvedValue(Response.json({ ok: true }));
+  vi.stubGlobal("fetch", fetch);
+  await authFetch("/api/v1/auth/me", { headers: {
+    "X-Forwarded-For": "198.51.100.99", "X-Real-IP": "198.51.100.99", "Forwarded": "for=198.51.100.99",
+  } });
+  const request = fetch.mock.calls[0][0] as Request;
+  for (const header of ["X-Forwarded-For", "X-Real-IP", "Forwarded"]) expect(request.headers.has(header)).toBe(false);
+  expect(request.credentials).toBe("include");
+});
+
+it.each(["/api/../private", "https://reader:password@localhost/api/v1/auth/me", "//evil.test/api/v1/auth/me"])("rejects unsafe API destination %s", async path => {
+  const fetch = vi.fn();
+  vi.stubGlobal("fetch", fetch);
+  await expect(authFetch(path)).rejects.toThrow();
+  expect(fetch).not.toHaveBeenCalled();
 });

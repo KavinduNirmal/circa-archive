@@ -1,3 +1,5 @@
+using System.Net;
+using Microsoft.AspNetCore.HttpOverrides;
 using Asp.Versioning;
 using Asp.Versioning.Builder;
 using Circa.Auth.Contracts;
@@ -10,6 +12,22 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddAuthModule(builder.Configuration, builder.Environment);
 builder.Services.AddProblemDetails();
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.KnownProxies.Clear();
+    options.KnownIPNetworks.Clear();
+    options.ForwardLimit = 1;
+    foreach (var address in builder.Configuration.GetSection("ReverseProxy:KnownProxies").Get<string[]>() ?? [])
+    {
+        if (!IPAddress.TryParse(address, out var proxy))
+            throw new InvalidOperationException("ReverseProxy:KnownProxies must contain literal IP addresses.");
+        options.KnownProxies.Add(proxy);
+    }
+    // Clearing both trust lists would otherwise trust every peer. No configuration means no forwarding.
+    options.ForwardedHeaders = options.KnownProxies.Count == 0
+        ? ForwardedHeaders.None
+        : ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+});
 
 builder.Services.AddApiVersioning(options =>
 {
@@ -20,6 +38,8 @@ builder.Services.AddApiVersioning(options =>
 });
 
 var app = builder.Build();
+
+app.UseForwardedHeaders();
 
 if (app.Configuration.GetValue<bool>("Database:InitializeOnStartup"))
 {

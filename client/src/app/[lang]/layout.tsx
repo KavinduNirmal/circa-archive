@@ -11,6 +11,7 @@ import "@fontsource/ibm-plex-mono/400.css";
  * masthead on `/site` names the family, so no other route downloads it.
  */
 import "@fontsource/libre-baskerville/400.css";
+import { CookieNotice } from "@/components/auth/cookie-notice";
 import { routing } from "@/i18n/routing";
 import "../globals.css";
 
@@ -60,6 +61,7 @@ export default async function LanguageLayout({ children, params }: LanguageLayou
       <body>
         <NextIntlClientProvider locale={lang} messages={clientMessages}>
           {children}
+          <CookieNotice />
         </NextIntlClientProvider>
       </body>
     </html>

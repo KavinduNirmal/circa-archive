@@ -1,5 +1,6 @@
 import "server-only";
 import { NextRequest, NextResponse } from "next/server";
+import { trustedProxyHeaders } from "./forwarded-address";
 import { apiOrigin } from "./server";
 
 function needsRefresh(token: string | undefined): boolean {
@@ -18,7 +19,7 @@ export async function refreshNavigation(request: NextRequest, response: NextResp
   try {
     const refreshed = await fetch(`${apiOrigin()}/api/v1/auth/refresh`, {
       method: "POST",
-      headers: { Cookie: request.headers.get("cookie") ?? "", Origin: request.nextUrl.origin },
+      headers: { ...trustedProxyHeaders(request.headers), Cookie: request.headers.get("cookie") ?? "", Origin: request.nextUrl.origin },
       cache: "no-store",
       redirect: "manual",
       signal: AbortSignal.timeout(5000),
