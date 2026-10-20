@@ -1,10 +1,16 @@
 # 006: Sessions with short-lived JWTs in HttpOnly cookies
 
-- **Status:** Accepted — implementation pending
+- **Status:** Accepted — implemented
 - **Date:** 2026-10-18
 - **Deciders:** Maintainers
 - **Supersedes:** —
 - **Superseded by:** —
+
+## Implementation update — 2026-10-20
+
+Authentication and Next.js session integration are implemented. The versioned endpoints use `/api/v1/auth/*`; both cookies use `Path=/` so refresh credentials reach page navigations. The original transport decision below records the earlier auth-only refresh path. Current configuration and operational limits are documented in the [backend guide](../../backend/README.md) and [client transport guide](../../client/src/lib/auth/README.md).
+
+The context and decision below are retained as the historical record.
 
 ## Context
 

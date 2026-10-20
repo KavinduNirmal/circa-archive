@@ -1,10 +1,16 @@
 # 005: The backend is a .NET modular monolith
 
-- **Status:** Accepted — scaffolded, implementation pending
+- **Status:** Accepted — authentication implemented; archive modules pending
 - **Date:** 2026-10-18
 - **Deciders:** Maintainers
 - **Supersedes:** —
 - **Superseded by:** —
+
+## Implementation update — 2026-10-20
+
+The modular monolith now implements the Auth module: account persistence, login, rotating cookie sessions, JWT validation, and authorization policies. The Next.js account pages and session navigation use it. Archive domain modules remain in development. See the [backend guide](../../backend/README.md).
+
+The context and decision below are retained as the historical record.
 
 ## Context
 

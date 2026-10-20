@@ -4,12 +4,12 @@ Where the routes, the components, the copy, and the corpus actually live.
 
 ## The tree
 
-The repository is a small monorepo with one built surface and two reserved ones. Read the top level before the client: most confusion about this project comes from searching the wrong tree.
+The repository is a small monorepo with an implemented client, an authentication backend, and reserved administration tooling. Read the top level before the client: most confusion about this project comes from searching the wrong tree.
 
 ```text
 circa/
 ├── client/           the Next.js interface
-├── backend/          scaffolded .NET 10 modular monolith services
+├── backend/          .NET 10 modular monolith with implemented authentication
 ├── admin/            reserved for administration
 ├── docs/             planning and the open-source checklist
 ├── scripts/          repository checks

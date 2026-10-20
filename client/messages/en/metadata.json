@@ -5,7 +5,7 @@
   "homeTitle": "Public Registry | Commission for Incident Review and Corrective Action",
   "homeDescription": "Public access statements, filing procedures, administrative notices, and the released incident registry.",
   "desktopTitle": "Workstation",
-  "desktopDescription": "CIRCA/OS 4.12 workstation preview: the archive browser, the mail client, the file browser, and the record editor, running on local fixtures while backend integration is in progress.",
+  "desktopDescription": "CIRCA/OS 4.12 workstation: explore the archive browser, mail client, file browser, and record editor in a fictional institution’s desktop.",
   "siteHomeTitle": "Public archive | Commission for Incident Review and Corrective Action",
   "siteHomeDescription": "The released record index, read as plain pages, with no workstation required.",
   "siteRecordsTitle": "Index of records | Public archive",
@@ -17,7 +17,7 @@
   "metaAboutTitle": "About this project | CIRCA Archive",
   "metaAboutDescription": "The long account of CIRCA Archive: the premise, both editions, how it is built, the maintainers, support, questions, and the licences.",
   "metaHomeTitle": "CIRCA Archive — an open-source registry for things that never happened",
-  "metaHomeDescription": "A fictional institution and a working interface: invented records in real Markdown, two reading editions, and open-source machinery. Pre-production with scaffolded backend.",
+  "metaHomeDescription": "A collaborative ghost-story archive: invented records in real Markdown, a public reading edition, and a fictional desktop workstation. Open-source and in pre-release development.",
   "metaDocsTitle": "Documentation | CIRCA Archive",
   "metaDocsDescription": "How the archive is built, how a record is written, and how to change either without breaking the other."
 }

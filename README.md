@@ -4,7 +4,11 @@
 [![CodeQL](https://github.com/KavinduNirmal/circa-archive/actions/workflows/codeql.yml/badge.svg?branch=develop)](https://github.com/KavinduNirmal/circa-archive/actions/workflows/codeql.yml)
 [![MIT License](https://img.shields.io/badge/license-MIT-2f6f6a)](LICENSE)
 
-CIRCA Archive is a collaborative ghost-story archive presented as a fictional desktop workstation. The Commission for Incident Review and Corrective Action (C.I.R.C.A.) files anomalous incidents, exploration records, and organization dossiers in a shared universe.
+**A ghost story survives by being told. CIRCA gives it a filing system.**
+
+CIRCA Archive is a collaborative horror-fiction project where readers become analysts and writers expand a shared universe through incident reports, exploration records, and organization dossiers. You enter the archive of the Commission for Incident Review and Corrective Action (C.I.R.C.A.), a bureaucracy that files the impossible. CIRCA does not decide truth. It decides what is on file.
+
+An incident begins with someone's encounter with the unexplained. Follow-up records uncover patterns, invent rules, and sometimes contradict each other. Different organizations give the same horror different names; continuities let those accounts branch without erasing the original.
 
 The project has two public faces. The **archive** is a server-rendered reading edition: search-first, readable without JavaScript, with record pages, an organizations directory, a guide, notes, and downloadable copies. The **workstation** is a period desktop for the same world: draggable and resizable windows, a Start menu, a taskbar, an emblem wallpaper, and a switchable CRT overlay. Its browser, mail client, file browser, record editor, and record reader all work over illustrative fixtures.
 
@@ -15,12 +19,13 @@ The project has two public faces. The **archive** is a server-rendered reading e
 
 ## Project status
 
-CIRCA Archive is in pre-release development. The Next.js frontend is implemented and runs entirely over local fixtures. No backend, hosted deployment, or supported release exists yet, and the .NET/PostgreSQL design in [ARCHITECTURE.md](ARCHITECTURE.md) remains a draft.
+CIRCA Archive is in pre-release development. The public archive and CIRCA/OS workstation let you explore illustrative records today. The .NET 10/PostgreSQL backend implements account registration, sign-in, cookie sessions, and authorization policies, with personal access integrated into the Next.js client. Archive content still comes from local fixtures; persistent records, notes, publishing, and moderation remain in development. The full platform design in [ARCHITECTURE.md](ARCHITECTURE.md) remains a draft, and no release is currently supported.
 
 ## What is in the repository
 
 - **Public archive.** A reading edition with server-rendered record pages, organization dossiers, search, notes, and Markdown-derived downloads.
 - **CIRCA/OS workstation.** A windowed desktop shell with five working applications over archive fixtures.
+- **Personal access.** Account registration, sign-in, and server-verified sessions backed by the .NET authentication service.
 - **Bilingual interface.** English and Korean catalogues, locale-aware routing, and a language switcher that preserves the current page. Filed content stays in the language it was filed in.
 - **Record renderer.** A shared Markdown pipeline for frontmatter, tables, redactions, references, and paper-like reading.
 - **Verification.** Vitest unit and interaction tests, Playwright browser tests, repository checks, and GitHub Actions on every pull request.
@@ -31,14 +36,14 @@ CIRCA Archive is in pre-release development. The Next.js frontend is implemented
 | --- | --- |
 | Frontend | Next.js 16, React 19, TypeScript, Tailwind CSS 4, shadcn/ui |
 | Tooling | Bun 1.3.14, ESLint, Vitest, Playwright |
-| Planned backend | .NET 10 Minimal APIs, EF Core, PostgreSQL, SignalR, S3-compatible storage |
+| Backend | .NET 10 Minimal APIs, EF Core, PostgreSQL; SignalR and S3-compatible storage planned |
 
 ## Repository layout
 
 | Path | Purpose |
 | --- | --- |
 | [client/](client/README.md) | Next.js application: public archive, project pages, and CIRCA/OS workstation |
-| [backend/](backend/README.md) | Reserved for the API and persistence services |
+| [backend/](backend/README.md) | Modular monolith API and persistence, including the integrated authentication service |
 | [admin/](admin/README.md) | Reserved for administration tooling |
 | [docs/](docs/README.md) | Branch model, architecture decision records, publishing checklist, and setting documentation |
 | [scripts/](scripts/README.md) | Repository README and whitespace checks |
@@ -73,7 +78,7 @@ bun install --frozen-lockfile
 bun run dev
 ```
 
-The application serves <http://localhost:3001>. A bare path redirects to the reader's language, then to the public portal.
+The application serves <http://localhost:3001>. A bare path redirects to the reader's language, then to the public portal. Public archive content can be explored without the API; to use personal accounts, configure and run the [backend](backend/README.md) and follow the [client authentication setup](client/src/lib/auth/README.md).
 
 Useful checks:
 
@@ -99,7 +104,7 @@ Read [CONTRIBUTING.md](CONTRIBUTING.md) and the [Code of Conduct](CODE_OF_CONDUC
 
 Story authors can read the [Author guide](docs/AUTHOR_GUIDE.md) for the pre-release collaboration framework, including Core Rules, character consent, independent filings, and adoption.
 
-Good early contributions include clarifying conflicting requirements, refining the draft API contracts, improving accessibility, and adding reproducible application scaffolding.
+Good early contributions include refining archive domain contracts, connecting fixture-backed features to persistent services, improving accessibility, and expanding the original record corpus.
 
 ## License and third-party assets
 

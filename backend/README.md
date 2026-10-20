@@ -17,7 +17,15 @@ backend/
   tests/                      # Unit and integration test suites
 ```
 
-Frontend rendering and browser logic belong in `client/`. The backend exposes HTTP Minimal APIs and SignalR hubs. Domain modules maintain isolated schemas within the single PostgreSQL instance and interact across module boundaries exclusively through contract interfaces and types.
+Frontend rendering and browser logic belong in `client/`. The backend exposes HTTP Minimal APIs; SignalR hubs are planned. Domain modules maintain isolated schemas within the single PostgreSQL instance and interact across module boundaries exclusively through contract interfaces and types.
+
+## Implementation status
+
+Authentication is implemented and integrated with the Next.js account pages and
+server-rendered session navigation: registration, sign-in, account persistence,
+rotating cookie sessions, JWT validation, and authorization policies. Archive
+records still come from client fixtures; record persistence, publishing, notes,
+moderation, and real-time delivery remain in development.
 
 ## Development
 

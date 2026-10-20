@@ -4,12 +4,12 @@
 
 ## 트리
 
-저장소는 작은 모노레포입니다. 구현된 표면 하나와 예약된 표면 둘이 있습니다. 클라이언트보다 최상위를 먼저 읽으세요. 이 프로젝트의 혼란은 대개 잘못된 트리에서 찾은 결과입니다.
+저장소는 작은 모노레포입니다. 구현된 클라이언트와 인증 백엔드, 예약된 관리 도구가 있습니다. 클라이언트보다 최상위를 먼저 읽으세요. 이 프로젝트의 혼란은 대개 잘못된 트리에서 찾은 결과입니다.
 
 ```text
 circa/
 ├── client/           the Next.js interface
-├── backend/          골격이 구축된 .NET 10 서비스
+├── backend/          인증이 구현된 .NET 10 모듈러 모놀리스
 ├── admin/            reserved for administration
 ├── docs/             planning and the open-source checklist
 ├── scripts/          repository checks

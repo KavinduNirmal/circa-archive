@@ -60,14 +60,6 @@ export async function MetaChrome({
             </span>
             <span>{t("kicker")}</span>
           </p>
-          <p className="meta-topline-right">
-            <span className="meta-status-dot" aria-hidden="true" />
-            <span>{t("statusLine")}</span>
-            <span className="meta-topline-sep" aria-hidden="true">
-              /
-            </span>
-            <span>{t("statusValue")}</span>
-          </p>
         </div>
       </div>
 

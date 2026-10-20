@@ -89,4 +89,4 @@ CIRCA-S-03007 is the renderer's test corpus and is filed in the index on purpose
 > [!NOTE]
 > There is no CMS yet
 >
-> Adding a record today means editing those two TypeScript modules. When the backend exists, the renderer should keep taking Markdown and not learn where it came from.
+> Adding a record today means editing those two TypeScript modules. When archive content is served by the API, the renderer should keep taking Markdown and not learn where it came from.

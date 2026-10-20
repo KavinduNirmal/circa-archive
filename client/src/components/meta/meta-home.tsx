@@ -101,10 +101,6 @@ export function MetaHome() {
               <dt>{t("statLanguages")}</dt>
               <dd>{t("statLanguagesValue")}</dd>
             </div>
-            <div>
-              <dt>{t("statBackend")}</dt>
-              <dd>{t("statNone")}</dd>
-            </div>
           </dl>
         </div>
       </section>

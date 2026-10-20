@@ -6,6 +6,12 @@
 - **Supersedes:** —
 - **Superseded by:** —
 
+## Implementation update — 2026-10-20
+
+The fixture decision still applies to archive records and workstation content. Account registration, sign-in, and personal access now use the .NET authentication service; the client is no longer entirely fixture-backed. See the [client authentication guide](../../client/src/lib/auth/README.md).
+
+The context and decision below are retained as the historical record.
+
 ## Context
 
 The backend does not exist yet ([ADR 005](005-modular-monolith-backend.md)), but the public archive, the workstation, the record reader, the record editor, the mail client, and the file browser all need believable content to be designed, built, tested, and demonstrated. Waiting for the API would have blocked the entire product surface.
