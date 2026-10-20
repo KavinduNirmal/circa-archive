@@ -20,7 +20,8 @@ has no foreign key until the organization module provides its contract.
 
 ## Schema upgrade and verification
 
-Fresh test/browser databases use `EnsureCreatedAsync` with the current model.
+Fresh test/browser databases and opt-in Development Compose startup use
+`EnsureCreatedAsync` with the current model.
 `EnsureCreatedAsync` does not upgrade an existing database. There is no EF
 migration history in this pre-release backend; this patch supplies an explicit
 SQL upgrade rather than introducing an incompatible initial migration.
@@ -41,7 +42,9 @@ account owners before retrying. Existing usernames and hashes are retained;
 stricter registration validation does not force existing users to reset passwords.
 Do not rerun the script on an upgraded database. Roll back a failed transaction
 normally; recovery after deployment requires the backup and previous application
-version. No destructive down migration or automatic startup upgrade is provided.
+version. No destructive down migration or automatic startup schema upgrade is provided.
+The Development-only `Database:InitializeOnStartup` option creates fresh schemas;
+it does not migrate existing ones.
 
 Run `dotnet test backend/Circa.sln` from the root (Docker required). The tests cover
 profile persistence, collision retries, account access, concurrent registration,
