@@ -2,7 +2,7 @@
 
 ## Responsibility and structure
 
-`page.tsx` resolves the language, publishes non-indexable metadata, and delegates the `account` view to the shared access page in `components/auth`.
+`page.tsx` resolves the language, publishes non-indexable metadata, and delegates the `account` view to the shared access page in `components/auth`. Authenticated readers receive the archive-themed account register: a left section index and an anchored details sheet for archive identity, account particulars, and session access. Public profile data comes from `/api/v1/auth/me`; the registration date is shown in the current language using UTC.
 
 ## Boundaries and verification
 

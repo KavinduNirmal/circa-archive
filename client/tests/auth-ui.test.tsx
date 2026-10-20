@@ -9,8 +9,12 @@ import { renderWithIntl } from "./intl";
 
 vi.mock("@/lib/auth/client", () => ({ authFetch: vi.fn() }));
 const request = vi.mocked(authFetch);
-const account = { id: "reader-id", username: "reader", role: "author" as const, createdAt: "2026-10-20" };
-beforeEach(() => { request.mockReset(); });
+const account = { id: "reader-id", username: "reader", role: "author" as const, createdAt: "2026-10-20", displayId: "123456789", displayName: "H. John Doe", displayEmail: "123456789@my.circa.archive", adoptedOrganizationId: null };
+const preview = { displayName: "H. John Doe" };
+function respondWith(response: Response) {
+  request.mockImplementation(async path => path.endsWith("/display-name") ? Response.json(preview) : response);
+}
+beforeEach(() => { request.mockReset(); respondWith(Response.json(account)); });
 
 async function enterCredentials(mode: "sign-in" | "sign-up" = "sign-in") {
   const user = userEvent.setup();
@@ -38,8 +42,64 @@ describe("personal access navigation", () => {
 });
 
 describe("authentication forms", () => {
+  it("previews and rerolls an analyst name, then submits the selected identity", async () => {
+    request.mockImplementation(async path => path.endsWith("/display-name")
+      ? Response.json({ displayName: request.mock.calls.filter(([url]) => url.endsWith("/display-name")).length === 1 ? "H. John Doe" : "A. Jane Ward" })
+      : Response.json(account, { status: 201 }));
+    renderWithIntl(<AuthForm mode="sign-up" onSuccess={vi.fn()} />);
+    expect(await screen.findByText("H. John Doe")).toBeVisible();
+    const user = await enterCredentials("sign-up");
+    await user.click(screen.getByRole("button", { name: "Reroll name" }));
+    expect(await screen.findByText("A. Jane Ward")).toBeVisible();
+    await user.click(screen.getByRole("button", { name: "Sign up" }));
+    const submission = request.mock.calls.find(([path]) => path.endsWith("/register"));
+    expect(JSON.parse(submission![1]!.body as string).displayName).toBe("A. Jane Ward");
+  });
+
+  it("keeps the selected name when a reroll is throttled and offers retry", async () => {
+    renderWithIntl(<AuthForm mode="sign-up" />);
+    await screen.findByText("H. John Doe");
+    request.mockResolvedValue(new Response(null, { status: 429 }));
+    await userEvent.click(screen.getByRole("button", { name: "Reroll name" }));
+    expect(await screen.findByRole("alert")).toHaveTextContent("Too many attempts.");
+    expect(screen.getByText("H. John Doe")).toBeVisible();
+    expect(screen.getByRole("button", { name: "Reroll name" })).toBeEnabled();
+  });
+
+  it("can register with a server-assigned name if the preview is unavailable", async () => {
+    request.mockImplementation(async path => path.endsWith("/display-name")
+      ? new Response(null, { status: 503 }) : Response.json(account, { status: 201 }));
+    const done = vi.fn();
+    renderWithIntl(<AuthForm mode="sign-up" onSuccess={done} />);
+    expect(await screen.findByRole("alert")).toHaveTextContent("A name will be assigned when you register.");
+    const user = await enterCredentials("sign-up");
+    await user.click(screen.getByRole("button", { name: "Sign up" }));
+    const submission = request.mock.calls.find(([path]) => path.endsWith("/register"));
+    expect(JSON.parse(submission![1]!.body as string)).not.toHaveProperty("displayName");
+    expect(done).toHaveBeenCalledOnce();
+  });
+
+  it("enforces the updated username and password rules before submission", async () => {
+    renderWithIntl(<AuthForm mode="sign-up" />);
+    const user = await enterCredentials("sign-up");
+    const username = screen.getByLabelText("Username", { exact: true });
+    await user.clear(username);
+    await user.type(username, "bad-name");
+    await user.click(screen.getByRole("button", { name: "Sign up" }));
+    expect(username).toBeInvalid();
+    expect(request.mock.calls.some(([path]) => path.endsWith("/register"))).toBe(false);
+    await user.clear(username);
+    await user.type(username, "reader");
+    const password = screen.getByLabelText("Password", { exact: true });
+    await user.clear(password);
+    await user.type(password, "passwordonly");
+    await user.click(screen.getByRole("button", { name: "Sign up" }));
+    expect(password).toBeInvalid();
+    expect(request.mock.calls.some(([path]) => path.endsWith("/register"))).toBe(false);
+  });
+
   it.each(["sign-in", "sign-up"] as const)("submits %s with the existing API contract", async mode => {
-    request.mockResolvedValue(Response.json(account, { status: mode === "sign-up" ? 201 : 200 }));
+    respondWith(Response.json(account, { status: mode === "sign-up" ? 201 : 200 }));
     const done = vi.fn();
     renderWithIntl(<AuthForm mode={mode} onSuccess={done} />);
     const user = await enterCredentials(mode);
@@ -48,11 +108,12 @@ describe("authentication forms", () => {
     await user.click(screen.getByLabelText("Show password"));
     expect(password).toHaveAttribute("type", "text");
     await user.click(screen.getByRole("button", { name: mode === "sign-up" ? "Sign up" : "Sign in" }));
-    expect(request).toHaveBeenCalledOnce();
-    expect(request.mock.calls[0][0]).toBe(`/api/v1/auth/${mode === "sign-up" ? "register" : "login"}`);
-    const body = JSON.parse(request.mock.calls[0][1]!.body as string);
+    const submissions = request.mock.calls.filter(([path]) => !path.endsWith("/display-name"));
+    expect(submissions).toHaveLength(1);
+    expect(submissions[0][0]).toBe(`/api/v1/auth/${mode === "sign-up" ? "register" : "login"}`);
+    const body = JSON.parse(submissions[0][1]!.body as string);
     expect(body).toEqual(mode === "sign-up"
-      ? { username: "reader", email: "reader@example.com", password: "Password123!" }
+      ? { username: "reader", email: "reader@example.com", password: "Password123!", displayName: "H. John Doe" }
       : { identifier: "reader", password: "Password123!" });
     expect(done).toHaveBeenCalledOnce();
   });
@@ -63,7 +124,7 @@ describe("authentication forms", () => {
     ["rate_limit_exceeded", 429, "Too many attempts. Please try again later."],
     ["validation_failed", 400, "Check the supplied details and try again."],
   ])("translates %s and retains input", async (code, status, message) => {
-    request.mockResolvedValue(Response.json({ code }, { status: Number(status) }));
+    respondWith(Response.json({ code }, { status: Number(status) }));
     renderWithIntl(<AuthForm mode="sign-in" />);
     const user = await enterCredentials();
     await user.click(screen.getByRole("button", { name: "Sign in" }));
@@ -73,7 +134,7 @@ describe("authentication forms", () => {
   });
 
   it.each(["username_taken", "email_taken"])("associates %s with its field", async code => {
-    request.mockResolvedValue(Response.json({ code }, { status: 409 }));
+    respondWith(Response.json({ code }, { status: 409 }));
     renderWithIntl(<AuthForm mode="sign-up" />);
     const user = await enterCredentials("sign-up");
     await user.click(screen.getByRole("button", { name: "Sign up" }));
@@ -111,7 +172,7 @@ describe("authentication forms", () => {
 
 describe("sign out", () => {
   it("navigates only after the API clears the session", async () => {
-    request.mockResolvedValue(new Response(null, { status: 204 }));
+    respondWith(new Response(null, { status: 204 }));
     const done = vi.fn();
     renderWithIntl(<SignOutButton onSuccess={done} />);
     await userEvent.click(screen.getByRole("button", { name: "Sign out" }));
@@ -119,7 +180,7 @@ describe("sign out", () => {
     expect(done).toHaveBeenCalledOnce();
   });
   it("keeps the account open when logout fails", async () => {
-    request.mockResolvedValue(new Response(null, { status: 503 }));
+    respondWith(new Response(null, { status: 503 }));
     const done = vi.fn();
     renderWithIntl(<SignOutButton onSuccess={done} />);
     await userEvent.click(screen.getByRole("button", { name: "Sign out" }));

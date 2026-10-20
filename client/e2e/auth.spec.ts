@@ -8,6 +8,7 @@ const copy = {
 async function inspectLayout(page: Page, name: string) {
   for (const width of [1440, 390]) {
     await page.setViewportSize({ width, height: 900 });
+    await page.evaluate(() => window.scrollTo(0, 0));
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
     await page.screenshot({ path: `/tmp/circa-auth-${name}-${width}.png`, fullPage: true });
   }
@@ -21,8 +22,13 @@ for (const locale of ["en", "ko"] as const) {
     await page.getByRole("link", { name: t.signUp, exact: true }).click();
     await expect(page).toHaveURL(new RegExp(`/${locale}/sign-up$`));
     await expect(page.getByRole("search")).toHaveCount(0);
+    const analyst = page.getByRole("status");
+    await expect(analyst).toHaveText(/^[A-Z]\. /);
+    await page.getByRole("button", { name: locale === "en" ? "Reroll name" : "이름 다시 뽑기", exact: true }).click();
+    await expect(page.getByRole("button", { name: t.signUp, exact: true })).toBeEnabled();
+    const selectedName = await analyst.textContent();
     await inspectLayout(page, `${locale}-sign-up`);
-    const username = `ui_${crypto.randomUUID().replaceAll("-", "")}`;
+    const username = `ui_${crypto.randomUUID().replaceAll("-", "").slice(0, 14)}`;
     await page.getByLabel(t.username, { exact: true }).fill(username);
     await page.getByLabel(t.email, { exact: true }).fill(`${username}@example.com`);
     await page.getByLabel(t.password, { exact: true }).fill("Password123!");
@@ -30,6 +36,12 @@ for (const locale of ["en", "ko"] as const) {
     await expect(page).toHaveURL(new RegExp(`/${locale}/account$`));
     await expect(page.getByRole("heading", { name: t.personal })).toBeVisible();
     await expect(page.getByText(username, { exact: true })).toBeVisible();
+    await expect(page.getByText(selectedName!, { exact: true })).toBeVisible();
+    await expect(page.getByText(/^\d{9}@my\.circa\.archive$/)).toBeVisible();
+    const sections = page.getByRole("navigation", { name: locale === "en" ? "Personal register sections" : "개인 등록부 항목" });
+    await sections.getByRole("link", { name: locale === "en" ? "Account particulars" : "계정 등록 사항" }).click();
+    await expect(page).toHaveURL(new RegExp(`/${locale}/account#account-details$`));
+    await expect(page.locator("#account-details time")).toBeVisible();
     await inspectLayout(page, `${locale}-account`);
     expect(await page.evaluate(() => document.cookie)).not.toMatch(/circa_(at|rt)/);
     const credentials = (await context.cookies()).filter(cookie => cookie.name.startsWith("circa_"));
@@ -102,7 +114,7 @@ test("the forms support keyboard submission and reject missing or short particul
   await page.goto("/en/sign-up");
   await page.getByRole("button", { name: "Sign up", exact: true }).click();
   await expect(page.getByLabel("Username", { exact: true })).toBeFocused();
-  const username = `keys_${crypto.randomUUID().replaceAll("-", "")}`;
+  const username = `keys_${crypto.randomUUID().replaceAll("-", "").slice(0, 14)}`;
   await page.keyboard.type(username);
   await page.keyboard.press("Tab");
   await page.keyboard.type(`${username}@example.com`);
