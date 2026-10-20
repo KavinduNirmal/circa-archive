@@ -42,4 +42,9 @@ Run `bun run test` or `bun run test:watch` from `client/`. Browser interaction a
 
 `auth-client.test.ts` covers refresh single-flight, request replay, retry limits, credential endpoints, and destination isolation. `auth-proxy.test.ts` covers refresh scheduling, locale preservation, cookie propagation to the current render and browser, session expiry, and outages. `auth-session.test.ts` covers uncached server cookie forwarding and anonymous/error distinctions.
 
-`auth-ui.test.tsx` verifies localized account links, API form contracts, translated and field-associated errors, preserved input, password visibility, pending protection, and logout failure. `auth-pages.test.tsx` verifies server redirects, account particulars, and retryable outages. Landing/archive tests mock only the async server access-link boundary; the real session state and control are covered separately. Use `--maxWorkers=1` for targeted runs on low-memory machines.
+`auth-ui.test.tsx` verifies localized account links, API form contracts, generated analyst-name selection and reroll recovery, username/password policy validation, translated and field-associated errors, preserved input, password visibility, pending protection, and logout failure. `auth-pages.test.tsx` verifies server redirects, public account particulars, localized section navigation, registration dates, organization identifiers, and retryable outages. Landing/archive tests mock only the async server access-link boundary; the real session state and control are covered separately. Use `--maxWorkers=1` for targeted runs on low-memory machines.
+
+`cookie-notice.test.tsx` verifies English/Korean disclosure, acknowledgement persistence and dismissal with blocked cookies. Auth transport tests exercise the Axios interceptors through the real fetch adapter, including unsafe destinations, browser IP-header stripping, shared refresh, and explicit server proxy trust.
+
+The archive section-anchor check also verifies unnumbered record headings and
+contents labels that match the heading at each destination.

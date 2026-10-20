@@ -205,7 +205,11 @@ describe("a released record", () => {
     expect(links.length).toBeGreaterThan(1);
     for (const link of links) {
       const href = link.getAttribute("href")!;
-      expect(container.querySelector(href), href).not.toBeNull();
+      const section = container.querySelector(href);
+      expect(section, href).not.toBeNull();
+      const heading = section!.querySelector("h2")!;
+      expect(heading.textContent?.trim()).not.toMatch(/^\d/);
+      expect(link.textContent?.trim()).toBe(heading.textContent?.trim());
     }
   });
 

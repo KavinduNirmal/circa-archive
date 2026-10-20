@@ -12,7 +12,7 @@ Next.js frontend serving a public landing page, a full-page public archive, and 
 - `src/i18n/`: locale routing, catalog loading, and locale-aware navigation; see its [README](src/i18n/README.md).
 - `messages/`: one catalog per language; see its [README](messages/README.md).
 - `src/components/`: desktop shell, the shared language switcher, the public [site](src/components/site/README.md) and post screen, the public [archive](src/components/archive-site/README.md), the [project surface](src/components/meta/README.md), the archive [browser](src/components/browser/README.md), the [mail client](src/components/mail/README.md), the [file browser](src/components/files/README.md), the record [editor](src/components/word/README.md) and [reader](src/components/reader/README.md), reusable navigation and icons, and shadcn/ui primitives.
-- `src/components/auth/`: the [minimal archive-themed access pages](src/components/auth/README.md) and server-verified portal/archive navigation.
+- `src/components/auth/`: the [archive-themed registry access pages](src/components/auth/README.md) and server-verified portal/archive navigation.
 - `src/lib/`: shared class-composition helper, the record [Markdown renderer](src/lib/markdown/README.md) the reader and the `.txt` export share, and the workstation's pure destination, window, and trail contracts.
 - `src/stores/`: the workstation [store](src/stores/README.md) and its provider — open windows, focus, geometry, the reader trail, and the CRT preference.
 - `src/proxy.ts`: the request-time language decision — path prefix, then cookie, then `Accept-Language`, then English.
@@ -59,7 +59,7 @@ Development serves http://localhost:3001. `bun run start` serves a production bu
 
 ## Theme
 
-The interface uses steel-blue surfaces, hard corners, and bevels. The supplied image controls desktop composition. The global screen overlay is pointer-transparent and can be disabled using CRT in the taskbar. DM Sans and IBM Plex Mono are bundled locally, plus Libre Baskerville for the archive masthead's wordmark alone; none carries Hangul, so `:lang(ko)` names the Korean faces to fall back to rather than letting each platform choose. Whether to bundle a Korean webfont instead remains an open question.
+The interface uses steel-blue surfaces, hard corners, and bevels. The supplied image controls desktop composition. The global screen overlay is pointer-transparent and can be disabled using CRT in the taskbar. DM Sans and IBM Plex Mono are bundled locally, plus Libre Baskerville for the public archive's wordmark and introductory prose, and Zilla Slab for its record reader; none carries Hangul, so `:lang(ko)` names the Korean faces to fall back to rather than letting each platform choose. Whether to bundle a Korean webfont instead remains an open question.
 
 See [third-party notices](THIRD_PARTY_NOTICES.md) and the root [asset notice](../NOTICE) for copied component and asset licensing. Every new authored folder needs a README.
 
@@ -72,7 +72,7 @@ overrides, publishing, global search, and source actions.
 
 ## Low-resource verification
 
-Run checks sequentially. Unit tests accept `bun run test -- --maxWorkers=1` or a selected file list. For a production build with one page worker, use `CIRCA_LOW_RESOURCE=1 RAYON_NUM_THREADS=1 bun run build`. The auth browser suite already limits worker concurrency; do not run it alongside a production build on a constrained machine.
+Run checks sequentially. Set `VITEST_MAX_WORKERS=1` when invoking root pre-commit checks on a constrained machine; the hooks still run every required check. Unit tests accept `bun run test -- --maxWorkers=1` or a selected file list. For a production build with one page worker, use `CIRCA_LOW_RESOURCE=1 RAYON_NUM_THREADS=1 bun run build`. The auth browser suite already limits worker concurrency; do not run it alongside a production build on a constrained machine.
 
 ## Local Docker
 
@@ -82,9 +82,33 @@ host dependencies, Next output, test artifacts, and local environment files.
 Source is copied into the image; rebuild after edits. No host `.next` or
 `node_modules` directory is mounted into the container.
 
+The `dependencies` build stage copies only `package.json` and `bun.lock`, so
+source-only edits reuse the installed dependency layer. Its Bun download cache
+is a persistent BuildKit mount (`circa-client-bun`), allowing lockfile changes
+to reuse previously downloaded package versions. The first build fills it;
+changing Docker builders, pruning the build cache, or using `--no-cache` /
+`--no-cache-filter` requires downloading again.
+The cache stays outside the image and does not change frozen-lockfile installs.
+Use plain build progress to see dependency-layer reuse:
+`docker compose --progress plain build circa-client`.
+
 The website serves port 3001. Compose sets server-only
-`API_ORIGIN=http://circa-api:8080`; existing development rewrites forward browser
-`/api/*` calls there. Direct `bun run dev` defaults to `http://localhost:5040`,
+`API_ORIGIN=http://circa-api:8080`; the ingress gateway forwards browser `/api/*` calls directly to the API.
+Host-run Next development still uses its API rewrites. Direct `bun run dev` defaults to `http://localhost:5040`,
 matching the Compose API's published port. Browser code never uses a Docker
 service hostname. The client health check requests `/api/v1/` through Next to
 verify the frontend-to-backend route.
+
+## HTTP authentication and cookies
+
+Authentication uses Axios through the [cookie transport](src/lib/auth/README.md).
+Browser interceptors include cookies, strip client IP claims, and share one refresh
+before a single retry. Server interceptors attach per-request cookies and, with
+explicit edge trust, a validated visitor address. The root layout shows an
+archive-themed necessary-cookie notice; no optional analytics/advertising cookies
+are currently set. Its separate acknowledgement cookie lasts one year.
+
+Compose now publishes the [ingress gateway](../infra/README.md) on port 3001 and
+keeps the Next port internal. API requests go directly through the gateway to the
+API. For direct host development, the existing Next rewrite still applies and
+proxy-header trust remains disabled by default.

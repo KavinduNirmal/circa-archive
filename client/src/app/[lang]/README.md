@@ -52,3 +52,9 @@ tells next-intl which one a build is for. The portal and archive resolve request
 To see the resolution rules rather than the pages, run `bun run test` and read
 `tests/i18n-routing.test.ts`, which drives the proxy directly: an explicit prefix
 wins, then the `NEXT_LOCALE` cookie, then `Accept-Language`, then English.
+
+The root layout also mounts the shared necessary-cookie notice after page content in DOM order, keeping page skip navigation first. Its banner reserves space through the document CSS and workstation canvas. Acknowledgement uses a separate non-authentication cookie.
+
+Font faces are declared locally in the root layout. The public record reader
+uses Zilla Slab's Latin regular/bold faces and their italics; only elements
+naming that family download its files. Interface typography stays independent.

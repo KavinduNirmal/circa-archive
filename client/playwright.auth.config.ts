@@ -13,7 +13,7 @@ export default defineConfig({
     {
       command: "dotnet run --project ../backend/tests/Circa.BrowserTestHost",
       url: "http://localhost:5041/api/v1/",
-      env: { DOTNET_PROCESSOR_COUNT: "2", MSBUILDDISABLENODEREUSE: "1" },
+      env: { DOTNET_PROCESSOR_COUNT: "1", DOTNET_CLI_USE_MSBUILD_SERVER: "0", MSBUILDDISABLENODEREUSE: "1" },
       timeout: 120000,
       gracefulShutdown: { signal: "SIGTERM", timeout: 10000 },
     },

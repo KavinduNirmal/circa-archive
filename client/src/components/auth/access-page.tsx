@@ -4,9 +4,8 @@ import type { Locale } from "@/i18n/routing";
 import { getSessionState } from "@/lib/auth/session";
 import { AccessShell } from "./access-shell";
 import { AuthForm } from "./auth-form";
-import { SignOutButton } from "./sign-out-button";
+import { AccountRecord, AccountSidebar } from "./account-record";
 import { ArchiveButton } from "../archive-site/archive-button";
-import styles from "./auth.module.css";
 
 export async function AccessPage({ mode, locale }: { mode: "sign-in" | "sign-up" | "account"; locale: Locale }) {
   const state = await getSessionState();
@@ -15,20 +14,16 @@ export async function AccessPage({ mode, locale }: { mode: "sign-in" | "sign-up"
   const t = await getTranslations({ locale, namespace: "auth" });
 
   if (state.status === "unavailable") {
-    return <AccessShell title={t("serviceTitle")} intro={t("serviceBody")}>
+    return <AccessShell mode={mode} title={t("serviceTitle")} intro={t("serviceBody")}>
       <ArchiveButton tone="paper" raw href={`/${locale}/${mode}`}>{t("retry")}</ArchiveButton>
     </AccessShell>;
   }
   if (mode === "account" && state.status === "authenticated") {
-    return <AccessShell title={t("personalAccess")} intro={t("accountIntro")}>
-      <dl className={styles.particulars}>
-        <div><dt>{t("username")}</dt><dd>{state.account.username}</dd></div>
-        <div><dt>{t("role")}</dt><dd>{t(state.account.role === "moderator" ? "roleModerator" : "roleAuthor")}</dd></div>
-      </dl>
-      <SignOutButton />
+    return <AccessShell mode={mode} title={t("personalAccess")} intro={t("accountIntro")} sidebar={<AccountSidebar />}>
+      <AccountRecord account={state.account} locale={locale} />
     </AccessShell>;
   }
-  return <AccessShell title={t(mode === "sign-up" ? "signUp" : "signIn")} intro={t(mode === "sign-up" ? "signUpIntro" : "signInIntro")}>
+  return <AccessShell mode={mode} title={t(mode === "sign-up" ? "signUp" : "signIn")} intro={t(mode === "sign-up" ? "signUpIntro" : "signInIntro")}>
     <AuthForm mode={mode === "sign-up" ? "sign-up" : "sign-in"} />
   </AccessShell>;
 }

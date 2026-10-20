@@ -17,9 +17,8 @@
  * `:lang(ko)`: chrome, headings, labels and controls. The reading face is Libre
  * Baskerville, for anything the archive is *saying at length* about itself — a
  * page's lede, a record's abstract, the standing note on the index. A record's
- * own prose is not that voice: it is a typed document, so the sheet is set in
- * Courier New, and `'Courier New'` keeps codes, dates, and counters everywhere
- * else as it always has.
+ * own prose uses Zilla Slab, a quieter printed-document voice. Courier New
+ * keeps codes, dates, and counters distinct from the reading text.
  *
  * Record names are filing titles, so they are set in capitals and tracked out;
  * the description under them stays serif and sentence-cased.
@@ -1102,24 +1101,14 @@
 
 .heldNotice { margin: 0 0 10px; padding: 8px 10px; border: 1px solid #b9a777; border-left: 4px solid var(--circa-stamp); background: #e9dcb6; color: #3b2e12; font-size: 11px; line-height: 1.55; }
 
-/* Contents is a line of the page, not a box on it: one band, numbered leaves. */
+/* Contents is a single band of section titles. */
 .contents { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; margin: 0 0 14px; padding: 0 0 2px; }
 .contentsTitle { margin: 0; color: var(--circa-ink-soft); font-size: 8.5px; letter-spacing: .12em; line-height: 1.4; text-transform: uppercase; }
 .contents ol { display: flex; flex-wrap: wrap; gap: 3px 16px; margin: 0; padding: 0; list-style: none; font-size: 11px; }
 .contents a { text-decoration: none; }
 .contents a:hover { text-decoration: underline; }
-.contents .sectionIndex { margin-right: 5px; }
-.sectionIndex { color: var(--circa-ink-soft); font-family: 'Courier New', monospace; font-size: 9px; }
-
-/*
- * The sheet. It is the document rather than a page about one, so it is the one
- * surface with a printed margin: the section numerals sit in the gutter, right
- * against a dotted rule, and the prose starts a column clear of them. That is
- * where the leaf's numbering lives on paper, and it uses the width the sheet
- * would otherwise leave dead beside a narrow measure.
- */
-.sheet { position: relative; padding: 20px 26px 12px 88px; border: 1px solid var(--circa-rule); background: var(--circa-paper-sunken); }
-.sheet::before { content: ""; position: absolute; top: 22px; bottom: 16px; left: 70px; border-left: 1px dotted #a7b5c3; }
+/* The printed sheet keeps balanced margins around its unnumbered sections. */
+.sheet { position: relative; padding: 20px 26px 12px; border: 1px solid var(--circa-rule); background: var(--circa-paper-sunken); }
 .sheetSection { padding-bottom: 14px; margin-bottom: 16px; border-bottom: 1px dotted var(--circa-rule); }
 .sheetSection:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: 0; }
 .sheetSection::after { content: ""; display: block; clear: both; }
@@ -1132,16 +1121,6 @@
   font-size: 19px;
   font-weight: normal;
   line-height: 1.25;
-}
-.sheetHeading .sectionIndex {
-  position: absolute;
-  top: .12em;
-  left: -76px;
-  width: 46px;
-  color: #8294a3;
-  font-size: 19px;
-  line-height: 1;
-  text-align: right;
 }
 
 .fields { margin: 0 0 10px; padding: 7px 10px; border: 1px solid var(--circa-rule); background: var(--circa-paper-raised); font-size: 10.5px; }
@@ -1319,27 +1298,20 @@
 }
 
 /* ------------------------------------------------------------------------- */
-/* Markdown: the typed leaf                                                   */
+/* Markdown: the printed leaf                                                 */
 /* ------------------------------------------------------------------------- */
 
 /*
- * A record is a typed document, so the reading edition sets it in the one face a
- * registry typewriter could produce. The chrome around the sheet stays DM Sans
- * and the ledes stay serif; inside the sheet the filing speaks in Courier New,
- * because a record's body is evidence rather than interface.
- *
- * The sheet's own content width is the measure: prose, tables, figures and the
- * ruled headings all end on the same edge, so the leaf has one right margin
- * rather than a text column beside a longer rule. At the site's widest that is
- * about a hundred characters of typewriter — long by book standards, ordinary
- * for a filing, and kept legible by the leading.
+ * Zilla Slab gives long filings the weight of printed archive stock. The
+ * sheet's prose, tables, figures, and ruled headings share one right margin;
+ * tables and codes retain the archive's register typography.
  */
 .prose {
-  --prose-font: "Courier New", Courier, "Nimbus Mono PS", "Liberation Mono", ui-monospace, monospace;
+  --prose-font: "Zilla Slab", Georgia, serif;
   color: var(--circa-ink);
   font-family: var(--prose-font);
-  font-size: 12.5px;
-  line-height: 1.85;
+  font-size: 16px;
+  line-height: 1.75;
 }
 .prose p { margin: 0 0 11px; }
 /*
@@ -1391,7 +1363,8 @@
   margin: 10px 0 14px;
   border: 1px solid var(--circa-rule);
   border-collapse: collapse;
-  font-size: 11.5px;
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
   line-height: 1.55;
 }
 .prose :is(th, td) { padding: 5px 9px; overflow-wrap: anywhere; text-align: left; vertical-align: top; }
@@ -1399,6 +1372,7 @@
   border-bottom: 1px solid var(--circa-rule);
   background: #dfe7ee;
   color: var(--circa-ink-soft);
+  font-family: var(--font-sans);
   font-size: 8.5px;
   font-weight: 700;
   letter-spacing: .12em;
@@ -1409,6 +1383,7 @@
 .prose table:has(thead th:nth-child(2):last-child) tbody td:first-child {
   width: 168px;
   color: var(--circa-ink-soft);
+  font-family: var(--font-sans);
   font-size: 9.5px;
   letter-spacing: .08em;
   text-transform: uppercase;
@@ -1420,7 +1395,7 @@
   border: 1px solid #b9c6d3;
   background: #e3eaf1;
   color: #22303d;
-  font-family: var(--prose-font);
+  font-family: 'Courier New', monospace;
   font-size: 10.5px;
   letter-spacing: .02em;
   white-space: nowrap;
@@ -1433,7 +1408,7 @@
   background: var(--circa-paper-raised);
   overflow-x: auto;
 }
-.prose pre code { padding: 0; border: 0; background: none; font-size: 11px; white-space: pre; }
+.prose pre code { padding: 0; border: 0; background: none; font-family: 'Courier New', monospace; font-size: 11px; white-space: pre; }
 
 /*
  * The corpus closes a filing with a rule and a note on where it is filed and
@@ -1842,10 +1817,7 @@
   .shell .orgOpen { margin-top: 0; }
   .title { font-size: 25px; }
   .recordTitle { font-size: 24px; }
-  /* The printed margin does not survive a phone: the numeral returns to the heading. */
   .sheet { padding: 14px 14px 8px; }
-  .sheet::before { display: none; }
-  .sheetHeading .sectionIndex { position: static; display: inline; margin-right: 8px; width: auto; color: var(--circa-ink-soft); font-size: 10px; vertical-align: baseline; }
   .recordFacts > div + div::before { margin: 0 8px; }
   .recordNav { grid-template-columns: minmax(0, 1fr); }
   .shell .leaf[data-dir="next"] { text-align: left; }
