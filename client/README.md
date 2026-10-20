@@ -2,6 +2,8 @@
 
 ## Responsibility
 
+The client package is versioned at **0.2.0**, an unreleased development milestone. See the [changelog](../CHANGELOG.md) and [release process](../docs/GITFLOW.md#release-process) for the distinction between a package version and a published release.
+
 Next.js frontend serving a public landing page, a full-page public archive, and the CIRCA/OS workstation in English and Korean. Every page lives under a language segment — `/{lang}`, `/{lang}/site`, `/{lang}/meta`, `/{lang}/meta/about`, `/{lang}/meta/documentation`, `/{lang}/desktop`, `/{lang}/desktop/{destination}`, and `/{lang}/desktop/record/{code}` — and a bare path is redirected to the reader's language. The landing page is a dense institutional portal: public notices, filing procedures, organization particulars, credential status, and a prominent archive entry. The archive is the reading edition of the same records: search-first, server-rendered, and readable without JavaScript, with record pages, an organizations directory, a guide, notes, and downloadable copies. The project layer outside the fiction describes what the archive is: a landing report, a dossier, and a documentation set. Its copy and metadata remain in the Commission's voice, in whichever language the request resolved to. The workstation answers the arrival with a post screen, then runs shortcut navigation, draggable and resizable destination windows, a Start launcher, taskbar, emblem wallpaper, and a switchable CRT overlay. Its desktop URLs are workspace positions — a destination or a record can be linked, Back and Forward move focus, and a refresh restores the tab's windows from session storage — while `/{lang}/site/records/{code}` stays the canonical public address. Every desktop destination opens a real screen over illustrative preview data: Search the archive browser, Inbox the mail client, each folder the file browser, CIRCA Word the Markdown record editor, and a record the record [reader](src/components/reader/README.md). The authentication backend lives under `../backend/`; sign-up, sign-in, and personal access are integrated with the cookie API, while archive/workstation records continue to read local fixtures. See the [auth transport guide](src/lib/auth/README.md) for configuration and browser verification.
 
 ## Structure and boundaries
@@ -71,3 +73,18 @@ overrides, publishing, global search, and source actions.
 ## Low-resource verification
 
 Run checks sequentially. Unit tests accept `bun run test -- --maxWorkers=1` or a selected file list. For a production build with one page worker, use `CIRCA_LOW_RESOURCE=1 RAYON_NUM_THREADS=1 bun run build`. The auth browser suite already limits worker concurrency; do not run it alongside a production build on a constrained machine.
+
+## Local Docker
+
+The root [Compose setup](../README.md#run-locally-with-docker) builds this folder
+using Node 24 and Bun 1.3.14 with the frozen lockfile. `.dockerignore` excludes
+host dependencies, Next output, test artifacts, and local environment files.
+Source is copied into the image; rebuild after edits. No host `.next` or
+`node_modules` directory is mounted into the container.
+
+The website serves port 3001. Compose sets server-only
+`API_ORIGIN=http://circa-api:8080`; existing development rewrites forward browser
+`/api/*` calls there. Direct `bun run dev` defaults to `http://localhost:5040`,
+matching the Compose API's published port. Browser code never uses a Docker
+service hostname. The client health check requests `/api/v1/` through Next to
+verify the frontend-to-backend route.

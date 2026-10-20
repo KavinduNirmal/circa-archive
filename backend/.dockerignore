@@ -9,3 +9,5 @@
 **/*.suo
 **/*.md
 docker-compose*.yml
+**/.env
+**/.env.*

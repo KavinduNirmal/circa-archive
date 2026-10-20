@@ -1,53 +1,5 @@
-services:
-  circa-db:
-    image: postgres:16-alpine
-    container_name: circa-postgres
-    restart: unless-stopped
-    environment:
-      POSTGRES_DB: circa
-      POSTGRES_USER: circa
-      POSTGRES_PASSWORD: circa_password
-    ports:
-      - "5432:5432"
-    volumes:
-      - circa_postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U circa -d circa"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-
-  circa-redis:
-    image: redis:7-alpine
-    container_name: circa-redis
-    restart: unless-stopped
-    ports:
-      - "6379:6379"
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-
-  circa-api:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: circa-api
-    restart: unless-stopped
-    ports:
-      - "8080:8080"
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__Auth=Host=circa-db;Port=5432;Database=circa;Username=circa;Password=circa_password
-      - ConnectionStrings__Redis=circa-redis:6379
-    depends_on:
-      circa-db:
-        condition: service_healthy
-      circa-redis:
-        condition: service_healthy
-    profiles:
-      - full
-
-volumes:
-  circa_postgres_data:
+# Compatibility entry point; the repository root owns the complete local stack.
+name: circa-local
+include:
+  - path: ../compose.yaml
+    project_directory: ..

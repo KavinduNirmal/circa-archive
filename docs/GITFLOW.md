@@ -99,4 +99,5 @@ Use a hotfix only for a defect that cannot wait for the next planned release.
 - Follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - `CHANGELOG.md` follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Add entries under `Unreleased` as changes land; move them into a dated version when releasing.
 - The client package version is the release version. The root package is private repository tooling and is not published.
+- The current package version, `0.2.0`, is an unreleased development milestone recorded in the changelog. Preparing that version on a feature branch does not publish a release or create a tag; publication still follows the release process above.
 - No release is currently supported. The first tagged release should be treated as a preview.

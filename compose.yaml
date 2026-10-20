@@ -1,0 +1,64 @@
+name: circa-local
+
+services:
+  circa-db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: circa
+      POSTGRES_USER: circa
+      POSTGRES_PASSWORD: ${CIRCA_POSTGRES_PASSWORD:?Set CIRCA_POSTGRES_PASSWORD in the root .env file}
+    ports:
+      - "127.0.0.1:${CIRCA_DB_PORT:-5432}:5432"
+    volumes:
+      - circa_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U circa -d circa"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  circa-api:
+    build:
+      context: ./backend
+    ports:
+      - "127.0.0.1:${CIRCA_API_PORT:-5040}:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_HTTP_PORTS: "8080"
+      ConnectionStrings__Auth: Host=circa-db;Port=5432;Database=circa;Username=circa;Password=${CIRCA_POSTGRES_PASSWORD:?Set CIRCA_POSTGRES_PASSWORD in the root .env file}
+      Auth__Issuer: http://localhost:${CIRCA_API_PORT:-5040}
+      Auth__Audience: circa-local-client
+      Auth__SigningKey: ${CIRCA_AUTH_SIGNING_KEY:?Set CIRCA_AUTH_SIGNING_KEY in the root .env file}
+      Auth__RequireSecureCookies: "false"
+      AllowedOrigins__0: http://localhost:${CIRCA_CLIENT_PORT:-3001}
+      AllowedOrigins__1: http://127.0.0.1:${CIRCA_CLIENT_PORT:-3001}
+      Database__InitializeOnStartup: "true"
+    volumes:
+      - circa_auth_keys:/home/app/.aspnet/DataProtection-Keys
+    depends_on:
+      circa-db:
+        condition: service_healthy
+
+  circa-client:
+    build:
+      context: ./client
+    ports:
+      - "127.0.0.1:${CIRCA_CLIENT_PORT:-3001}:3001"
+    environment:
+      NODE_ENV: development
+      API_ORIGIN: http://circa-api:8080
+      NEXT_TELEMETRY_DISABLED: "1"
+      CIRCA_LOW_RESOURCE: "1"
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3001/api/v1/').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
+      interval: 10s
+      timeout: 10s
+      start_period: 30s
+      retries: 12
+    depends_on:
+      circa-api:
+        condition: service_started
+
+volumes:
+  circa_postgres_data:
+  circa_auth_keys:
