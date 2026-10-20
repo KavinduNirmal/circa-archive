@@ -2,7 +2,9 @@ import { documentationHeadings } from "@/components/meta/docs/docs-markdown";
 import { readFileSync } from "node:fs";
 import { screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+import { createTranslator } from "next-intl";
+import { MetaChrome } from "@/components/meta/meta-chrome";
 import { ARCHIVE_INDEX } from "@/components/browser/archive-index";
 import { DocsPage } from "@/components/meta/docs/docs-page";
 import { DOC_GROUPS, DOC_TOPICS, docHref, docNeighbours, docTopic } from "@/components/meta/docs/docs-topics";
@@ -17,6 +19,11 @@ import { catalogFor, renderWithIntl } from "./intl";
  * assert the sentences and destinations a person gets, not the keys that built
  * them.
  */
+
+vi.mock("next-intl/server", () => ({
+  getTranslations: async ({ locale, namespace }: { locale: "en" | "ko"; namespace: "meta" }) =>
+    createTranslator({ locale, namespace, messages: catalogFor(locale) }),
+}));
 
 const english = catalogFor("en");
 const korean = catalogFor("ko");
@@ -69,7 +76,7 @@ describe("the project landing page", () => {
     const stats = screen.getAllByRole("definition")[0].closest("dl")!;
     expect(within(stats).getByText(String(ARCHIVE_INDEX.length).padStart(2, "0"))).toBeVisible();
     expect(within(stats).getByText(meta.statLanguagesValue)).toBeVisible();
-    expect(within(stats).getByText(meta.statNone)).toBeVisible();
+    expect(within(stats).queryByText("Backend")).toBeNull();
   });
 
   it("introduces the documentation pillars and links to the full index", () => {
@@ -239,5 +246,15 @@ describe("the documentation index", () => {
         expect(documentationHeadings(markdown).length).toBeGreaterThanOrEqual(1);
       }
     }
+  });
+});
+
+describe("the shared project frame", () => {
+  it.each(["en", "ko"] as const)("keeps navigation without a backend status banner in %s", async locale => {
+    const { container } = renderWithIntl(await MetaChrome({ lang: locale, children: <h1>Project</h1> }), { locale });
+    const copy = catalogFor(locale).meta;
+    expect(container.querySelector(".meta-topline-right")).toBeNull();
+    expect(screen.getByRole("heading", { name: "Project" })).toBeVisible();
+    expect(screen.getByRole("link", { name: new RegExp(copy.navHome) })).toHaveAttribute("href", `/${locale}/meta`);
   });
 });

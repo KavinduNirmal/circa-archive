@@ -78,15 +78,6 @@
   -webkit-font-smoothing: antialiased;
 }
 
-.meta-status-dot {
-  display: inline-block;
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: var(--meta-ember);
-  box-shadow: 0 0 0 3px rgb(201 118 47 / 13%);
-  flex-shrink: 0;
-}
 
 
 
@@ -108,8 +99,7 @@
   color: var(--meta-mist-2);
 }
 
-.meta-topline-left,
-.meta-topline-right {
+.meta-topline-left {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -2925,10 +2915,6 @@
 }
 
 @media (max-width: 720px) {
-  .meta-topline-right {
-    display: none;
-  }
-
   .meta-display {
     font-size: clamp(2.5rem, 8.6vw, 3.6rem);
   }
@@ -3375,7 +3361,7 @@
 
 .meta-stats {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   flex: 1;
   gap: 0;
   margin: 0;

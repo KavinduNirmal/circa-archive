@@ -10,8 +10,8 @@ navigation, frame, footer — comes from `../layout.tsx`.
 
 No fiction chrome and no record content: this page answers a question about the
 thing the reader was using. All copy comes from the `meta` namespace, and the
-page asserts nothing the project cannot do — the FAQ says plainly that there is
-no backend and that notes are not saved.
+page distinguishes the integrated account service from notes and drafts that
+remain local to the current tab.
 
 ## Usage
 

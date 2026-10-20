@@ -24,4 +24,7 @@
     <ProjectReference Include="..\..\src\Circa.Api\Circa.Api.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="../../src/Modules/Auth/Circa.Auth.Infrastructure/Persistence/ExtendUserProfiles.sql" Link="ExtendUserProfiles.sql" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
 </Project>

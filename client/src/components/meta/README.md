@@ -8,7 +8,7 @@ it answers a different question.
 
 | File | Owns |
 | --- | --- |
-| `meta-chrome.tsx` | The frame shared by every project route: skip link, top status line, navigation, framed `<main>`, and footer. A server component; the two client islands are `MetaNav` and the language switcher. |
+| `meta-chrome.tsx` | The frame shared by every project route: skip link, project identity strip, navigation, framed `<main>`, and footer. A server component; the two client islands are `MetaNav` and the language switcher. |
 | `meta-nav.tsx` | The shadcn NavigationMenu (documentation panel) and the mobile Sheet, with grouped mobile documentation and a global documentation-search entry. Client component. |
 | `meta-home.tsx` | The landing report: the hero field with its faded seal, premise and specimen, editions, the specifications and field guides, the machinery, contribution, and the questions. Six sections and no closing pitch. |
 | `meta-about.tsx` | The dossier: the register, the nine-section index, and the long-form premise, editions, build, contribution, roster, support, questions, contact, and licence. |
@@ -57,13 +57,15 @@ drawer is portalled to `<body>`, so `.meta-sheet` restates the tokens it needs.
 
 ## Boundaries
 
+The shared header and landing statistics omit backend progress notices. Technical
+status belongs in the documentation and specific FAQ answers.
+
 This folder owns the only copy allowed to say the Commission is not real. UI copy
 lives in the `meta` namespace; documentation articles live in `docs/documentation/`; names that are data rather than
 copy — the maintainer's handle, licence identifiers — live in `meta-links.ts`.
 
-It asserts no capability the project does not have. While the backend solution is
-scaffolded, frontend integration is pending, so notes, drafts, and replies are
-described as living in the browser tab; there is no mail service, so the three
+It asserts no capability the project does not have. Account registration and sessions use the
+.NET authentication service; notes, drafts, and replies remain in the browser tab; there is no mail service, so the three
 contact doors are repository issues.
 
 ## Regenerating the dossier's plate

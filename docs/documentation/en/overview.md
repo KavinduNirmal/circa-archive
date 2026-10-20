@@ -6,7 +6,7 @@ How the archive is built, how a record is written, and how to change either with
 
 CIRCA Archive is two things at once. In fiction it is the public face of the Commission for Incident Review and Corrective Action: a continuity that files reports on incidents that should not have happened. In code it is a Next.js application that renders that invented archive in English and Korean, with a server-rendered reading edition and an interactive workstation preview.
 
-The records are invented. The interface, the renderer, the tests, and this documentation are real work. The site currently operates over local fixtures while backend integration is in progress; nothing you type is stored.
+The records are invented. The interface, the renderer, the tests, and this documentation are real work. Account registration, sign-in, and personal access use the .NET backend and its PostgreSQL database. Archive records remain local fixtures; notes, replies, and editor drafts stay in the browser tab.
 
 ```brand-callout
 This is code documentation
@@ -33,16 +33,16 @@ Both editions read the same index entries and the same Markdown sources. Neither
 
 ## What is built
 
-The reading edition and the workstation preview work end to end over fixtures. The boundary between what exists and what is planned is part of the interface's honesty.
+The reading edition and workstation present illustrative archive content. Personal accounts and sessions use the integrated authentication service.
 
-- **==Built== —** the public portal, the reading edition and record downloads, the workstation and its five applications, the Markdown pipeline, the project pages, this documentation, and the scaffolded .NET 10 backend modular monolith solution (`backend/Circa.sln`).
-- **==In progress== —** domain module handlers, live database persistence, authentication handlers, saved annotations, moderation, and API client integration.
+- **==Built== —** the public portal, the reading edition and record downloads, the workstation and its five applications, the Markdown pipeline, the project pages, this documentation, and the .NET 10 authentication service with account persistence, rotating cookie sessions, authorization policies, and Next.js integration (`backend/Circa.sln`).
+- **==In progress== —** archive domain handlers, persistent records, saved annotations, publishing, moderation, and integration of those features with the client.
 - **==Planned== —** the full .NET 10, EF Core, and SignalR platform described in ARCHITECTURE.md.
 
 > [!WARNING]
 > ARCHITECTURE.md is a draft
 >
-> It describes a platform whose API and schema do not exist. The running code is the source of truth for what the interface does today, and these pages document the running code.
+> It describes the full target platform. Authentication APIs and their schema are implemented; the archive domain contracts remain a draft. The running code is the source of truth for what the interface does today, and these pages document the running code.
 
 ## Reading this documentation
 

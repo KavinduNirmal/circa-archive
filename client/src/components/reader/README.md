@@ -144,7 +144,7 @@ The preview rail shows a section that is not in the record and then corrects its
 
 ## Boundaries and verification
 
-Reading, and only the record in front of it. Notes, endorsements, and votes are session state: they are not persisted, not authorized, and not sent anywhere, and the reviewer credential is a fixed handle rather than an authentication. There is no filing, no rating aggregate, and no backend.
+Reading, and only the record in front of it. Notes, endorsements, and votes are session state: they are not persisted, not authorized, and not sent anywhere, and the reviewer credential is a fixed handle rather than an authentication. Filing, rating aggregates, and backend persistence are not connected to the reader; the separate account service does not authenticate these local reader actions.
 
 Run `bun run test` for the model, the filings, the record sources, the status accounts, the correspondence, the frame's slot, the three silent controls, the scale limits, the arrangements, the search count, the session gate, the two engagement signals, the trail, the strip's cap and collapse, the box that explains the cap, and the rendered sheet — the repaired table, the three figure alignments, the labelled and openable redactions, and raw HTML left inert; `bun run lint` and `bun run typecheck` for the rest.
 

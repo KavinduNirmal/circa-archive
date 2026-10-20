@@ -41,18 +41,23 @@ public static class AuthModuleExtensions
         services.AddIdentityCore<AppUser>(options =>
         {
             options.User.RequireUniqueEmail = true;
+            options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
             options.Password.RequiredLength = 8;
-            options.Password.RequireDigit = false;
-            options.Password.RequireLowercase = false;
-            options.Password.RequireUppercase = false;
-            options.Password.RequireNonAlphanumeric = false;
+            options.Password.RequireDigit = true;
+            options.Password.RequireLowercase = true;
+            options.Password.RequireUppercase = true;
+            options.Password.RequireNonAlphanumeric = true;
 
             options.Lockout.AllowedForNewUsers = true;
             options.Lockout.MaxFailedAccessAttempts = 10;
             options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
         })
         .AddEntityFrameworkStores<AuthDbContext>()
-        .AddDefaultTokenProviders();
+        .AddDefaultTokenProviders()
+        .AddUserValidator<AccountValidator>();
+
+        services.Configure<UsernamePolicyOptions>(configuration.GetSection("Auth:UsernamePolicy"));
+        services.AddScoped<IUserStore<AppUser>, RegistrationUserStore>();
 
         services.Configure<PasswordHasherOptions>(options =>
         {
@@ -103,6 +108,16 @@ public static class AuthModuleExtensions
                 problem.Extensions["code"] = "rate_limit_exceeded";
                 await context.HttpContext.Response.WriteAsJsonAsync(problem, cancellationToken: token);
             };
+
+            options.AddPolicy("display_name_limit", httpContext =>
+                System.Threading.RateLimiting.RateLimitPartition.GetFixedWindowLimiter(
+                    httpContext.Connection.RemoteIpAddress?.ToString() ?? "default_ip",
+                    _ => new System.Threading.RateLimiting.FixedWindowRateLimiterOptions
+                    {
+                        PermitLimit = 30,
+                        Window = TimeSpan.FromMinutes(1),
+                        QueueLimit = 0
+                    }));
 
             options.AddPolicy("login_limit", httpContext =>
             {

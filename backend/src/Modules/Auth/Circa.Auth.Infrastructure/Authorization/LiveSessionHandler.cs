@@ -5,6 +5,8 @@ namespace Circa.Auth.Infrastructure.Authorization;
 
 public sealed class LiveSessionHandler : AuthorizationHandler<LiveSessionRequirement>
 {
+    public const string ArchiveRestrictedReason = "Account has a temporary archive restriction.";
+
     private readonly IAuthRequestContext _authContext;
 
     public LiveSessionHandler(IAuthRequestContext authContext)
@@ -56,6 +58,20 @@ public sealed class LiveSessionHandler : AuthorizationHandler<LiveSessionRequire
         {
             context.Fail(new AuthorizationFailureReason(this, "Session token version mismatch."));
             context.Fail();
+            return;
+        }
+
+        var user = await _authContext.GetUserAsync(session.UserId);
+        if (!Guid.TryParse(context.User.FindFirst("sub")?.Value, out var userId) || userId != session.UserId ||
+            user is null || !user.IsActive || user.IsBanned || user.DeletedAt is not null)
+        {
+            context.Fail(new AuthorizationFailureReason(this, "Account cannot access the archive."));
+            return;
+        }
+
+        if (!user.CanAccessArchive(DateTimeOffset.UtcNow))
+        {
+            context.Fail(new AuthorizationFailureReason(this, ArchiveRestrictedReason));
             return;
         }
 

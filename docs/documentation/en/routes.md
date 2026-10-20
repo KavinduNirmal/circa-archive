@@ -35,7 +35,7 @@ The language layout validates the segment, sets the document language, loads the
 
 The reading edition is server-first: search is a GET form, downloads are route handlers, and the only client island on a record is the notes composer.
 
-The workstation is a client shell: stateful windows over local fixtures while backend integration is in progress. Neither edition owns content, so a change in one corpus appears in both.
+The workstation is a client shell: stateful windows over local archive fixtures. Account routes use the .NET authentication service; archive content services are not connected yet. Neither edition owns content, so a change in one corpus appears in both.
 
 ## Adding a route
 

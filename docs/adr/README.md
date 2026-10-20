@@ -4,6 +4,10 @@
 
 Record the architectural decisions that shape CIRCA Archive: what was decided, what forced it, and what it costs. One decision per file, written when the decision is made. An ADR is a historical record — its Decision section is not rewritten after the fact; a later ADR supersedes it instead.
 
+Dated implementation notes distinguish current capabilities from the original
+context without rewriting accepted decisions. ADR 004 still governs archive
+fixtures; account routes now use the authentication service.
+
 The current design is described in [ARCHITECTURE.md](../../ARCHITECTURE.md). The ADRs explain how the repository arrived there and which alternatives were rejected.
 
 ## Structure
@@ -18,8 +22,8 @@ The current design is described in [ARCHITECTURE.md](../../ARCHITECTURE.md). The
 | [002](002-two-reading-surfaces.md) | A server-rendered archive and a client-side workstation over one corpus | Accepted |
 | [003](003-markdown-records-no-pdf.md) | Records are Markdown rendered as paper; no PDF generation | Accepted |
 | [004](004-fixture-backed-client.md) | The client runs on local fixtures until the backend exists | Accepted |
-| [005](005-modular-monolith-backend.md) | The backend is a .NET modular monolith | Accepted, scaffolded |
-| [006](006-session-tokens-in-http-only-cookies.md) | Sessions with short-lived JWTs in HttpOnly cookies | Accepted, implementation pending |
+| [005](005-modular-monolith-backend.md) | The backend is a .NET modular monolith | Accepted, authentication implemented |
+| [006](006-session-tokens-in-http-only-cookies.md) | Sessions with short-lived JWTs in HttpOnly cookies | Accepted, implemented |
 
 ## Boundaries
 

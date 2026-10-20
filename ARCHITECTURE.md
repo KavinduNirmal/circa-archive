@@ -131,17 +131,32 @@ The draft schema below predates the [authoring framework](docs/AUTHOR_GUIDE.md).
 #### 3.5.1 Users
 
 ```sql
+-- Conceptual auth.users shape; ASP.NET Core Identity adds normalized names,
+-- credential/lockout fields and concurrency stamps. See AuthDbContext for mapping.
 CREATE TABLE Users (
-    Id UUID PRIMARY KEY,
-    Username VARCHAR(50) NOT NULL UNIQUE,
-    Email VARCHAR(255) NOT NULL UNIQUE,
+    Id UUID PRIMARY KEY, -- UUIDv7 for new accounts; legacy IDs remain valid
+    Username VARCHAR(256) NOT NULL, -- new usernames validate at 3–20 characters
+    NormalizedUsername VARCHAR(256) UNIQUE,
+    Email VARCHAR(256) NOT NULL,
+    NormalizedEmail VARCHAR(256) UNIQUE,
     PasswordHash TEXT NOT NULL,
-    Role VARCHAR(20) NOT NULL DEFAULT 'author', -- guest, author, moderator
-    FlairOrgId UUID NULL REFERENCES Organizations(Id),
-    StrikeCount INT NOT NULL DEFAULT 0,
-    LastStrikeAt TIMESTAMP NULL,
-    CreatedAt TIMESTAMP NOT NULL DEFAULT NOW()
+    DisplayId VARCHAR(9) NOT NULL UNIQUE,
+    DisplayName VARCHAR(64) NOT NULL, -- non-unique generated analyst name
+    AdoptedOrganizationId UUID NULL, -- shared cosmetic flair; null = my.circa.archive
+    Role VARCHAR(20) NOT NULL DEFAULT 'author',
+    IsActive BOOLEAN NOT NULL DEFAULT TRUE,
+    IsBanned BOOLEAN NOT NULL DEFAULT FALSE,
+    StrikeCount INT NOT NULL DEFAULT 0, -- capped at five; fifth strike bans
+    LastStrikeAt TIMESTAMPTZ NULL,
+    RestrictedUntil TIMESTAMPTZ NULL,
+    CreatedAt TIMESTAMPTZ NOT NULL,
+    UpdatedAt TIMESTAMPTZ NOT NULL,
+    DeletedAt TIMESTAMPTZ NULL,
+    LastLoginAt TIMESTAMPTZ NULL,
+    LastLogoutAt TIMESTAMPTZ NULL,
+    ActivityIPList TEXT[] NOT NULL -- ten most recent distinct login IPs
 );
+-- DisplayEmail derives from DisplayId + '@my.circa.archive'; never authenticates.
 ```
 
 #### 3.5.2 Incidents
@@ -316,7 +331,7 @@ CREATE TABLE Folders (
 
 ### 3.6 Indexes and Constraints
 
-- `Users.Username` unique
+- `Users.NormalizedUsername`, `Users.NormalizedEmail`, and `Users.DisplayId` unique
 - `Incidents.CircaCode` unique
 - `Records.CircaCode` unique
 - `Organizations.CircaCode` unique

@@ -113,6 +113,10 @@ public sealed class SessionService : ISessionService
             ipAddress,
             userAgent);
 
+        var user = await _context.Users.FindAsync([userId], cancellationToken: ct)
+            ?? throw new InvalidOperationException("Account not found.");
+        if (!user.CanAccessArchive(now)) throw new InvalidOperationException("Account cannot access the archive.");
+        user.RecordLogin(now, ipAddress);
         _context.Sessions.Add(session);
         await _context.SaveChangesAsync(ct);
 
@@ -140,7 +144,7 @@ public sealed class SessionService : ISessionService
 
         if (session is not null)
         {
-            if (session.IsLive(now))
+            if (session.IsLive(now) && await CanUseSessionAsync(session, now, ct))
             {
                 var replacementRaw = GenerateRawToken();
                 var replacementHash = HashToken(replacementRaw);
@@ -165,6 +169,12 @@ public sealed class SessionService : ISessionService
 
         if (session is not null)
         {
+            if (!await CanUseSessionAsync(session, now, ct))
+            {
+                await tx.RollbackAsync(ct);
+                return SessionRefreshResult.FailedResult(SessionRefreshStatus.ExpiredOrRevoked);
+            }
+
             if (session.IsLive(now) && session.PreviousGraceUntil.HasValue && now < session.PreviousGraceUntil.Value)
             {
                 // Idempotent retry within grace window: return same replacement token
@@ -195,8 +205,15 @@ public sealed class SessionService : ISessionService
         if (string.IsNullOrWhiteSpace(rawRefreshToken)) return null;
         var hash = HashToken(rawRefreshToken);
         var now = DateTimeOffset.UtcNow;
-        return await _context.Sessions.AsNoTracking().FirstOrDefaultAsync(s =>
+        var session = await _context.Sessions.AsNoTracking().FirstOrDefaultAsync(s =>
             s.RefreshTokenHash == hash || (s.PreviousTokenHash == hash && s.PreviousGraceUntil > now), ct);
+        return session is not null && await CanUseSessionAsync(session, now, ct) ? session : null;
+    }
+
+    private async Task<bool> CanUseSessionAsync(Session session, DateTimeOffset now, CancellationToken ct)
+    {
+        var user = await _context.Users.FindAsync([session.UserId], cancellationToken: ct);
+        return user is not null && user.CanAccessArchive(now);
     }
 
     public async Task RevokeSessionAsync(
@@ -209,6 +226,11 @@ public sealed class SessionService : ISessionService
         if (session is not null && session.RevokedAt is null)
         {
             session.Revoke(now, reason);
+            if (reason == "manual_logout")
+            {
+                var user = await _context.Users.FindAsync([session.UserId], cancellationToken: ct);
+                user?.RecordLogout(now);
+            }
             await _context.SaveChangesAsync(ct);
             _eventLogger.LogSessionRevoked(sessionId, reason);
         }

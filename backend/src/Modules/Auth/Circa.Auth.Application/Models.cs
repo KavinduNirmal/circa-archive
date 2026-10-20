@@ -1,6 +1,6 @@
 namespace Circa.Auth.Application;
 
-public sealed record RegisterRequest(string Username, string Email, string Password);
+public sealed record RegisterRequest(string Username, string Email, string Password, string? DisplayName = null);
 
 public sealed record RegisterResponse(Guid Id, string Username, string Role);
 

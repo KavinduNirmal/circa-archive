@@ -23,6 +23,9 @@ public static class AuthEndpoints
         var group = endpoints.MapGroup("/auth")
             .HasApiVersion(new ApiVersion(1, 0));
 
+        group.MapGet("/display-name", () => Results.Ok(new { displayName = AnalystName.Generate() }))
+            .AllowAnonymous().RequireRateLimiting("display_name_limit");
+
         group.MapPost("/register", async (
             RegisterRequest request,
             RegisterHandler handler,
@@ -176,7 +179,7 @@ public static class AuthEndpoints
             }
 
             var user = await userManager.FindByIdAsync(refreshResult.Session.UserId.ToString());
-            if (user is null)
+            if (user is null || !user.CanAccessArchive(now))
             {
                 DeleteAccessTokenCookie(httpContext, authOptions.Value);
                 DeleteRefreshTokenCookie(httpContext, authOptions.Value);
@@ -259,7 +262,11 @@ public static class AuthEndpoints
                 id = user.Id,
                 username = user.UserName,
                 role = user.Role,
-                createdAt = user.CreatedAt
+                createdAt = user.CreatedAt,
+                displayId = user.DisplayId,
+                displayName = user.DisplayName,
+                displayEmail = user.DisplayEmail,
+                adoptedOrganizationId = user.AdoptedOrganizationId
             });
         }).RequireAuthorization(policy => policy.RequireAuthenticatedUser().AddRequirements(new Circa.Auth.Contracts.LiveSessionRequirement()));
 

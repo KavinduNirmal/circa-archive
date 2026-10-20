@@ -22,7 +22,7 @@ public sealed class LoginHandler
         var user = await _userManager.FindByNameAsync(request.Identifier)
                    ?? await _userManager.FindByEmailAsync(request.Identifier);
 
-        if (user is null)
+        if (user is null || !user.CanAccessArchive(DateTimeOffset.UtcNow))
         {
             return AuthResult<LoginResponse>.Failure(AuthFailureReason.InvalidCredentials, "Invalid credentials.");
         }

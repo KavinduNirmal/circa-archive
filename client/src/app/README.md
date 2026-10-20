@@ -23,7 +23,8 @@ public procedures, and diegetic route metadata. `/{lang}/desktop` plays the post
 screen before the shell, so the workstation is entered rather than merely loaded;
 the post screen and the shell live in the `(workspace)` layout so a deep link or
 Back does not replay the post or discard the open windows.
-Backend integration is not implemented; the application screens are the archive
+Account registration, sign-in, and personal access use the authentication API.
+Archive content still uses local fixtures; the application screens are the archive
 browser behind Search, the mail client behind Inbox, the file browser behind every
 folder destination, and the record editor behind CIRCA Word.
 
