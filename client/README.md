@@ -82,6 +82,16 @@ host dependencies, Next output, test artifacts, and local environment files.
 Source is copied into the image; rebuild after edits. No host `.next` or
 `node_modules` directory is mounted into the container.
 
+The `dependencies` build stage copies only `package.json` and `bun.lock`, so
+source-only edits reuse the installed dependency layer. Its Bun download cache
+is a persistent BuildKit mount (`circa-client-bun`), allowing lockfile changes
+to reuse previously downloaded package versions. The first build fills it;
+changing Docker builders, pruning the build cache, or using `--no-cache` /
+`--no-cache-filter` requires downloading again.
+The cache stays outside the image and does not change frozen-lockfile installs.
+Use plain build progress to see dependency-layer reuse:
+`docker compose --progress plain build circa-client`.
+
 The website serves port 3001. Compose sets server-only
 `API_ORIGIN=http://circa-api:8080`; the ingress gateway forwards browser `/api/*` calls directly to the API.
 Host-run Next development still uses its API rewrites. Direct `bun run dev` defaults to `http://localhost:5040`,
