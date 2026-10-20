@@ -10,6 +10,7 @@
         "@fontsource/instrument-serif": "5.3.0",
         "@fontsource/libre-baskerville": "5.3.0",
         "@fontsource/noto-serif-kr": "5.3.1",
+        "@fontsource/zilla-slab": "5.3.0",
         "axios": "^1.20.0",
         "class-variance-authority": "0.7.1",
         "clsx": "2.1.1",
@@ -158,6 +159,8 @@
     "@fontsource/libre-baskerville": ["@fontsource/libre-baskerville@5.3.0", "", {}, "sha512-IA6OLq36/JWMX70Fha15sri2qWsijFh7hgdDXCRZHjKUHtWarLQoiGilvm7iMqm7HiYFEv9acF3+IuRHO9kUiA=="],
 
     "@fontsource/noto-serif-kr": ["@fontsource/noto-serif-kr@5.3.1", "", {}, "sha512-xtsAgK4S4MjPllHRSAFaMiB7xnFb8Nlhx47uPaD/qvyTP5WgRICNawZmwGzLVshCyA/QmydSVzA9kWF8otycpQ=="],
+
+    "@fontsource/zilla-slab": ["@fontsource/zilla-slab@5.3.0", "", {}, "sha512-xbdDx5OESJDQqp3GIp4pjBgI+qpcg4AxnHLN15ekfJbG+ZYaOXg3uBjDpYlkuPQpey91afxHBNaqZgzluJ2FWA=="],
 
     "@formatjs/fast-memoize": ["@formatjs/fast-memoize@3.1.7", "", {}, "sha512-zXfhLpvA6T7+efdt9JLbBwZ00tT7NsBMDVnDu8rpHeNNv8KfRZAMo2gkG0k9lK/Nzc//3kJ9pImsfuJxk3KhUA=="],
 

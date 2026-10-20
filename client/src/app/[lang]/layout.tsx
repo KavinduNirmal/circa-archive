@@ -11,6 +11,11 @@ import "@fontsource/ibm-plex-mono/400.css";
  * masthead on `/site` names the family, so no other route downloads it.
  */
 import "@fontsource/libre-baskerville/400.css";
+// The public record reader's slab serif, including authored emphasis and strong text.
+import "@fontsource/zilla-slab/latin-400.css";
+import "@fontsource/zilla-slab/latin-400-italic.css";
+import "@fontsource/zilla-slab/latin-700.css";
+import "@fontsource/zilla-slab/latin-700-italic.css";
 import { CookieNotice } from "@/components/auth/cookie-notice";
 import { routing } from "@/i18n/routing";
 import "../globals.css";

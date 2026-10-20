@@ -7,6 +7,8 @@
 - [adr/](adr/README.md): architecture decision records — what was decided, why, and what it costs.
 - [OPEN_SOURCE_CHECKLIST.md](OPEN_SOURCE_CHECKLIST.md): verified repository settings and remaining owner actions.
 - `auth-sign-in-desktop.png` and `auth-sign-up-mobile-ko.png`: reviewed English desktop and Korean mobile previews of the personal access forms, captured by the auth browser suite with an isolated test API.
+- `reader-slab-desktop.png` and `reader-slab-mobile.png`: reviewed public record reader at 1440px and 390px, showing locally bundled Zilla Slab and unnumbered section headings.
+- `reader-table-desktop.png`: Markdown table typography keeps Courier New values and DM Sans headers alongside the slab-serif prose.
 - `portal.webp`: preview of the public archive portal used by the root README.
 - `workstation.webp`: preview of the CIRCA/OS workstation used by the root README.
 - [AUTHOR_GUIDE.md](AUTHOR_GUIDE.md): platform collaboration rules for story authors, protected constraints, character permissions, and continuity adoption; implementation remains pending.
