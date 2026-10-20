@@ -21,7 +21,7 @@ never opens it downloads no Markdown parser and runs no state.
 - `archive-records.tsx`: the index table and the search results page.
 - `archive-record.tsx`: one record as a work page. The name and its code share a
   line, the tools that act on the whole record sit in one band, the sheet carries
-  a printed margin of section numerals, and the foot repeats the step through the
+  unnumbered section headings with matching contents links, and the foot repeats the step through the
   register as two large leaves. Its particulars carry the exploration count when
   records have been filed against it, and the status updates have their own rail
   section: an accordion of coloured cards.
@@ -35,7 +35,7 @@ never opens it downloads no Markdown parser and runs no state.
   prose. The classes are a colour key with a released code beside each, and the
   statuses wear the chips they wear in the index; either name opens the index
   filtered by it. The margin carries the guide's sections and the edition's own
-  count, and the sections are numbered in the sheet's gutter like a record's.
+  count; its guide numbering is independent of the record reader.
 - `archive-data.ts`: the questions these pages ask of the index — consultation
   counts, holdings, adjacency, and a random code. No React.
 - `record-prose.tsx`: the server-side Markdown renderer. It runs the same pipeline
@@ -69,8 +69,13 @@ under it is the landing catalog's `motto`, not a second string, so both language
 already carry it. The serif also sets what the archive says at length about
 itself — a record's abstract, a page's lede, the standing note — while chrome,
 headings, labels and keys stay DM Sans through `--font-sans`. A record's own prose
-is the exception inside the exception: the sheet is a typed document, so its
-Markdown — paragraphs, quotations, tables, the colophon — is set in Courier New.
+uses locally bundled Zilla Slab at 16px with 1.75 leading for a printed archive
+feel. Paragraphs, quotations, and the colophon share that face. Markdown table
+values and code retain Courier New; table headers and two-column key labels
+use DM Sans. Regular, italic, bold, and bold italic Latin faces are
+bundled so authored emphasis renders without synthetic styling. This reader
+choice supersedes the earlier Courier-only reading-edition specification;
+the workstation reader retains its own typography.
 Record names are set as filing titles: capitals and tracked; their descriptions
 stay serif and sentence-cased.
 

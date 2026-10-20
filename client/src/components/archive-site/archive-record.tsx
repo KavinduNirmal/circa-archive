@@ -211,7 +211,6 @@ export function ArchiveRecord({ code }: { code: string }) {
               {document.sections.map((section) => (
                 <li key={section.id}>
                   <a href={`#${sectionAnchor(section.id)}`}>
-                    <span className={styles.sectionIndex}>{section.index}</span>
                     {section.heading}
                   </a>
                 </li>
@@ -219,16 +218,11 @@ export function ArchiveRecord({ code }: { code: string }) {
             </ol>
           </nav>
 
-          {/*
-            The sheet. Section numerals sit in the printed margin rather than in
-            the running text, so a heading rule spans the body and the eye can
-            find a leaf by its number without reading the heading.
-          */}
+          {/* Headings and contents share the filing's titles and stable anchors. */}
           <div className={styles.sheet}>
             {document.sections.map((section) => (
               <section key={section.id} id={sectionAnchor(section.id)} className={styles.sheetSection}>
                 <h2 className={styles.sheetHeading}>
-                  <span className={styles.sectionIndex} aria-hidden="true">{section.index}</span>
                   {section.heading}
                 </h2>
                 {section.source ? (
