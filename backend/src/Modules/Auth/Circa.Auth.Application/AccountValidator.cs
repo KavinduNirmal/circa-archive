@@ -1,5 +1,6 @@
 using System.Net.Mail;
 using Circa.Auth.Domain;
+using Circa.Auth.Application.Blocklists;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 
@@ -19,7 +20,7 @@ public sealed class AccountValidator(IOptions<UsernamePolicyOptions> options) : 
         var name = user.UserName ?? "";
         if (name.Length is < 3 or > 20 || name.Any(c => !char.IsAsciiLetterOrDigit(c) && c != '_'))
             errors.Add(new IdentityError { Code = "InvalidUserName", Description = "Username must contain 3–20 ASCII letters, digits or underscores." });
-        if (options.Value.BlockedTerms.Any(term => !string.IsNullOrWhiteSpace(term) && name.Contains(term, StringComparison.OrdinalIgnoreCase)))
+        if (UsernameBlocklist.IsReserved(name) || options.Value.BlockedTerms.Any(term => !string.IsNullOrWhiteSpace(term) && name.Contains(term, StringComparison.OrdinalIgnoreCase)))
             errors.Add(new IdentityError { Code = "BlockedUserName", Description = "Choose a different username." });
         if (!MailAddress.TryCreate(user.Email, out var email) || email.Address != user.Email)
             errors.Add(new IdentityError { Code = "InvalidEmail", Description = "Invalid email address format." });

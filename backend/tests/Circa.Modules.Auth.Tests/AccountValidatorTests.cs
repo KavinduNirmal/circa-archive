@@ -37,4 +37,30 @@ public sealed class AccountValidatorTests
         var validator = new AccountValidator(Options.Create(new UsernamePolicyOptions()));
         Assert.False((await validator.ValidateAsync(null!, AppUser.Create("analyst", email))).Succeeded);
     }
+    [Theory]
+    [InlineData("root")]
+    [InlineData("AdMiN")]
+    [InlineData("SYSTEM")]
+    [InlineData("moderator")]
+    [InlineData("support")]
+    [InlineData("payment")]
+    public async Task RejectsReservedUsernamesEvenWithoutProfanityTerms(string name)
+    {
+        var validator = new AccountValidator(Options.Create(new UsernamePolicyOptions { BlockedTerms = [] }));
+        var result = await validator.ValidateAsync(null!, AppUser.Create(name, "user@example.com"));
+
+        Assert.False(result.Succeeded);
+        Assert.Contains(result.Errors, error => error.Code == "BlockedUserName");
+    }
+
+    [Theory]
+    [InlineData("rootbeer")]
+    [InlineData("systematic")]
+    [InlineData("payment_plan")]
+    public async Task ReservedWords_OnlyBlockTheEntireUsername(string name)
+    {
+        var validator = new AccountValidator(Options.Create(new UsernamePolicyOptions { BlockedTerms = [] }));
+
+        Assert.True((await validator.ValidateAsync(null!, AppUser.Create(name, "user@example.com"))).Succeeded);
+    }
 }

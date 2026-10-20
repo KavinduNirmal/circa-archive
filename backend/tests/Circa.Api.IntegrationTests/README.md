@@ -26,6 +26,6 @@ dotnet test tests/Circa.Api.IntegrationTests
 
 `UserProfileTests.cs` covers profile round-trips, private-field exclusion, password
 rules, account-state access denial, case-insensitive and concurrent registration,
-and display-ID collision retries. `UserProfileUpgradeTests.cs` verifies the SQL
+display-ID collision retries, and reserved-name rejection without account creation or cookies. `UserProfileUpgradeTests.cs` verifies the SQL
 upgrade against a separate disposable legacy-shaped database. Docker is required.
 Run `dotnet test backend/Circa.sln` from the repository root.

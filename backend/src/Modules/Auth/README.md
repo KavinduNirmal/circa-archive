@@ -31,8 +31,10 @@ Organization lookup and adoption endpoints await the organization module.
 
 Registration permits ASCII letters, digits and underscores, 3–20 characters,
 case-insensitive unique username/email, and an eight-character password containing
-uppercase, lowercase, digit and symbol. A configurable username blocklist provides
-a baseline profanity filter; it is not comprehensive multilingual moderation.
+uppercase, lowercase, digit and symbol. A pinned [username blocklist](Circa.Auth.Application/Blocklists/README.md)
+reserves upstream account names using case-insensitive exact matches. A separate
+configurable substring list provides baseline profanity filtering; it is not
+comprehensive multilingual moderation. Content flagging is deferred.
 Display-name previews can be rerolled before registration; accepted names must
 come from the server's predefined vocabulary. Existing registration clients may
 omit the name and receive a generated one.

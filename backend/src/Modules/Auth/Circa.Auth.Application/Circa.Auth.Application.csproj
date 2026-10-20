@@ -10,4 +10,8 @@
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Include="Blocklists/reserved-usernames.json" LogicalName="Circa.Auth.Application.Blocklists.reserved-usernames.json" />
+    <None Update="Blocklists/LICENSE.The-Big-Username-Blocklist.txt" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
 </Project>

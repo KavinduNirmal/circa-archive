@@ -141,4 +141,24 @@ public sealed class UserProfileTests(PostgresFixture postgres) : IClassFixture<P
         var persisted = (await db.Users.FindAsync(first.Id))!;
         Assert.Equal(new[] { "192.0.2.1" }, persisted.ActivityIPList);
     }
+    [Theory]
+    [InlineData("root")]
+    [InlineData("AdMiN")]
+    [InlineData("moderator")]
+    public async Task Registration_RejectsReservedNamesWithoutCreatingAccounts(string username)
+    {
+        using var client = _factory.CreateClient();
+        var email = $"{Guid.NewGuid():N}@example.com";
+
+        var response = await client.PostAsJsonAsync("/api/v1/auth/register",
+            new RegisterRequest(username, email, "Password123!"));
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        var problem = await response.Content.ReadFromJsonAsync<JsonElement>();
+        Assert.Equal("validation_failed", problem.GetProperty("code").GetString());
+        Assert.False(response.Headers.Contains("Set-Cookie"));
+        using var scope = _factory.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<AuthDbContext>();
+        Assert.False(await db.Users.AnyAsync(user => user.Email == email));
+    }
 }
