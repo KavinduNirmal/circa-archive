@@ -173,8 +173,10 @@ export function DesktopShell() {
     if (!layer) return;
     const measure = () => setArea({ width: layer.clientWidth, height: layer.clientHeight });
     measure();
-    window.addEventListener("resize", measure);
-    return () => window.removeEventListener("resize", measure);
+    // The cookie notice changes the canvas without a browser resize event.
+    const observer = new ResizeObserver(measure);
+    observer.observe(layer);
+    return () => observer.disconnect();
   }, [setArea]);
 
   useEffect(() => {

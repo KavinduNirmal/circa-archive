@@ -36,6 +36,13 @@ for (const viewport of [{ width: 1440, height: 900 }, { width: 390, height: 844 
     await expect(page).toHaveTitle("Workstation");
     await page.evaluate(() => document.fonts.ready);
     await expect(page.getByRole("main", { name: "CIRCA desktop" })).toBeVisible();
+    await expect(page.getByRole("region", { name: "Cookie notice" })).toBeVisible();
+    // The notice, taskbar, and usable canvas must occupy separate vertical space.
+    await expect.poll(() => page.evaluate(() => {
+      const area = document.querySelector(".desktop-area")!.getBoundingClientRect();
+      const taskbar = document.querySelector(".desktop-taskbar")!.getBoundingClientRect();
+      return Math.round(area.bottom - taskbar.top);
+    })).toBe(0);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
     const navigation = page.getByRole("navigation", { name: "Desktop folders" });
     for (const [folder, windowTitle] of shortcuts) {
@@ -92,6 +99,8 @@ test("desktop shortcuts explain themselves with the beveled tooltip", async ({ p
 });
 
 test("windows drag, resize, minimize, and maximize", async ({ page }) => {
+  // Leave room for the full drag and resize even while the cookie notice is open.
+  await page.setViewportSize({ width: 1440, height: 1000 });
   await page.goto("/desktop");
   const shortcut = page.getByRole("navigation", { name: "Desktop folders" }).getByRole("button", { name: "Archive", exact: true });
   await shortcut.click();
@@ -117,6 +126,9 @@ test("windows drag, resize, minimize, and maximize", async ({ page }) => {
   expect(Math.round(settled.y)).toBe(Math.round(moved.y));
 
   const resizeHandle = windowFrame.locator(".workstation-window-resize");
+  const canvas = (await page.locator(".desktop-area").boundingBox())!;
+  expect(canvas.x + canvas.width - moved.x - moved.width).toBeGreaterThanOrEqual(90);
+  expect(canvas.y + canvas.height - moved.y - moved.height).toBeGreaterThanOrEqual(60);
   const handle = (await resizeHandle.boundingBox())!;
   await page.mouse.move(handle.x + handle.width / 2, handle.y + handle.height / 2);
   await page.mouse.down();
@@ -145,6 +157,30 @@ test("windows drag, resize, minimize, and maximize", async ({ page }) => {
   await taskEntry.click();
   await expect(page.getByRole("dialog", { name: ARCHIVE_WINDOW, exact: true })).toBeVisible();
   await expect(taskEntry).toHaveAttribute("aria-pressed", "false");
+});
+
+test("the canvas and maximized window follow cookie notice expansion and dismissal", async ({ page }) => {
+  await page.setViewportSize({ width: 640, height: 700 });
+  await page.goto("/desktop");
+  const notice = page.getByRole("region", { name: "Cookie notice" });
+  await expect(notice).toBeVisible();
+  await page.getByRole("navigation", { name: "Desktop folders" }).getByRole("button", { name: "Archive", exact: true }).click();
+  const frame = page.getByRole("dialog", { name: ARCHIVE_WINDOW, exact: true });
+  await page.getByRole("button", { name: `Maximize ${ARCHIVE_WINDOW}`, exact: true }).click();
+  const area = page.locator(".desktop-area");
+  const originalHeight = (await area.boundingBox())!.height;
+  await notice.getByText("Cookie details", { exact: true }).click();
+  await expect.poll(async () => (await area.boundingBox())!.height).toBeLessThan(originalHeight);
+  await expect.poll(() => page.evaluate(() => {
+    const canvas = document.querySelector(".desktop-area")!.getBoundingClientRect();
+    const taskbar = document.querySelector(".desktop-taskbar")!.getBoundingClientRect();
+    return Math.round(canvas.bottom - taskbar.top);
+  })).toBe(0);
+  await expect.poll(async () => Math.round((await frame.boundingBox())!.height - (await area.boundingBox())!.height)).toBe(0);
+  await notice.getByRole("button", { name: "Understood", exact: true }).click();
+  await expect(notice).toHaveCount(0);
+  await expect.poll(async () => (await area.boundingBox())!.height).toBe(660);
+  await expect.poll(async () => Math.round((await frame.boundingBox())!.height - (await area.boundingBox())!.height)).toBe(0);
 });
 
 test("My PC contains System and back-tracks", async ({ page }) => {
