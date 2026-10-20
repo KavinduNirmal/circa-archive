@@ -9,6 +9,10 @@ export interface Account {
   username: string;
   role: "author" | "moderator";
   createdAt: string;
+  displayId: string;
+  displayName: string;
+  displayEmail: string;
+  adoptedOrganizationId: string | null;
 }
 
 /** Read-only server requests. Cookie mutation belongs to proxy or browser API calls. */
