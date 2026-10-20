@@ -98,6 +98,19 @@ runs in development mode for its existing API rewrites; this is a local setup,
 not the production reverse-proxy deployment. The client health check verifies the
 API through Next before `--wait` completes.
 
+If startup reports that database port 5432 is already in use, set
+`CIRCA_DB_PORT=5433` (or another available host port) in the root `.env` and run
+the startup command again. Docker services still connect to `circa-db:5432`;
+host database tools must use the configured host port.
+
+If the API exits with `Name or service not known` for `circa-db`, check
+`docker inspect circa-local-circa-db-1 --format '{{json .NetworkSettings.Networks}}'`.
+A running database with no network attachment can pass its internal health
+check while remaining unreachable by the API. Restore the Compose network
+attachments with `docker compose up --detach --force-recreate --wait` after
+resolving any host port conflict. This preserves named data and key volumes;
+do not use `down --volumes` to repair connectivity.
+
 ## Getting started
 
 Install Bun 1.3.14 and Node.js 20.9 or newer. From the repository root:
