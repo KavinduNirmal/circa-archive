@@ -72,7 +72,7 @@ overrides, publishing, global search, and source actions.
 
 ## Low-resource verification
 
-Run checks sequentially. Unit tests accept `bun run test -- --maxWorkers=1` or a selected file list. For a production build with one page worker, use `CIRCA_LOW_RESOURCE=1 RAYON_NUM_THREADS=1 bun run build`. The auth browser suite already limits worker concurrency; do not run it alongside a production build on a constrained machine.
+Run checks sequentially. Set `VITEST_MAX_WORKERS=1` when invoking root pre-commit checks on a constrained machine; the hooks still run every required check. Unit tests accept `bun run test -- --maxWorkers=1` or a selected file list. For a production build with one page worker, use `CIRCA_LOW_RESOURCE=1 RAYON_NUM_THREADS=1 bun run build`. The auth browser suite already limits worker concurrency; do not run it alongside a production build on a constrained machine.
 
 ## Local Docker
 
@@ -83,8 +83,22 @@ Source is copied into the image; rebuild after edits. No host `.next` or
 `node_modules` directory is mounted into the container.
 
 The website serves port 3001. Compose sets server-only
-`API_ORIGIN=http://circa-api:8080`; existing development rewrites forward browser
-`/api/*` calls there. Direct `bun run dev` defaults to `http://localhost:5040`,
+`API_ORIGIN=http://circa-api:8080`; the ingress gateway forwards browser `/api/*` calls directly to the API.
+Host-run Next development still uses its API rewrites. Direct `bun run dev` defaults to `http://localhost:5040`,
 matching the Compose API's published port. Browser code never uses a Docker
 service hostname. The client health check requests `/api/v1/` through Next to
 verify the frontend-to-backend route.
+
+## HTTP authentication and cookies
+
+Authentication uses Axios through the [cookie transport](src/lib/auth/README.md).
+Browser interceptors include cookies, strip client IP claims, and share one refresh
+before a single retry. Server interceptors attach per-request cookies and, with
+explicit edge trust, a validated visitor address. The root layout shows an
+archive-themed necessary-cookie notice; no optional analytics/advertising cookies
+are currently set. Its separate acknowledgement cookie lasts one year.
+
+Compose now publishes the [ingress gateway](../infra/README.md) on port 3001 and
+keeps the Next port internal. API requests go directly through the gateway to the
+API. For direct host development, the existing Next rewrite still applies and
+proxy-header trust remains disabled by default.

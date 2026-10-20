@@ -45,6 +45,7 @@ CIRCA Archive is in pre-release development. The public archive and CIRCA/OS wor
 | Path | Purpose |
 | --- | --- |
 | [client/](client/README.md) | Next.js application: public archive, project pages, and CIRCA/OS workstation |
+| [infra/](infra/README.md) | Local ingress configuration and forwarding trust boundary |
 | [backend/](backend/README.md) | Modular monolith API and persistence, including the integrated authentication service |
 | [admin/](admin/README.md) | Reserved for administration tooling |
 | [docs/](docs/README.md) | Branch model, architecture decision records, publishing checklist, and setting documentation |
@@ -63,8 +64,8 @@ Empty placeholder folders may not appear in a fresh clone; Git tracks files rath
 
 ## Run locally with Docker
 
-The root [`compose.yaml`](compose.yaml) runs PostgreSQL, the .NET API, and the
-Next.js development server. Requires Docker with Compose v2.20 or newer. For a
+The root [`compose.yaml`](compose.yaml) runs PostgreSQL, the .NET API, the
+Next.js development server, and an Nginx ingress gateway. Requires Docker with Compose v2.20 or newer. For a
 fresh clone, copy `.env.example` to `.env` at the repository root and set
 `CIRCA_AUTH_SIGNING_KEY` and `CIRCA_POSTGRES_PASSWORD` to separate random values
 (generate each with `openssl rand -hex 32`). The `.env` file stays out of Git.
@@ -75,12 +76,13 @@ docker compose up --build --detach --wait
 
 | Service | Local address | Container address |
 | --- | --- | --- |
-| Website | <http://localhost:3001> | `circa-client:3001` |
+| Website gateway | <http://localhost:3001> | `circa-gateway:8080` |
+| Next.js | Internal only | `circa-client:3001` |
 | API | <http://localhost:5040/api/v1/> | `circa-api:8080` |
 | PostgreSQL | `localhost:5432` | `circa-db:5432` |
 
 Compose sets server-only `API_ORIGIN=http://circa-api:8080`. Browser `/api/*`
-requests stay on the website origin and Next forwards them to the API. A frontend
+requests stay on the website origin and the gateway forwards them to the API. A frontend
 running directly on the host defaults to `http://localhost:5040`, matching the
 API's published port. All published ports bind to the local machine. Override
 `CIRCA_CLIENT_PORT`, `CIRCA_API_PORT`, or `CIRCA_DB_PORT` in `.env` if needed; a
@@ -95,8 +97,8 @@ when reusing an older auth database. Redis is not used by the current app.
 Use `docker compose logs -f` for logs and `docker compose down` to stop while
 retaining data. Source is copied into images, so rebuild after editing. The client
 runs in development mode for its existing API rewrites; this is a local setup,
-not the production reverse-proxy deployment. The client health check verifies the
-API through Next before `--wait` completes.
+not a production TLS deployment. Client and gateway health checks verify their
+API routes before `--wait` completes.
 
 If startup reports that database port 5432 is already in use, set
 `CIRCA_DB_PORT=5433` (or another available host port) in the root `.env` and run
@@ -110,6 +112,17 @@ check while remaining unreachable by the API. Restore the Compose network
 attachments with `docker compose up --detach --force-recreate --wait` after
 resolving any host port conflict. This preserves named data and key volumes;
 do not use `down --volumes` to repair connectivity.
+
+### Trusted local ingress
+
+The local website port is served by the [ingress gateway](infra/README.md).
+It sends `/api/*` directly to the API and all other traffic to the internal Next
+server. Caller-supplied IP headers are replaced at ingress; the API trusts only
+the gateway/Next addresses for forwarded IPs before authentication and rate limits.
+`CIRCA_PROXY_NETWORK_PREFIX` chooses a private ingress /24 (default `172.30.0`).
+Change it if that subnet conflicts with another local network. The existing
+DB/API default network and named volumes are retained. Rebuild/recreate services
+with `docker compose up --build --detach --wait` after these source changes.
 
 ## Getting started
 

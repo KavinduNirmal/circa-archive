@@ -8,8 +8,8 @@
 .desktop-shell {
   position: relative;
   isolation: isolate;
-  min-height: 100dvh;
-  height: 100dvh;
+  min-height: calc(100dvh - var(--circa-cookie-notice-height, 0px));
+  height: calc(100dvh - var(--circa-cookie-notice-height, 0px));
   overflow: hidden;
   background: #17232c;
   color: #c8d6e5;

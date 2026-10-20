@@ -135,11 +135,13 @@
 }
 
 @layer base {
+  html { scroll-padding-bottom: calc(var(--circa-cookie-notice-height, 0px) + 16px); }
   * { @apply border-border outline-ring/50; }
   body {
     @apply bg-background text-foreground font-sans;
     margin: 0;
     min-height: 100dvh;
+    padding-bottom: var(--circa-cookie-notice-height, 0px);
     font-size: 12px;
     line-height: 16px;
     letter-spacing: 0.01em;

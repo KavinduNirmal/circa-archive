@@ -1,7 +1,9 @@
 import "server-only";
 import { unstable_rethrow } from "next/navigation";
 import { cache } from "react";
-import { cookies } from "next/headers";
+import { cookies, headers as requestHeaders } from "next/headers";
+import { createApiTransport, requestOptions, webResponse } from "./transport";
+import { trustedProxyHeaders } from "./forwarded-address";
 import { apiOrigin } from "./server";
 
 export interface Account {
@@ -17,14 +19,20 @@ export interface Account {
 
 /** Read-only server requests. Cookie mutation belongs to proxy or browser API calls. */
 export async function sessionFetch(path: string, init?: RequestInit): Promise<Response> {
-  const origin = apiOrigin();
-  const url = new URL(path, origin);
-  if (url.origin !== origin || !url.pathname.startsWith("/api/")) {
-    throw new TypeError("Session requests require an API path on the configured origin");
-  }
-  const headers = new Headers(init?.headers);
-  headers.set("Cookie", (await cookies()).toString());
-  return fetch(url, { ...init, headers, cache: "no-store", redirect: "manual", signal: init?.signal ?? AbortSignal.timeout(5000) });
+  const api = createApiTransport(apiOrigin());
+  const cookie = (await cookies()).toString();
+  const forwarded = trustedProxyHeaders(await requestHeaders());
+  api.interceptors.request.use(config => {
+    config.headers.set("Cookie", cookie);
+    return config;
+  });
+  api.interceptors.request.use(config => {
+    for (const name of ["X-Forwarded-For", "X-Real-IP", "Forwarded", "X-Forwarded-Proto"]) config.headers.delete(name);
+    for (const [name, value] of Object.entries(forwarded)) config.headers.set(name, value);
+    return config;
+  });
+  const response = await api.request<string>({ ...requestOptions(path, init), timeout: 5000 });
+  return webResponse(response);
 }
 
 export type SessionState = { status: "authenticated"; account: Account } | { status: "guest" | "unavailable" };

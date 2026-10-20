@@ -28,3 +28,12 @@ auth settings and publishes container port 8080 at `localhost:5040`.
 auth schema in a fresh database before listening. Enabling it outside Development
 aborts startup. Existing schemas and data are preserved; `EnsureCreatedAsync`
 does not apply upgrades to an existing database.
+
+## Forwarded client addresses
+
+`ReverseProxy:KnownProxies` is an explicit list of literal gateway/server IPs.
+Forwarded headers are disabled when it is empty. The middleware processes one
+rightmost hop before authentication and rate limiting; it never trusts an
+arbitrary caller's IP claim. The Compose ingress replaces inbound forwarding
+headers, and Next forwards its validated edge address for server session calls.
+See the [ingress guide](../../../infra/README.md). No schema changes are needed.
