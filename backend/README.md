@@ -12,7 +12,7 @@ backend/
   Directory.Build.props       # Central build properties (net10.0, nullable, warnings-as-errors)
   Directory.Packages.props    # Central package version management (CPM)
   Dockerfile                  # Multistage build and runtime container image
-  docker-compose.yml          # Local database (PostgreSQL 16) and Redis backing services
+  docker-compose.yml          # Compatibility entry point for the root local Compose stack
   src/                        # Application host, shared cross-cutting layers, and domain modules
   tests/                      # Unit and integration test suites
 ```
@@ -34,9 +34,9 @@ Prerequisites: .NET 10 SDK and Docker.
 - Restore dependencies: `dotnet restore`
 - Build solution: `dotnet build`
 - Run test suites: `dotnet test`
-- Start local backing database: `docker compose up -d circa-db`
+- Start local backing database: configure the root `.env`, then `docker compose up -d circa-db`
 - Run local API host: `dotnet run --project src/Circa.Api`
-- Run full container stack: `docker compose --profile full up --build`
+- Run the full app: `docker compose up --build --detach --wait` from the repository root or this folder.
 
 ## Authentication hardening
 
@@ -58,4 +58,18 @@ The single user model is [`AppUser`](src/Modules/Auth/Circa.Auth.Domain/AppUser.
 in the Auth domain; the Common domain does not own account entities. Developer
 requirements are retained with the model. See [user model decisions](src/Modules/Auth/README.md#user-model-decisions)
 for profile fields and lifecycle rules, and [schema upgrade instructions](src/Modules/Auth/Circa.Auth.Infrastructure/Persistence/README.md#schema-upgrade-and-verification)
-before running this version against an existing auth database. No upgrade runs automatically.
+before running this version against an existing auth database. No existing schema upgrade runs automatically.
+
+## Local containers
+
+See the root [Docker instructions](../README.md#run-locally-with-docker). The API
+listens on container port 8080 and host port 5040; the frontend uses
+`http://circa-api:8080` inside Docker and `http://localhost:5040` on the host.
+Compose supplies local auth settings, the website origin allowlist, database
+connection, and HTTP cookie settings. `Database:InitializeOnStartup=true` creates
+a fresh schema only in Development. The option defaults to false and is rejected
+outside Development. Existing schemas require the explicit upgrade above.
+
+The Dockerfile restores/publishes the API project and its references without
+including test projects. It runs as the image's non-root app user. Separate named
+volumes retain PostgreSQL data and Data Protection keys across restarts.

@@ -20,3 +20,8 @@ Import `authFetch` only in browser code; import `getSession` or `sessionFetch` o
 Set `API_ORIGIN` to the internal API origin. Development and tests default to `http://localhost:5040`; production requires an explicit value for server auth. Local Next rewrites `/api/*` to that origin in development. Production routing must send `/api` directly to the API through the shared reverse proxy. Set the API `AllowedOrigins` to the public website origin.
 
 From `client/`, run `bun run test -- tests/auth-client.test.ts tests/auth-proxy.test.ts tests/auth-session.test.ts tests/i18n-routing.test.ts` and `bun run test:e2e:auth` (Docker, .NET 10, and Chromium required). The latter starts an isolated PostgreSQL/API and a separate Next development server on port 3101, using `.next/auth-e2e` to coexist with the normal development server. Tests simulate access-cookie expiry without wall-clock waiting.
+
+For the root [local Compose stack](../../../../README.md#run-locally-with-docker),
+`API_ORIGIN` is `http://circa-api:8080` inside the frontend container. The API is
+published at `http://localhost:5040` for a host-run frontend. Browser requests stay
+on the website origin; the Docker hostname is server-only.

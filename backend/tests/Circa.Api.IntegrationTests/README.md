@@ -29,3 +29,11 @@ rules, account-state access denial, case-insensitive and concurrent registration
 display-ID collision retries, and reserved-name rejection without account creation or cookies. `UserProfileUpgradeTests.cs` verifies the SQL
 upgrade against a separate disposable legacy-shaped database. Docker is required.
 Run `dotnet test backend/Circa.sln` from the repository root.
+
+## Local database startup
+
+`DatabaseInitializationTests.cs` starts isolated PostgreSQL databases without the
+usual fixture schema creation. It verifies opt-in Development initialization,
+default-disabled behavior, data preservation on restart, and rejection outside
+Development. `ApiFactory.EnvironmentName` and `PostgresFixture.InitializeSchema`
+let these tests exercise real startup without changing other suites' defaults.

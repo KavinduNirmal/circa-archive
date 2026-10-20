@@ -3,6 +3,8 @@ using Asp.Versioning.Builder;
 using Circa.Auth.Contracts;
 using Circa.Auth.Infrastructure;
 using Circa.Auth.Infrastructure.Endpoints;
+using Circa.Auth.Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +20,19 @@ builder.Services.AddApiVersioning(options =>
 });
 
 var app = builder.Build();
+
+if (app.Configuration.GetValue<bool>("Database:InitializeOnStartup"))
+{
+    if (!app.Environment.IsDevelopment())
+    {
+        throw new InvalidOperationException("Automatic database initialization is only allowed in Development.");
+    }
+
+    // Local Compose owns a fresh database. Existing schemas still require an explicit upgrade.
+    await using var scope = app.Services.CreateAsyncScope();
+    var database = scope.ServiceProvider.GetRequiredService<AuthDbContext>();
+    await database.Database.EnsureCreatedAsync();
+}
 
 app.UseMiddleware<Circa.Auth.Infrastructure.Security.SecurityHeadersMiddleware>();
 app.UseMiddleware<Circa.Auth.Infrastructure.Security.OriginValidationMiddleware>();

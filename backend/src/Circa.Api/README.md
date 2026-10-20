@@ -21,3 +21,10 @@ Run the web host locally:
 ```sh
 dotnet run --project src/Circa.Api
 ```
+
+The root [Compose stack](../../../README.md#run-locally-with-docker) supplies local
+auth settings and publishes container port 8080 at `localhost:5040`.
+`Database:InitializeOnStartup` defaults to false. When true, it creates the current
+auth schema in a fresh database before listening. Enabling it outside Development
+aborts startup. Existing schemas and data are preserved; `EnsureCreatedAsync`
+does not apply upgrades to an existing database.

@@ -13,11 +13,15 @@ public sealed class PostgresFixture : IAsyncLifetime
         .WithPassword("circa_test_password")
         .Build();
 
+    public bool InitializeSchema { get; init; } = true;
+
     public string ConnectionString => _container.GetConnectionString();
 
     public async Task InitializeAsync()
     {
         await _container.StartAsync();
+
+        if (!InitializeSchema) return;
 
         var options = new Microsoft.EntityFrameworkCore.DbContextOptionsBuilder<Circa.Auth.Infrastructure.Persistence.AuthDbContext>()
             .UseNpgsql(ConnectionString)

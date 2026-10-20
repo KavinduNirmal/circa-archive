@@ -19,6 +19,8 @@ The project has two public faces. The **archive** is a server-rendered reading e
 
 ## Project status
 
+The current development milestone is **0.2.0**, recorded in the [changelog](CHANGELOG.md). It has not been tagged or published as a supported release.
+
 CIRCA Archive is in pre-release development. The public archive and CIRCA/OS workstation let you explore illustrative records today. The .NET 10/PostgreSQL backend implements account registration, sign-in, cookie sessions, and authorization policies, with personal access integrated into the Next.js client. Archive content still comes from local fixtures; persistent records, notes, publishing, and moderation remain in development. The full platform design in [ARCHITECTURE.md](ARCHITECTURE.md) remains a draft, and no release is currently supported.
 
 ## What is in the repository
@@ -58,6 +60,43 @@ CIRCA Archive is in pre-release development. The public archive and CIRCA/OS wor
 | [LICENSE](LICENSE) | MIT license for original code and documentation |
 
 Empty placeholder folders may not appear in a fresh clone; Git tracks files rather than directories.
+
+## Run locally with Docker
+
+The root [`compose.yaml`](compose.yaml) runs PostgreSQL, the .NET API, and the
+Next.js development server. Requires Docker with Compose v2.20 or newer. For a
+fresh clone, copy `.env.example` to `.env` at the repository root and set
+`CIRCA_AUTH_SIGNING_KEY` and `CIRCA_POSTGRES_PASSWORD` to separate random values
+(generate each with `openssl rand -hex 32`). The `.env` file stays out of Git.
+
+```sh
+docker compose up --build --detach --wait
+```
+
+| Service | Local address | Container address |
+| --- | --- | --- |
+| Website | <http://localhost:3001> | `circa-client:3001` |
+| API | <http://localhost:5040/api/v1/> | `circa-api:8080` |
+| PostgreSQL | `localhost:5432` | `circa-db:5432` |
+
+Compose sets server-only `API_ORIGIN=http://circa-api:8080`. Browser `/api/*`
+requests stay on the website origin and Next forwards them to the API. A frontend
+running directly on the host defaults to `http://localhost:5040`, matching the
+API's published port. All published ports bind to the local machine. Override
+`CIRCA_CLIENT_PORT`, `CIRCA_API_PORT`, or `CIRCA_DB_PORT` in `.env` if needed; a
+host-run frontend needs `API_ORIGIN` in `client/.env.local` if the API host port
+changes. The backend origin allowlist follows the configured website port.
+
+The API initializes a fresh local database on first startup. Named volumes retain
+accounts and refresh-token protection keys across restarts. Existing schemas are
+not upgraded automatically; follow the [profile upgrade guide](backend/src/Modules/Auth/Circa.Auth.Infrastructure/Persistence/README.md#schema-upgrade-and-verification)
+when reusing an older auth database. Redis is not used by the current app.
+
+Use `docker compose logs -f` for logs and `docker compose down` to stop while
+retaining data. Source is copied into images, so rebuild after editing. The client
+runs in development mode for its existing API rewrites; this is a local setup,
+not the production reverse-proxy deployment. The client health check verifies the
+API through Next before `--wait` completes.
 
 ## Getting started
 

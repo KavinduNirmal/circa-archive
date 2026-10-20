@@ -8,6 +8,7 @@ namespace Circa.Api.IntegrationTests;
 public class ApiFactory : WebApplicationFactory<Program>
 {
     public PostgresFixture? PostgresFixture { get; set; }
+    public string EnvironmentName { get; set; } = "Development";
     public string? ContentRoot { get; set; }
 
     public Dictionary<string, string?> Overrides { get; } = new();
@@ -24,7 +25,7 @@ public class ApiFactory : WebApplicationFactory<Program>
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         if (ContentRoot is not null) builder.UseContentRoot(ContentRoot);
-        builder.UseEnvironment("Development");
+        builder.UseEnvironment(EnvironmentName);
         builder.ConfigureAppConfiguration((_, config) =>
         {
             var inMemoryConfig = new Dictionary<string, string?>
