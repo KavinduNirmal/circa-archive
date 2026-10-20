@@ -29,7 +29,7 @@ public sealed class HardeningTests : IClassFixture<PostgresFixture>
     {
         _factory.Overrides["Auth:RefreshRateLimitPermitLimit"] = "2";
         using var client = _factory.CreateClient();
-        var name = $"flood_{Guid.NewGuid():N}";
+        var name = $"flood_{Guid.NewGuid():N}"[..20];
         Assert.Equal(HttpStatusCode.Created, (await client.PostAsJsonAsync("/api/v1/auth/register",
             new RegisterRequest(name, $"{name}@example.com", "Password123!"))).StatusCode);
         Assert.Equal(HttpStatusCode.NoContent, (await client.PostAsync("/api/v1/auth/refresh", null)).StatusCode);
@@ -70,7 +70,7 @@ public sealed class HardeningTests : IClassFixture<PostgresFixture>
         using var second = _factory.CreateClient();
         foreach (var client in new[] { first, second })
         {
-            var name = $"owner_{Guid.NewGuid():N}";
+            var name = $"owner_{Guid.NewGuid():N}"[..20];
             Assert.Equal(HttpStatusCode.Created, (await client.PostAsJsonAsync("/api/v1/auth/register",
                 new RegisterRequest(name, $"{name}@example.com", "Password123!"))).StatusCode);
         }

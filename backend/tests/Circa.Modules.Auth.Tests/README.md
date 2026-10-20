@@ -6,7 +6,7 @@ Validates domain invariants, use case handlers, cryptographic token generation, 
 
 ## Structure
 
-Uses `xunit`. References `Circa.Auth.Domain`, `Circa.Auth.Application`, `Circa.Auth.Infrastructure`, and `Circa.Auth.Contracts`.
+`AppUserTests.cs` covers identity defaults, lifecycle restrictions, five-strike bans, analyst names and bounded login history. `AccountValidatorTests.cs` covers username and email boundaries. Uses `xunit`. References `Circa.Auth.Domain`, `Circa.Auth.Application`, `Circa.Auth.Infrastructure`, and `Circa.Auth.Contracts`.
 
 ## Boundaries
 

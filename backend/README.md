@@ -51,3 +51,11 @@ Auth audit events record login success/failure, refresh, reuse, logout, and revo
 To rotate the single signing key, deploy a new random key on every instance together, revoke active `auth.sessions` through an operational database procedure, and require sign-in again. Replacing the JWT signing key alone invalidates access JWTs but does not revoke opaque refresh sessions. Persist Data Protection keys across host restarts for refresh grace retries.
 
 The Next.js integration uses `Path=/` for the Strict, HttpOnly refresh cookie so it reaches page navigations. The previous auth-only path cannot support proxy refresh. Clear pre-release local auth cookies and sign in again after this change. See the [client transport guide](../client/src/lib/auth/README.md).
+
+## Account profiles
+
+The single user model is [`AppUser`](src/Modules/Auth/Circa.Auth.Domain/AppUser.cs)
+in the Auth domain; the Common domain does not own account entities. Developer
+requirements are retained with the model. See [user model decisions](src/Modules/Auth/README.md#user-model-decisions)
+for profile fields and lifecycle rules, and [schema upgrade instructions](src/Modules/Auth/Circa.Auth.Infrastructure/Persistence/README.md#schema-upgrade-and-verification)
+before running this version against an existing auth database. No upgrade runs automatically.

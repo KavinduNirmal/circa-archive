@@ -26,7 +26,7 @@ public sealed class RegisterHandler
             return AuthResult<RegisterResponse>.Failure(AuthFailureReason.ValidationFailed, "Password must be at least 8 characters long.");
         }
 
-        if (!request.Email.Contains('@') || !request.Email.Contains('.'))
+        if (!System.Net.Mail.MailAddress.TryCreate(request.Email, out var email) || email.Address != request.Email)
         {
             return AuthResult<RegisterResponse>.Failure(AuthFailureReason.ValidationFailed, "Invalid email address format.");
         }
@@ -43,7 +43,12 @@ public sealed class RegisterHandler
             return AuthResult<RegisterResponse>.Failure(AuthFailureReason.EmailTaken, "Email is already taken.");
         }
 
-        var user = AppUser.Create(request.Username, request.Email, "author");
+        if (request.DisplayName is not null && !AnalystName.IsValid(request.DisplayName))
+        {
+            return AuthResult<RegisterResponse>.Failure(AuthFailureReason.ValidationFailed, "Choose a generated analyst name.");
+        }
+
+        var user = AppUser.Create(request.Username, request.Email, "author", displayName: request.DisplayName);
         var result = await _userManager.CreateAsync(user, request.Password);
 
         if (!result.Succeeded)

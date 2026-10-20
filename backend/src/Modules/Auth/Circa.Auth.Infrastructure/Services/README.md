@@ -11,3 +11,8 @@ Infrastructure services for the Auth module that implement cross-cutting and int
 ## Boundaries
 
 - Provides read-only user summary projection to satisfy cross-module author resolutions.
+
+Session creation records successful sign-in time and a valid connection IP on the
+account in the same save as the new session. Manual logout records the account's
+last logout time. Refresh and cookie-session lookup check current account access
+state; refresh does not add IP history entries or count as a new login.

@@ -24,7 +24,10 @@ public sealed class CircaAuthorizationMiddlewareResultHandler : IAuthorizationMi
                 authorizeResult.AuthorizationFailure?.FailedRequirements.OfType<LiveSessionRequirement>().Any() == true ||
                 authorizeResult.AuthorizationFailure?.FailureReasons.Any(r => r.Handler is LiveSessionHandler) == true;
 
-            if (isLiveSessionFailed)
+            var isTemporarilyRestricted = authorizeResult.AuthorizationFailure?.FailureReasons
+                .Any(r => r.Handler is LiveSessionHandler && r.Message == LiveSessionHandler.ArchiveRestrictedReason) == true;
+
+            if (isLiveSessionFailed && !isTemporarilyRestricted)
             {
                 context.Response.StatusCode = StatusCodes.Status401Unauthorized;
                 context.Response.ContentType = "application/problem+json";
