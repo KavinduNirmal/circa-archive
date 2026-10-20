@@ -42,6 +42,13 @@ Settings stays a full-screen modal: it is workstation chrome, not a document win
 
 A destination may also ask to open maximized, which is how the reader arrives: full screen in the desktop sense, with the taskbar still under it. The flag is read only when the window is created, so restoring a frame by hand is never undone by a later open.
 
+The desktop canvas takes its height from the shell after the cookie notice's
+reserved space, then subtracts the shared taskbar-height token (52px on mobile,
+40px otherwise). A ResizeObserver tracks the actual canvas so window bounds and
+maximized frames follow notice expansion/dismissal as well as viewport changes.
+The shortcut rail scrolls when its icon/label rows no longer fit; shortcuts never
+extend under the taskbar.
+
 A minimized window is hidden rather than unmounted. It costs one hidden element and buys back whatever the window was holding: the browser's history, the editor's undo stack, and the reader's place in a record all survive a trip to the taskbar. The `hidden` attribute does the hiding, so assistive technology stops seeing the window at the same moment the screen does.
 
 ## Boundaries and verification
