@@ -17,7 +17,9 @@ export default defineConfig({
        * aliasing under the test runner, so it is declared here too; without it
        * any import of `next-intl/server` fails to resolve.
        */
-      "next-intl/config": fileURLToPath(new URL("./src/i18n/request.ts", import.meta.url)),
+      "next-intl/config": fileURLToPath(
+        new URL("./src/i18n/request.ts", import.meta.url),
+      ),
       /**
        * `next-intl/server` ships a client-condition build whose every export
        * throws, and a `react-server` build that is the real implementation. Next
@@ -26,7 +28,10 @@ export default defineConfig({
        * page's `generateMetadata` fails with "not supported in Client Components".
        */
       "next-intl/server": fileURLToPath(
-        new URL("./node_modules/next-intl/dist/esm/development/server.react-server.js", import.meta.url),
+        new URL(
+          "./node_modules/next-intl/dist/esm/development/server.react-server.js",
+          import.meta.url,
+        ),
       ),
     },
   },

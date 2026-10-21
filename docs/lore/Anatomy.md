@@ -6,12 +6,12 @@ An Incident is a supernatural system anchored to reality. An entity operating wi
 
 ## Parts of the system
 
-| Part | Responsibility within the account |
-| --- | --- |
+| Part                  | Responsibility within the account                                             |
+| --------------------- | ----------------------------------------------------------------------------- |
 | **Anchor or anchors** | Connect the Incident to ordinary reality and bear themes of the story within. |
-| **Nature** | The environment, circumstances, and boundaries in which the story proceeds. |
-| **Actor or actors** | Entities, forces, or participants driving events. |
-| **Conditions** | Triggers, prohibitions, consequences, and completion rules. |
+| **Nature**            | The environment, circumstances, and boundaries in which the story proceeds.   |
+| **Actor or actors**   | Entities, forces, or participants driving events.                             |
+| **Conditions**        | Triggers, prohibitions, consequences, and completion rules.                   |
 
 Nature and actor need not be separate. An environment may act, and some Incidents have no identifiable actor. Every Incident nevertheless requires an [anchor](Anchors.md) and a [beginning and conclusion](Narrative%20flow.md).
 

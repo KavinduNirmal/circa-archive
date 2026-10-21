@@ -106,19 +106,30 @@ export const TYPING_WINDOW_MS = 900;
  * though both are small adjacent edits. Everything that is not a keystroke keeps
  * its own undo step.
  */
-function isKeystroke(before: string, after: string, caret: TextSelection): boolean {
+function isKeystroke(
+  before: string,
+  after: string,
+  caret: TextSelection,
+): boolean {
   const shorter = before.length <= after.length ? before : after;
   const longer = before.length <= after.length ? after : before;
   if (longer.length - shorter.length > 32) return false;
   let head = 0;
   while (head < shorter.length && shorter[head] === longer[head]) head += 1;
   let tail = 0;
-  while (tail < shorter.length - head && shorter[shorter.length - 1 - tail] === longer[longer.length - 1 - tail]) tail += 1;
+  while (
+    tail < shorter.length - head &&
+    shorter[shorter.length - 1 - tail] === longer[longer.length - 1 - tail]
+  )
+    tail += 1;
   if (tail !== shorter.length - head) return false;
   // `head` is where the edited run begins, `tail` is where it ends in each string.
   const runEndInLonger = longer.length - tail;
   const runEndInShorter = shorter.length - tail;
-  return (head <= caret.start && caret.end <= runEndInShorter) || (head <= caret.start && caret.end <= runEndInLonger);
+  return (
+    (head <= caret.start && caret.end <= runEndInShorter) ||
+    (head <= caret.start && caret.end <= runEndInLonger)
+  );
 }
 
 /**
@@ -128,8 +139,15 @@ function isKeystroke(before: string, after: string, caret: TextSelection): boole
  * style box, and the statistics can never disagree with the selection they
  * describe.
  */
-function withDocument(state: EditorState, text: string, selection: TextSelection): EditorState {
-  const clamped = { start: Math.max(0, Math.min(selection.start, text.length)), end: Math.max(0, Math.min(selection.end, text.length)) };
+function withDocument(
+  state: EditorState,
+  text: string,
+  selection: TextSelection,
+): EditorState {
+  const clamped = {
+    start: Math.max(0, Math.min(selection.start, text.length)),
+    end: Math.max(0, Math.min(selection.end, text.length)),
+  };
   const line = text.slice(0, clamped.start).split("\n").pop() ?? "";
   return {
     ...state,
@@ -141,9 +159,15 @@ function withDocument(state: EditorState, text: string, selection: TextSelection
 }
 
 /** The caret's line and column, one-based, as the status bar prints them. */
-export function cursorPosition(text: string, selection: TextSelection): { line: number; column: number } {
+export function cursorPosition(
+  text: string,
+  selection: TextSelection,
+): { line: number; column: number } {
   const lines = text.slice(0, selection.start).split("\n");
-  return { line: lines.length, column: (lines[lines.length - 1]?.length ?? 0) + 1 };
+  return {
+    line: lines.length,
+    column: (lines[lines.length - 1]?.length ?? 0) + 1,
+  };
 }
 
 export function editorStats(state: EditorState): TextStats {
@@ -178,67 +202,120 @@ export function initialState(body = EMPTY_DOCUMENT): EditorState {
   return withDocument(base, body, base.selection);
 }
 
-export function editorReducer(state: EditorState, action: EditorAction): EditorState {
+export function editorReducer(
+  state: EditorState,
+  action: EditorAction,
+): EditorState {
   switch (action.type) {
     case "change": {
       const at = action.at ?? Date.now();
-      if (action.text === state.present) return withDocument(state, action.text, action.selection);
+      if (action.text === state.present)
+        return withDocument(state, action.text, action.selection);
       // A keystroke inside the window continues the last undo step. Everything
       // else, including a pause, starts a new one.
-      const continues = !state.toolPress && isKeystroke(state.present, action.text, state.selection) && at - state.marked <= TYPING_WINDOW_MS;
-      const past = continues ? state.past : [...state.past, state.present].slice(-HISTORY_LIMIT);
-      return withDocument({ ...state, past, future: [], marked: at, toolPress: false }, action.text, action.selection);
+      const continues =
+        !state.toolPress &&
+        isKeystroke(state.present, action.text, state.selection) &&
+        at - state.marked <= TYPING_WINDOW_MS;
+      const past = continues
+        ? state.past
+        : [...state.past, state.present].slice(-HISTORY_LIMIT);
+      return withDocument(
+        { ...state, past, future: [], marked: at, toolPress: false },
+        action.text,
+        action.selection,
+      );
     }
     case "tool": {
-      const result = applyChange(state.present, { tool: action.tool, selection: state.selection, address: action.address });
-      return withDocument({
-        ...state,
-        past: [...state.past, state.present].slice(-HISTORY_LIMIT),
-        future: [],
-        address: null,
-        // A tool press ends the typing run, so the next keystroke is its own step.
-        marked: 0,
-        toolPress: true,
-      }, result.text, result.selection);
+      const result = applyChange(state.present, {
+        tool: action.tool,
+        selection: state.selection,
+        address: action.address,
+      });
+      return withDocument(
+        {
+          ...state,
+          past: [...state.past, state.present].slice(-HISTORY_LIMIT),
+          future: [],
+          address: null,
+          // A tool press ends the typing run, so the next keystroke is its own step.
+          marked: 0,
+          toolPress: true,
+        },
+        result.text,
+        result.selection,
+      );
     }
     case "selection":
       return withDocument(state, state.present, action.selection);
     case "focus":
       return { ...state, focused: action.focused };
     case "address":
-      return { ...state, address: action.tool ? { tool: action.tool, value: state.address?.value ?? "" } : null };
+      return {
+        ...state,
+        address: action.tool
+          ? { tool: action.tool, value: state.address?.value ?? "" }
+          : null,
+      };
     case "addressValue":
-      return { ...state, address: state.address ? { ...state.address, value: action.value } : null };
+      return {
+        ...state,
+        address: state.address
+          ? { ...state.address, value: action.value }
+          : null,
+      };
     case "undo": {
       if (state.past.length === 0) return state;
       const previous = state.past[state.past.length - 1];
-      return withDocument({
-        ...state,
-        past: state.past.slice(0, -1),
-        future: [state.present, ...state.future].slice(0, HISTORY_LIMIT),
-        toolPress: true,
-      }, previous, { start: previous.length, end: previous.length });
+      return withDocument(
+        {
+          ...state,
+          past: state.past.slice(0, -1),
+          future: [state.present, ...state.future].slice(0, HISTORY_LIMIT),
+          toolPress: true,
+        },
+        previous,
+        { start: previous.length, end: previous.length },
+      );
     }
     case "redo": {
       if (state.future.length === 0) return state;
       const next = state.future[0];
-      return withDocument({
-        ...state,
-        past: [...state.past, state.present].slice(-HISTORY_LIMIT),
-        future: state.future.slice(1),
-        toolPress: true,
-      }, next, { start: next.length, end: next.length });
+      return withDocument(
+        {
+          ...state,
+          past: [...state.past, state.present].slice(-HISTORY_LIMIT),
+          future: state.future.slice(1),
+          toolPress: true,
+        },
+        next,
+        { start: next.length, end: next.length },
+      );
     }
     case "new":
-      return { ...initialState(), size: state.size, ruler: state.ruler, focused: true, revision: state.revision + 1 };
+      return {
+        ...initialState(),
+        size: state.size,
+        ruler: state.ruler,
+        focused: true,
+        revision: state.revision + 1,
+      };
     case "report":
       return { ...state, notice: action.message };
     case "quiet":
       return state.notice === null ? state : { ...state, notice: null };
     case "size":
-      return { ...state, size: action.size, notice: { key: "textSizeNotice", size: action.size } };
+      return {
+        ...state,
+        size: action.size,
+        notice: { key: "textSizeNotice", size: action.size },
+      };
     case "ruler":
-      return { ...state, ruler: action.ruler, notice: { key: action.ruler ? "rulerShown" : "rulerHidden" } };
+      return {
+        ...state,
+        ruler: action.ruler,
+        notice: { key: action.ruler ? "rulerShown" : "rulerHidden" },
+      };
     case "about":
       return { ...state, notice: { key: "buildNotice" } };
   }

@@ -7,7 +7,13 @@ import { Input } from "../../ui/input";
 
 export type DocsSidebarGroup = Readonly<{
   label: string;
-  items: readonly { label: string; href: string; slug: string; number: string; text?: string }[];
+  items: readonly {
+    label: string;
+    href: string;
+    slug: string;
+    number: string;
+    text?: string;
+  }[];
 }>;
 
 export type DocsSidebarLabels = Readonly<{
@@ -49,7 +55,8 @@ export function DocsSidebar({
       } else desktopInput.current?.focus();
     }
     function focusSearch(event: KeyboardEvent) {
-      if (!(event.ctrlKey || event.metaKey) || event.key.toLowerCase() !== "k") return;
+      if (!(event.ctrlKey || event.metaKey) || event.key.toLowerCase() !== "k")
+        return;
       event.preventDefault();
       focusInput();
     }
@@ -71,13 +78,18 @@ export function DocsSidebar({
       groups
         .map((group) => ({
           ...group,
-          items: group.items.filter((item) => `${item.label} ${item.text ?? ""}`.toLowerCase().includes(needle)),
+          items: group.items.filter((item) =>
+            `${item.label} ${item.text ?? ""}`.toLowerCase().includes(needle),
+          ),
         }))
         .filter((group) => group.items.length > 0),
     [groups, needle],
   );
 
-  const count = filtered.reduce((total, group) => total + group.items.length, 0);
+  const count = filtered.reduce(
+    (total, group) => total + group.items.length,
+    0,
+  );
   const groupId = React.useId();
 
   const nav = (
@@ -99,7 +111,10 @@ export function DocsSidebar({
                       data-active={active ? "true" : undefined}
                       aria-current={active ? "page" : undefined}
                     >
-                      <span className="meta-docs-link-number" aria-hidden="true">
+                      <span
+                        className="meta-docs-link-number"
+                        aria-hidden="true"
+                      >
                         {item.number}
                       </span>
                       <span>{item.label}</span>
@@ -117,12 +132,18 @@ export function DocsSidebar({
   const search = (id: string) => (
     <div className="meta-docs-search">
       <div className="meta-docs-search-field">
-        <Search className="meta-docs-search-icon" aria-hidden="true" size={14} />
+        <Search
+          className="meta-docs-search-icon"
+          aria-hidden="true"
+          size={14}
+        />
         <Input
           id={id}
           ref={id.endsWith("desktop") ? desktopInput : mobileInput}
           aria-keyshortcuts="Control+k Meta+k"
-          onKeyDown={(event) => { if (event.key === "Escape") setQuery(""); }}
+          onKeyDown={(event) => {
+            if (event.key === "Escape") setQuery("");
+          }}
           type="search"
           value={query}
           onChange={(event) => setQuery(event.target.value)}
@@ -137,7 +158,11 @@ export function DocsSidebar({
       </p>
       {needle.length > 0 && partial && labels.searchPartial && (
         <div className="meta-docs-search-warning" role="status">
-          <AlertTriangle className="meta-docs-search-warning-icon" aria-hidden="true" size={13} />
+          <AlertTriangle
+            className="meta-docs-search-warning-icon"
+            aria-hidden="true"
+            size={13}
+          />
           <span>{labels.searchPartial}</span>
         </div>
       )}
@@ -148,7 +173,12 @@ export function DocsSidebar({
     <>
       <details className="meta-docs-mobile" ref={mobileDisclosure}>
         <summary>
-          <span>{groups.flatMap(group => group.items).find(item => item.slug === currentSlug)?.label ?? labels.contents}</span>
+          <span>
+            {groups
+              .flatMap((group) => group.items)
+              .find((item) => item.slug === currentSlug)?.label ??
+              labels.contents}
+          </span>
           <ChevronDown aria-hidden="true" size={16} />
         </summary>
         <div className="meta-docs-mobile-body">
@@ -158,7 +188,9 @@ export function DocsSidebar({
       </details>
 
       <div className="meta-docs-sidebar-inner">
-        <p className="meta-docs-group-title">{labels.contents} <kbd>Ctrl / ⌘ K</kbd></p>
+        <p className="meta-docs-group-title">
+          {labels.contents} <kbd>Ctrl / ⌘ K</kbd>
+        </p>
         {search(`${groupId}-desktop`)}
         {nav}
       </div>

@@ -1,6 +1,12 @@
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { Attendance, PortalSigns, RegisterRefresh, UnavailableLink, attendanceText } from "@/components/site/portal-signs";
+import {
+  Attendance,
+  PortalSigns,
+  RegisterRefresh,
+  UnavailableLink,
+  attendanceText,
+} from "@/components/site/portal-signs";
 
 /**
  * The portal's uncanny apparatus.
@@ -21,10 +27,20 @@ afterEach(() => {
 });
 
 describe("sentence alteration", () => {
-  function Fixture({ after = 4000, hold = 900 }: { after?: number; hold?: number }) {
+  function Fixture({
+    after = 4000,
+    hold = 900,
+  }: {
+    after?: number;
+    hold?: number;
+  }) {
     return (
       <div>
-        <p data-alter="If a record names you, forget the reference number." data-alter-after={after} data-alter-hold={hold}>
+        <p
+          data-alter="If a record names you, forget the reference number."
+          data-alter-after={after}
+          data-alter-hold={hold}
+        >
           If a record names you in error, retain the reference number.
         </p>
         <PortalSigns />
@@ -38,10 +54,14 @@ describe("sentence alteration", () => {
     expect(sentence).toBeVisible();
 
     act(() => vi.advanceTimersByTime(4000));
-    expect(sentence).toHaveTextContent("If a record names you, forget the reference number.");
+    expect(sentence).toHaveTextContent(
+      "If a record names you, forget the reference number.",
+    );
 
     act(() => vi.advanceTimersByTime(900));
-    expect(sentence).toHaveTextContent("If a record names you in error, retain the reference number.");
+    expect(sentence).toHaveTextContent(
+      "If a record names you in error, retain the reference number.",
+    );
   });
 
   it("leaves the sentence alone until its own cue, so alterations do not fire together", () => {
@@ -52,7 +72,14 @@ describe("sentence alteration", () => {
   });
 
   it("never alters a sentence when reduced motion is asked for", () => {
-    vi.stubGlobal("matchMedia", vi.fn(() => ({ matches: true, addEventListener() {}, removeEventListener() {} })));
+    vi.stubGlobal(
+      "matchMedia",
+      vi.fn(() => ({
+        matches: true,
+        addEventListener() {},
+        removeEventListener() {},
+      })),
+    );
     render(<Fixture />);
     const sentence = screen.getByText(/retain the reference number/);
     act(() => vi.advanceTimersByTime(60000));
@@ -68,17 +95,27 @@ describe("attendance", () => {
   });
 
   it("counts while the page is open and then says it is still counting", () => {
-    render(<Attendance label="Attendance this visit" note="Recorded for the duration of the visit." still="Still present. Attendance is retained." />);
+    render(
+      <Attendance
+        label="Attendance this visit"
+        note="Recorded for the duration of the visit."
+        still="Still present. Attendance is retained."
+      />,
+    );
     const readout = screen.getByText("00:00:00", { selector: "span" });
     expect(readout).toBeVisible();
 
     act(() => vi.advanceTimersByTime(3000));
     expect(readout).toHaveTextContent("00:00:03");
-    expect(screen.getByText(/Recorded for the duration of the visit/)).toBeVisible();
+    expect(
+      screen.getByText(/Recorded for the duration of the visit/),
+    ).toBeVisible();
 
     act(() => vi.advanceTimersByTime(57000));
     expect(readout).toHaveTextContent("00:01:00");
-    expect(screen.getByText(/Still present. Attendance is retained/)).toBeVisible();
+    expect(
+      screen.getByText(/Still present. Attendance is retained/),
+    ).toBeVisible();
   });
 });
 
@@ -101,9 +138,13 @@ describe("the register", () => {
     expect(screen.getByText("Revised public access circular")).toBeVisible();
     expect(screen.getByText("Last updated: 14 November 2003")).toBeVisible();
 
-    fireEvent.click(screen.getByRole("button", { name: "Refresh the register" }));
+    fireEvent.click(
+      screen.getByRole("button", { name: "Refresh the register" }),
+    );
 
-    expect(screen.getByText(/No notices were received this time/)).toBeVisible();
+    expect(
+      screen.getByText(/No notices were received this time/),
+    ).toBeVisible();
     expect(screen.getByText("Last updated: 13 November 2003")).toBeVisible();
     // The withdrawn notices leave the document rather than sitting hidden in the
     // accessibility tree, which is what "returned to the file" is allowed to mean.
@@ -129,7 +170,9 @@ describe("pages that are not held", () => {
     fireEvent.click(screen.getByRole("button", { name: "Reading room plan" }));
     expect(await screen.findByRole("alertdialog")).toBeVisible();
     expect(screen.getByText("Page not held in this copy")).toBeVisible();
-    expect(screen.getByText("Withdrawn on 08.06.2001. The room remains in use.")).toBeVisible();
+    expect(
+      screen.getByText("Withdrawn on 08.06.2001. The room remains in use."),
+    ).toBeVisible();
     expect(screen.getByText("PL–04a")).toBeVisible();
   });
 });

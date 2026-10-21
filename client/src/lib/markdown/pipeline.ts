@@ -6,7 +6,10 @@ import { unified, type PluggableList } from "unified";
 import { VFile } from "vfile";
 import { remarkFrontmatterData } from "./frontmatter-plugin";
 import { remarkHeadingIds } from "./heading-ids-plugin";
-import { remarkImageDirective, type ImageDirectiveOptions } from "./image-directive-plugin";
+import {
+  remarkImageDirective,
+  type ImageDirectiveOptions,
+} from "./image-directive-plugin";
 import { normaliseTableRedactions } from "./normalise-redactions";
 import { remarkRedactions } from "./redaction-plugin";
 import type { ParsedRecord, RenderInput } from "./types";
@@ -26,7 +29,9 @@ import { collectWarnings, disagreementWarning, metadataOf } from "./validate";
  * YAML is a node before anything walks the tree. Then the three transforms, and
  * anchors last, once the text they are named from has settled.
  */
-export function recordPlugins(options: ImageDirectiveOptions = {}): PluggableList {
+export function recordPlugins(
+  options: ImageDirectiveOptions = {},
+): PluggableList {
   return [
     remarkGfm,
     [remarkFrontmatter, ["yaml"]],
@@ -49,8 +54,13 @@ export const RECORD_REMARK_PLUGINS: PluggableList = recordPlugins();
  * done.
  */
 export function parseRecord(input: RenderInput): ParsedRecord {
-  const source = input.normalise === false ? input.markdown : normaliseTableRedactions(input.markdown);
-  const processor = unified().use(remarkParse).use(recordPlugins({ assetBaseUrl: input.assetBaseUrl }));
+  const source =
+    input.normalise === false
+      ? input.markdown
+      : normaliseTableRedactions(input.markdown);
+  const processor = unified()
+    .use(remarkParse)
+    .use(recordPlugins({ assetBaseUrl: input.assetBaseUrl }));
   const file = new VFile({ value: source });
   const output = processor.runSync(processor.parse(source), file) as Root;
   const warnings = collectWarnings(file);

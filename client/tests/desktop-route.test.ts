@@ -2,7 +2,12 @@ import { describe, expect, it } from "vitest";
 import { ARCHIVE_INDEX } from "@/components/browser/archive-index";
 import type { WorkstationWindowState } from "@/lib/desktop-types";
 import { allDestinations } from "@/lib/desktop-destinations";
-import { focusedResource, pathForResource, resourceFromPath, resourceKey } from "@/lib/desktop-route";
+import {
+  focusedResource,
+  pathForResource,
+  resourceFromPath,
+  resourceKey,
+} from "@/lib/desktop-route";
 
 /**
  * The URL and the workstation are two views of the same focus, so the mapping
@@ -18,7 +23,10 @@ function resourceOf(pathname: string) {
   return match.kind === "resource" ? match.resource : match.kind;
 }
 
-function windowState(id: string, overrides: Partial<WorkstationWindowState> = {}): WorkstationWindowState {
+function windowState(
+  id: string,
+  overrides: Partial<WorkstationWindowState> = {},
+): WorkstationWindowState {
   return {
     id,
     title: id,
@@ -54,13 +62,17 @@ describe("desktop route mapping", () => {
       expect(resourceOf(path)).toEqual(record(entry.code));
     }
     // The continuity codes contain a slash; they are one segment, encoded.
-    expect(pathForResource(record("ORG-C-005102/C1"))).toBe("/desktop/record/ORG-C-005102%2FC1");
+    expect(pathForResource(record("ORG-C-005102/C1"))).toBe(
+      "/desktop/record/ORG-C-005102%2FC1",
+    );
   });
 
   it("reads a pathname that was already decoded back into segments", () => {
     // Next's pathname hook is allowed to hand over a decoded path; the same
     // record must resolve either way rather than depending on the encoding.
-    expect(resourceOf("/desktop/record/ORG-C-005102/C1")).toEqual(record("ORG-C-005102/C1"));
+    expect(resourceOf("/desktop/record/ORG-C-005102/C1")).toEqual(
+      record("ORG-C-005102/C1"),
+    );
   });
 
   it("rejects destinations and codes it does not know, without guessing", () => {
@@ -85,12 +97,28 @@ describe("desktop route mapping", () => {
 
   it("names the focused visible window, mapping the reader to its record", () => {
     const trail = { codes: ["INC-00014", "INC-00027"], at: 1 };
-    expect(focusedResource([windowState("archive")], "archive", trail)).toEqual(destination("archive"));
-    expect(focusedResource([windowState("reader", { maximized: true })], "reader", trail)).toEqual(record("INC-00027"));
+    expect(focusedResource([windowState("archive")], "archive", trail)).toEqual(
+      destination("archive"),
+    );
+    expect(
+      focusedResource(
+        [windowState("reader", { maximized: true })],
+        "reader",
+        trail,
+      ),
+    ).toEqual(record("INC-00027"));
     // A minimized focused window is not on the screen, so nothing is focused.
-    expect(focusedResource([windowState("archive", { minimized: true })], "archive", trail)).toBeNull();
+    expect(
+      focusedResource(
+        [windowState("archive", { minimized: true })],
+        "archive",
+        trail,
+      ),
+    ).toBeNull();
     // A reader with no record has nothing to name.
-    expect(focusedResource([windowState("reader")], "reader", { codes: [], at: 0 })).toBeNull();
+    expect(
+      focusedResource([windowState("reader")], "reader", { codes: [], at: 0 }),
+    ).toBeNull();
     expect(focusedResource([], null, trail)).toBeNull();
   });
 
@@ -101,6 +129,8 @@ describe("desktop route mapping", () => {
     ];
     // Restored state can carry a focus id that no longer resolves; the top
     // visible frame is still what the operator would call focused.
-    expect(focusedResource(windows, "gone", { codes: ["INC-00014"], at: 0 })).toEqual(destination("archive"));
+    expect(
+      focusedResource(windows, "gone", { codes: ["INC-00014"], at: 0 }),
+    ).toEqual(destination("archive"));
   });
 });

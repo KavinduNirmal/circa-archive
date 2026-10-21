@@ -4,14 +4,18 @@ import { ArchiveRecord } from "@/components/archive-site/archive-record";
 import { SITE_INDEX } from "@/components/archive-site/archive-data";
 import { ARCHIVE_INDEX } from "@/components/browser/archive-index";
 
-type RecordPageProps = Readonly<{ params: Promise<{ lang: string; code: string }> }>;
+type RecordPageProps = Readonly<{
+  params: Promise<{ lang: string; code: string }>;
+}>;
 
 /** Every released code is prerendered in both languages; anything else is a 404. */
 export function generateStaticParams() {
   return ARCHIVE_INDEX.map((entry) => ({ code: entry.code }));
 }
 
-export async function generateMetadata({ params }: RecordPageProps): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: RecordPageProps): Promise<Metadata> {
   const { lang, code } = await params;
   const entry = SITE_INDEX.find((item) => item.code === code);
   if (!entry) return {};

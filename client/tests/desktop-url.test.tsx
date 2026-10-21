@@ -40,7 +40,12 @@ function harness(initial = "/desktop") {
   const store = createWorkstationStore();
   // A fresh element per render: React may bail out of re-rendering an identical
   // tree, and the pathname change only reaches the effect through a render.
-  const renderSubject = () => <><DesktopShell /><DesktopUrlSync /></>;
+  const renderSubject = () => (
+    <>
+      <DesktopShell />
+      <DesktopUrlSync />
+    </>
+  );
   const rendered = renderWorkstation(renderSubject(), { store });
   /** Applies a written URL the way the router would, without remounting the shell. */
   const go = (path: string) => {
@@ -50,8 +55,10 @@ function harness(initial = "/desktop") {
   return { ...rendered, store, go };
 }
 
-const rail = () => within(screen.getByRole("navigation", { name: shell.foldersLabel }));
-const taskbar = () => within(screen.getByRole("contentinfo", { name: shell.taskbarLabel }));
+const rail = () =>
+  within(screen.getByRole("navigation", { name: shell.foldersLabel }));
+const taskbar = () =>
+  within(screen.getByRole("contentinfo", { name: shell.taskbarLabel }));
 
 beforeEach(() => {
   nav.pathname = "/desktop";
@@ -72,8 +79,13 @@ describe("URL to workstation", () => {
   it("opens the reader on the record a deep link names", () => {
     const { store } = harness("/desktop/record/INC-00014");
     const reader = screen.getByRole("dialog", { name: RECORD });
-    expect(within(reader).getByRole("heading", { level: 1 })).toHaveTextContent("Unlogged freight car, northbound");
-    expect(store.getState().readerTrail).toEqual({ codes: ["INC-00014"], at: 0 });
+    expect(within(reader).getByRole("heading", { level: 1 })).toHaveTextContent(
+      "Unlogged freight car, northbound",
+    );
+    expect(store.getState().readerTrail).toEqual({
+      codes: ["INC-00014"],
+      at: 0,
+    });
     expect(nav.push).not.toHaveBeenCalled();
     expect(nav.replace).not.toHaveBeenCalled();
   });
@@ -84,17 +96,26 @@ describe("URL to workstation", () => {
     return (async () => {
       await user.click(rail().getByRole("button", { name: shell.searchLabel }));
       go("/desktop/search");
-      await user.click(within(screen.getByRole("dialog", { name: shell.browserTitle })).getByRole("button", { name: "INC-00907" }));
+      await user.click(
+        within(
+          screen.getByRole("dialog", { name: shell.browserTitle }),
+        ).getByRole("button", { name: "INC-00907" }),
+      );
       go("/desktop/record/INC-00907");
       expect(store.getState().readerTrail.codes).toEqual(["INC-00907"]);
 
       // Back to the bare search destination: the reader stays open, unfocused.
       go("/desktop/search");
-      expect(screen.getByRole("dialog", { name: shell.browserTitle })).toBeVisible();
+      expect(
+        screen.getByRole("dialog", { name: shell.browserTitle }),
+      ).toBeVisible();
 
       // Forward to the record again: the cursor returns, the trail does not grow.
       go("/desktop/record/INC-00907");
-      expect(store.getState().readerTrail).toEqual({ codes: ["INC-00907"], at: 0 });
+      expect(store.getState().readerTrail).toEqual({
+        codes: ["INC-00907"],
+        at: 0,
+      });
       expect(store.getState().lastFocused).toBe("reader");
     })();
   });
@@ -118,7 +139,11 @@ describe("workstation to URL", () => {
   it("pushes a record opened from the browser, with its code in the URL", async () => {
     const { go } = harness("/desktop/search");
     const user = userEvent.setup();
-    await user.click(within(screen.getByRole("dialog", { name: shell.browserTitle })).getByRole("button", { name: "INC-00907" }));
+    await user.click(
+      within(
+        screen.getByRole("dialog", { name: shell.browserTitle }),
+      ).getByRole("button", { name: "INC-00907" }),
+    );
     expect(nav.push).toHaveBeenCalledWith("/desktop/record/INC-00907");
     go("/desktop/record/INC-00907");
     expect(nav.push).toHaveBeenCalledTimes(1);
@@ -183,22 +208,35 @@ describe("workstation to URL", () => {
     const user = userEvent.setup();
     await user.click(rail().getByRole("button", { name: shell.searchLabel }));
     go("/desktop/search");
-    const browser = within(screen.getByRole("dialog", { name: shell.browserTitle }));
+    const browser = within(
+      screen.getByRole("dialog", { name: shell.browserTitle }),
+    );
     await user.click(browser.getByRole("button", { name: "INC-00907" }));
     go("/desktop/record/INC-00907");
     const reader = screen.getByRole("dialog", { name: RECORD });
     // A follow-up opens a second record in the same viewer.
-    const strip = within(reader).getByRole("region", { name: /Subsequent Records/i });
-    const inbound = within(strip).getByRole("list", { name: /Filed against this record/i });
-    await user.click(within(inbound).getByRole("button", { name: /INC-00027/ }));
+    const strip = within(reader).getByRole("region", {
+      name: /Subsequent Records/i,
+    });
+    const inbound = within(strip).getByRole("list", {
+      name: /Filed against this record/i,
+    });
+    await user.click(
+      within(inbound).getByRole("button", { name: /INC-00027/ }),
+    );
     go("/desktop/record/INC-00027");
-    expect(store.getState().readerTrail).toEqual({ codes: ["INC-00907", "INC-00027"], at: 1 });
+    expect(store.getState().readerTrail).toEqual({
+      codes: ["INC-00907", "INC-00027"],
+      at: 1,
+    });
     nav.replace.mockClear();
     nav.push.mockClear();
 
     // The reader's own Back is a position change inside one document window, so
     // it replaces the address rather than growing history.
-    await user.click(within(reader).getByRole("button", { name: /previous record/i }));
+    await user.click(
+      within(reader).getByRole("button", { name: /previous record/i }),
+    );
     expect(nav.replace).toHaveBeenCalledWith("/desktop/record/INC-00907");
     expect(nav.push).not.toHaveBeenCalled();
   });

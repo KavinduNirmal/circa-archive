@@ -17,21 +17,21 @@ messages/ko/<namespace>.json   Korean
 `en` is the reference: its key set is what every other language is compared
 against, so a key is added there first.
 
-| Namespace | Owner |
-| --- | --- |
-| `auth` | sign-up, sign-in, personal access, session links, and authentication errors |
-| `metadata` | page titles, descriptions, and the registry's own names |
-| `switcher` | the language control, including each language's endonym |
-| `boot` | the workstation post screen |
-| `shell` | workstation chrome — shortcuts, Start, taskbar, Settings, window titles |
-| `landing` | the whole public portal |
-| `site` | the public archive: chrome, index, records, tools, notes, and guide |
-| `meta` | the project page outside the fiction |
-| `files` | the file browser window |
-| `mail` | the mail client window |
-| `word` | the record editor window |
-| `browser` | the archive browser window |
-| `reader` | the record reader window |
+| Namespace  | Owner                                                                       |
+| ---------- | --------------------------------------------------------------------------- |
+| `auth`     | sign-up, sign-in, personal access, session links, and authentication errors |
+| `metadata` | page titles, descriptions, and the registry's own names                     |
+| `switcher` | the language control, including each language's endonym                     |
+| `boot`     | the workstation post screen                                                 |
+| `shell`    | workstation chrome — shortcuts, Start, taskbar, Settings, window titles     |
+| `landing`  | the whole public portal                                                     |
+| `site`     | the public archive: chrome, index, records, tools, notes, and guide         |
+| `meta`     | the project page outside the fiction                                        |
+| `files`    | the file browser window                                                     |
+| `mail`     | the mail client window                                                      |
+| `word`     | the record editor window                                                    |
+| `browser`  | the archive browser window                                                  |
+| `reader`   | the record reader window                                                    |
 
 Each file is a flat map of camelCase keys to strings. `src/i18n/request.ts` imports
 them one by one and assembles the catalog for the resolved locale; the imports are
@@ -44,7 +44,7 @@ matters here, and it is a deliberate product decision rather than a shortcut.
 
 What is translated: menus, menu items, buttons, field labels, column headers,
 status-bar segments, tooltips, notices, About and refusal boxes, empty states, and
-aria-labels — everything the workstation says *about* the records.
+aria-labels — everything the workstation says _about_ the records.
 
 What is not: the records themselves. The archive index, the incident titles, the
 record corpus, the mail subjects and bodies, the correspondence, and the file tree

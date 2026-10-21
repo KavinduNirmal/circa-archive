@@ -10,7 +10,7 @@ address into a window.
 ## Structure
 
 - `page.tsx`: `generateStaticParams` over `allDestinations`, `dynamicParams =
-  false`, and a runtime `isDestinationId` guard that calls `notFound()`. It
+false`, and a runtime `isDestinationId` guard that calls `notFound()`. It
   renders `null`.
 
 ## Boundaries

@@ -28,11 +28,19 @@ export type ArchiveCrumb = { label: string; href?: string };
 const NAV: readonly { section: ArchiveSection; key: string; href: string }[] = [
   { section: "archive", key: "navArchive", href: "/site" },
   { section: "records", key: "navRecords", href: "/site/records" },
-  { section: "organizations", key: "navOrganizations", href: "/site/organizations" },
+  {
+    section: "organizations",
+    key: "navOrganizations",
+    href: "/site/organizations",
+  },
   { section: "about", key: "navAbout", href: "/site/about" },
 ];
 
-export function ArchiveChrome({ active, trail, children }: {
+export function ArchiveChrome({
+  active,
+  trail,
+  children,
+}: {
   active: ArchiveSection;
   trail: readonly ArchiveCrumb[];
   children: React.ReactNode;
@@ -43,7 +51,9 @@ export function ArchiveChrome({ active, trail, children }: {
 
   return (
     <div className={styles.shell} id="top">
-      <a className={styles.skip} href="#site-content">{t("skip")}</a>
+      <a className={styles.skip} href="#site-content">
+        {t("skip")}
+      </a>
 
       {/*
         The classification notice sits above the masthead, so it is the first
@@ -86,14 +96,20 @@ export function ArchiveChrome({ active, trail, children }: {
       <nav className={styles.nav} aria-label={t("navLabel")}>
         <div className={styles.navInner}>
           {NAV.map((item) => (
-            <ArchiveButton key={item.section} href={item.href} current={item.section === active}>
+            <ArchiveButton
+              key={item.section}
+              href={item.href}
+              current={item.section === active}
+            >
               {t(item.key)}
             </ArchiveButton>
           ))}
           <ArchiveButton href="/meta">{t("aboutSite")}</ArchiveButton>
           <span className={styles.navSpacer} />
           <ArchiveButton href="/site/random">{t("actionRandom")}</ArchiveButton>
-          <ArchiveButton href="/desktop">{t("navWorkstation")} <span aria-hidden="true">»</span></ArchiveButton>
+          <ArchiveButton href="/desktop">
+            {t("navWorkstation")} <span aria-hidden="true">»</span>
+          </ArchiveButton>
         </div>
       </nav>
 
@@ -116,12 +132,20 @@ export function ArchiveChrome({ active, trail, children }: {
           <div className={styles.bannerTicker}>
             <div className={styles.bannerTrack}>
               <span className={styles.bannerText}>{t("bannerText")}</span>
-              <span className={styles.bannerText} aria-hidden="true">{t("bannerText")}</span>
+              <span className={styles.bannerText} aria-hidden="true">
+                {t("bannerText")}
+              </span>
             </div>
           </div>
           <div className={styles.bannerTools}>
-            <label className={styles.bannerPause} htmlFor="site-announcement-pause" aria-hidden="true" />
-            <ArchiveButton href="/site/about" className={styles.bannerKey}>{t("bannerLink")}</ArchiveButton>
+            <label
+              className={styles.bannerPause}
+              htmlFor="site-announcement-pause"
+              aria-hidden="true"
+            />
+            <ArchiveButton href="/site/about" className={styles.bannerKey}>
+              {t("bannerLink")}
+            </ArchiveButton>
           </div>
         </div>
       </aside>
@@ -133,7 +157,11 @@ export function ArchiveChrome({ active, trail, children }: {
             {trail.map((crumb) => (
               <span key={crumb.label}>
                 {" / "}
-                {crumb.href ? <Link href={crumb.href}>{crumb.label}</Link> : <strong>{crumb.label}</strong>}
+                {crumb.href ? (
+                  <Link href={crumb.href}>{crumb.label}</Link>
+                ) : (
+                  <strong>{crumb.label}</strong>
+                )}
               </span>
             ))}
           </span>
@@ -146,11 +174,20 @@ export function ArchiveChrome({ active, trail, children }: {
       <footer className={styles.footer}>
         <div className={styles.footerInner}>
           <div className={styles.footerRow}>
-            <p>{institution("footerRegistry")} <span aria-hidden="true">·</span> {institution("footerService")}</p>
-            <p className={styles.footerMeta}>{t("footerEdition")} <span aria-hidden="true">·</span> {t("circularReissue")}</p>
+            <p>
+              {institution("footerRegistry")} <span aria-hidden="true">·</span>{" "}
+              {institution("footerService")}
+            </p>
+            <p className={styles.footerMeta}>
+              {t("footerEdition")} <span aria-hidden="true">·</span>{" "}
+              {t("circularReissue")}
+            </p>
           </div>
 
-          <nav className={styles.footerLinks} aria-label={t("footerLinksLabel")}>
+          <nav
+            className={styles.footerLinks}
+            aria-label={t("footerLinksLabel")}
+          >
             <Link href="/site">{t("navArchive")}</Link>
             <Link href="/site/records">{t("navRecords")}</Link>
             <Link href="/site/organizations">{t("navOrganizations")}</Link>

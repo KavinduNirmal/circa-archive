@@ -17,7 +17,8 @@ const REPOSITORY = `https://github.com/${HANDLE}/circa-archive`;
 
 export const PROJECT_LINKS = {
   repository: process.env.PROJECT_REPOSITORY_URL ?? REPOSITORY,
-  sponsor: process.env.PROJECT_SPONSOR_URL ?? `https://github.com/sponsors/${HANDLE}`,
+  sponsor:
+    process.env.PROJECT_SPONSOR_URL ?? `https://github.com/sponsors/${HANDLE}`,
 };
 
 /**
@@ -28,7 +29,8 @@ export const PROJECT_LINKS = {
 export const ISSUES = {
   bug: `${PROJECT_LINKS.repository}/issues/new?template=bug_report.yml`,
   feature: `${PROJECT_LINKS.repository}/issues/new?template=feature_request.yml`,
-  contact: process.env.PROJECT_CONTACT_URL ?? `${PROJECT_LINKS.repository}/issues/new`,
+  contact:
+    process.env.PROJECT_CONTACT_URL ?? `${PROJECT_LINKS.repository}/issues/new`,
 };
 
 /**
@@ -38,7 +40,10 @@ export const ISSUES = {
  */
 export const LICENCES = {
   code: { name: "MIT", href: "https://opensource.org/license/mit" },
-  content: { name: "CC BY-NC-SA 4.0", href: "https://creativecommons.org/licenses/by-nc-sa/4.0/" },
+  content: {
+    name: "CC BY-NC-SA 4.0",
+    href: "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+  },
 } as const;
 
 /** External links leave the site, so every one of them opens the same way. */

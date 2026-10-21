@@ -25,7 +25,7 @@
   background: #0d131a;
   color: #a4c2e6;
   font-size: 15px;
-  letter-spacing: .14em;
+  letter-spacing: 0.14em;
   line-height: 1.3;
 }
 
@@ -37,7 +37,9 @@
 }
 
 /* The second line is the page noticing it is still being read. */
-.site-attendance-note[data-still="true"] { color: var(--circa-stamp); }
+.site-attendance-note[data-still="true"] {
+  color: var(--circa-stamp);
+}
 
 .site-register-updated {
   margin: 0;
@@ -76,10 +78,19 @@
   cursor: pointer;
 }
 
-.site-refresh:hover { background: #becbd8; color: var(--circa-ink); }
-.site-refresh:focus-visible { outline: 1px dotted var(--circa-link); outline-offset: 2px; }
+.site-refresh:hover {
+  background: #becbd8;
+  color: var(--circa-ink);
+}
+.site-refresh:focus-visible {
+  outline: 1px dotted var(--circa-link);
+  outline-offset: 2px;
+}
 
-.site-refresh-count { color: var(--circa-ink-soft); font-size: 10px; }
+.site-refresh-count {
+  color: var(--circa-ink-soft);
+  font-size: 10px;
+}
 
 /*
  * A page the site lists and does not hold. It reads as a link because the site's
@@ -98,5 +109,11 @@
   cursor: pointer;
 }
 
-.site-dead-link:hover { background: #becbd8; color: var(--circa-ink); }
-.site-dead-link:focus-visible { outline: 1px dotted var(--circa-link); outline-offset: 2px; }
+.site-dead-link:hover {
+  background: #becbd8;
+  color: var(--circa-ink);
+}
+.site-dead-link:focus-visible {
+  outline: 1px dotted var(--circa-link);
+  outline-offset: 2px;
+}

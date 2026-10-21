@@ -27,7 +27,9 @@ export function CopyCode({
   copiedLabel: string;
   failedLabel: string;
 }>) {
-  const [state, setState] = React.useState<"idle" | "copied" | "failed">("idle");
+  const [state, setState] = React.useState<"idle" | "copied" | "failed">(
+    "idle",
+  );
 
   React.useEffect(() => {
     if (state === "idle") return;
@@ -44,7 +46,12 @@ export function CopyCode({
     }
   }
 
-  const status = state === "copied" ? copiedLabel : state === "failed" ? failedLabel : copyLabel;
+  const status =
+    state === "copied"
+      ? copiedLabel
+      : state === "failed"
+        ? failedLabel
+        : copyLabel;
 
   return (
     <figure className="meta-code">
@@ -62,7 +69,11 @@ export function CopyCode({
           onClick={copy}
           aria-label={`${copyLabel} — ${label}`}
         >
-          {state === "copied" ? <Check aria-hidden="true" size={12} /> : <Copy aria-hidden="true" size={12} />}
+          {state === "copied" ? (
+            <Check aria-hidden="true" size={12} />
+          ) : (
+            <Copy aria-hidden="true" size={12} />
+          )}
           <span aria-live="polite">{status}</span>
         </Button>
       </div>

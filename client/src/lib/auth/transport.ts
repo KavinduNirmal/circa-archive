@@ -6,17 +6,27 @@ export function createApiTransport(origin: string) {
     baseURL: origin,
     adapter: "fetch",
     responseType: "text",
-    transformResponse: [value => value],
+    transformResponse: [(value) => value],
     validateStatus: () => true,
     timeout: 15000,
     fetchOptions: { cache: "no-store", redirect: "manual" },
     // Resolve the platform fetch per call, including request instrumentation.
-    env: { fetch: (input: RequestInfo | URL, init?: RequestInit) => fetch(input, init) },
+    env: {
+      fetch: (input: RequestInfo | URL, init?: RequestInit) =>
+        fetch(input, init),
+    },
   });
-  api.interceptors.request.use(config => {
+  api.interceptors.request.use((config) => {
     const url = new URL(config.url ?? "", origin);
-    if (url.origin !== origin || url.username || url.password || !url.pathname.startsWith("/api/")) {
-      throw new TypeError("Authentication requires an API path on the configured origin");
+    if (
+      url.origin !== origin ||
+      url.username ||
+      url.password ||
+      !url.pathname.startsWith("/api/")
+    ) {
+      throw new TypeError(
+        "Authentication requires an API path on the configured origin",
+      );
     }
     config.url = url.href;
     config.baseURL = origin;
@@ -39,9 +49,15 @@ export function requestOptions(path: string, init?: RequestInit) {
 export function webResponse(response: AxiosResponse<string>): Response {
   const headers = new Headers();
   for (const [key, value] of Object.entries(response.headers)) {
-    if (value !== undefined && value !== null && value !== false) headers.set(key, String(value));
+    if (value !== undefined && value !== null && value !== false)
+      headers.set(key, String(value));
   }
-  return new Response([204, 205, 304].includes(response.status) ? null : response.data || null, {
-    status: response.status, statusText: response.statusText, headers,
-  });
+  return new Response(
+    [204, 205, 304].includes(response.status) ? null : response.data || null,
+    {
+      status: response.status,
+      statusText: response.statusText,
+      headers,
+    },
+  );
 }

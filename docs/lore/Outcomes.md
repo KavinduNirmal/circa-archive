@@ -6,16 +6,16 @@ Contact, survival, return, and completion answer different questions. An Inciden
 
 ## Terms in an account
 
-| Term | Meaning |
-| --- | --- |
-| **Encounter** | Contact with a phenomenon, whether intended or accidental. |
-| **Exploration** | A deliberate attempt to investigate its nature. |
-| **Survival** | Leaving an encounter alive. This does not by itself establish return to ordinary reality or freedom from harm. |
-| **Escape** | Crossing back into ordinary reality. Once participation begins, this cannot be treated as a refusal to continue; the system's conclusion must be accounted for. |
-| **Clearance** | Reaching the story's conclusion under its completion conditions, including a permitted alternative ending. Clearance does not guarantee survival. |
-| **Reset** | Returning the stage to its starting operational state for another run. This ordinarily follows clearance, immediately or after a delay. |
-| **Suppression** | Temporarily preventing further manifestations. |
-| **Resolution** | Eliminating or neutralizing an Incident's immediate consequences. |
+| Term            | Meaning                                                                                                                                                         |
+| --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Encounter**   | Contact with a phenomenon, whether intended or accidental.                                                                                                      |
+| **Exploration** | A deliberate attempt to investigate its nature.                                                                                                                 |
+| **Survival**    | Leaving an encounter alive. This does not by itself establish return to ordinary reality or freedom from harm.                                                  |
+| **Escape**      | Crossing back into ordinary reality. Once participation begins, this cannot be treated as a refusal to continue; the system's conclusion must be accounted for. |
+| **Clearance**   | Reaching the story's conclusion under its completion conditions, including a permitted alternative ending. Clearance does not guarantee survival.               |
+| **Reset**       | Returning the stage to its starting operational state for another run. This ordinarily follows clearance, immediately or after a delay.                         |
+| **Suppression** | Temporarily preventing further manifestations.                                                                                                                  |
+| **Resolution**  | Eliminating or neutralizing an Incident's immediate consequences.                                                                                               |
 
 These terms describe different results. Clearing the present run does not establish permanent destruction of the Incident.
 

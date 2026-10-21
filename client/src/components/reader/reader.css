@@ -76,7 +76,9 @@
    * sans. Courier New is a system face and will not be present everywhere, so
    * the stack falls back to the metric-compatible clones before plain mono.
    */
-  --reader-document-font: "Courier New", Courier, "Nimbus Mono PS", "Liberation Mono", ui-monospace, monospace;
+  --reader-document-font:
+    "Courier New", Courier, "Nimbus Mono PS", "Liberation Mono", ui-monospace,
+    monospace;
   /* Redacted Crimson. The code that names the record is the one red mark on the leaf. */
   --reader-ident: #8a2b2b;
   /* The stamp's own colour on paper, at 22%: a contested record carries a fill. */
@@ -116,11 +118,30 @@
   /* The document reads as loaded first and the software catching up. */
   animation: reader-chrome-in 160ms ease-out 130ms backwards;
 }
-.reader-toolgroup { display: flex; align-items: center; gap: 3px; }
-.reader-toolbar-spacer { flex: 1 1 20px; min-width: 0; }
-.reader-divider { align-self: stretch; width: 0; margin: 0 4px; border-left: 1px solid var(--circa-bevel-shadow); border-right: 1px solid #4b5d6a; }
+.reader-toolgroup {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+.reader-toolbar-spacer {
+  flex: 1 1 20px;
+  min-width: 0;
+}
+.reader-divider {
+  align-self: stretch;
+  width: 0;
+  margin: 0 4px;
+  border-left: 1px solid var(--circa-bevel-shadow);
+  border-right: 1px solid #4b5d6a;
+}
 /* A group's name, the way the format bar names Text and Blocks. */
-.reader-legend { flex: 0 0 auto; padding-right: 2px; color: #8fa3b6; font-size: 8px; letter-spacing: .1em; }
+.reader-legend {
+  flex: 0 0 auto;
+  padding-right: 2px;
+  color: #8fa3b6;
+  font-size: 8px;
+  letter-spacing: 0.1em;
+}
 .reader-action {
   display: flex;
   flex: 0 0 auto;
@@ -128,23 +149,30 @@
   gap: 5px;
   padding: 3px 7px;
   border: 1px solid;
-  border-color: var(--circa-bevel-light) var(--circa-bevel-shadow) var(--circa-bevel-shadow) var(--circa-bevel-light);
+  border-color: var(--circa-bevel-light) var(--circa-bevel-shadow)
+    var(--circa-bevel-shadow) var(--circa-bevel-light);
   background: var(--secondary);
   color: #a4c2e6;
   font: inherit;
   font-size: 9px;
   font-weight: 700;
-  letter-spacing: .06em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   cursor: pointer;
 }
 /* A glyph that already says the word does not need the word beside it. */
-.reader-action[data-glyph-only="true"] { padding: 3px 6px; }
-.reader-action:hover:not(:disabled) { background: #304155; color: #dce9f5; }
+.reader-action[data-glyph-only="true"] {
+  padding: 3px 6px;
+}
+.reader-action:hover:not(:disabled) {
+  background: #304155;
+  color: #dce9f5;
+}
 /* A held plate is a hole in the bar, which is how a pressed button always read. */
 .reader-action:active:not(:disabled),
 .reader-action[data-pressed="true"] {
-  border-color: var(--circa-bevel-shadow) var(--circa-bevel-light) var(--circa-bevel-light) var(--circa-bevel-shadow);
+  border-color: var(--circa-bevel-shadow) var(--circa-bevel-light)
+    var(--circa-bevel-light) var(--circa-bevel-shadow);
   background: var(--card);
   color: #dce9f5;
 }
@@ -154,11 +182,31 @@
  * neither is the resting state; the red is the documented hazard fill, and its
  * border stays the crimson the rest of the system already uses.
  */
-.reader-action[data-pressed="true"][data-tone="affirm"] { border-color: var(--circa-affirm); background: var(--circa-affirm-deep); color: #dff0e4; }
-.reader-action[data-pressed="true"][data-tone="deny"] { border-color: #8a2b2b; background: #5c1d1d; color: #f0dcdc; }
-.reader-action:disabled { border-color: #3d4c5e #131b24 #131b24 #3d4c5e; background: #1e2836; color: #64757f; cursor: default; }
-.reader-action:focus-visible { outline: 1px dashed #c8d6e5; outline-offset: -3px; }
-.reader-action-glyph { flex: 0 0 auto; width: 13px; height: 13px; }
+.reader-action[data-pressed="true"][data-tone="affirm"] {
+  border-color: var(--circa-affirm);
+  background: var(--circa-affirm-deep);
+  color: #dff0e4;
+}
+.reader-action[data-pressed="true"][data-tone="deny"] {
+  border-color: #8a2b2b;
+  background: #5c1d1d;
+  color: #f0dcdc;
+}
+.reader-action:disabled {
+  border-color: #3d4c5e #131b24 #131b24 #3d4c5e;
+  background: #1e2836;
+  color: #64757f;
+  cursor: default;
+}
+.reader-action:focus-visible {
+  outline: 1px dashed #c8d6e5;
+  outline-offset: -3px;
+}
+.reader-action-glyph {
+  flex: 0 0 auto;
+  width: 13px;
+  height: 13px;
+}
 
 /*
  * The scale and the search field are readouts, not buttons, so they sink into
@@ -175,7 +223,8 @@
   height: 22px;
   padding: 0 6px;
   border: 1px solid;
-  border-color: var(--circa-bevel-shadow) var(--border) var(--border) var(--circa-bevel-shadow);
+  border-color: var(--circa-bevel-shadow) var(--border) var(--border)
+    var(--circa-bevel-shadow);
   background: var(--card);
   color: #dbe7f5;
   font-family: var(--font-mono);
@@ -203,20 +252,60 @@
   min-width: 150px;
   padding: 0 5px;
   border: 1px solid;
-  border-color: var(--circa-bevel-shadow) var(--border) var(--border) var(--circa-bevel-shadow);
+  border-color: var(--circa-bevel-shadow) var(--border) var(--border)
+    var(--circa-bevel-shadow);
   background: var(--card);
 }
-.reader-search-input { width: 100%; border: 0; background: none; color: #dbe7f5; font: inherit; font-family: var(--font-mono); font-size: 10px; outline: none; }
-.reader-search-input::placeholder { color: #6d8199; }
-.reader-search-input::-webkit-search-cancel-button { filter: invert(80%); }
-.reader-match-count { align-self: center; min-width: 0; padding: 0 5px; color: #8fa3b6; font-family: var(--font-mono); font-size: 9px; white-space: nowrap; }
+.reader-search-input {
+  width: 100%;
+  border: 0;
+  background: none;
+  color: #dbe7f5;
+  font: inherit;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  outline: none;
+}
+.reader-search-input::placeholder {
+  color: #6d8199;
+}
+.reader-search-input::-webkit-search-cancel-button {
+  filter: invert(80%);
+}
+.reader-match-count {
+  align-self: center;
+  min-width: 0;
+  padding: 0 5px;
+  color: #8fa3b6;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  white-space: nowrap;
+}
 
 /* Quality, kept in its own field so it cannot be read as a vote. */
-.reader-engagement { align-items: center; gap: 4px; }
-.reader-assessment { display: flex; flex-direction: column; gap: 2px; }
-.reader-assessment-label { color: #8fa3b6; }
-.reader-assessment-well { display: flex; align-items: stretch; gap: 1px; height: 22px; padding: 1px; }
-.reader-points { display: flex; gap: 1px; }
+.reader-engagement {
+  align-items: center;
+  gap: 4px;
+}
+.reader-assessment {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.reader-assessment-label {
+  color: #8fa3b6;
+}
+.reader-assessment-well {
+  display: flex;
+  align-items: stretch;
+  gap: 1px;
+  height: 22px;
+  padding: 1px;
+}
+.reader-points {
+  display: flex;
+  gap: 1px;
+}
 .reader-point {
   position: relative;
   display: flex;
@@ -230,24 +319,68 @@
   color: #8b9fb5;
   font-size: 8px;
   font-weight: 700;
-  letter-spacing: .07em;
+  letter-spacing: 0.07em;
   text-transform: uppercase;
   cursor: pointer;
 }
-.reader-point:hover { color: #dbe7f5; background: #22304a; }
+.reader-point:hover {
+  color: #dbe7f5;
+  background: #22304a;
+}
 /* The scale fills up to the grade reached; the chosen block is the loudest. */
-.reader-point[data-lit="true"] { background: #26364f; color: #cfe0f2; }
-.reader-point[data-checked="true"] { border-color: var(--circa-stamp); background: #2c2416; color: var(--circa-hazard); }
+.reader-point[data-lit="true"] {
+  background: #26364f;
+  color: #cfe0f2;
+}
+.reader-point[data-checked="true"] {
+  border-color: var(--circa-stamp);
+  background: #2c2416;
+  color: var(--circa-hazard);
+}
 /* How many of the five points the record has been given. */
-.reader-assessment-score { display: flex; align-items: center; min-width: 30px; padding: 0 5px; border-left: 1px solid #0d131a; color: #8fa3b6; font-size: 9px; letter-spacing: .06em; }
+.reader-assessment-score {
+  display: flex;
+  align-items: center;
+  min-width: 30px;
+  padding: 0 5px;
+  border-left: 1px solid #0d131a;
+  color: #8fa3b6;
+  font-size: 9px;
+  letter-spacing: 0.06em;
+}
 /* A real radio, so the scale keeps its arrow keys and one tab stop. */
-.reader-point-input { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
-.reader-point-input:focus-visible + .reader-point-word { outline: 2px solid var(--ring); outline-offset: 3px; }
+.reader-point-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+.reader-point-input:focus-visible + .reader-point-word {
+  outline: 2px solid var(--ring);
+  outline-offset: 3px;
+}
 
 /* --- The three regions of the desk --- */
-.reader-main { position: relative; display: grid; flex: 1; grid-template-columns: var(--reader-rail-left) minmax(0, 1fr) var(--reader-rail-right); min-height: 0; }
+.reader-main {
+  position: relative;
+  display: grid;
+  flex: 1;
+  grid-template-columns: var(--reader-rail-left) minmax(0, 1fr) var(
+      --reader-rail-right
+    );
+  min-height: 0;
+}
 
-.reader-sheetwrap { min-width: 0; min-height: 0; overflow: hidden; }
+.reader-sheetwrap {
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
 .reader-sheet {
   position: relative;
   height: 100%;
@@ -264,13 +397,44 @@
    * drawing lines the text would then have to sit on.
    */
   background-image:
-    radial-gradient(circle at var(--reader-perf-x) calc(var(--reader-perf-step) / 2), var(--reader-perf-hole) 0 var(--reader-perf-r), transparent calc(var(--reader-perf-r) + .5px)),
-    radial-gradient(circle at calc(100% - var(--reader-perf-x)) calc(var(--reader-perf-step) / 2), var(--reader-perf-hole) 0 var(--reader-perf-r), transparent calc(var(--reader-perf-r) + .5px)),
-    repeating-linear-gradient(180deg, var(--reader-perf-line) 0 1.5px, transparent 1.5px 7px),
-    repeating-linear-gradient(180deg, var(--reader-perf-line) 0 1.5px, transparent 1.5px 7px),
-    repeating-linear-gradient(0deg, rgb(22 32 43 / 1.4%) 0 1px, transparent 1px 3px);
-  background-size: 100% var(--reader-perf-step), 100% var(--reader-perf-step), 1px 7px, 1px 7px, auto;
-  background-position: 0 0, 0 0, left calc(var(--reader-perf-x) + 9px) top, right calc(var(--reader-perf-x) + 9px) top, 0 0;
+    radial-gradient(
+      circle at var(--reader-perf-x) calc(var(--reader-perf-step) / 2),
+      var(--reader-perf-hole) 0 var(--reader-perf-r),
+      transparent calc(var(--reader-perf-r) + 0.5px)
+    ),
+    radial-gradient(
+      circle at calc(100% - var(--reader-perf-x))
+        calc(var(--reader-perf-step) / 2),
+      var(--reader-perf-hole) 0 var(--reader-perf-r),
+      transparent calc(var(--reader-perf-r) + 0.5px)
+    ),
+    repeating-linear-gradient(
+      180deg,
+      var(--reader-perf-line) 0 1.5px,
+      transparent 1.5px 7px
+    ),
+    repeating-linear-gradient(
+      180deg,
+      var(--reader-perf-line) 0 1.5px,
+      transparent 1.5px 7px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      rgb(22 32 43 / 1.4%) 0 1px,
+      transparent 1px 3px
+    );
+  background-size:
+    100% var(--reader-perf-step),
+    100% var(--reader-perf-step),
+    1px 7px,
+    1px 7px,
+    auto;
+  background-position:
+    0 0,
+    0 0,
+    left calc(var(--reader-perf-x) + 9px) top,
+    right calc(var(--reader-perf-x) + 9px) top,
+    0 0;
   background-repeat: repeat-y, repeat-y, repeat-y, repeat-y, repeat;
   color: var(--reader-sheet-ink);
   font-family: var(--reader-document-font);
@@ -287,29 +451,92 @@
  * the text it belongs to; on a wrapper it is the document's own measure and
  * every child inside it shares that one width.
  */
-.reader-measure { width: 100%; max-width: 68ch; margin-inline: auto; }
+.reader-measure {
+  width: 100%;
+  max-width: 68ch;
+  margin-inline: auto;
+}
 .reader-sheet[data-fit="margin"] .reader-measure,
-.reader-sheet[data-view="two-up"] .reader-measure { max-width: none; }
+.reader-sheet[data-view="two-up"] .reader-measure {
+  max-width: none;
+}
 
 /*
  * The running head and foot. Both carry the filing lens, because a sheet that
  * leaves the desk should still say whose filing it is: the head pairs it with
  * the record's code, the foot with what the sheet is and who may read it.
  */
-.reader-running-head, .reader-running-foot { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 14px; color: var(--reader-sheet-soft); font-size: .66em; letter-spacing: .16em; text-transform: uppercase; }
+.reader-running-head,
+.reader-running-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 14px;
+  color: var(--reader-sheet-soft);
+  font-size: 0.66em;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
 /* The measure wrapper does the centring, so these carry only their own spacing. */
-.reader-running-head { margin: 0 0 20px; padding-bottom: 7px; border-bottom: 1px solid var(--reader-sheet-edge); }
-.reader-running-foot { margin: 30px 0 0; padding-top: 7px; border-top: 1px solid var(--reader-sheet-edge); }
+.reader-running-head {
+  margin: 0 0 20px;
+  padding-bottom: 7px;
+  border-bottom: 1px solid var(--reader-sheet-edge);
+}
+.reader-running-foot {
+  margin: 30px 0 0;
+  padding-top: 7px;
+  border-top: 1px solid var(--reader-sheet-edge);
+}
 
 /* --- The leaf: the record's identity, in the catalogue's own words --- */
-.reader-leaf { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 10px 18px; padding-bottom: 13px; border-bottom: 2px solid var(--reader-sheet-ink); margin-bottom: 26px; }
-.reader-leaf-text { flex: 1 1 auto; min-width: 0; }
-.reader-leaf-code { color: var(--reader-ident); font-size: 1.05em; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; }
+.reader-leaf {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 10px 18px;
+  padding-bottom: 13px;
+  border-bottom: 2px solid var(--reader-sheet-ink);
+  margin-bottom: 26px;
+}
+.reader-leaf-text {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.reader-leaf-code {
+  color: var(--reader-ident);
+  font-size: 1.05em;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
 /* Headings are set in caps the way an institutional filing sets them, and in
    the markup's own casing, so the accessible name and any copy keep their case. */
-.reader-leaf-title { margin: 5px 0 9px; max-width: 52ch; font-size: 1.8em; font-weight: 700; line-height: 1.16; letter-spacing: .01em; text-transform: uppercase; }
-.reader-leaf-line { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 9px; color: var(--reader-sheet-soft); font-size: 10px; letter-spacing: .05em; text-transform: uppercase; }
-.reader-leaf-sep { width: 1px; height: 9px; background: var(--circa-rule); }
+.reader-leaf-title {
+  margin: 5px 0 9px;
+  max-width: 52ch;
+  font-size: 1.8em;
+  font-weight: 700;
+  line-height: 1.16;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+}
+.reader-leaf-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 9px;
+  color: var(--reader-sheet-soft);
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.reader-leaf-sep {
+  width: 1px;
+  height: 9px;
+  background: var(--circa-rule);
+}
 /* The status stamp, on the exceptional states only. An ordinary filing is not stamped. */
 .reader-stamp {
   align-self: flex-start;
@@ -319,60 +546,183 @@
   color: var(--circa-stamp);
   font-size: 10px;
   font-weight: 700;
-  letter-spacing: .22em;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
   transform: rotate(-2.5deg);
-  opacity: .8;
+  opacity: 0.8;
 }
 /* A contested record's stamp carries a fill, so the state reads at a glance and
    not only from a two-pixel border. The fill is light enough to stay a stamp. */
-.reader-stamp[data-status="contested"] { background: var(--reader-stamp-fill); }
+.reader-stamp[data-status="contested"] {
+  background: var(--reader-stamp-fill);
+}
 /* A withheld value is drawn as the design system draws one, at any scale. */
-.reader-redaction { display: inline-block; width: 16ch; max-width: 100%; height: 1em; background: var(--reader-redact); vertical-align: baseline; }
+.reader-redaction {
+  display: inline-block;
+  width: 16ch;
+  max-width: 100%;
+  height: 1em;
+  background: var(--reader-redact);
+  vertical-align: baseline;
+}
 
 /* --- The sheet's own contents. The slot decides what is inside a section. --- */
-.reader-sections { display: grid; gap: 30px; }
-.reader-section { position: relative; }
-.reader-sheet[data-view="two-up"] .reader-sections { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 30px 40px; max-width: none; }
-.reader-section[data-withheld="true"] { color: var(--reader-sheet-soft); }
-.reader-section-heading { margin: 0 0 12px; font-size: 1.16em; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; }
+.reader-sections {
+  display: grid;
+  gap: 30px;
+}
+.reader-section {
+  position: relative;
+}
+.reader-sheet[data-view="two-up"] .reader-sections {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 30px 40px;
+  max-width: none;
+}
+.reader-section[data-withheld="true"] {
+  color: var(--reader-sheet-soft);
+}
+.reader-section-heading {
+  margin: 0 0 12px;
+  font-size: 1.16em;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
 /* --- The body slot: whatever Markdown the host renders, set on the sheet --- */
-.reader-markdown { font-size: 1em; }
+.reader-markdown {
+  font-size: 1em;
+}
 /* A floated figure is cleared at the end of its own section, never the next one. */
-.reader-markdown::after { content: ""; display: block; clear: both; }
-.reader-markdown p { margin: 0 0 14px; }
+.reader-markdown::after {
+  content: "";
+  display: block;
+  clear: both;
+}
+.reader-markdown p {
+  margin: 0 0 14px;
+}
 /* The opening line of a section carries it, the way a filing's first line does. */
-.reader-markdown > p:first-child { font-size: 1.04em; color: #22303c; }
-.reader-markdown > :first-child { margin-top: 0; }
-.reader-markdown h1, .reader-markdown h2, .reader-markdown h3, .reader-markdown h4 { margin: 22px 0 10px; font-weight: 700; line-height: 1.25; letter-spacing: .04em; text-transform: uppercase; }
-.reader-markdown h1 { font-size: 1.5em; }
-.reader-markdown h2 { font-size: 1.24em; }
-.reader-markdown h3 { font-size: 1.06em; }
+.reader-markdown > p:first-child {
+  font-size: 1.04em;
+  color: #22303c;
+}
+.reader-markdown > :first-child {
+  margin-top: 0;
+}
+.reader-markdown h1,
+.reader-markdown h2,
+.reader-markdown h3,
+.reader-markdown h4 {
+  margin: 22px 0 10px;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.reader-markdown h1 {
+  font-size: 1.5em;
+}
+.reader-markdown h2 {
+  font-size: 1.24em;
+}
+.reader-markdown h3 {
+  font-size: 1.06em;
+}
 /*
  * The prose rules have to restate what Tailwind's preflight resets: it strips
  * list markers and makes an anchor inherit its parent's decoration, which is
  * right for chrome and wrong for a document that is meant to be read.
  */
-.reader-markdown ul, .reader-markdown ol { margin: 0 0 14px; padding-left: 22px; }
-.reader-markdown ul { list-style: disc; }
-.reader-markdown ol { list-style: decimal; }
-.reader-markdown ul ul { list-style: circle; }
-.reader-markdown ul ul ul { list-style: square; }
-.reader-markdown li { margin-bottom: 5px; }
-.reader-markdown li > p { margin: 0 0 6px; }
-.reader-markdown blockquote { margin: 0 0 16px; padding: 3px 0 3px 16px; border-left: 3px solid var(--circa-rule); color: #26323d; }
-.reader-markdown blockquote p { margin: 0 0 6px; font-style: italic; }
-.reader-markdown blockquote p:last-child { margin-bottom: 0; }
-.reader-markdown a { color: inherit; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 2px; }
-.reader-markdown code { padding: 0 3px; background: rgb(22 32 43 / 7%); font-family: var(--font-mono); font-size: .88em; }
-.reader-markdown pre { margin: 0 0 16px; padding: 10px 12px; overflow-x: auto; background: rgb(22 32 43 / 5%); border: 1px solid var(--reader-sheet-edge); }
-.reader-markdown pre code { padding: 0; background: none; font-size: .84em; line-height: 1.5; }
-.reader-markdown hr { height: 1px; margin: 22px 0; border: 0; background: var(--reader-sheet-edge); }
+.reader-markdown ul,
+.reader-markdown ol {
+  margin: 0 0 14px;
+  padding-left: 22px;
+}
+.reader-markdown ul {
+  list-style: disc;
+}
+.reader-markdown ol {
+  list-style: decimal;
+}
+.reader-markdown ul ul {
+  list-style: circle;
+}
+.reader-markdown ul ul ul {
+  list-style: square;
+}
+.reader-markdown li {
+  margin-bottom: 5px;
+}
+.reader-markdown li > p {
+  margin: 0 0 6px;
+}
+.reader-markdown blockquote {
+  margin: 0 0 16px;
+  padding: 3px 0 3px 16px;
+  border-left: 3px solid var(--circa-rule);
+  color: #26323d;
+}
+.reader-markdown blockquote p {
+  margin: 0 0 6px;
+  font-style: italic;
+}
+.reader-markdown blockquote p:last-child {
+  margin-bottom: 0;
+}
+.reader-markdown a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+.reader-markdown code {
+  padding: 0 3px;
+  background: rgb(22 32 43 / 7%);
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+}
+.reader-markdown pre {
+  margin: 0 0 16px;
+  padding: 10px 12px;
+  overflow-x: auto;
+  background: rgb(22 32 43 / 5%);
+  border: 1px solid var(--reader-sheet-edge);
+}
+.reader-markdown pre code {
+  padding: 0;
+  background: none;
+  font-size: 0.84em;
+  line-height: 1.5;
+}
+.reader-markdown hr {
+  height: 1px;
+  margin: 22px 0;
+  border: 0;
+  background: var(--reader-sheet-edge);
+}
 /* A filing's table is part of the record, so it is ruled the way the sheet is. */
-.reader-markdown table { width: 100%; margin: 0 0 18px; border-collapse: collapse; font-size: .82em; }
-.reader-markdown th, .reader-markdown td { padding: 4px 7px; border: 1px solid var(--reader-sheet-edge); text-align: left; vertical-align: top; }
-.reader-markdown th { background: rgb(22 32 43 / 5%); font-weight: 700; letter-spacing: .04em; }
-.reader-markdown tbody tr:nth-child(even) { background: rgb(22 32 43 / 3%); }
+.reader-markdown table {
+  width: 100%;
+  margin: 0 0 18px;
+  border-collapse: collapse;
+  font-size: 0.82em;
+}
+.reader-markdown th,
+.reader-markdown td {
+  padding: 4px 7px;
+  border: 1px solid var(--reader-sheet-edge);
+  text-align: left;
+  vertical-align: top;
+}
+.reader-markdown th {
+  background: rgb(22 32 43 / 5%);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+.reader-markdown tbody tr:nth-child(even) {
+  background: rgb(22 32 43 / 3%);
+}
 /* --- Figures: instant prints lying on the sheet --- */
 /*
  * A record's figures are photographs, so each one is framed as an instant
@@ -386,7 +736,9 @@
   padding: 8px 8px 0;
   background: var(--reader-print);
   border: 1px solid var(--reader-print-edge);
-  box-shadow: 0 1px 2px rgb(13 19 26 / 12%), 0 8px 18px -10px rgb(13 19 26 / 40%);
+  box-shadow:
+    0 1px 2px rgb(13 19 26 / 12%),
+    0 8px 18px -10px rgb(13 19 26 / 40%);
   break-inside: avoid;
 }
 .reader-figure img {
@@ -405,69 +757,277 @@
   margin: 0;
   padding: 9px 4px 14px;
   color: var(--reader-print-ink);
-  font-size: .68em;
+  font-size: 0.68em;
   line-height: 1.4;
   text-align: center;
 }
-.reader-figure-right { float: right; width: min(46%, 252px); margin: 4px 0 18px 22px; }
-.reader-figure-left { float: left; width: min(46%, 252px); margin: 4px 22px 18px 0; }
-.reader-figure-full { width: 100%; clear: both; }
+.reader-figure-right {
+  float: right;
+  width: min(46%, 252px);
+  margin: 4px 0 18px 22px;
+}
+.reader-figure-left {
+  float: left;
+  width: min(46%, 252px);
+  margin: 4px 22px 18px 0;
+}
+.reader-figure-full {
+  width: 100%;
+  clear: both;
+}
 /* A redaction: held behind paper until the reader opens it, and labelled either way. */
-.reader-redaction-inline { padding: 0 2px; border: 0; background: var(--reader-redact); color: transparent; font: inherit; cursor: pointer; }
-.reader-redaction-inline[data-revealed="false"] { user-select: none; }
-.reader-redaction-inline[data-revealed="true"] { background: #f2e4c4; color: #22303c; box-shadow: inset 0 -1px 0 var(--circa-stamp); }
-.reader-redaction-inline[data-empty="true"] { padding: 0 4px; color: var(--reader-sheet); cursor: default; font-size: .82em; letter-spacing: .1em; }
-.reader-redaction-inline:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+.reader-redaction-inline {
+  padding: 0 2px;
+  border: 0;
+  background: var(--reader-redact);
+  color: transparent;
+  font: inherit;
+  cursor: pointer;
+}
+.reader-redaction-inline[data-revealed="false"] {
+  user-select: none;
+}
+.reader-redaction-inline[data-revealed="true"] {
+  background: #f2e4c4;
+  color: #22303c;
+  box-shadow: inset 0 -1px 0 var(--circa-stamp);
+}
+.reader-redaction-inline[data-empty="true"] {
+  padding: 0 4px;
+  color: var(--reader-sheet);
+  cursor: default;
+  font-size: 0.82em;
+  letter-spacing: 0.1em;
+}
+.reader-redaction-inline:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
 /* The redaction outranks the selection colour: without this, dragging across a
    hidden mark would print the withheld words in the selected-text colour. */
 .reader-redaction-inline[data-revealed="false"]::selection,
-.reader-redaction-inline[data-revealed="false"] *::selection { background: var(--reader-redact); color: transparent; }
-.reader-fields { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 3px 18px; margin: 0 0 18px; padding: 12px 0; border-top: 1px solid var(--reader-sheet-edge); border-bottom: 1px solid var(--reader-sheet-edge); font-size: .86em; }
-.reader-field { display: contents; }
-.reader-field dt { color: var(--reader-sheet-soft); font-size: .84em; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
-.reader-field dd { margin: 0; }
-.reader-withheld { margin: 0 0 14px; }
-.reader-withheld-stamp { display: inline-block; margin-bottom: 9px; padding: 2px 7px; border: 1px solid var(--circa-stamp); color: var(--circa-stamp); font-size: 9px; letter-spacing: .16em; }
-.reader-withheld-bars { display: grid; gap: 6px; margin: 0 0 10px; }
-.reader-withheld-bars > span { height: 1em; background: var(--reader-redact); }
-.reader-withheld-bars > span:nth-child(1) { width: 100%; }
-.reader-withheld-bars > span:nth-child(2) { width: 91%; }
-.reader-withheld-bars > span:nth-child(3) { width: 56%; }
-.reader-withheld-note { margin: 0; color: var(--reader-sheet-soft); font-size: .84em; }
+.reader-redaction-inline[data-revealed="false"] *::selection {
+  background: var(--reader-redact);
+  color: transparent;
+}
+.reader-fields {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 3px 18px;
+  margin: 0 0 18px;
+  padding: 12px 0;
+  border-top: 1px solid var(--reader-sheet-edge);
+  border-bottom: 1px solid var(--reader-sheet-edge);
+  font-size: 0.86em;
+}
+.reader-field {
+  display: contents;
+}
+.reader-field dt {
+  color: var(--reader-sheet-soft);
+  font-size: 0.84em;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.reader-field dd {
+  margin: 0;
+}
+.reader-withheld {
+  margin: 0 0 14px;
+}
+.reader-withheld-stamp {
+  display: inline-block;
+  margin-bottom: 9px;
+  padding: 2px 7px;
+  border: 1px solid var(--circa-stamp);
+  color: var(--circa-stamp);
+  font-size: 9px;
+  letter-spacing: 0.16em;
+}
+.reader-withheld-bars {
+  display: grid;
+  gap: 6px;
+  margin: 0 0 10px;
+}
+.reader-withheld-bars > span {
+  height: 1em;
+  background: var(--reader-redact);
+}
+.reader-withheld-bars > span:nth-child(1) {
+  width: 100%;
+}
+.reader-withheld-bars > span:nth-child(2) {
+  width: 91%;
+}
+.reader-withheld-bars > span:nth-child(3) {
+  width: 56%;
+}
+.reader-withheld-note {
+  margin: 0;
+  color: var(--reader-sheet-soft);
+  font-size: 0.84em;
+}
 /* The honesty marker: this filing is sample content, and the sheet says so. */
-.reader-fixture { margin: 32px auto 0; padding-top: 10px; border-top: 1px solid var(--reader-sheet-edge); color: #5a6a7a; font-size: 10px; font-style: italic; letter-spacing: .02em; }
-.reader-empty { display: grid; align-content: center; justify-items: center; gap: 10px; min-height: 62%; text-align: center; }
-.reader-empty-title { font-size: 1.5em; font-weight: 700; }
-.reader-empty-code { color: var(--reader-sheet-soft); font-size: 1.05em; letter-spacing: .1em; }
-.reader-empty-note { max-width: 46ch; color: var(--reader-sheet-soft); }
+.reader-fixture {
+  margin: 32px auto 0;
+  padding-top: 10px;
+  border-top: 1px solid var(--reader-sheet-edge);
+  color: #5a6a7a;
+  font-size: 10px;
+  font-style: italic;
+  letter-spacing: 0.02em;
+}
+.reader-empty {
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 10px;
+  min-height: 62%;
+  text-align: center;
+}
+.reader-empty-title {
+  font-size: 1.5em;
+  font-weight: 700;
+}
+.reader-empty-code {
+  color: var(--reader-sheet-soft);
+  font-size: 1.05em;
+  letter-spacing: 0.1em;
+}
+.reader-empty-note {
+  max-width: 46ch;
+  color: var(--reader-sheet-soft);
+}
 
 /* --- Rails: one strip of paper leaves, one sheet of ruled margin --- */
-.reader-rail { display: flex; flex-direction: column; min-height: 0; background: #1b2636; }
-.reader-rail-left { width: var(--reader-rail-left); border-right: 1px solid var(--circa-bevel-shadow); }
-.reader-rail-right { width: var(--reader-rail-right); border-left: 1px solid var(--circa-bevel-shadow); }
-.reader-rail-head { display: flex; flex: 0 0 auto; align-items: center; gap: 6px; padding: 5px 6px 5px 8px; background: #24334a; border-bottom: 1px solid var(--circa-bevel-shadow); }
-.reader-rail-title { flex: 1; min-width: 0; color: #cfe0f2; }
-.reader-rail-toggle { display: flex; flex: 0 0 auto; align-items: center; justify-content: center; width: 18px; height: 16px; border: 1px solid transparent; background: none; color: #8fa3b6; cursor: pointer; }
-.reader-rail-toggle:hover { border-color: var(--circa-bevel-light); background: var(--secondary); color: #dbe7f5; }
-.reader-rail-toggle-glyph { width: 12px; height: 12px; }
-.reader-rail-none { padding: 8px; color: #7f97ab; font-size: 10px; }
+.reader-rail {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: #1b2636;
+}
+.reader-rail-left {
+  width: var(--reader-rail-left);
+  border-right: 1px solid var(--circa-bevel-shadow);
+}
+.reader-rail-right {
+  width: var(--reader-rail-right);
+  border-left: 1px solid var(--circa-bevel-shadow);
+}
+.reader-rail-head {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 6px 5px 8px;
+  background: #24334a;
+  border-bottom: 1px solid var(--circa-bevel-shadow);
+}
+.reader-rail-title {
+  flex: 1;
+  min-width: 0;
+  color: #cfe0f2;
+}
+.reader-rail-toggle {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 16px;
+  border: 1px solid transparent;
+  background: none;
+  color: #8fa3b6;
+  cursor: pointer;
+}
+.reader-rail-toggle:hover {
+  border-color: var(--circa-bevel-light);
+  background: var(--secondary);
+  color: #dbe7f5;
+}
+.reader-rail-toggle-glyph {
+  width: 12px;
+  height: 12px;
+}
+.reader-rail-none {
+  padding: 8px;
+  color: #7f97ab;
+  font-size: 10px;
+}
 
 /* Collapsed is a strip with a vertical name, at any width. */
-.reader-rail[data-collapsed="true"] { width: var(--reader-strip); align-items: center; }
-.reader-rail[data-collapsed="true"] .reader-rail-head { flex-direction: column; gap: 8px; padding: 6px 0; }
-.reader-rail[data-collapsed="true"] .reader-rail-title { flex: 0 0 auto; writing-mode: vertical-rl; text-orientation: mixed; }
+.reader-rail[data-collapsed="true"] {
+  width: var(--reader-strip);
+  align-items: center;
+}
+.reader-rail[data-collapsed="true"] .reader-rail-head {
+  flex-direction: column;
+  gap: 8px;
+  padding: 6px 0;
+}
+.reader-rail[data-collapsed="true"] .reader-rail-title {
+  flex: 0 0 auto;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+}
 .reader-rail[data-collapsed="true"] .reader-previews,
 .reader-rail[data-collapsed="true"] .reader-notes,
 .reader-rail[data-collapsed="true"] .reader-composer,
-.reader-rail[data-collapsed="true"] .reader-rail-none { display: none; }
-.reader-rail[data-collapsed="true"] .reader-annotation-count { border: 1px solid #3d5064; padding: 0 4px; color: #cfe0f2; }
+.reader-rail[data-collapsed="true"] .reader-rail-none {
+  display: none;
+}
+.reader-rail[data-collapsed="true"] .reader-annotation-count {
+  border: 1px solid #3d5064;
+  padding: 0 4px;
+  color: #cfe0f2;
+}
 
 /* Left rail: one redacted leaf per section, numbered the way a page is. */
-.reader-previews { display: grid; flex: 1; align-content: start; gap: 4px; min-height: 0; margin: 0; padding: 6px; overflow: auto; list-style: none; }
-.reader-preview { display: flex; align-items: flex-start; gap: 8px; width: 100%; padding: 5px; border: 1px solid transparent; background: none; color: #b7c8dd; font: inherit; text-align: left; cursor: pointer; }
-.reader-preview:hover { border-color: var(--circa-bevel-light); background: #22304a; }
-.reader-preview[aria-current="true"] { border-color: var(--circa-bevel-shadow) var(--circa-bevel-light) var(--circa-bevel-light) var(--circa-bevel-shadow); background: #26364f; color: #e8f1fc; }
-.reader-thumb { display: block; flex: 0 0 auto; width: 34px; height: 44px; padding: 4px; background: var(--reader-sheet); border: 1px solid #0d131a; box-shadow: 1px 1px 0 rgb(0 0 0 / 35%); }
+.reader-previews {
+  display: grid;
+  flex: 1;
+  align-content: start;
+  gap: 4px;
+  min-height: 0;
+  margin: 0;
+  padding: 6px;
+  overflow: auto;
+  list-style: none;
+}
+.reader-preview {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  width: 100%;
+  padding: 5px;
+  border: 1px solid transparent;
+  background: none;
+  color: #b7c8dd;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.reader-preview:hover {
+  border-color: var(--circa-bevel-light);
+  background: #22304a;
+}
+.reader-preview[aria-current="true"] {
+  border-color: var(--circa-bevel-shadow) var(--circa-bevel-light)
+    var(--circa-bevel-light) var(--circa-bevel-shadow);
+  background: #26364f;
+  color: #e8f1fc;
+}
+.reader-thumb {
+  display: block;
+  flex: 0 0 auto;
+  width: 34px;
+  height: 44px;
+  padding: 4px;
+  background: var(--reader-sheet);
+  border: 1px solid #0d131a;
+  box-shadow: 1px 1px 0 rgb(0 0 0 / 35%);
+}
 /* The leaf is drawn: a title, a rule, and four lines of nothing. */
 .reader-thumb-page {
   display: block;
@@ -481,21 +1041,55 @@
     linear-gradient(rgb(38 51 63 / 42%) 0 0),
     linear-gradient(rgb(38 51 63 / 42%) 0 0);
   background-repeat: no-repeat;
-  background-size: 62% 3px, 100% 3px, 100% 1px, 100% 1px, 100% 1px, 72% 1px;
-  background-position: 0 0, 0 6px, 0 12px, 0 17px, 0 22px, 0 27px;
+  background-size:
+    62% 3px,
+    100% 3px,
+    100% 1px,
+    100% 1px,
+    100% 1px,
+    72% 1px;
+  background-position:
+    0 0,
+    0 6px,
+    0 12px,
+    0 17px,
+    0 22px,
+    0 27px;
 }
-.reader-preview[data-withheld="true"] .reader-thumb { background: #e7d6c4; }
+.reader-preview[data-withheld="true"] .reader-thumb {
+  background: #e7d6c4;
+}
 .reader-preview[data-withheld="true"] .reader-thumb-page {
   background-image:
     linear-gradient(var(--circa-stamp) 0 0),
     linear-gradient(var(--circa-stamp) 0 0),
     linear-gradient(var(--circa-stamp) 0 0);
-  background-size: 100% 4px, 84% 4px, 100% 4px;
-  background-position: 0 1px, 0 9px, 0 17px;
+  background-size:
+    100% 4px,
+    84% 4px,
+    100% 4px;
+  background-position:
+    0 1px,
+    0 9px,
+    0 17px;
 }
-.reader-preview-text { display: grid; gap: 2px; min-width: 0; padding-top: 1px; }
-.reader-preview-index { color: #7f97ab; font-size: 9px; letter-spacing: .1em; }
-.reader-preview-heading { font-size: 10px; font-weight: 700; line-height: 1.3; letter-spacing: .03em; }
+.reader-preview-text {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  padding-top: 1px;
+}
+.reader-preview-index {
+  color: #7f97ab;
+  font-size: 9px;
+  letter-spacing: 0.1em;
+}
+.reader-preview-heading {
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: 0.03em;
+}
 /* The section that is not there: one frame of it, then the rail corrects itself. */
 .reader-preview-phantom {
   display: flex;
@@ -520,17 +1114,46 @@
   padding: 10px 10px 14px 22px;
   overflow: auto;
   background-color: var(--reader-note);
-  background-image: repeating-linear-gradient(180deg, transparent 0 21px, var(--reader-note-rule) 21px 22px);
+  background-image: repeating-linear-gradient(
+    180deg,
+    transparent 0 21px,
+    var(--reader-note-rule) 21px 22px
+  );
   border-left: 1px solid var(--reader-margin-rule);
   /* The margin slips a few pixels and settles, as if it had been nudged. */
   animation: reader-margin-settle 320ms ease-out 260ms backwards;
 }
-.reader-notes-empty { margin: 2px 0 16px; }
-.reader-notes-empty-title { color: #4a3d1c; font-size: 11px; font-weight: 700; letter-spacing: .04em; }
-.reader-notes-empty-note { margin-top: 3px; color: #8a7a52; font-size: 10px; }
-.reader-note-group { margin-bottom: 14px; }
-.reader-note-group-heading { margin-bottom: 7px; padding-bottom: 3px; border-bottom: 1px solid #cdbb92; color: #7a6a45; font-size: 9px; letter-spacing: .13em; }
-.reader-note-thread, .reader-replies { margin: 0; padding: 0; list-style: none; }
+.reader-notes-empty {
+  margin: 2px 0 16px;
+}
+.reader-notes-empty-title {
+  color: #4a3d1c;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+.reader-notes-empty-note {
+  margin-top: 3px;
+  color: #8a7a52;
+  font-size: 10px;
+}
+.reader-note-group {
+  margin-bottom: 14px;
+}
+.reader-note-group-heading {
+  margin-bottom: 7px;
+  padding-bottom: 3px;
+  border-bottom: 1px solid #cdbb92;
+  color: #7a6a45;
+  font-size: 9px;
+  letter-spacing: 0.13em;
+}
+.reader-note-thread,
+.reader-replies {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
 .reader-note {
   /* The width of the fold control and its gap. Everything the note says lines
      up on this inset, so the body sits under the name rather than under the
@@ -545,12 +1168,29 @@
 }
 /* The punched hole that says this slip was filed in a ring binder. It sits in
    the rail's own gutter, clear of the slip it belongs to. */
-.reader-note::before { content: ""; position: absolute; left: -15px; top: 9px; width: 8px; height: 8px; border-radius: 50%; background: #b9a97c; box-shadow: inset 0 1px 0 rgb(0 0 0 / 30%); }
+.reader-note::before {
+  content: "";
+  position: absolute;
+  left: -15px;
+  top: 9px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #b9a97c;
+  box-shadow: inset 0 1px 0 rgb(0 0 0 / 30%);
+}
 /* The body, its actions, and its replies all start where the name does. */
-.reader-note-rest { padding-left: var(--reader-note-indent); }
+.reader-note-rest {
+  padding-left: var(--reader-note-indent);
+}
 /* The fold control, the writer's name, and the number the archive files them
    under. A folded note keeps this line, which is what makes folding useful. */
-.reader-note-head { display: flex; align-items: flex-start; gap: 6px; margin-bottom: 4px; }
+.reader-note-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin-bottom: 4px;
+}
 .reader-note-fold {
   display: inline-flex;
   flex: 0 0 auto;
@@ -565,20 +1205,66 @@
   color: #7a6a45;
   cursor: pointer;
 }
-.reader-note-fold:hover { border-color: #c3b085; background: #efe2bc; color: #3b2f14; }
-.reader-note-fold:focus-visible { outline: 2px solid var(--ring); outline-offset: 1px; }
-.reader-note-caret { width: 11px; height: 11px; }
-.reader-note-who { display: flex; flex: 1 1 auto; flex-direction: column; gap: 1px; min-width: 0; }
-.reader-note-author { color: #3b2f14; font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
-.reader-note-code { color: #8a7a52; font-size: 9px; letter-spacing: .1em; }
-.reader-note-when { flex: 0 0 auto; color: #7a6a45; font-size: 9px; }
+.reader-note-fold:hover {
+  border-color: #c3b085;
+  background: #efe2bc;
+  color: #3b2f14;
+}
+.reader-note-fold:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 1px;
+}
+.reader-note-caret {
+  width: 11px;
+  height: 11px;
+}
+.reader-note-who {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+.reader-note-author {
+  color: #3b2f14;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.reader-note-code {
+  color: #8a7a52;
+  font-size: 9px;
+  letter-spacing: 0.1em;
+}
+.reader-note-when {
+  flex: 0 0 auto;
+  color: #7a6a45;
+  font-size: 9px;
+}
 /* Folded, the head is the whole slip: it loses the gap the body had needed. */
-.reader-note[data-folded="true"] { padding-bottom: 8px; }
-.reader-note[data-folded="true"] .reader-note-head { margin-bottom: 0; }
+.reader-note[data-folded="true"] {
+  padding-bottom: 8px;
+}
+.reader-note[data-folded="true"] .reader-note-head {
+  margin-bottom: 0;
+}
 /* `pre-line` keeps the writer's line breaks; the blank lines became elements. */
-.reader-note-body { margin: 0 0 7px; color: var(--reader-note-ink); font-size: 11.5px; line-height: 1.55; white-space: pre-line; overflow-wrap: anywhere; }
-.reader-note-actions { display: flex; align-items: center; gap: 6px; }
-.reader-note-noted, .reader-note-reply {
+.reader-note-body {
+  margin: 0 0 7px;
+  color: var(--reader-note-ink);
+  font-size: 11.5px;
+  line-height: 1.55;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+.reader-note-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.reader-note-noted,
+.reader-note-reply {
   padding: 2px 6px;
   border: 1px solid #c3b085;
   background: #efe2bc;
@@ -586,54 +1272,185 @@
   font: inherit;
   font-size: 9px;
   font-weight: 700;
-  letter-spacing: .07em;
+  letter-spacing: 0.07em;
   text-transform: uppercase;
   cursor: pointer;
 }
-.reader-note-noted:hover, .reader-note-reply:hover { background: #e7d6a8; border-color: #a3906a; }
-.reader-note-noted-count { color: #6d5c34; }
+.reader-note-noted:hover,
+.reader-note-reply:hover {
+  background: #e7d6a8;
+  border-color: #a3906a;
+}
+.reader-note-noted-count {
+  color: #6d5c34;
+}
 /* One level deep, and the reply is a slip tucked under the one it answers. */
-.reader-replies { margin-top: 8px; padding-left: 10px; border-left: 2px solid #cfbd92; }
-.reader-note-answer { background: #f1e6c8; }
-.reader-note-answer::before { display: none; }
-.reader-composer { flex: 0 0 auto; padding: 8px 10px 10px; background: #e2d4ad; border-top: 1px solid #c3b085; }
-.reader-composer-where { margin-bottom: 5px; color: #7a6a45; }
-.reader-composer-input { width: 100%; min-height: 52px; padding: 6px; border: 1px solid #b9a97c; background: #f8f1dc; color: var(--reader-note-ink); font: inherit; font-size: 11.5px; line-height: 1.5; resize: vertical; }
-.reader-composer-input::placeholder { color: #97865c; }
-.reader-composer-actions { display: flex; gap: 6px; margin-top: 6px; }
+.reader-replies {
+  margin-top: 8px;
+  padding-left: 10px;
+  border-left: 2px solid #cfbd92;
+}
+.reader-note-answer {
+  background: #f1e6c8;
+}
+.reader-note-answer::before {
+  display: none;
+}
+.reader-composer {
+  flex: 0 0 auto;
+  padding: 8px 10px 10px;
+  background: #e2d4ad;
+  border-top: 1px solid #c3b085;
+}
+.reader-composer-where {
+  margin-bottom: 5px;
+  color: #7a6a45;
+}
+.reader-composer-input {
+  width: 100%;
+  min-height: 52px;
+  padding: 6px;
+  border: 1px solid #b9a97c;
+  background: #f8f1dc;
+  color: var(--reader-note-ink);
+  font: inherit;
+  font-size: 11.5px;
+  line-height: 1.5;
+  resize: vertical;
+}
+.reader-composer-input::placeholder {
+  color: #97865c;
+}
+.reader-composer-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 6px;
+}
 .reader-composer-file {
   padding: 3px 10px;
   border: 1px solid;
-  border-color: var(--circa-bevel-light) var(--circa-bevel-shadow) var(--circa-bevel-shadow) var(--circa-bevel-light);
+  border-color: var(--circa-bevel-light) var(--circa-bevel-shadow)
+    var(--circa-bevel-shadow) var(--circa-bevel-light);
   background: var(--secondary);
   color: #dbe7f5;
   font: inherit;
   font-size: 9px;
   font-weight: 700;
-  letter-spacing: .08em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   cursor: pointer;
 }
-.reader-composer-file:hover { border-color: var(--primary); }
-.reader-composer-cancel { padding: 3px 8px; border: 1px solid #b9a97c; background: none; color: #6d5c34; font: inherit; font-size: 9px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; cursor: pointer; }
+.reader-composer-file:hover {
+  border-color: var(--primary);
+}
+.reader-composer-cancel {
+  padding: 3px 8px;
+  border: 1px solid #b9a97c;
+  background: none;
+  color: #6d5c34;
+  font: inherit;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
 
 /* --- The follow-up strip: how one record reaches another --- */
-.reader-followups { display: flex; flex: 0 0 auto; flex-direction: column; height: 126px; min-height: 0; background: #18222e; border-top: 1px solid var(--circa-bevel-shadow); }
+.reader-followups {
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  height: 126px;
+  min-height: 0;
+  background: #18222e;
+  border-top: 1px solid var(--circa-bevel-shadow);
+}
 /* Put away, the strip is its own head: the lists are gone, not hidden. */
-.reader-followups[data-collapsed="true"] { height: auto; }
-.reader-followups-body { display: flex; flex: 1; flex-direction: column; min-height: 0; }
-.reader-followups-head { display: flex; flex: 0 0 auto; align-items: center; gap: 10px; padding: 5px 10px; background: #24334a; border-bottom: 1px solid var(--circa-bevel-shadow); }
-.reader-followups-title { color: #cfe0f2; }
-.reader-followups-count { margin-left: auto; color: #8fa3b6; font-size: 9px; }
-.reader-followups-toggle { display: flex; flex: 0 0 auto; align-items: center; justify-content: center; width: 18px; height: 16px; border: 1px solid transparent; background: none; color: #8fa3b6; cursor: pointer; }
-.reader-followups-toggle:hover { border-color: var(--circa-bevel-light); background: var(--secondary); color: #dbe7f5; }
-.reader-followups-toggle-glyph { width: 12px; height: 12px; }
-.reader-followups-empty { align-self: center; margin: auto; color: #6d8199; font-size: 10px; font-style: italic; }
-.reader-followups-groups { display: grid; flex: 1; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); min-height: 0; }
-.reader-followup-group { display: flex; flex-direction: column; min-width: 0; min-height: 0; padding: 5px 10px 6px; }
-.reader-followup-group + .reader-followup-group { border-left: 1px solid #0d131a; }
-.reader-followup-head { display: flex; flex: 0 0 auto; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 4px; }
-.reader-followup-label { display: flex; align-items: center; gap: 6px; color: #9fb4c9; }
+.reader-followups[data-collapsed="true"] {
+  height: auto;
+}
+.reader-followups-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+.reader-followups-head {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 10px;
+  background: #24334a;
+  border-bottom: 1px solid var(--circa-bevel-shadow);
+}
+.reader-followups-title {
+  color: #cfe0f2;
+}
+.reader-followups-count {
+  margin-left: auto;
+  color: #8fa3b6;
+  font-size: 9px;
+}
+.reader-followups-toggle {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 16px;
+  border: 1px solid transparent;
+  background: none;
+  color: #8fa3b6;
+  cursor: pointer;
+}
+.reader-followups-toggle:hover {
+  border-color: var(--circa-bevel-light);
+  background: var(--secondary);
+  color: #dbe7f5;
+}
+.reader-followups-toggle-glyph {
+  width: 12px;
+  height: 12px;
+}
+.reader-followups-empty {
+  align-self: center;
+  margin: auto;
+  color: #6d8199;
+  font-size: 10px;
+  font-style: italic;
+}
+.reader-followups-groups {
+  display: grid;
+  flex: 1;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  min-height: 0;
+}
+.reader-followup-group {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  padding: 5px 10px 6px;
+}
+.reader-followup-group + .reader-followup-group {
+  border-left: 1px solid #0d131a;
+}
+.reader-followup-head {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.reader-followup-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #9fb4c9;
+}
 /* The one place the panel admits it is holding something back. */
 .reader-followup-more {
   flex: 0 0 auto;
@@ -644,14 +1461,36 @@
   font: inherit;
   font-size: 8px;
   font-weight: 700;
-  letter-spacing: .06em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   cursor: pointer;
 }
-.reader-followup-more:hover { border-color: var(--circa-hazard); color: #dbe7f5; }
-.reader-followup-tally { padding: 0 4px; border: 1px solid #3d5064; color: #7f97ab; font-size: 8px; }
-.reader-followup-none { color: #6d8199; font-size: 10px; font-style: italic; }
-.reader-cards { display: flex; flex: 1; gap: 8px; min-height: 0; margin: 0; padding: 0 0 4px; overflow-x: auto; overflow-y: hidden; list-style: none; }
+.reader-followup-more:hover {
+  border-color: var(--circa-hazard);
+  color: #dbe7f5;
+}
+.reader-followup-tally {
+  padding: 0 4px;
+  border: 1px solid #3d5064;
+  color: #7f97ab;
+  font-size: 8px;
+}
+.reader-followup-none {
+  color: #6d8199;
+  font-size: 10px;
+  font-style: italic;
+}
+.reader-cards {
+  display: flex;
+  flex: 1;
+  gap: 8px;
+  min-height: 0;
+  margin: 0;
+  padding: 0 0 4px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  list-style: none;
+}
 /* A card is a file card: a folded corner, a code, and a line of the record. */
 .reader-card {
   position: relative;
@@ -668,117 +1507,404 @@
   text-align: left;
   cursor: pointer;
 }
-.reader-card::after { content: ""; position: absolute; right: 0; top: 0; width: 9px; height: 9px; background: linear-gradient(225deg, #a7b8c7 0 50%, transparent 50%); }
-.reader-card:hover { background: #f8fbfd; border-color: var(--circa-bevel-light); }
-.reader-card-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-.reader-card-code { font-size: 10px; font-weight: 700; letter-spacing: .06em; }
-.reader-card-type { padding: 1px 4px; border: 1px solid currentColor; color: var(--circa-stamp); font-size: 8px; }
-.reader-card[data-type="EXPLORATION"] .reader-card-type { color: #2c5470; }
-.reader-card[data-type="RUMOR"] .reader-card-type { color: #7a3d5a; }
-.reader-card-org { color: var(--reader-sheet-soft); font-size: 9px; letter-spacing: .05em; text-transform: uppercase; }
-.reader-card-preview { display: -webkit-box; overflow: hidden; color: #2c3a47; font-size: 10px; line-height: 1.35; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.reader-card::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 9px;
+  height: 9px;
+  background: linear-gradient(225deg, #a7b8c7 0 50%, transparent 50%);
+}
+.reader-card:hover {
+  background: #f8fbfd;
+  border-color: var(--circa-bevel-light);
+}
+.reader-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.reader-card-code {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+.reader-card-type {
+  padding: 1px 4px;
+  border: 1px solid currentColor;
+  color: var(--circa-stamp);
+  font-size: 8px;
+}
+.reader-card[data-type="EXPLORATION"] .reader-card-type {
+  color: #2c5470;
+}
+.reader-card[data-type="RUMOR"] .reader-card-type {
+  color: #7a3d5a;
+}
+.reader-card-org {
+  color: var(--reader-sheet-soft);
+  font-size: 9px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.reader-card-preview {
+  display: -webkit-box;
+  overflow: hidden;
+  color: #2c3a47;
+  font-size: 10px;
+  line-height: 1.35;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
 
 /* --- Status bar and the credentials prompt --- */
-.reader-statusbar { display: flex; flex: 0 0 auto; align-items: stretch; background: #1b2636; border-top: 1px solid #0d131a; font-size: 9px; letter-spacing: .05em; text-transform: uppercase; }
-.reader-status-text { flex: 1; min-width: 0; padding: 4px 8px; color: #a4c2e6; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.reader-status-cell { display: flex; align-items: center; padding: 4px 8px; border-left: 1px solid #0d131a; color: #8fa3b6; white-space: nowrap; }
-.reader-status-fixture { color: #7f97ab; font-style: italic; }
+.reader-statusbar {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: stretch;
+  background: #1b2636;
+  border-top: 1px solid #0d131a;
+  font-size: 9px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.reader-status-text {
+  flex: 1;
+  min-width: 0;
+  padding: 4px 8px;
+  color: #a4c2e6;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.reader-status-cell {
+  display: flex;
+  align-items: center;
+  padding: 4px 8px;
+  border-left: 1px solid #0d131a;
+  color: #8fa3b6;
+  white-space: nowrap;
+}
+.reader-status-fixture {
+  color: #7f97ab;
+  font-style: italic;
+}
 /* The count stays in the bar; the history opens above it, never on the sheet. */
-.reader-status-action { border: 0; border-left: 1px solid #0d131a; background: none; color: #a4c2e6; font: inherit; letter-spacing: inherit; text-transform: inherit; cursor: pointer; }
-.reader-status-action:hover { background: #24334a; color: #dbe7f5; }
-.reader-status-action:focus-visible { outline: 1px solid var(--ring); outline-offset: -2px; }
-.reader-status-panel { z-index: 30; width: min(332px, calc(100vw - 28px)); max-height: min(360px, 60vh); overflow: auto; padding: 0; background: #1b2636; border: 1px solid #0d131a; color: #dbe7f5; box-shadow: 0 8px 22px rgb(8 17 25 / 55%); }
-.reader-status-panel-title { margin: 0; padding: 7px 10px; border-bottom: 1px solid #3d5064; color: #8fa3b6; font-size: 9px; letter-spacing: .12em; text-transform: uppercase; }
-.reader-status-updates { display: grid; gap: 6px; margin: 0; padding: 8px; list-style: none; }
-.reader-status-updates li { display: grid; grid-template-columns: 66px minmax(0, 1fr); gap: 10px; padding: 6px 8px; border: 1px solid rgb(61 80 100 / 55%); border-left: 3px solid #526e94; background: #22303f; font-size: 10px; line-height: 1.45; }
-.reader-status-updates li[data-tone="changed"] { border-color: #8d6a2b; background: #2b2820; }
-.reader-status-updates li[data-tone="claimed"] { border-color: #7d4d4d; background: #2e2226; }
-.reader-status-updates time { color: #a9b8c8; font-family: var(--font-mono); font-size: 9px; letter-spacing: .04em; }
-.reader-status-updates span { color: #dbe7f5; }
-.reader-status-explorations { margin: 0; padding: 0; list-style: none; }
-.reader-status-explorations li + li { border-top: 1px solid rgb(61 80 100 / 45%); }
-.reader-status-record { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 3px 10px; width: 100%; padding: 7px 10px; border: 0; background: none; color: inherit; text-align: left; cursor: pointer; }
-.reader-status-record:hover, .reader-status-record:focus-visible { background: #24334a; outline: none; }
-.reader-status-record:focus-visible { box-shadow: inset 0 0 0 1px var(--ring); }
-.reader-status-record-code { color: #a4c2e6; font-size: 10px; }
-.reader-status-record-org { color: #8fa3b6; font-size: 8px; letter-spacing: .06em; text-transform: uppercase; }
-.reader-status-record-preview { grid-column: 1 / -1; color: #b9cbdd; font-size: 10px; line-height: 1.4; }
+.reader-status-action {
+  border: 0;
+  border-left: 1px solid #0d131a;
+  background: none;
+  color: #a4c2e6;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  cursor: pointer;
+}
+.reader-status-action:hover {
+  background: #24334a;
+  color: #dbe7f5;
+}
+.reader-status-action:focus-visible {
+  outline: 1px solid var(--ring);
+  outline-offset: -2px;
+}
+.reader-status-panel {
+  z-index: 30;
+  width: min(332px, calc(100vw - 28px));
+  max-height: min(360px, 60vh);
+  overflow: auto;
+  padding: 0;
+  background: #1b2636;
+  border: 1px solid #0d131a;
+  color: #dbe7f5;
+  box-shadow: 0 8px 22px rgb(8 17 25 / 55%);
+}
+.reader-status-panel-title {
+  margin: 0;
+  padding: 7px 10px;
+  border-bottom: 1px solid #3d5064;
+  color: #8fa3b6;
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.reader-status-updates {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 8px;
+  list-style: none;
+}
+.reader-status-updates li {
+  display: grid;
+  grid-template-columns: 66px minmax(0, 1fr);
+  gap: 10px;
+  padding: 6px 8px;
+  border: 1px solid rgb(61 80 100 / 55%);
+  border-left: 3px solid #526e94;
+  background: #22303f;
+  font-size: 10px;
+  line-height: 1.45;
+}
+.reader-status-updates li[data-tone="changed"] {
+  border-color: #8d6a2b;
+  background: #2b2820;
+}
+.reader-status-updates li[data-tone="claimed"] {
+  border-color: #7d4d4d;
+  background: #2e2226;
+}
+.reader-status-updates time {
+  color: #a9b8c8;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.04em;
+}
+.reader-status-updates span {
+  color: #dbe7f5;
+}
+.reader-status-explorations {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.reader-status-explorations li + li {
+  border-top: 1px solid rgb(61 80 100 / 45%);
+}
+.reader-status-record {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 3px 10px;
+  width: 100%;
+  padding: 7px 10px;
+  border: 0;
+  background: none;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.reader-status-record:hover,
+.reader-status-record:focus-visible {
+  background: #24334a;
+  outline: none;
+}
+.reader-status-record:focus-visible {
+  box-shadow: inset 0 0 0 1px var(--ring);
+}
+.reader-status-record-code {
+  color: #a4c2e6;
+  font-size: 10px;
+}
+.reader-status-record-org {
+  color: #8fa3b6;
+  font-size: 8px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.reader-status-record-preview {
+  grid-column: 1 / -1;
+  color: #b9cbdd;
+  font-size: 10px;
+  line-height: 1.4;
+}
 .reader-enter {
   min-width: 74px;
   padding: 4px 10px;
   border: 1px solid;
-  border-color: var(--circa-bevel-light) var(--circa-bevel-shadow) var(--circa-bevel-shadow) var(--circa-bevel-light);
+  border-color: var(--circa-bevel-light) var(--circa-bevel-shadow)
+    var(--circa-bevel-shadow) var(--circa-bevel-light);
   background: var(--secondary);
   color: #dbe7f5;
   font: inherit;
   font-size: 10px;
   font-weight: 700;
-  letter-spacing: .08em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   cursor: pointer;
 }
-.reader-enter:hover { background: #304155; }
+.reader-enter:hover {
+  background: #304155;
+}
 
-@keyframes reader-chrome-in { from { opacity: 0; transform: translateY(-2px); } }
-@keyframes reader-margin-settle { from { transform: translateY(6px); } }
-@keyframes reader-scale-blip { 0%, 44% { opacity: 1; } 45%, 100% { opacity: 0; } }
+@keyframes reader-chrome-in {
+  from {
+    opacity: 0;
+    transform: translateY(-2px);
+  }
+}
+@keyframes reader-margin-settle {
+  from {
+    transform: translateY(6px);
+  }
+}
+@keyframes reader-scale-blip {
+  0%,
+  44% {
+    opacity: 1;
+  }
+  45%,
+  100% {
+    opacity: 0;
+  }
+}
 @keyframes reader-phantom {
-  0%, 68% { opacity: .9; max-height: 56px; padding-block: 5px; border-width: 1px; }
-  69%, 100% { opacity: 0; max-height: 0; padding-block: 0; border-width: 0; }
+  0%,
+  68% {
+    opacity: 0.9;
+    max-height: 56px;
+    padding-block: 5px;
+    border-width: 1px;
+  }
+  69%,
+  100% {
+    opacity: 0;
+    max-height: 0;
+    padding-block: 0;
+    border-width: 0;
+  }
 }
 
 /* --- Responsive: the sheet is never squeezed below a readable width --- */
 @container (max-width: 1100px) {
   /* Two columns of prose need the width; below it the second column folds under,
      and the sheet takes its measure back. */
-  .reader-sheet[data-view="two-up"] .reader-sections { grid-template-columns: minmax(0, 1fr); }
-  .reader-sheet[data-view="two-up"] .reader-measure { max-width: 68ch; }
+  .reader-sheet[data-view="two-up"] .reader-sections {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .reader-sheet[data-view="two-up"] .reader-measure {
+    max-width: 68ch;
+  }
 }
 @container (max-width: 1023px) {
   /* Both rails start as strips, which is what keeps the measure readable here. */
-  .reader-main { grid-template-columns: var(--reader-strip) minmax(0, 1fr) var(--reader-strip); }
-  .reader-rail:not([data-rail="open"]) { width: var(--reader-strip); align-items: center; }
-  .reader-rail:not([data-rail="open"]) .reader-rail-head { flex-direction: column; gap: 8px; padding: 6px 0; }
-  .reader-rail:not([data-rail="open"]) .reader-rail-title { flex: 0 0 auto; writing-mode: vertical-rl; text-orientation: mixed; }
+  .reader-main {
+    grid-template-columns: var(--reader-strip) minmax(0, 1fr) var(
+        --reader-strip
+      );
+  }
+  .reader-rail:not([data-rail="open"]) {
+    width: var(--reader-strip);
+    align-items: center;
+  }
+  .reader-rail:not([data-rail="open"]) .reader-rail-head {
+    flex-direction: column;
+    gap: 8px;
+    padding: 6px 0;
+  }
+  .reader-rail:not([data-rail="open"]) .reader-rail-title {
+    flex: 0 0 auto;
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+  }
   .reader-rail:not([data-rail="open"]) .reader-previews,
   .reader-rail:not([data-rail="open"]) .reader-notes,
   .reader-rail:not([data-rail="open"]) .reader-composer,
-  .reader-rail:not([data-rail="open"]) .reader-rail-none { display: none; }
-  .reader-rail:not([data-rail="open"]) .reader-annotation-count { border: 1px solid #3d5064; padding: 0 4px; color: #cfe0f2; }
+  .reader-rail:not([data-rail="open"]) .reader-rail-none {
+    display: none;
+  }
+  .reader-rail:not([data-rail="open"]) .reader-annotation-count {
+    border: 1px solid #3d5064;
+    padding: 0 4px;
+    color: #cfe0f2;
+  }
   /* Opened on a narrow frame, a rail covers the sheet rather than pushing it. */
-  .reader-rail[data-rail="open"] { position: absolute; z-index: 6; top: 0; bottom: 0; }
-  .reader-rail-left[data-rail="open"] { left: 0; width: var(--reader-rail-left); box-shadow: 3px 0 0 rgb(8 17 25 / 40%); }
-  .reader-rail-right[data-rail="open"] { right: 0; width: var(--reader-rail-right); box-shadow: -3px 0 0 rgb(8 17 25 / 40%); }
+  .reader-rail[data-rail="open"] {
+    position: absolute;
+    z-index: 6;
+    top: 0;
+    bottom: 0;
+  }
+  .reader-rail-left[data-rail="open"] {
+    left: 0;
+    width: var(--reader-rail-left);
+    box-shadow: 3px 0 0 rgb(8 17 25 / 40%);
+  }
+  .reader-rail-right[data-rail="open"] {
+    right: 0;
+    width: var(--reader-rail-right);
+    box-shadow: -3px 0 0 rgb(8 17 25 / 40%);
+  }
   /* The bar is dense enough that the word on each plate is the first thing to go. */
-  .reader-action-label { display: none; }
-  .reader-action { padding: 3px 6px; }
-  .reader-legend { display: none; }
+  .reader-action-label {
+    display: none;
+  }
+  .reader-action {
+    padding: 3px 6px;
+  }
+  .reader-legend {
+    display: none;
+  }
 }
 @container (max-width: 767px) {
   /* The follow-ups stack, and their cards stop pretending to be a filmstrip. */
-  .reader-followups:not([data-collapsed="true"]) { height: auto; max-height: 40%; }
-  .reader-followups-groups { grid-template-columns: minmax(0, 1fr); overflow-y: auto; }
-  .reader-followup-group + .reader-followup-group { border-left: 0; border-top: 1px solid #0d131a; }
-  .reader-followup-group .reader-cards { flex-direction: column; overflow-x: hidden; overflow-y: visible; }
-  .reader-card { width: 100%; }
+  .reader-followups:not([data-collapsed="true"]) {
+    height: auto;
+    max-height: 40%;
+  }
+  .reader-followups-groups {
+    grid-template-columns: minmax(0, 1fr);
+    overflow-y: auto;
+  }
+  .reader-followup-group + .reader-followup-group {
+    border-left: 0;
+    border-top: 1px solid #0d131a;
+  }
+  .reader-followup-group .reader-cards {
+    flex-direction: column;
+    overflow-x: hidden;
+    overflow-y: visible;
+  }
+  .reader-card {
+    width: 100%;
+  }
 }
 @container (max-width: 560px) {
   /* The sheet loses its padding before it loses its measure, and the printed
      edge pulls in with it so a hole never lands on the text. */
-  .reader-sheet { padding: 22px 20px 34px; --reader-perf-x: 9px; --reader-perf-r: 2.6px; }
+  .reader-sheet {
+    padding: 22px 20px 34px;
+    --reader-perf-x: 9px;
+    --reader-perf-r: 2.6px;
+  }
   /* A floated print would leave too little measure beside it, so a narrow
      sheet gives the figure the whole column and drops the float. */
-  .reader-figure-left, .reader-figure-right { float: none; width: 100%; margin: 0 0 20px; }
-  .reader-leaf-title { font-size: 1.4em; }
-  .reader-stamp { margin-left: 0; }
-  .reader-point { min-width: 28px; padding: 0 3px; }
-  .reader-assessment-score { min-width: 24px; padding: 0 3px; }
+  .reader-figure-left,
+  .reader-figure-right {
+    float: none;
+    width: 100%;
+    margin: 0 0 20px;
+  }
+  .reader-leaf-title {
+    font-size: 1.4em;
+  }
+  .reader-stamp {
+    margin-left: 0;
+  }
+  .reader-point {
+    min-width: 28px;
+    padding: 0 3px;
+  }
+  .reader-assessment-score {
+    min-width: 24px;
+    padding: 0 3px;
+  }
   .reader-status-cell:nth-last-child(1),
-  .reader-status-cell:nth-last-child(2) { display: none; }
+  .reader-status-cell:nth-last-child(2) {
+    display: none;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   /* Every glitch has a hidden base state, so declining to animate is enough. */
-  .reader-toolbar, .reader-scale-blip, .reader-preview-phantom, .reader-notes { animation: none; }
-  .reader-sheet { scroll-behavior: auto; }
+  .reader-toolbar,
+  .reader-scale-blip,
+  .reader-preview-phantom,
+  .reader-notes {
+    animation: none;
+  }
+  .reader-sheet {
+    scroll-behavior: auto;
+  }
 }

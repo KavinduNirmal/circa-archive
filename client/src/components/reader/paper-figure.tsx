@@ -9,7 +9,13 @@ import type { ReactNode } from "react";
  * place when the sheet is printed. `full` is not a fourth kind of float: it is
  * the absence of one, and the width a figure falls back to.
  */
-export function PaperFigure({ className, children }: { className?: string; children?: ReactNode }) {
+export function PaperFigure({
+  className,
+  children,
+}: {
+  className?: string;
+  children?: ReactNode;
+}) {
   const align = className?.includes("reader-figure-right")
     ? "right"
     : className?.includes("reader-figure-left")

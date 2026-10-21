@@ -57,7 +57,9 @@ function proseHandlers(
      * href — an external copy, an in-page anchor — is left alone.
      */
     link(state, node) {
-      const href = node.url.startsWith("/site/") ? `/${locale}${node.url}` : node.url;
+      const href = node.url.startsWith("/site/")
+        ? `/${locale}${node.url}`
+        : node.url;
       return {
         type: "element",
         tagName: "a",
@@ -87,7 +89,11 @@ function proseHandlers(
           {
             type: "element",
             tagName: "input",
-            properties: { type: "checkbox", id, className: [styles.redactionToggle] },
+            properties: {
+              type: "checkbox",
+              id,
+              className: [styles.redactionToggle],
+            },
             children: [],
           },
           {
@@ -107,31 +113,51 @@ function proseHandlers(
     },
     figure(state, node) {
       void state;
-      const align = node.align === "left" || node.align === "right" ? node.align : "full";
+      const align =
+        node.align === "left" || node.align === "right" ? node.align : "full";
       const held = imageHeld(node.url);
       return {
         type: "element",
         tagName: "figure",
-        properties: { className: [styles.figure, styles[`figure${align[0].toUpperCase()}${align.slice(1)}`]] },
+        properties: {
+          className: [
+            styles.figure,
+            styles[`figure${align[0].toUpperCase()}${align.slice(1)}`],
+          ],
+        },
         children: [
           held
             ? {
                 type: "element",
                 tagName: "img",
-                properties: { src: node.url, alt: node.caption, loading: "lazy", ...(node.title ? { title: node.title } : {}) },
+                properties: {
+                  src: node.url,
+                  alt: node.caption,
+                  loading: "lazy",
+                  ...(node.title ? { title: node.title } : {}),
+                },
                 children: [],
               }
             : {
                 type: "element",
                 tagName: "div",
-                properties: { className: [styles.figureHeld], role: "img", ariaLabel: imageNotHeld },
+                properties: {
+                  className: [styles.figureHeld],
+                  role: "img",
+                  ariaLabel: imageNotHeld,
+                },
                 children: [{ type: "text", value: "×" }],
               },
           {
             type: "element",
             tagName: "figcaption",
             properties: { className: [styles.figureCaption] },
-            children: [{ type: "text", value: `${held ? "" : `${imageNotHeld}. `}${node.caption}` }],
+            children: [
+              {
+                type: "text",
+                value: `${held ? "" : `${imageNotHeld}. `}${node.caption}`,
+              },
+            ],
           },
         ],
       };
@@ -139,7 +165,11 @@ function proseHandlers(
   };
 }
 
-export function RecordProse({ source, redactionLabel, imageNotHeld }: {
+export function RecordProse({
+  source,
+  redactionLabel,
+  imageNotHeld,
+}: {
   source: string;
   redactionLabel: string;
   imageNotHeld: string;
@@ -149,11 +179,19 @@ export function RecordProse({ source, redactionLabel, imageNotHeld }: {
   // sections, so a label opens the mark it was drawn for and nothing else.
   const uid = useId();
   const { output } = parseRecord({ markdown: source });
-  const tree = toHast(output, { handlers: proseHandlers(redactionLabel, imageNotHeld, locale, uid) });
+  const tree = toHast(output, {
+    handlers: proseHandlers(redactionLabel, imageNotHeld, locale, uid),
+  });
   if (!tree) return null;
   return (
     <div className={styles.prose}>
-      {toJsxRuntime(tree, { Fragment, jsx, jsxs, development: false, components: { img: RecordImage } })}
+      {toJsxRuntime(tree, {
+        Fragment,
+        jsx,
+        jsxs,
+        development: false,
+        components: { img: RecordImage },
+      })}
     </div>
   );
 }

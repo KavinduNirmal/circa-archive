@@ -21,7 +21,8 @@ import { useTranslations } from "next-intl";
 export function PaperRedaction({ children }: { children?: ReactNode }) {
   const t = useTranslations("reader");
   const [revealed, setRevealed] = useState(false);
-  const hasText = children !== undefined && children !== null && children !== false;
+  const hasText =
+    children !== undefined && children !== null && children !== false;
 
   function toggle() {
     if (hasText) setRevealed((current) => !current);
@@ -51,7 +52,11 @@ export function PaperRedaction({ children }: { children?: ReactNode }) {
       onClick={toggle}
       onKeyDown={onKeyDown}
     >
-      {hasText ? <span aria-hidden={revealed ? undefined : true}>{children}</span> : <span aria-hidden="true">{t("redactionMarker")}</span>}
+      {hasText ? (
+        <span aria-hidden={revealed ? undefined : true}>{children}</span>
+      ) : (
+        <span aria-hidden="true">{t("redactionMarker")}</span>
+      )}
     </mark>
   );
 }

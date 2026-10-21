@@ -6,18 +6,18 @@ The in-world mail client, opened from the **Inbox** desktop shortcut. It is a th
 
 The fiction decides the interaction model, the same way it does in the archive browser. This terminal reads mail; it cannot send any. Nothing pretends otherwise:
 
-| Affordance | Behaviour |
-| --- | --- |
-| Folders | Six, in the Outlook Bar and the Go menu: Inbox, Drafts, Outbox, Sent Items, Deleted Items, Dead Letters. Every one holds real messages. |
-| Reading | Selecting a message opens it and marks it read, so the status bar's unread count follows the operator. |
-| Sorting | Real, from the column headers, with the direction announced through `aria-sort`. |
-| Find | Real; typing filters the current folder as it is entered. There is no `Find Now` because a button that changed nothing would be a lie. |
-| New, Reply, Reply All, Forward | Real; each opens the composer with the recipient, the subject, and the original quoted. |
-| **Send** | Queues the message in the **Outbox**, which is what the reference client did with mail it could not hand to a transport. |
-| **Send and receive** | Reports that no correspondence transport is connected and how many messages are waiting, instead of faking a transfer. |
-| **Empty Deleted Items** | Refused with a notice: the retention schedule has no disposal line, so the archive destroys nothing. |
-| View → Show | All messages, or unread only. A message stays listed in the unread view while it is open, so marking it read does not pull the row out from under the pointer. |
-| Outlook Bar group arrows | Real disabled controls. This mailbox is provisioned with one shortcut group, and saying so is better than faking a switcher. |
+| Affordance                     | Behaviour                                                                                                                                                      |
+| ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Folders                        | Six, in the Outlook Bar and the Go menu: Inbox, Drafts, Outbox, Sent Items, Deleted Items, Dead Letters. Every one holds real messages.                        |
+| Reading                        | Selecting a message opens it and marks it read, so the status bar's unread count follows the operator.                                                         |
+| Sorting                        | Real, from the column headers, with the direction announced through `aria-sort`.                                                                               |
+| Find                           | Real; typing filters the current folder as it is entered. There is no `Find Now` because a button that changed nothing would be a lie.                         |
+| New, Reply, Reply All, Forward | Real; each opens the composer with the recipient, the subject, and the original quoted.                                                                        |
+| **Send**                       | Queues the message in the **Outbox**, which is what the reference client did with mail it could not hand to a transport.                                       |
+| **Send and receive**           | Reports that no correspondence transport is connected and how many messages are waiting, instead of faking a transfer.                                         |
+| **Empty Deleted Items**        | Refused with a notice: the retention schedule has no disposal line, so the archive destroys nothing.                                                           |
+| View → Show                    | All messages, or unread only. A message stays listed in the unread view while it is open, so marking it read does not pull the row out from under the pointer. |
+| Outlook Bar group arrows       | Real disabled controls. This mailbox is provisioned with one shortcut group, and saying so is better than faking a switcher.                                   |
 
 ## Structure
 
@@ -31,6 +31,7 @@ The fiction decides the interaction model, the same way it does in the archive b
 ## Interface copy
 
 Every component here is a client component and reads its copy with `useTranslations("mail")` from `next-intl`; the strings live in `messages/<locale>/mail.json` and nowhere else. `mailbox-index.ts` is deliberately not a copy source for chrome: `MAIL_FOLDERS` keeps a folder's id and icon but not its name, because a folder name is interface chrome — `folderLabel` in `mail-chrome.tsx` resolves it from the catalog, so Inbox and 받은 편지함 are one key rather than two literals. The message fixture itself (subjects, senders, bodies, addresses, stamps) is filed correspondence and stays as filed in both languages, as does the quoted original a reply carries. `MAIL_NAME` stays a constant, and the retention policy references (`LN-POLICY-19 / RETENTION-SCHEDULE-0`, `Build 1999.4 / CIRCA-OS`) are identical in both catalogs.
+
 - `mail-identity.ts`: the in-world product name and window title, in their own module so the chrome and the notices do not import each other in a cycle.
 - `mail.css`: the Outlook Bar, find bar, grid, reading pane, composer, and status bar, with the white viewer override scoped to `.mail-view`. Imported by `mail-window.tsx`.
 

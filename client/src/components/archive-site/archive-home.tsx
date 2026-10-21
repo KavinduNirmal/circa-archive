@@ -1,7 +1,21 @@
 import { useTranslations } from "next-intl";
-import { ArrowRight, Building2, Clock3, FileText, LayoutGrid, Library, Monitor, Shuffle, TrendingUp } from "lucide-react";
+import {
+  ArrowRight,
+  Building2,
+  Clock3,
+  FileText,
+  LayoutGrid,
+  Library,
+  Monitor,
+  Shuffle,
+  TrendingUp,
+} from "lucide-react";
 import { Link } from "@/i18n/navigation";
-import { ARCHIVE_CLASSES, countClass, recentFilings } from "../browser/archive-index";
+import {
+  ARCHIVE_CLASSES,
+  countClass,
+  recentFilings,
+} from "../browser/archive-index";
 import { ArchiveButton } from "./archive-button";
 import { ArchiveChrome } from "./archive-chrome";
 import {
@@ -28,7 +42,8 @@ const FEATURED_CODE = "CIRCA-S-03007";
 
 export function ArchiveHome() {
   const t = useTranslations("site");
-  const featured = SITE_INDEX.find((entry) => entry.code === FEATURED_CODE) ?? SITE_INDEX[0];
+  const featured =
+    SITE_INDEX.find((entry) => entry.code === FEATURED_CODE) ?? SITE_INDEX[0];
   const consulted = mostConsulted(5);
 
   return (
@@ -70,30 +85,59 @@ export function ArchiveHome() {
               */}
               <article className={styles.featured}>
                 <div className={styles.featuredBody}>
-                  <p className={styles.featuredCode} data-klass={featured.klass}>{featured.code}</p>
+                  <p
+                    className={styles.featuredCode}
+                    data-klass={featured.klass}
+                  >
+                    {featured.code}
+                  </p>
                   <h3 className={styles.featuredTitle}>
-                    <Link href={`/site/records/${featured.code}`}>{featured.designation ?? featured.code}</Link>
+                    <Link href={`/site/records/${featured.code}`}>
+                      {featured.designation ?? featured.code}
+                    </Link>
                   </h3>
                   <p className={styles.featuredAbstract}>{featured.abstract}</p>
                   <p className={styles.featuredAction}>
                     <ArchiveButton
                       tone="paper"
                       href={`/site/records/${featured.code}`}
-                      icon={<ArrowRight size={13} strokeWidth={1.9} aria-hidden="true" />}
+                      icon={
+                        <ArrowRight
+                          size={13}
+                          strokeWidth={1.9}
+                          aria-hidden="true"
+                        />
+                      }
                     >
                       {t("featuredLink")}
                     </ArchiveButton>
-                    <span className={styles.featuredNote}>{t("featuredNote")}</span>
+                    <span className={styles.featuredNote}>
+                      {t("featuredNote")}
+                    </span>
                   </p>
                 </div>
                 <dl className={styles.featuredFacts}>
                   <div>
                     <dt>{t("columnClass")}</dt>
-                    <dd><span className={styles.classTag} data-klass={featured.klass}>{t(CLASS_MESSAGE_KEY[featured.klass])}</span></dd>
+                    <dd>
+                      <span
+                        className={styles.classTag}
+                        data-klass={featured.klass}
+                      >
+                        {t(CLASS_MESSAGE_KEY[featured.klass])}
+                      </span>
+                    </dd>
                   </div>
                   <div>
                     <dt>{t("columnStatus")}</dt>
-                    <dd><span className={styles.statusChip} data-status={featured.status}>{t(STATUS_MESSAGE_KEY[featured.status])}</span></dd>
+                    <dd>
+                      <span
+                        className={styles.statusChip}
+                        data-status={featured.status}
+                      >
+                        {t(STATUS_MESSAGE_KEY[featured.status])}
+                      </span>
+                    </dd>
                   </div>
                   <div>
                     <dt>{t("columnFiled")}</dt>
@@ -115,7 +159,11 @@ export function ArchiveHome() {
                 </h2>
                 <p className={styles.blockNote}>{t("homeLatestNote")}</p>
               </div>
-              <RecordTable entries={recentFilings(SITE_INDEX, 5)} label={t("homeLatestTitle")} compact />
+              <RecordTable
+                entries={recentFilings(SITE_INDEX, 5)}
+                label={t("homeLatestTitle")}
+                compact
+              />
             </section>
 
             <section className={styles.block} aria-labelledby="browse-title">
@@ -130,15 +178,25 @@ export function ArchiveHome() {
               <ul className={styles.classList}>
                 {ARCHIVE_CLASSES.map((klass) => (
                   <li key={klass}>
-                    <Link className={styles.classLink} href="/site/records" data-klass={klass}>
-                      <span className={styles.className}>{t(CLASS_MESSAGE_KEY[klass])}</span>
-                      <span className={styles.classCount}>{t("homeCount", { count: countClass(klass) })}</span>
+                    <Link
+                      className={styles.classLink}
+                      href="/site/records"
+                      data-klass={klass}
+                    >
+                      <span className={styles.className}>
+                        {t(CLASS_MESSAGE_KEY[klass])}
+                      </span>
+                      <span className={styles.classCount}>
+                        {t("homeCount", { count: countClass(klass) })}
+                      </span>
                     </Link>
                   </li>
                 ))}
               </ul>
               <p className={styles.blockFoot}>
-                <span className={styles.count}>{t("homeCount", { count: SITE_INDEX.length })}</span>
+                <span className={styles.count}>
+                  {t("homeCount", { count: SITE_INDEX.length })}
+                </span>
                 <Link className={styles.more} href="/site/records">
                   {t("homeIndexLink")} <span aria-hidden="true">»</span>
                 </Link>
@@ -157,7 +215,10 @@ export function ArchiveHome() {
               {t("railTitle")}
             </h2>
 
-            <section className={styles.railBlock} aria-labelledby="popular-title">
+            <section
+              className={styles.railBlock}
+              aria-labelledby="popular-title"
+            >
               <h3 className={styles.railHeading} id="popular-title">
                 <TrendingUp size={13} strokeWidth={1.7} aria-hidden="true" />
                 {t("popularTitle")}
@@ -166,14 +227,21 @@ export function ArchiveHome() {
               <ol className={`${styles.railList} ${styles.railRanked}`}>
                 {consulted.map(({ entry, consultations }) => (
                   <li key={entry.code} className={styles.railItem}>
-                    <Link href={`/site/records/${entry.code}`}>{entry.designation ?? entry.code}</Link>
-                    <span className={styles.railMeta}>{t("popularCount", { count: consultations })}</span>
+                    <Link href={`/site/records/${entry.code}`}>
+                      {entry.designation ?? entry.code}
+                    </Link>
+                    <span className={styles.railMeta}>
+                      {t("popularCount", { count: consultations })}
+                    </span>
                   </li>
                 ))}
               </ol>
             </section>
 
-            <section className={styles.railBlock} aria-labelledby="random-title">
+            <section
+              className={styles.railBlock}
+              aria-labelledby="random-title"
+            >
               <h3 className={styles.railHeading} id="random-title">
                 <Shuffle size={13} strokeWidth={1.7} aria-hidden="true" />
                 {t("randomTitle")}
@@ -183,13 +251,18 @@ export function ArchiveHome() {
                 tone="paper"
                 className={styles.railAction}
                 href="/site/random"
-                icon={<Shuffle size={13} strokeWidth={1.9} aria-hidden="true" />}
+                icon={
+                  <Shuffle size={13} strokeWidth={1.9} aria-hidden="true" />
+                }
               >
                 {t("randomLink")}
               </ArchiveButton>
             </section>
 
-            <section className={styles.railBlock} aria-labelledby="home-organizations-title">
+            <section
+              className={styles.railBlock}
+              aria-labelledby="home-organizations-title"
+            >
               <h3 className={styles.railHeading} id="home-organizations-title">
                 <Building2 size={13} strokeWidth={1.7} aria-hidden="true" />
                 {t("homeOrganizationsTitle")}
@@ -198,24 +271,37 @@ export function ArchiveHome() {
               <ul className={styles.railList}>
                 {ORGANIZATIONS.map((organization) => (
                   <li key={organization.code} className={styles.railItem}>
-                    <Link href={`/site/records/${organization.code}`}>{organization.designation ?? t("withheldDesignation")}</Link>
-                    <span className={styles.railMeta}>{t("orgFilings", { count: filingsFor(organization.code) })}</span>
+                    <Link href={`/site/records/${organization.code}`}>
+                      {organization.designation ?? t("withheldDesignation")}
+                    </Link>
+                    <span className={styles.railMeta}>
+                      {t("orgFilings", {
+                        count: filingsFor(organization.code),
+                      })}
+                    </span>
                   </li>
                 ))}
               </ul>
               <p className={styles.railFoot}>
-                <Link className={styles.more} href="/site/organizations">{t("navOrganizations")} <span aria-hidden="true">»</span></Link>
+                <Link className={styles.more} href="/site/organizations">
+                  {t("navOrganizations")} <span aria-hidden="true">»</span>
+                </Link>
               </p>
             </section>
 
-            <section className={styles.railBlock} aria-labelledby="home-workstation-title">
+            <section
+              className={styles.railBlock}
+              aria-labelledby="home-workstation-title"
+            >
               <h3 className={styles.railHeading} id="home-workstation-title">
                 <Monitor size={13} strokeWidth={1.7} aria-hidden="true" />
                 {t("homeWorkstationTitle")}
               </h3>
               <p className={styles.railNote}>{t("homeWorkstationNote")}</p>
               <p className={styles.railFoot}>
-                <Link className={styles.more} href="/desktop">{t("homeWorkstationLink")} <span aria-hidden="true">»</span></Link>
+                <Link className={styles.more} href="/desktop">
+                  {t("homeWorkstationLink")} <span aria-hidden="true">»</span>
+                </Link>
               </p>
             </section>
           </aside>

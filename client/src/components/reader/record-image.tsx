@@ -12,7 +12,13 @@ import Image from "next/image";
  * An absolute URL is optimised against the hosts in `next.config.ts`; a new
  * image host has to be allowed there before it can be displayed.
  */
-export function RecordImage({ src, alt = "", title, className, loading }: {
+export function RecordImage({
+  src,
+  alt = "",
+  title,
+  className,
+  loading,
+}: {
   src?: string | Blob;
   alt?: string;
   title?: string;

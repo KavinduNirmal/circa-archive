@@ -59,6 +59,9 @@ export function normaliseTrail(trail: RecordTrail): RecordTrail {
     if (!codes.includes(code)) codes.push(code);
   }
   if (codes.length === 0) return EMPTY_TRAIL;
-  const at = current === null ? Math.min(Math.max(0, trail.at), codes.length - 1) : codes.indexOf(current);
+  const at =
+    current === null
+      ? Math.min(Math.max(0, trail.at), codes.length - 1)
+      : codes.indexOf(current);
   return { codes, at };
 }

@@ -15,8 +15,13 @@ function subscribe(callback: () => void) {
   };
 }
 function acknowledged() {
-  try { return document.cookie.split(";").some(cookie => cookie.trim() === "circa_cookie_notice=v1"); }
-  catch { return false; }
+  try {
+    return document.cookie
+      .split(";")
+      .some((cookie) => cookie.trim() === "circa_cookie_notice=v1");
+  } catch {
+    return false;
+  }
 }
 
 export function CookieNotice() {
@@ -29,7 +34,11 @@ export function CookieNotice() {
   useEffect(() => {
     if (!visible || !notice.current) return;
     const root = document.documentElement;
-    const update = () => root.style.setProperty("--circa-cookie-notice-height", `${notice.current?.getBoundingClientRect().height ?? 0}px`);
+    const update = () =>
+      root.style.setProperty(
+        "--circa-cookie-notice-height",
+        `${notice.current?.getBoundingClientRect().height ?? 0}px`,
+      );
     update();
     const observer = new ResizeObserver(update);
     observer.observe(notice.current);
@@ -50,14 +59,24 @@ export function CookieNotice() {
   }
 
   if (!visible) return null;
-  return <aside ref={notice} role="region" aria-label={t("cookieNotice")} className={styles.notice}>
-    <div className={styles.inner}>
-      <p className={styles.label}>{t("cookieNotice")}</p>
-      <div className={styles.copy}>
-        <p>{t("cookieBody")}</p>
-        <details><summary>{t("cookieDetails")}</summary><p>{t("cookieInventory")}</p></details>
+  return (
+    <aside
+      ref={notice}
+      role="region"
+      aria-label={t("cookieNotice")}
+      className={styles.notice}
+    >
+      <div className={styles.inner}>
+        <p className={styles.label}>{t("cookieNotice")}</p>
+        <div className={styles.copy}>
+          <p>{t("cookieBody")}</p>
+          <details>
+            <summary>{t("cookieDetails")}</summary>
+            <p>{t("cookieInventory")}</p>
+          </details>
+        </div>
+        <ArchiveButton onClick={dismiss}>{t("cookieUnderstood")}</ArchiveButton>
       </div>
-      <ArchiveButton onClick={dismiss}>{t("cookieUnderstood")}</ArchiveButton>
-    </div>
-  </aside>;
+    </aside>
+  );
 }

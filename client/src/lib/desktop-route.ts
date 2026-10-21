@@ -22,8 +22,7 @@ import { currentCode, type RecordTrail } from "./record-trail";
  */
 
 export type DesktopResource =
-  | { kind: "destination"; id: string }
-  | { kind: "record"; code: string };
+  { kind: "destination"; id: string } | { kind: "record"; code: string };
 
 export type RouteMatch =
   | { kind: "root" }
@@ -113,13 +112,16 @@ export function focusedResource(
 ): DesktopResource | null {
   if (windows.length === 0) return null;
   const visible = windows.filter((item) => !item.minimized);
-  const focused = visible.find((item) => item.id === lastFocused)
-    ?? [...visible].sort((a, b) => b.z - a.z)[0];
+  const focused =
+    visible.find((item) => item.id === lastFocused) ??
+    [...visible].sort((a, b) => b.z - a.z)[0];
   if (!focused) return null;
 
   if (focused.id === "reader") {
     const code = currentCode(trail);
     return code === null ? null : { kind: "record", code };
   }
-  return isDestinationId(focused.id) ? { kind: "destination", id: focused.id } : null;
+  return isDestinationId(focused.id)
+    ? { kind: "destination", id: focused.id }
+    : null;
 }

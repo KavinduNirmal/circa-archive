@@ -20,14 +20,14 @@ CIRCA Archive is in pre-release development. `ARCHITECTURE.md` is a draft, and s
 
 `develop` is the default branch and the integration point for ordinary work. `main` contains released code. Do not commit directly to either branch.
 
-| Branch | Use |
-| --- | --- |
-| `feature/<topic>` | New behavior or a substantial enhancement |
-| `fix/<topic>` | A defect fix |
-| `docs/<topic>` | Documentation or specification changes |
-| `chore/<topic>` | Tooling, dependencies, and repository maintenance |
-| `release/<version>` | Release preparation, cut from `develop` |
-| `hotfix/<version>` | Urgent production fix, cut from `main` |
+| Branch              | Use                                               |
+| ------------------- | ------------------------------------------------- |
+| `feature/<topic>`   | New behavior or a substantial enhancement         |
+| `fix/<topic>`       | A defect fix                                      |
+| `docs/<topic>`      | Documentation or specification changes            |
+| `chore/<topic>`     | Tooling, dependencies, and repository maintenance |
+| `release/<version>` | Release preparation, cut from `develop`           |
+| `hotfix/<version>`  | Urgent production fix, cut from `main`            |
 
 Branch from `develop` for the first four. Release and hotfix branches are maintainer-owned. Open ordinary pull requests against `develop`; see [docs/GITFLOW.md](docs/GITFLOW.md) for the complete release and hotfix procedure.
 

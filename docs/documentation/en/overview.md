@@ -20,7 +20,6 @@ It describes the repository, not the fiction. The archive's own reading guide is
 - [Contribute](contributing.md) — One coherent change, the checks that prove it, and a pull request that says what you verified.
 ```
 
-
 ## The two editions
 
 One corpus, three surfaces. A change to a record or an index entry appears wherever that record is read.

@@ -1,7 +1,17 @@
-import { ARCHIVE_INDEX, CLASS_LABELS, STATUS_LABELS, type ArchiveEntry } from "../browser/archive-index";
+import {
+  ARCHIVE_INDEX,
+  CLASS_LABELS,
+  STATUS_LABELS,
+  type ArchiveEntry,
+} from "../browser/archive-index";
 import { recordSections, recordSource } from "./record-sources";
 import { RecordMarkdown } from "./record-markdown";
-import { sectionIndex, type ReaderBlock, type ReaderSection, type RecordDocument } from "./reader-model";
+import {
+  sectionIndex,
+  type ReaderBlock,
+  type ReaderSection,
+  type RecordDocument,
+} from "./reader-model";
 
 /**
  * The record service, stood in for.
@@ -28,7 +38,8 @@ import { sectionIndex, type ReaderBlock, type ReaderSection, type RecordDocument
 /** What the withheld block says in the rail and on the sheet. */
 export const READER_HELD_LABEL = "Held at the desk";
 
-const HELD_NOTE = "The filing itself is not released. Only the index entry is on the screen.";
+const HELD_NOTE =
+  "The filing itself is not released. Only the index entry is on the screen.";
 
 /**
  * Section names by class, used for every record whose body is held. A memo is
@@ -48,7 +59,9 @@ const SECTION_NAMES: Record<ArchiveEntry["klass"], readonly string[]> = {
  * is sealed, so the section exists in the source and the sheet renders the
  * withheld shape in its place rather than the prose the author wrote.
  */
-const WITHHELD_SECTIONS: Readonly<Record<string, readonly { heading: string; label: string; note: string }[]>> = {
+const WITHHELD_SECTIONS: Readonly<
+  Record<string, readonly { heading: string; label: string; note: string }[]>
+> = {
   "INC-00042": [
     {
       heading: "Disposition",
@@ -59,7 +72,10 @@ const WITHHELD_SECTIONS: Readonly<Record<string, readonly { heading: string; lab
 };
 
 function slug(heading: string): string {
-  return heading.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+  return heading
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
 }
 
 /** The entry's own facts, laid out as the labelled block the opening section carries. */
@@ -90,7 +106,12 @@ function filedSections(entry: ArchiveEntry): ReaderSection[] {
     const withheld = held.find((item) => item.heading === section.heading);
     const blocks: ReaderBlock[] = [];
     if (position === 0) blocks.push(fieldsBlock(entry));
-    if (withheld) blocks.push({ kind: "withheld", label: withheld.label, note: withheld.note });
+    if (withheld)
+      blocks.push({
+        kind: "withheld",
+        label: withheld.label,
+        note: withheld.note,
+      });
     return {
       id: slug(section.heading),
       index: sectionIndex(position),
@@ -120,7 +141,9 @@ function heldSections(entry: ArchiveEntry): ReaderSection[] {
       index: sectionIndex(position),
       heading,
       withheld: true,
-      blocks: [{ kind: "withheld", label: READER_HELD_LABEL, note: HELD_NOTE }] satisfies readonly ReaderBlock[],
+      blocks: [
+        { kind: "withheld", label: READER_HELD_LABEL, note: HELD_NOTE },
+      ] satisfies readonly ReaderBlock[],
     };
   });
 }
@@ -162,7 +185,9 @@ export function RecordFilingBody({ section }: { section: ReaderSection }) {
     <>
       <h2 className="reader-section-heading">{section.heading}</h2>
       {section.source ? <RecordMarkdown source={section.source} /> : null}
-      {section.blocks.map((block, position) => <FilingBlock key={position} block={block} />)}
+      {section.blocks.map((block, position) => (
+        <FilingBlock key={position} block={block} />
+      ))}
     </>
   );
 }
@@ -175,7 +200,9 @@ function FilingBlock({ block }: { block: ReaderBlock }) {
           {block.rows.map((row) => (
             <div className="reader-field" key={row.label}>
               <dt>{row.label}</dt>
-              <dd className={row.mono ? "circa-mono" : undefined}>{row.value}</dd>
+              <dd className={row.mono ? "circa-mono" : undefined}>
+                {row.value}
+              </dd>
             </div>
           ))}
         </dl>
@@ -183,10 +210,18 @@ function FilingBlock({ block }: { block: ReaderBlock }) {
     case "withheld":
       return (
         <div className="reader-withheld">
-          <span className="reader-withheld-stamp circa-label">{block.label}</span>
+          <span className="reader-withheld-stamp circa-label">
+            {block.label}
+          </span>
           {/* The redaction is drawn rather than typed, the way the index draws a withheld name. */}
-          <span className="reader-withheld-bars" role="img" aria-label={block.label}>
-            <span /><span /><span />
+          <span
+            className="reader-withheld-bars"
+            role="img"
+            aria-label={block.label}
+          >
+            <span />
+            <span />
+            <span />
           </span>
           <p className="reader-withheld-note">{block.note}</p>
         </div>

@@ -44,7 +44,9 @@ export function SectionBand({
           <h2 id={id}>{title}</h2>
           {/* With no lede there is nothing to sit beside, so the door belongs
               under the title rather than floating at the far right. */}
-          {action && !lede ? <div className="meta-band-action">{action}</div> : null}
+          {action && !lede ? (
+            <div className="meta-band-action">{action}</div>
+          ) : null}
         </div>
         {lede ? (
           <div className="meta-band-aside">
@@ -72,7 +74,10 @@ export function SpecimenCard() {
         <p>{t("specimenText")}</p>
       </blockquote>
       <footer className="meta-specimen-foot">
-        <Link className="meta-specimen-link" href={`/site/records/${t("specimenCode")}`}>
+        <Link
+          className="meta-specimen-link"
+          href={`/site/records/${t("specimenCode")}`}
+        >
           {t("specimenLink")}
           <ArrowRight size={15} aria-hidden="true" />
         </Link>
@@ -108,7 +113,11 @@ export function EditionCards() {
   return (
     <div className="meta-editions">
       {EDITIONS.map((edition) => (
-        <article className="meta-edition" data-tone={edition.tone} key={edition.tone}>
+        <article
+          className="meta-edition"
+          data-tone={edition.tone}
+          key={edition.tone}
+        >
           <p className="meta-edition-figure" aria-hidden="true">
             {t(edition.index)}
           </p>

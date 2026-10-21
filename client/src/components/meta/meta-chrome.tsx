@@ -63,7 +63,11 @@ export async function MetaChrome({
         </div>
       </div>
 
-      <MetaNav labels={navLabels} groups={groups} repositoryUrl={PROJECT_LINKS.repository} />
+      <MetaNav
+        labels={navLabels}
+        groups={groups}
+        repositoryUrl={PROJECT_LINKS.repository}
+      />
 
       <main id="meta-content">
         <div className="meta-frame">{children}</div>
@@ -91,10 +95,14 @@ export async function MetaChrome({
                   <Link href="/meta/documentation">{t("footerDocsTitle")}</Link>
                 </li>
                 <li>
-                  <Link href={docHref("contributing")}>{t("docsContributingNav")}</Link>
+                  <Link href={docHref("contributing")}>
+                    {t("docsContributingNav")}
+                  </Link>
                 </li>
                 <li>
-                  <Link href="/meta/about#questions">{t("footerQuestions")}</Link>
+                  <Link href="/meta/about#questions">
+                    {t("footerQuestions")}
+                  </Link>
                 </li>
               </ul>
             </div>
@@ -109,7 +117,9 @@ export async function MetaChrome({
                   <Link href="/site/records">{t("footerRecords")}</Link>
                 </li>
                 <li>
-                  <Link href="/site/organizations">{t("footerOrganizations")}</Link>
+                  <Link href="/site/organizations">
+                    {t("footerOrganizations")}
+                  </Link>
                 </li>
                 <li>
                   <Link href="/desktop">{t("footerWorkstation")}</Link>
@@ -147,7 +157,10 @@ export async function MetaChrome({
 
         <div className="meta-shell meta-footer-legal">
           <p className="meta-footer-fiction">{t("footerFiction")}</p>
-          <nav className="meta-footer-legal-links" aria-label={t("footerLegalNav")}>
+          <nav
+            className="meta-footer-legal-links"
+            aria-label={t("footerLegalNav")}
+          >
             <a href={LICENCES.code.href} {...EXTERNAL}>
               {t("footerCodeLicence")}
             </a>
@@ -163,7 +176,6 @@ export async function MetaChrome({
           <p className="meta-footer-copy">{t("footerCopyright")}</p>
         </div>
       </footer>
-
     </div>
   );
 }

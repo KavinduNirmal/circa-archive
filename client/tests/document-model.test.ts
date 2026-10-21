@@ -59,20 +59,32 @@ describe("inline markup", () => {
 
 describe("line prefixes", () => {
   it("adds a heading marker to the line the caret is on", () => {
-    const result = applyChange(text("Black dog\nsecond line"), { start: 3, end: 3 }, "heading1");
+    const result = applyChange(
+      text("Black dog\nsecond line"),
+      { start: 3, end: 3 },
+      "heading1",
+    );
     expect(result.text).toBe("# Black dog\nsecond line");
     expect(result.selection).toEqual({ start: 5, end: 5 });
   });
 
   it("replaces an existing heading rather than stacking markers", () => {
-    const result = applyChange(text("## Black dog"), { start: 4, end: 4 }, "heading1");
+    const result = applyChange(
+      text("## Black dog"),
+      { start: 4, end: 4 },
+      "heading1",
+    );
     expect(result.text).toBe("# Black dog");
     // Dropping the extra `#` moves the caret one place left with the line.
     expect(result.selection).toEqual({ start: 3, end: 3 });
   });
 
   it("removes the marker when the line already has it", () => {
-    const result = applyChange(text("# Black dog"), { start: 4, end: 4 }, "heading1");
+    const result = applyChange(
+      text("# Black dog"),
+      { start: 4, end: 4 },
+      "heading1",
+    );
     expect(result.text).toBe("Black dog");
     expect(result.selection).toEqual({ start: 2, end: 2 });
   });
@@ -85,7 +97,11 @@ describe("line prefixes", () => {
   });
 
   it("numbers a list from one", () => {
-    const result = applyChange(text("one\ntwo"), { start: 0, end: 7 }, "numbers");
+    const result = applyChange(
+      text("one\ntwo"),
+      { start: 0, end: 7 },
+      "numbers",
+    );
     expect(result.text).toBe("1. one\n1. two");
   });
 
@@ -104,7 +120,11 @@ describe("line prefixes", () => {
 
 describe("block insertions", () => {
   it("fences the selection as a code block on its own lines", () => {
-    const result = applyChange(text("const a = 1;"), { start: 0, end: 12 }, "codeblock");
+    const result = applyChange(
+      text("const a = 1;"),
+      { start: 0, end: 12 },
+      "codeblock",
+    );
     expect(result.text).toBe("```\nconst a = 1;\n```");
   });
 
@@ -125,7 +145,12 @@ describe("block insertions", () => {
 
 describe("link and image insertions", () => {
   it("wraps the selection as link text and leaves the caret in the address", () => {
-    const result = applyChange(text("see the brief"), { start: 4, end: 15 }, "link", "https://archive.local/x");
+    const result = applyChange(
+      text("see the brief"),
+      { start: 4, end: 15 },
+      "link",
+      "https://archive.local/x",
+    );
     expect(result.text).toBe("see [the brief](https://archive.local/x)");
     // With an address supplied the caret lands after it, ready for the next word.
     expect(result.selection).toEqual({ start: 40, end: 40 });
@@ -138,7 +163,12 @@ describe("link and image insertions", () => {
   });
 
   it("inserts an image with alt text from the selection", () => {
-    const result = applyChange(text("map"), { start: 0, end: 3 }, "image", "/icons/map.png");
+    const result = applyChange(
+      text("map"),
+      { start: 0, end: 3 },
+      "image",
+      "/icons/map.png",
+    );
     expect(result.text).toBe("![map](/icons/map.png)");
   });
 
@@ -151,7 +181,8 @@ describe("link and image insertions", () => {
 });
 
 describe("what the caret is sitting in", () => {
-  const active = (text: string, position = text.length) => detectActive(text, { start: position, end: position });
+  const active = (text: string, position = text.length) =>
+    detectActive(text, { start: position, end: position });
 
   it("reports the inline markers that enclose the caret", () => {
     expect(active("say **bravo** now", 7)).toContain("bold");
@@ -186,7 +217,12 @@ describe("statistics", () => {
   });
 
   it("counts an empty document as no lines rather than one", () => {
-    expect(textStats("")).toEqual({ words: 0, lines: 0, characters: 0, paragraphs: 0 });
+    expect(textStats("")).toEqual({
+      words: 0,
+      lines: 0,
+      characters: 0,
+      paragraphs: 0,
+    });
   });
 
   it("ignores whitespace-only text when counting words", () => {
@@ -194,7 +230,9 @@ describe("statistics", () => {
   });
 
   it("formats the status bar's count cell", () => {
-    expect(formatCounts(textStats("one two three"))).toBe("3 words, 1 line, 13 characters");
+    expect(formatCounts(textStats("one two three"))).toBe(
+      "3 words, 1 line, 13 characters",
+    );
     expect(formatCounts(textStats("one"))).toBe("1 word, 1 line, 3 characters");
   });
 });

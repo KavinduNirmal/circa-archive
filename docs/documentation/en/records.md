@@ -41,18 +41,18 @@ A free-standing door in a pasture in Gangwon Province.
 
 The frontmatter is parsed and kept as metadata. The archive index remains the source of truth for the catalogue, so a record's body can disagree with its own header — one intentionally does. The pipeline reports the disagreement rather than reconciling it.
 
-| Field | Meaning |
-| --- | --- |
-| `circa_code` | the record code this filing is cited by. |
-| `incident_ref` | the incident the filing belongs to. |
-| `title` | the title printed on the sheet. |
-| `type` | DISCOVERY, INCIDENT, EXPLORATION, or RUMOR. |
-| `status` | the filing state as the document declares it. |
-| `severity` | S, A, or B — the classification's severity. |
-| `originator` | the name on the byline. |
-| `filed_date` | ISO filing day and last revision day. |
+| Field            | Meaning                                         |
+| ---------------- | ----------------------------------------------- |
+| `circa_code`     | the record code this filing is cited by.        |
+| `incident_ref`   | the incident the filing belongs to.             |
+| `title`          | the title printed on the sheet.                 |
+| `type`           | DISCOVERY, INCIDENT, EXPLORATION, or RUMOR.     |
+| `status`         | the filing state as the document declares it.   |
+| `severity`       | S, A, or B — the classification's severity.     |
+| `originator`     | the name on the byline.                         |
+| `filed_date`     | ISO filing day and last revision day.           |
 | `classification` | the access level and the clearance it requires. |
-| `related / tags` | cross-references and labels; both are lists. |
+| `related / tags` | cross-references and labels; both are lists.    |
 
 ## Sections and anchors
 
@@ -69,12 +69,12 @@ Record names are set as filing titles; the prose is set in a typed face. There i
 
 The corpus extends GFM with four conventions. Each one is handled by the shared pipeline, so every renderer agrees about it.
 
-| Convention | Result |
-| --- | --- |
-| `\|\|text\|\|` | a redaction, held behind paper until the reader opens it. |
-| `![right\|caption](path)` | a figure with an alignment (left, right, full) and a caption. |
-| `> quote` | a blockquote; the filings use it for correspondence and notices. |
-| `\| table \|` | a GFM table. Redactions work inside cells because rows are repaired before parsing. |
+| Convention                | Result                                                                              |
+| ------------------------- | ----------------------------------------------------------------------------------- |
+| `\|\|text\|\|`            | a redaction, held behind paper until the reader opens it.                           |
+| `![right\|caption](path)` | a figure with an alignment (left, right, full) and a caption.                       |
+| `> quote`                 | a blockquote; the filings use it for correspondence and notices.                    |
+| `\| table \|`             | a GFM table. Redactions work inside cells because rows are repaired before parsing. |
 
 Raw HTML is not passed through: a script element in a record is text, and enabling raw HTML would make the archive's own syntax legend live markup.
 

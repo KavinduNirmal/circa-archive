@@ -36,6 +36,9 @@ export const remarkHeadingIds: Plugin<[], Root> = () => (tree) => {
     const count = seen.get(base) ?? 0;
     seen.set(base, count + 1);
     const id = count === 0 ? base : `${base}-${count}`;
-    node.data = { ...(node.data ?? {}), hProperties: { ...(node.data?.hProperties ?? {}), id } };
+    node.data = {
+      ...(node.data ?? {}),
+      hProperties: { ...(node.data?.hProperties ?? {}), id },
+    };
   });
 };

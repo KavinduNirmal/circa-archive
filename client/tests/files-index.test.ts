@@ -29,12 +29,55 @@ import {
  * helpers are exercised in isolation. `f` is the root, `a` a folder inside it,
  * and `b` the empty folder that makes the depth checks meaningful.
  */
-const FOLDER: FileNode = { id: "a", name: "Alpha", kind: "folder", parent: "f", opened: "2003-01-02 08:00", note: "A folder." };
-const EMPTY: FileNode = { id: "b", name: "Blank", kind: "folder", parent: "a", opened: "1999-12-31 23:50" };
-const PDF: FileNode = { id: "c", name: "CASE_BRIEF.pdf", kind: "file", ext: "pdf", parent: "f", size: 412, modified: "2003-02-10 14:05" };
-const TXT: FileNode = { id: "d", name: "zulu.txt", kind: "file", ext: "txt", parent: "f", size: 9, modified: "2003-02-11 09:15" };
-const EML: FileNode = { id: "e", name: "LOG-002_ORG-B.eml", kind: "file", ext: "eml", parent: "f", size: 1024, modified: "2000-06-05 11:00" };
-const ROOT: FileNode = { id: "f", name: "Root", kind: "folder", parent: null, opened: "2003-02-11 08:00" };
+const FOLDER: FileNode = {
+  id: "a",
+  name: "Alpha",
+  kind: "folder",
+  parent: "f",
+  opened: "2003-01-02 08:00",
+  note: "A folder.",
+};
+const EMPTY: FileNode = {
+  id: "b",
+  name: "Blank",
+  kind: "folder",
+  parent: "a",
+  opened: "1999-12-31 23:50",
+};
+const PDF: FileNode = {
+  id: "c",
+  name: "CASE_BRIEF.pdf",
+  kind: "file",
+  ext: "pdf",
+  parent: "f",
+  size: 412,
+  modified: "2003-02-10 14:05",
+};
+const TXT: FileNode = {
+  id: "d",
+  name: "zulu.txt",
+  kind: "file",
+  ext: "txt",
+  parent: "f",
+  size: 9,
+  modified: "2003-02-11 09:15",
+};
+const EML: FileNode = {
+  id: "e",
+  name: "LOG-002_ORG-B.eml",
+  kind: "file",
+  ext: "eml",
+  parent: "f",
+  size: 1024,
+  modified: "2000-06-05 11:00",
+};
+const ROOT: FileNode = {
+  id: "f",
+  name: "Root",
+  kind: "folder",
+  parent: null,
+  opened: "2003-02-11 08:00",
+};
 const CANVAS: readonly FileNode[] = [ROOT, FOLDER, EMPTY, PDF, TXT, EML];
 
 describe("file tree lookups", () => {
@@ -42,14 +85,21 @@ describe("file tree lookups", () => {
     expect(nodeById("c", CANVAS)?.name).toBe("CASE_BRIEF.pdf");
     expect(nodeById("missing", CANVAS)).toBeUndefined();
     expect(pathOf("c", CANVAS)).toEqual(["f"]);
-    expect(breadcrumbOf("c", CANVAS)?.map((node) => node.name)).toEqual(["Root", "CASE_BRIEF.pdf"]);
+    expect(breadcrumbOf("c", CANVAS)?.map((node) => node.name)).toEqual([
+      "Root",
+      "CASE_BRIEF.pdf",
+    ]);
     expect(pathOf("b", CANVAS)).toEqual(["f", "a"]);
     expect(pathOf("f", CANVAS)).toEqual([]);
     expect(breadcrumbOf("nope", CANVAS)).toBeUndefined();
   });
 
   it("lists a folder's children and counts what they are", () => {
-    expect(childrenOf("f", CANVAS).map((node) => node.id).sort()).toEqual(["a", "c", "d", "e"]);
+    expect(
+      childrenOf("f", CANVAS)
+        .map((node) => node.id)
+        .sort(),
+    ).toEqual(["a", "c", "d", "e"]);
     expect(childrenOf("b", CANVAS)).toEqual([]);
     expect(folderCounts("f", CANVAS)).toEqual({ folders: 1, files: 3 });
     expect(childrenOf("b", CANVAS).filter(isFolder)).toEqual([]);
@@ -69,8 +119,14 @@ describe("file tree lookups", () => {
 const files = translatorFor("files");
 
 describe("sorting", () => {
-  const ids = (view: FileView, key: "name" | "type" | "size" | "modified", direction: "ascending" | "descending") =>
-    sortNodes(childrenOf("f", CANVAS), key, direction, view, files, CANVAS).map((node) => node.id);
+  const ids = (
+    view: FileView,
+    key: "name" | "type" | "size" | "modified",
+    direction: "ascending" | "descending",
+  ) =>
+    sortNodes(childrenOf("f", CANVAS), key, direction, view, files, CANVAS).map(
+      (node) => node.id,
+    );
 
   it("orders names and reverses only the files when the direction flips", () => {
     expect(ids("details", "name", "ascending")).toEqual(["a", "c", "e", "d"]);
@@ -80,8 +136,18 @@ describe("sorting", () => {
   it("orders by type, size, and modified", () => {
     expect(ids("details", "type", "ascending")).toEqual(["a", "e", "c", "d"]);
     expect(ids("details", "size", "ascending")).toEqual(["a", "d", "c", "e"]);
-    expect(ids("details", "modified", "ascending")).toEqual(["a", "e", "c", "d"]);
-    expect(ids("details", "modified", "descending")).toEqual(["a", "d", "c", "e"]);
+    expect(ids("details", "modified", "ascending")).toEqual([
+      "a",
+      "e",
+      "c",
+      "d",
+    ]);
+    expect(ids("details", "modified", "descending")).toEqual([
+      "a",
+      "d",
+      "c",
+      "e",
+    ]);
   });
 
   it("keeps the stored order in the views that have no column headers to sort by", () => {
@@ -98,7 +164,9 @@ describe("selection and tri-state", () => {
    */
   it("reads checked, unchecked, and mixed from the branch below a folder", () => {
     expect(selectionState("f", [], CANVAS)).toBe("unchecked");
-    expect(selectionState("f", ["a", "b", "c", "d", "e"], CANVAS)).toBe("checked");
+    expect(selectionState("f", ["a", "b", "c", "d", "e"], CANVAS)).toBe(
+      "checked",
+    );
     expect(selectionState("f", ["a", "c", "d", "e"], CANVAS)).toBe("mixed");
     expect(selectionState("a", [], CANVAS)).toBe("unchecked");
     expect(selectionState("a", ["b"], CANVAS)).toBe("checked");
@@ -123,12 +191,36 @@ describe("type and size presentation", () => {
     expect(fileTypeOf(PDF, files)).toBe("Record document");
     expect(fileTypeOf(EML, files)).toBe("Filed email");
     expect(fileTypeOf(FOLDER, files)).toBe("File folder");
-    expect(fileTypeOf({ id: "x", name: "X.weird", kind: "file", ext: "weird" as never, parent: null, size: 1, modified: "2003-01-01 00:00" }, files))
-      .toBe("Unregistered file");
+    expect(
+      fileTypeOf(
+        {
+          id: "x",
+          name: "X.weird",
+          kind: "file",
+          ext: "weird" as never,
+          parent: null,
+          size: 1,
+          modified: "2003-01-01 00:00",
+        },
+        files,
+      ),
+    ).toBe("Unregistered file");
     // The two unreadable cases stay distinct: one is a known orphan, the other an
     // extension the table has never heard of.
-    expect(fileTypeOf({ id: "y", name: "ORPHAN.bin", kind: "file", ext: "bin", parent: null, size: 1, modified: "2003-01-01 00:00" }, files))
-      .toBe("Unreadable binary");
+    expect(
+      fileTypeOf(
+        {
+          id: "y",
+          name: "ORPHAN.bin",
+          kind: "file",
+          ext: "bin",
+          parent: null,
+          size: 1,
+          modified: "2003-01-01 00:00",
+        },
+        files,
+      ),
+    ).toBe("Unreadable binary");
   });
 
   it("describes a node for the status bar", () => {
@@ -160,7 +252,9 @@ describe("the shipped tree and its scopes", () => {
   it("keeps every child's parent pointing back at a real folder", () => {
     const byId = new Map(FILE_TREE.map((node) => [node.id, node]));
     for (const node of FILE_TREE) {
-      expect(new Set(FILE_TREE.map((item) => item.id)).size).toBe(FILE_TREE.length);
+      expect(new Set(FILE_TREE.map((item) => item.id)).size).toBe(
+        FILE_TREE.length,
+      );
       if (node.parent === null) continue;
       const parent = byId.get(node.parent);
       expect(parent, `${node.id} has no parent`).toBeDefined();
@@ -177,11 +271,17 @@ describe("the shipped tree and its scopes", () => {
       if (node.kind === "file") {
         expect(node.ext, `${node.id} has no extension`).toBeDefined();
         expect(node.size, `${node.id} has no size`).toBeGreaterThan(0);
-        expect(node.modified, `${node.id} has no modified stamp`).toMatch(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/);
+        expect(node.modified, `${node.id} has no modified stamp`).toMatch(
+          /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/,
+        );
         expect(node.ext, `${node.id} is a file with no extension`).toBeTruthy();
       } else {
-        expect("ext" in node, `${node.id} is a folder with an extension`).toBe(false);
-        expect(node.opened, `${node.id} has no opened stamp`).toMatch(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/);
+        expect("ext" in node, `${node.id} is a folder with an extension`).toBe(
+          false,
+        );
+        expect(node.opened, `${node.id} has no opened stamp`).toMatch(
+          /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/,
+        );
       }
     }
   });
@@ -192,14 +292,20 @@ describe("the shipped tree and its scopes", () => {
     const cases = childrenOf("dir-archive", FILE_TREE);
     expect(cases.length).toBeGreaterThan(4);
     expect(cases.every((node) => depth(node) === 3)).toBe(true);
-    const inside = FILE_TREE.filter((node) => cases.some((root) => isWithin(node.id, root.id, FILE_TREE)));
+    const inside = FILE_TREE.filter((node) =>
+      cases.some((root) => isWithin(node.id, root.id, FILE_TREE)),
+    );
     // Two levels at most: the case root's own children, and one nested folder's children.
     expect(inside.every((node) => depth(node) <= 5)).toBe(true);
     expect(inside.some((node) => depth(node) === 5)).toBe(true);
     // Evidence stays flat on the case root rather than being filed away.
-    const evidence = inside.filter((node) => !isFolder(node) && (node.ext === "jpg" || node.ext === "png"));
+    const evidence = inside.filter(
+      (node) => !isFolder(node) && (node.ext === "jpg" || node.ext === "png"),
+    );
     expect(evidence.length).toBeGreaterThan(0);
-    expect(evidence.every((node) => cases.some((root) => node.parent === root.id))).toBe(true);
+    expect(
+      evidence.every((node) => cases.some((root) => node.parent === root.id)),
+    ).toBe(true);
   });
 
   it("routes each scope to a folder that exists and contains what it promises", () => {

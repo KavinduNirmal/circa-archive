@@ -21,7 +21,11 @@ function type(state: EditorState, value: string): EditorState {
   return [...value].reduce((current, character) => {
     const text = `${current.present.slice(0, current.selection.start)}${character}${current.present.slice(current.selection.end)}`;
     const caret = current.selection.start + 1;
-    return editorReducer(current, { type: "change", text, selection: { start: caret, end: caret } });
+    return editorReducer(current, {
+      type: "change",
+      text,
+      selection: { start: caret, end: caret },
+    });
   }, state);
 }
 
@@ -37,14 +41,32 @@ describe("derived state", () => {
   });
 
   it("reports the caret's line and column from the text", () => {
-    expect(cursorPosition("one\ntwo", { start: 0, end: 0 })).toEqual({ line: 1, column: 1 });
-    expect(cursorPosition("one\ntwo", { start: 6, end: 6 })).toEqual({ line: 2, column: 3 });
-    expect(cursorPosition("", { start: 0, end: 0 })).toEqual({ line: 1, column: 1 });
+    expect(cursorPosition("one\ntwo", { start: 0, end: 0 })).toEqual({
+      line: 1,
+      column: 1,
+    });
+    expect(cursorPosition("one\ntwo", { start: 6, end: 6 })).toEqual({
+      line: 2,
+      column: 3,
+    });
+    expect(cursorPosition("", { start: 0, end: 0 })).toEqual({
+      line: 1,
+      column: 1,
+    });
   });
 
   it("counts the document for the status bar", () => {
-    const state = run({ type: "change", text: "one two\nthree", selection: { start: 13, end: 13 } });
-    expect(editorStats(state)).toEqual({ words: 3, lines: 2, characters: 13, paragraphs: 1 });
+    const state = run({
+      type: "change",
+      text: "one two\nthree",
+      selection: { start: 13, end: 13 },
+    });
+    expect(editorStats(state)).toEqual({
+      words: 3,
+      lines: 2,
+      characters: 13,
+      paragraphs: 1,
+    });
   });
 });
 
@@ -71,7 +93,11 @@ describe("typing and undo", () => {
   it("starts a new undo step when the document is edited away from the caret", () => {
     const typed = type(initialState(), "one two");
     // A paste at the front is not a keystroke, so it keeps its own step.
-    const pasted = editorReducer(typed, { type: "change", text: "zero one two", selection: { start: 4, end: 4 } });
+    const pasted = editorReducer(typed, {
+      type: "change",
+      text: "zero one two",
+      selection: { start: 4, end: 4 },
+    });
     expect(pasted.past).toHaveLength(2);
     expect(editorReducer(pasted, { type: "undo" }).present).toBe("one two");
   });
@@ -89,7 +115,11 @@ describe("typing and undo", () => {
     for (let index = 0; index < HISTORY_LIMIT + 20; index += 1) {
       const text = state.present + "x";
       const caret = text.length;
-      state = editorReducer(state, { type: "change", text: `\n${index} ${text}`, selection: { start: caret + 4, end: caret + 4 } });
+      state = editorReducer(state, {
+        type: "change",
+        text: `\n${index} ${text}`,
+        selection: { start: caret + 4, end: caret + 4 },
+      });
     }
     expect(state.past.length).toBeLessThanOrEqual(HISTORY_LIMIT);
   });
@@ -97,10 +127,20 @@ describe("typing and undo", () => {
 
 describe("the typing window", () => {
   /** Types one character at a known time, the way a keyboard delivers it. */
-  function keystroke(state: EditorState, at: number, character: string, position = state.selection.end): EditorState {
+  function keystroke(
+    state: EditorState,
+    at: number,
+    character: string,
+    position = state.selection.end,
+  ): EditorState {
     const text = `${state.present.slice(0, position)}${character}${state.present.slice(position)}`;
     const caret = position + 1;
-    return editorReducer(state, { type: "change", text, selection: { start: caret, end: caret }, at });
+    return editorReducer(state, {
+      type: "change",
+      text,
+      selection: { start: caret, end: caret },
+      at,
+    });
   }
 
   it("merges keystrokes inside the window into one undo step", () => {
@@ -120,7 +160,10 @@ describe("the typing window", () => {
 
   it("starts a new step after a tool press", () => {
     let state = keystroke(initialState(), 1_000, "one");
-    state = editorReducer(state, { type: "selection", selection: { start: 0, end: 3 } });
+    state = editorReducer(state, {
+      type: "selection",
+      selection: { start: 0, end: 3 },
+    });
     state = editorReducer(state, { type: "tool", tool: "bold" });
     const afterTool = state.past.length;
     state = keystroke(state, 1_050, "!");
@@ -132,7 +175,10 @@ describe("tools through the reducer", () => {
   it("applies a tool and reports the pressed state at the new caret", () => {
     // Type a word, select it, and make it bold.
     const typed = type(initialState(), "bravo");
-    const selected = editorReducer(typed, { type: "selection", selection: { start: 0, end: 5 } });
+    const selected = editorReducer(typed, {
+      type: "selection",
+      selection: { start: 0, end: 5 },
+    });
     const bolded = editorReducer(selected, { type: "tool", tool: "bold" });
     expect(bolded.present).toBe("**bravo**");
     expect(bolded.active).toContain("bold");
@@ -150,12 +196,23 @@ describe("tools through the reducer", () => {
     expect(heading.active).not.toContain("heading2");
     expect(heading.style).toBe("heading");
     // Moving the caret onto a plain line takes the style reading with it.
-    const moved = editorReducer(heading, { type: "change", text: `${heading.present}\nplain`, selection: { start: heading.present.length + 7, end: heading.present.length + 7 } });
+    const moved = editorReducer(heading, {
+      type: "change",
+      text: `${heading.present}\nplain`,
+      selection: {
+        start: heading.present.length + 7,
+        end: heading.present.length + 7,
+      },
+    });
     expect(moved.style).toBe("body");
   });
 
   it("reports a body line as body text and a heading as a heading", () => {
-    const body = run({ type: "change", text: "plain prose", selection: { start: 11, end: 11 } });
+    const body = run({
+      type: "change",
+      text: "plain prose",
+      selection: { start: 11, end: 11 },
+    });
     expect(body.style).toBe("body");
     // Switching a heading level replaces the marker instead of stacking one.
     const first = editorReducer(body, { type: "tool", tool: "heading2" });
@@ -167,11 +224,21 @@ describe("tools through the reducer", () => {
   });
 
   it("opens an address strip for a link, takes the address, and closes it", () => {
-    const selected = editorReducer(type(initialState(), "brief"), { type: "selection", selection: { start: 0, end: 5 } });
+    const selected = editorReducer(type(initialState(), "brief"), {
+      type: "selection",
+      selection: { start: 0, end: 5 },
+    });
     const asking = editorReducer(selected, { type: "address", tool: "link" });
     expect(asking.address).toEqual({ tool: "link", value: "" });
-    const filled = editorReducer(asking, { type: "addressValue", value: "https://archive.local/x" });
-    const linked = editorReducer(filled, { type: "tool", tool: "link", address: filled.address?.value });
+    const filled = editorReducer(asking, {
+      type: "addressValue",
+      value: "https://archive.local/x",
+    });
+    const linked = editorReducer(filled, {
+      type: "tool",
+      tool: "link",
+      address: filled.address?.value,
+    });
     expect(linked.present).toBe("[brief](https://archive.local/x)");
     expect(linked.address).toBeNull();
     // Cancelling the strip writes nothing into the document.
@@ -191,7 +258,10 @@ describe("tools through the reducer", () => {
   });
 
   it("keeps the view settings across a new document", () => {
-    const configured = run({ type: "size", size: "large" }, { type: "ruler", ruler: false });
+    const configured = run(
+      { type: "size", size: "large" },
+      { type: "ruler", ruler: false },
+    );
     const fresh = editorReducer(configured, { type: "new" });
     expect(fresh.size).toBe("large");
     expect(fresh.ruler).toBe(false);
@@ -210,6 +280,8 @@ describe("status reports", () => {
   });
 
   it("tracks where the caret is", () => {
-    expect(editorReducer(initialState(), { type: "focus", focused: true }).focused).toBe(true);
+    expect(
+      editorReducer(initialState(), { type: "focus", focused: true }).focused,
+    ).toBe(true);
   });
 });

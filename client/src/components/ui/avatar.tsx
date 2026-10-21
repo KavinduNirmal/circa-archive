@@ -10,23 +10,39 @@ import { cn } from "@/lib/utils";
  * pages pass no `src` at all: a profile picture fetched from someone else's
  * server would be a third-party request on a site that promises none.
  */
-function Avatar({ className, ...props }: React.ComponentProps<typeof AvatarPrimitive.Root>) {
+function Avatar({
+  className,
+  ...props
+}: React.ComponentProps<typeof AvatarPrimitive.Root>) {
   return (
     <AvatarPrimitive.Root
       data-slot="avatar"
-      className={cn("relative flex size-9 shrink-0 overflow-hidden rounded-full", className)}
+      className={cn(
+        "relative flex size-9 shrink-0 overflow-hidden rounded-full",
+        className,
+      )}
       {...props}
     />
   );
 }
 
-function AvatarImage({ className, ...props }: React.ComponentProps<typeof AvatarPrimitive.Image>) {
+function AvatarImage({
+  className,
+  ...props
+}: React.ComponentProps<typeof AvatarPrimitive.Image>) {
   return (
-    <AvatarPrimitive.Image data-slot="avatar-image" className={cn("aspect-square size-full", className)} {...props} />
+    <AvatarPrimitive.Image
+      data-slot="avatar-image"
+      className={cn("aspect-square size-full", className)}
+      {...props}
+    />
   );
 }
 
-function AvatarFallback({ className, ...props }: React.ComponentProps<typeof AvatarPrimitive.Fallback>) {
+function AvatarFallback({
+  className,
+  ...props
+}: React.ComponentProps<typeof AvatarPrimitive.Fallback>) {
   return (
     <AvatarPrimitive.Fallback
       data-slot="avatar-fallback"
@@ -45,10 +61,19 @@ function AvatarFallback({ className, ...props }: React.ComponentProps<typeof Ava
  * from the next.
  */
 function AvatarGroup({ className, ...props }: React.ComponentProps<"div">) {
-  return <div data-slot="avatar-group" className={cn("flex flex-row items-center -space-x-2", className)} {...props} />;
+  return (
+    <div
+      data-slot="avatar-group"
+      className={cn("flex flex-row items-center -space-x-2", className)}
+      {...props}
+    />
+  );
 }
 
-function AvatarGroupCount({ className, ...props }: React.ComponentProps<"div">) {
+function AvatarGroupCount({
+  className,
+  ...props
+}: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="avatar-group-count"

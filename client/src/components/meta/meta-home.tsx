@@ -3,7 +3,12 @@ import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { EXTERNAL, PROJECT_LINKS } from "./meta-links";
-import { EditionCards, RECORD_COUNT, SectionBand, SpecimenCard } from "./meta-parts";
+import {
+  EditionCards,
+  RECORD_COUNT,
+  SectionBand,
+  SpecimenCard,
+} from "./meta-parts";
 import { docHref } from "./docs/docs-topics";
 
 /**
@@ -16,7 +21,15 @@ import { docHref } from "./docs/docs-topics";
  * closing pitch: the record ends, and the footer answers what is left.
  */
 
-const STACK = ["Next.js 16", "React 19", "TypeScript", "Tailwind CSS 4", "next-intl", "remark", "Vitest"];
+const STACK = [
+  "Next.js 16",
+  "React 19",
+  "TypeScript",
+  "Tailwind CSS 4",
+  "next-intl",
+  "remark",
+  "Vitest",
+];
 
 const FLOW = [
   { step: "01", title: "flowSource", note: "flowSourceNote" },
@@ -60,7 +73,14 @@ export function MetaHome() {
         <div className="meta-hero-field" aria-hidden="true">
           <span className="meta-hero-dots meta-hero-dots-fine" />
           <span className="meta-hero-dots meta-hero-dots-coarse" />
-          <Image className="meta-hero-eye" src="/circa_snake_with_eye.svg" alt="" width={710} height={755} unoptimized />
+          <Image
+            className="meta-hero-eye"
+            src="/circa_snake_with_eye.svg"
+            alt=""
+            width={710}
+            height={755}
+            unoptimized
+          />
         </div>
 
         <div className="meta-shell meta-hero-grid">
@@ -81,7 +101,11 @@ export function MetaHome() {
                 {t("heroSecondary")}
                 <ArrowUpRight aria-hidden="true" size={14} />
               </Link>
-              <a className="meta-text-link" href={PROJECT_LINKS.repository} {...EXTERNAL}>
+              <a
+                className="meta-text-link"
+                href={PROJECT_LINKS.repository}
+                {...EXTERNAL}
+              >
                 {t("heroSource")}
                 <ArrowUpRight aria-hidden="true" size={13} />
               </a>
@@ -105,7 +129,11 @@ export function MetaHome() {
         </div>
       </section>
 
-      <section className="meta-section meta-section-first" id="premise" aria-labelledby="meta-premise-title">
+      <section
+        className="meta-section meta-section-first"
+        id="premise"
+        aria-labelledby="meta-premise-title"
+      >
         <div className="meta-shell">
           <SectionBand
             id="meta-premise-title"
@@ -137,7 +165,11 @@ export function MetaHome() {
         </div>
       </section>
 
-      <section className="meta-section" id="editions" aria-labelledby="meta-editions-title">
+      <section
+        className="meta-section"
+        id="editions"
+        aria-labelledby="meta-editions-title"
+      >
         <div className="meta-shell">
           <SectionBand
             id="meta-editions-title"
@@ -150,7 +182,11 @@ export function MetaHome() {
         </div>
       </section>
 
-      <section className="meta-section meta-docs-section" id="documentation" aria-labelledby="meta-docs-title">
+      <section
+        className="meta-section meta-docs-section"
+        id="documentation"
+        aria-labelledby="meta-docs-title"
+      >
         <div className="meta-shell">
           <SectionBand
             id="meta-docs-title"
@@ -172,9 +208,14 @@ export function MetaHome() {
                 <span className="meta-docs-pillar-folio">01</span>
                 <span className="meta-docs-pillar-tag">System Specs</span>
               </div>
-              <h3 className="meta-docs-pillar-title">{t("docsPillarArchTitle")}</h3>
+              <h3 className="meta-docs-pillar-title">
+                {t("docsPillarArchTitle")}
+              </h3>
               <p className="meta-docs-pillar-body">{t("docsPillarArchBody")}</p>
-              <Link className="meta-docs-pillar-link" href={docHref("architecture")}>
+              <Link
+                className="meta-docs-pillar-link"
+                href={docHref("architecture")}
+              >
                 <span>{t("docsPillarArchLink")}</span>
                 <ArrowRight aria-hidden="true" size={13} />
               </Link>
@@ -185,9 +226,16 @@ export function MetaHome() {
                 <span className="meta-docs-pillar-folio">02</span>
                 <span className="meta-docs-pillar-tag">Field Guide</span>
               </div>
-              <h3 className="meta-docs-pillar-title">{t("docsPillarAuthorTitle")}</h3>
-              <p className="meta-docs-pillar-body">{t("docsPillarAuthorBody")}</p>
-              <Link className="meta-docs-pillar-link" href={docHref("author-guide")}>
+              <h3 className="meta-docs-pillar-title">
+                {t("docsPillarAuthorTitle")}
+              </h3>
+              <p className="meta-docs-pillar-body">
+                {t("docsPillarAuthorBody")}
+              </p>
+              <Link
+                className="meta-docs-pillar-link"
+                href={docHref("author-guide")}
+              >
                 <span>{t("docsPillarAuthorLink")}</span>
                 <ArrowRight aria-hidden="true" size={13} />
               </Link>
@@ -198,7 +246,9 @@ export function MetaHome() {
                 <span className="meta-docs-pillar-folio">03</span>
                 <span className="meta-docs-pillar-tag">Universe Canon</span>
               </div>
-              <h3 className="meta-docs-pillar-title">{t("docsPillarLoreTitle")}</h3>
+              <h3 className="meta-docs-pillar-title">
+                {t("docsPillarLoreTitle")}
+              </h3>
               <p className="meta-docs-pillar-body">{t("docsPillarLoreBody")}</p>
               <Link className="meta-docs-pillar-link" href={docHref("lore")}>
                 <span>{t("docsPillarLoreLink")}</span>
@@ -209,7 +259,11 @@ export function MetaHome() {
         </div>
       </section>
 
-      <section className="meta-section" id="built" aria-labelledby="meta-built-title">
+      <section
+        className="meta-section"
+        id="built"
+        aria-labelledby="meta-built-title"
+      >
         <div className="meta-shell">
           <SectionBand
             id="meta-built-title"
@@ -243,14 +297,21 @@ export function MetaHome() {
             {STACK.join(" · ")}
           </p>
 
-          <Link className="meta-text-link meta-section-link" href={docHref("rendering")}>
+          <Link
+            className="meta-text-link meta-section-link"
+            href={docHref("rendering")}
+          >
             {t("builtDocsLink")}
             <ArrowRight aria-hidden="true" size={14} />
           </Link>
         </div>
       </section>
 
-      <section className="meta-section" id="contribute" aria-labelledby="meta-contribute-title">
+      <section
+        className="meta-section"
+        id="contribute"
+        aria-labelledby="meta-contribute-title"
+      >
         <div className="meta-shell">
           <SectionBand
             id="meta-contribute-title"
@@ -277,7 +338,11 @@ export function MetaHome() {
               <span aria-hidden="true">$</span>
               <code>{t("stepChecksCommand")}</code>
             </p>
-            <a className="meta-button" href={PROJECT_LINKS.repository} {...EXTERNAL}>
+            <a
+              className="meta-button"
+              href={PROJECT_LINKS.repository}
+              {...EXTERNAL}
+            >
               {t("contributeRepository")}
               <ArrowUpRight aria-hidden="true" size={15} />
             </a>
@@ -289,7 +354,11 @@ export function MetaHome() {
         </div>
       </section>
 
-      <section className="meta-section" id="questions" aria-labelledby="meta-questions-title">
+      <section
+        className="meta-section"
+        id="questions"
+        aria-labelledby="meta-questions-title"
+      >
         <div className="meta-shell">
           <SectionBand
             id="meta-questions-title"
@@ -307,7 +376,11 @@ export function MetaHome() {
 
           <div className="meta-faq">
             {LANDING_FAQ.map(([question, answer]) => (
-              <details className="meta-faq-item" name="meta-home-questions" key={question}>
+              <details
+                className="meta-faq-item"
+                name="meta-home-questions"
+                key={question}
+              >
                 <summary>{t(question)}</summary>
                 <p>{t(answer)}</p>
               </details>

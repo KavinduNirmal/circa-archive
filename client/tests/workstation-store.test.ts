@@ -1,7 +1,12 @@
 import { describe, expect, it } from "vitest";
 import type { PersistStorage, StorageValue } from "zustand/middleware";
 import type { DesktopIconSpec } from "@/components/desktop-icons";
-import { createPersistedWorkstationStore, createWorkstationStore, STORAGE_KEY, type PersistedWorkstationState } from "@/stores/workstation-store";
+import {
+  createPersistedWorkstationStore,
+  createWorkstationStore,
+  STORAGE_KEY,
+  type PersistedWorkstationState,
+} from "@/stores/workstation-store";
 
 /**
  * The workstation store is the single owner of the window list and the reader's
@@ -40,7 +45,9 @@ describe("workstation store", () => {
     expect(state().lastFocused).toBe("archive");
 
     state().minimize("archive");
-    expect(state().windows.find((item) => item.id === "archive")?.minimized).toBe(true);
+    expect(
+      state().windows.find((item) => item.id === "archive")?.minimized,
+    ).toBe(true);
     // The focused window was minimized, so focus falls to the next visible one
     // rather than becoming null and leaving the shell without an active window.
     expect(state().lastFocused).toBe("inbox");
@@ -94,8 +101,14 @@ describe("workstation store", () => {
     const store = createWorkstationStore();
     const width = window.innerWidth;
     const height = window.innerHeight;
-    Object.defineProperty(window, "innerWidth", { configurable: true, value: 800 });
-    Object.defineProperty(window, "innerHeight", { configurable: true, value: 400 });
+    Object.defineProperty(window, "innerWidth", {
+      configurable: true,
+      value: 800,
+    });
+    Object.defineProperty(window, "innerHeight", {
+      configurable: true,
+      value: 400,
+    });
     try {
       store.getState().open(spec("archive"), "push");
       const [opened] = store.getState().windows;
@@ -105,16 +118,29 @@ describe("workstation store", () => {
       expect(opened.geometry.width).toBe(620);
       expect(opened.geometry.height).toBe(180);
     } finally {
-      Object.defineProperty(window, "innerWidth", { configurable: true, value: width });
-      Object.defineProperty(window, "innerHeight", { configurable: true, value: height });
+      Object.defineProperty(window, "innerWidth", {
+        configurable: true,
+        value: width,
+      });
+      Object.defineProperty(window, "innerHeight", {
+        configurable: true,
+        value: height,
+      });
     }
   });
 
   it("keeps a window above its minimum size when geometry is committed", () => {
     const store = setup();
     store.getState().open(spec("archive"), "push");
-    store.getState().setGeometry("archive", { x: 10, y: 10, width: 40, height: 30 });
-    expect(store.getState().windows[0].geometry).toEqual({ x: 10, y: 10, width: 260, height: 180 });
+    store
+      .getState()
+      .setGeometry("archive", { x: 10, y: 10, width: 40, height: 30 });
+    expect(store.getState().windows[0].geometry).toEqual({
+      x: 10,
+      y: 10,
+      width: 260,
+      height: 180,
+    });
   });
 
   it("dedupes the reader trail and keeps the forward entries", () => {
@@ -122,15 +148,24 @@ describe("workstation store", () => {
     const state = () => store.getState();
     state().openRecord("INC-00014", "Record Viewer", "push");
     state().openRecord("INC-00027", "Record Viewer", "push");
-    expect(state().readerTrail).toEqual({ codes: ["INC-00014", "INC-00027"], at: 1 });
+    expect(state().readerTrail).toEqual({
+      codes: ["INC-00014", "INC-00027"],
+      at: 1,
+    });
 
     // Revisiting a record moves the cursor; it does not append a duplicate.
     state().openRecord("INC-00014", "Record Viewer", "push");
-    expect(state().readerTrail).toEqual({ codes: ["INC-00014", "INC-00027"], at: 0 });
+    expect(state().readerTrail).toEqual({
+      codes: ["INC-00014", "INC-00027"],
+      at: 0,
+    });
 
     // Forward still returns to the record read after it.
     state().travelRecord(1);
-    expect(state().readerTrail).toEqual({ codes: ["INC-00014", "INC-00027"], at: 1 });
+    expect(state().readerTrail).toEqual({
+      codes: ["INC-00014", "INC-00027"],
+      at: 1,
+    });
   });
 
   it("truncates the forward trail when a new record is opened", () => {
@@ -203,9 +238,27 @@ describe("workstation store", () => {
     const store = setup();
     store.setState({
       windows: [
-        { ...spec("archive"), geometry: { x: 0, y: 0, width: 400, height: 300 }, maximized: false, minimized: false, z: 7 },
-        { ...spec("gone"), geometry: { x: 0, y: 0, width: 400, height: 300 }, maximized: false, minimized: false, z: 9 },
-        { ...spec("reader"), geometry: { x: 0, y: 0, width: 400, height: 300 }, maximized: true, minimized: false, z: 4 },
+        {
+          ...spec("archive"),
+          geometry: { x: 0, y: 0, width: 400, height: 300 },
+          maximized: false,
+          minimized: false,
+          z: 7,
+        },
+        {
+          ...spec("gone"),
+          geometry: { x: 0, y: 0, width: 400, height: 300 },
+          maximized: false,
+          minimized: false,
+          z: 9,
+        },
+        {
+          ...spec("reader"),
+          geometry: { x: 0, y: 0, width: 400, height: 300 },
+          maximized: true,
+          minimized: false,
+          z: 4,
+        },
       ],
       lastFocused: "gone",
       readerTrail: { codes: ["A", "B", "A"], at: 2 },
@@ -213,7 +266,10 @@ describe("workstation store", () => {
 
     store.getState().validateRestored();
 
-    expect(store.getState().windows.map((item) => item.id)).toEqual(["reader", "archive"]);
+    expect(store.getState().windows.map((item) => item.id)).toEqual([
+      "reader",
+      "archive",
+    ]);
     expect(store.getState().windows.map((item) => item.z)).toEqual([1, 2]);
     expect(store.getState().lastFocused).toBe("archive");
     expect(store.getState().readerTrail).toEqual({ codes: ["A", "B"], at: 0 });
@@ -237,13 +293,19 @@ function memoryStorage(seed?: StorageValue<PersistedWorkstationState>) {
   let value: StorageValue<PersistedWorkstationState> | null = seed ?? null;
   const storage: PersistStorage<PersistedWorkstationState> = {
     getItem: async () => value,
-    setItem: async (_name, next) => { value = next; },
-    removeItem: async () => { value = null; },
+    setItem: async (_name, next) => {
+      value = next;
+    },
+    removeItem: async () => {
+      value = null;
+    },
   };
   return { storage, read: () => value };
 }
 
-const persisted = (state: Partial<PersistedWorkstationState>): StorageValue<PersistedWorkstationState> => ({
+const persisted = (
+  state: Partial<PersistedWorkstationState>,
+): StorageValue<PersistedWorkstationState> => ({
   state: {
     windows: [],
     lastFocused: null,
@@ -257,7 +319,20 @@ const persisted = (state: Partial<PersistedWorkstationState>): StorageValue<Pers
 
 describe("a persisted workstation", () => {
   it("starts empty until it is told to rehydrate", async () => {
-    const { storage } = memoryStorage(persisted({ windows: [{ ...spec("archive"), geometry: { x: 90, y: 70, width: 640, height: 460 }, maximized: false, minimized: false, z: 1 }], lastFocused: "archive" }));
+    const { storage } = memoryStorage(
+      persisted({
+        windows: [
+          {
+            ...spec("archive"),
+            geometry: { x: 90, y: 70, width: 640, height: 460 },
+            maximized: false,
+            minimized: false,
+            z: 1,
+          },
+        ],
+        lastFocused: "archive",
+      }),
+    );
     const store = createPersistedWorkstationStore({ storage });
     expect(store.getState().hydrated).toBe(false);
     expect(store.getState().windows).toEqual([]);
@@ -273,21 +348,44 @@ describe("a persisted workstation", () => {
   });
 
   it("drops what no longer resolves and repairs the rest on restore", async () => {
-    const { storage } = memoryStorage(persisted({
-      windows: [
-        { ...spec("archive"), geometry: { x: 0, y: 0, width: 400, height: 300 }, maximized: false, minimized: false, z: 7 },
-        { ...spec("gone"), geometry: { x: 0, y: 0, width: 400, height: 300 }, maximized: false, minimized: false, z: 9 },
-        { ...spec("reader"), geometry: { x: 0, y: 0, width: 400, height: 300 }, maximized: true, minimized: false, z: 4 },
-      ],
-      lastFocused: "gone",
-      readerTrail: { codes: ["A", "B", "A"], at: 2 },
-      screenFilter: false,
-    }));
+    const { storage } = memoryStorage(
+      persisted({
+        windows: [
+          {
+            ...spec("archive"),
+            geometry: { x: 0, y: 0, width: 400, height: 300 },
+            maximized: false,
+            minimized: false,
+            z: 7,
+          },
+          {
+            ...spec("gone"),
+            geometry: { x: 0, y: 0, width: 400, height: 300 },
+            maximized: false,
+            minimized: false,
+            z: 9,
+          },
+          {
+            ...spec("reader"),
+            geometry: { x: 0, y: 0, width: 400, height: 300 },
+            maximized: true,
+            minimized: false,
+            z: 4,
+          },
+        ],
+        lastFocused: "gone",
+        readerTrail: { codes: ["A", "B", "A"], at: 2 },
+        screenFilter: false,
+      }),
+    );
     const store = createPersistedWorkstationStore({ storage });
     await store.persist?.rehydrate();
     store.getState().validateRestored();
 
-    expect(store.getState().windows.map((item) => item.id)).toEqual(["reader", "archive"]);
+    expect(store.getState().windows.map((item) => item.id)).toEqual([
+      "reader",
+      "archive",
+    ]);
     expect(store.getState().windows.map((item) => item.z)).toEqual([1, 2]);
     expect(store.getState().lastFocused).toBe("archive");
     expect(store.getState().readerTrail).toEqual({ codes: ["A", "B"], at: 0 });
@@ -314,20 +412,37 @@ describe("a persisted workstation", () => {
     // The shell publishes the measured desktop area on mount, before rehydration
     // finishes. That write must not replace the saved workspace with the empty
     // one being restored, or a refresh loses every window but the URL's.
-    window.sessionStorage.setItem(STORAGE_KEY, JSON.stringify(persisted({
-      windows: [{ ...spec("archive"), geometry: { x: 90, y: 70, width: 640, height: 460 }, maximized: false, minimized: false, z: 1 }],
-      lastFocused: "archive",
-    })));
+    window.sessionStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify(
+        persisted({
+          windows: [
+            {
+              ...spec("archive"),
+              geometry: { x: 90, y: 70, width: 640, height: 460 },
+              maximized: false,
+              minimized: false,
+              z: 1,
+            },
+          ],
+          lastFocused: "archive",
+        }),
+      ),
+    );
     try {
       const store = createPersistedWorkstationStore();
       store.getState().setArea(area);
       await Promise.resolve();
       const untouched = JSON.parse(window.sessionStorage.getItem(STORAGE_KEY)!);
-      expect(untouched.state.windows.map((item: { id: string }) => item.id)).toEqual(["archive"]);
+      expect(
+        untouched.state.windows.map((item: { id: string }) => item.id),
+      ).toEqual(["archive"]);
 
       await store.persist?.rehydrate();
       store.getState().validateRestored();
-      expect(store.getState().windows.map((item) => item.id)).toEqual(["archive"]);
+      expect(store.getState().windows.map((item) => item.id)).toEqual([
+        "archive",
+      ]);
       expect(store.getState().lastFocused).toBe("archive");
     } finally {
       window.sessionStorage.removeItem(STORAGE_KEY);

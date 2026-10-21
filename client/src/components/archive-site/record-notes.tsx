@@ -65,13 +65,18 @@ type Draft = {
 /** The composer's ceiling. A note is marginalia, not a second filing. */
 const MAX_LENGTH = 1200;
 
-export function RecordNotes({ notes, labels }: {
+export function RecordNotes({
+  notes,
+  labels,
+}: {
   notes: readonly RecordNoteView[];
   labels: RecordNoteLabels;
 }) {
   const [drafts, setDrafts] = useState<Draft[]>([]);
   const [replies, setReplies] = useState<Record<string, Draft[]>>({});
-  const [replyTo, setReplyTo] = useState<{ id: string; author: string } | null>(null);
+  const [replyTo, setReplyTo] = useState<{ id: string; author: string } | null>(
+    null,
+  );
   const [name, setName] = useState("");
   const [body, setBody] = useState("");
   const [announcement, setAnnouncement] = useState("");
@@ -79,7 +84,9 @@ export function RecordNotes({ notes, labels }: {
   const composer = useRef<HTMLTextAreaElement>(null);
 
   const ready = body.trim().length > 0;
-  const title = replyTo ? labels.replyTo.replace("{author}", replyTo.author) : labels.composerTitle;
+  const title = replyTo
+    ? labels.replyTo.replace("{author}", replyTo.author)
+    : labels.composerTitle;
 
   // A reply moves the composer under the reader's hands, so it is focused for them.
   useEffect(() => {
@@ -95,11 +102,17 @@ export function RecordNotes({ notes, labels }: {
       id: `held-note-${nextDraft.current}`,
       author: name.trim() || labels.anonymous,
       when: labels.draftWhen,
-      paragraphs: text.split(/\n{2,}/).map((paragraph) => paragraph.trim()).filter(Boolean),
+      paragraphs: text
+        .split(/\n{2,}/)
+        .map((paragraph) => paragraph.trim())
+        .filter(Boolean),
     };
 
     if (replyTo) {
-      setReplies((held) => ({ ...held, [replyTo.id]: [...(held[replyTo.id] ?? []), draft] }));
+      setReplies((held) => ({
+        ...held,
+        [replyTo.id]: [...(held[replyTo.id] ?? []), draft],
+      }));
       setReplyTo(null);
     } else {
       setDrafts((held) => [draft, ...held]);
@@ -114,13 +127,18 @@ export function RecordNotes({ notes, labels }: {
   }
 
   function discardReply(noteId: string, id: string) {
-    setReplies((held) => ({ ...held, [noteId]: (held[noteId] ?? []).filter((draft) => draft.id !== id) }));
+    setReplies((held) => ({
+      ...held,
+      [noteId]: (held[noteId] ?? []).filter((draft) => draft.id !== id),
+    }));
   }
 
   return (
     <section className={styles.notes} id="notes" aria-labelledby="notes-title">
       <div className={styles.notesHead}>
-        <h2 className={styles.notesTitle} id="notes-title">{labels.title}</h2>
+        <h2 className={styles.notesTitle} id="notes-title">
+          {labels.title}
+        </h2>
         <span className={styles.notesCount}>{notes.length}</span>
       </div>
       <p className={styles.notesLead}>{labels.lead}</p>
@@ -136,7 +154,9 @@ export function RecordNotes({ notes, labels }: {
               </span>
             </p>
             <div className={styles.noteBody}>
-              {draft.paragraphs.map((paragraph, index) => <p key={index}>{paragraph}</p>)}
+              {draft.paragraphs.map((paragraph, index) => (
+                <p key={index}>{paragraph}</p>
+              ))}
             </div>
             <p className={styles.noteActions}>
               <button
@@ -158,7 +178,9 @@ export function RecordNotes({ notes, labels }: {
               <span className={styles.noteWhen}>{note.when}</span>
             </p>
             <div className={styles.noteBody}>
-              {note.paragraphs.map((paragraph, index) => <p key={index}>{paragraph}</p>)}
+              {note.paragraphs.map((paragraph, index) => (
+                <p key={index}>{paragraph}</p>
+              ))}
             </div>
 
             {note.replies.map((reply) => (
@@ -168,13 +190,19 @@ export function RecordNotes({ notes, labels }: {
                   <span className={styles.noteWhen}>{reply.when}</span>
                 </p>
                 <div className={styles.noteBody}>
-                  {reply.paragraphs.map((paragraph, index) => <p key={index}>{paragraph}</p>)}
+                  {reply.paragraphs.map((paragraph, index) => (
+                    <p key={index}>{paragraph}</p>
+                  ))}
                 </div>
               </div>
             ))}
 
             {(replies[note.id] ?? []).map((draft) => (
-              <div className={styles.noteReply} data-draft="true" key={draft.id}>
+              <div
+                className={styles.noteReply}
+                data-draft="true"
+                key={draft.id}
+              >
                 <p className={styles.noteMeta}>
                   <span className={styles.noteAuthor}>{draft.author}</span>
                   <span className={styles.noteWhen}>
@@ -183,7 +211,9 @@ export function RecordNotes({ notes, labels }: {
                   </span>
                 </p>
                 <div className={styles.noteBody}>
-                  {draft.paragraphs.map((paragraph, index) => <p key={index}>{paragraph}</p>)}
+                  {draft.paragraphs.map((paragraph, index) => (
+                    <p key={index}>{paragraph}</p>
+                  ))}
                 </div>
                 <p className={styles.noteActions}>
                   <button
@@ -216,7 +246,11 @@ export function RecordNotes({ notes, labels }: {
         )}
       </div>
 
-      <form className={styles.composer} onSubmit={file} aria-labelledby="note-composer-title">
+      <form
+        className={styles.composer}
+        onSubmit={file}
+        aria-labelledby="note-composer-title"
+      >
         <h3 className={styles.composerTitle} id="note-composer-title">
           <PenLine aria-hidden size={13} />
           {title}
@@ -266,13 +300,20 @@ export function RecordNotes({ notes, labels }: {
               {labels.cancel}
             </button>
           ) : null}
-          <button type="submit" className={buttonStyles.button} data-tone="paper" disabled={!ready}>
+          <button
+            type="submit"
+            className={buttonStyles.button}
+            data-tone="paper"
+            disabled={!ready}
+          >
             <Send aria-hidden size={12} />
             {labels.submit}
           </button>
         </div>
 
-        <p className={styles.visuallyHidden} role="status">{announcement}</p>
+        <p className={styles.visuallyHidden} role="status">
+          {announcement}
+        </p>
       </form>
     </section>
   );

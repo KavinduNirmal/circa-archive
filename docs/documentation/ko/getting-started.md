@@ -40,13 +40,13 @@ bun run --cwd=client dev
 # http://localhost:3001 -> /en
 ```
 
-| 라우트 | 표면 |
-| --- | --- |
-| `/en` | 위원회의 목소리로 된 공개 포털 |
-| `/en/site` | 아카이브의 열람판 |
-| `/en/meta` | 프로젝트 랜딩 페이지 |
-| `/en/meta/documentation` | 이 문서 |
-| `/en/desktop` | 워크스테이션 프리뷰 |
+| 라우트                   | 표면                           |
+| ------------------------ | ------------------------------ |
+| `/en`                    | 위원회의 목소리로 된 공개 포털 |
+| `/en/site`               | 아카이브의 열람판              |
+| `/en/meta`               | 프로젝트 랜딩 페이지           |
+| `/en/meta/documentation` | 이 문서                        |
+| `/en/desktop`            | 워크스테이션 프리뷰            |
 
 프로덕션 빌드는 bun run --cwd=client build, 그다음 bun run --cwd=client start입니다.
 

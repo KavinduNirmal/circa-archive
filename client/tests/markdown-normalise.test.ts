@@ -9,7 +9,10 @@ import { parseRecord } from "@/lib/markdown/pipeline";
  * normaliser runs before any parser does, so these tests hold the string it
  * produces, not a rendered document.
  */
-const CORPUS = readFileSync(resolve(process.cwd(), "public/Ghost_story.md"), "utf8");
+const CORPUS = readFileSync(
+  resolve(process.cwd(), "public/Ghost_story.md"),
+  "utf8",
+);
 
 const lines = (text: string) => text.split("\n");
 
@@ -33,9 +36,17 @@ function tableRows(source: string): string[] {
   for (let index = 0; index < all.length; index += 1) {
     // A delimiter row: the table runs from the header above it to the blank line
     // below. A bare `---` is a rule, not a one-column table, so it must hold a pipe.
-    if (all[index].includes("|") && /^\|?\s*:?-{1,}:?\s*(\|\s*:?-{1,}:?\s*)*\|?$/.test(all[index])) {
+    if (
+      all[index].includes("|") &&
+      /^\|?\s*:?-{1,}:?\s*(\|\s*:?-{1,}:?\s*)*\|?$/.test(all[index])
+    ) {
       found.push(all[index - 1]);
-      for (let row = index + 1; row < all.length && all[row].trim().startsWith("|"); row += 1) found.push(all[row]);
+      for (
+        let row = index + 1;
+        row < all.length && all[row].trim().startsWith("|");
+        row += 1
+      )
+        found.push(all[row]);
       break;
     }
   }
@@ -47,27 +58,35 @@ describe("normaliseTableRedactions", () => {
     const normalised = normaliseTableRedactions(CORPUS);
     const before = lines(CORPUS);
     const after = lines(normalised);
-    const changed = after.map((line, index) => (line === before[index] ? null : index)).filter((index) => index !== null);
+    const changed = after
+      .map((line, index) => (line === before[index] ? null : index))
+      .filter((index) => index !== null);
     // Exactly one line differs, and it is the S-05 row.
     expect(changed).toEqual([46]);
     expect(after[46]).toContain("\\|\\|redacted\\|\\|");
   });
 
   it("is a no-op on a document with no redaction delimiter at all", () => {
-    const plain = "# A record\n\n| a | b |\n|---|---|\n| 1 | 2 |\n\nNothing hidden here.\n";
+    const plain =
+      "# A record\n\n| a | b |\n|---|---|\n| 1 | 2 |\n\nNothing hidden here.\n";
     expect(normaliseTableRedactions(plain)).toBe(plain);
   });
 
   it("leaves a delimiter outside a table byte-identical, because a pipe is not structural there", () => {
-    const prose = "The door is ||not to be approached|| and that is the whole of it.\n";
+    const prose =
+      "The door is ||not to be approached|| and that is the whole of it.\n";
     expect(normaliseTableRedactions(prose)).toBe(prose);
   });
 
   it("repairs the row the parser would otherwise shatter, and leaves the bug visible without it", () => {
     // The bug this exists to prevent: an unescaped `||` is two empty cells.
     const broken = parseRecord({ markdown: CORPUS, normalise: false });
-    const brokenRows = broken.output.children.find((node) => node.type === "table");
-    expect(brokenRows?.type === "table" ? brokenRows.children[5].children.length : 0).toBe(12);
+    const brokenRows = broken.output.children.find(
+      (node) => node.type === "table",
+    );
+    expect(
+      brokenRows?.type === "table" ? brokenRows.children[5].children.length : 0,
+    ).toBe(12);
 
     const fixed = parseRecord({ markdown: CORPUS });
     const table = fixed.output.children.find((node) => node.type === "table");
@@ -78,6 +97,7 @@ describe("normaliseTableRedactions", () => {
   });
 
   it("keeps every table row four cells wide in the normalised source", () => {
-    for (const row of tableRows(normaliseTableRedactions(CORPUS))) expect(cellCount(row)).toBe(4);
+    for (const row of tableRows(normaliseTableRedactions(CORPUS)))
+      expect(cellCount(row)).toBe(4);
   });
 });

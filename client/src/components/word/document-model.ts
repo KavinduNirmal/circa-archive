@@ -15,10 +15,22 @@ export type TextSelection = { start: number; end: number };
 
 /** Which markdown tool a control stands for. */
 export type MarkdownToolId =
-  | "bold" | "italic" | "strike" | "code"
-  | "heading1" | "heading2" | "heading3"
-  | "bullets" | "numbers" | "quote" | "codeblock"
-  | "link" | "image" | "table" | "rule" | "clear";
+  | "bold"
+  | "italic"
+  | "strike"
+  | "code"
+  | "heading1"
+  | "heading2"
+  | "heading3"
+  | "bullets"
+  | "numbers"
+  | "quote"
+  | "codeblock"
+  | "link"
+  | "image"
+  | "table"
+  | "rule"
+  | "clear";
 
 export type MarkdownTool = {
   id: MarkdownToolId;
@@ -41,21 +53,111 @@ export type MarkdownTool = {
  */
 export const MARKDOWN_TOOLS: readonly MarkdownTool[] = [
   { id: "bold", label: "B", name: "Bold", syntax: "**bold**", group: "text" },
-  { id: "italic", label: "I", name: "Italic", syntax: "*italic*", group: "text" },
-  { id: "strike", label: "S", name: "Strikethrough", syntax: "~~struck~~", group: "text" },
-  { id: "code", label: "<>", name: "Inline code", syntax: "`code`", group: "text" },
-  { id: "heading1", label: "H1", name: "Heading 1", syntax: "# Heading", group: "text" },
-  { id: "heading2", label: "H2", name: "Heading 2", syntax: "## Heading", group: "text" },
-  { id: "heading3", label: "H3", name: "Heading 3", syntax: "### Heading", group: "text" },
-  { id: "bullets", label: "\u2022", name: "Bulleted list", syntax: "- item", group: "blocks" },
-  { id: "numbers", label: "1.", name: "Numbered list", syntax: "1. item", group: "blocks" },
-  { id: "quote", label: "\u00b6", name: "Blockquote", syntax: "> quoted", group: "blocks" },
-  { id: "codeblock", label: "{ }", name: "Code block", syntax: "```", group: "blocks" },
-  { id: "link", label: "\u2197", name: "Link", syntax: "[text](address)", group: "blocks" },
-  { id: "image", label: "\u25a3", name: "Image", syntax: "![alt](address)", group: "blocks" },
-  { id: "table", label: "\u229e", name: "Table", syntax: "| a | b |", group: "blocks" },
-  { id: "rule", label: "\u2014", name: "Horizontal rule", syntax: "---", group: "blocks" },
-  { id: "clear", label: "\u232b", name: "Clear formatting", syntax: "plain text", group: "blocks" },
+  {
+    id: "italic",
+    label: "I",
+    name: "Italic",
+    syntax: "*italic*",
+    group: "text",
+  },
+  {
+    id: "strike",
+    label: "S",
+    name: "Strikethrough",
+    syntax: "~~struck~~",
+    group: "text",
+  },
+  {
+    id: "code",
+    label: "<>",
+    name: "Inline code",
+    syntax: "`code`",
+    group: "text",
+  },
+  {
+    id: "heading1",
+    label: "H1",
+    name: "Heading 1",
+    syntax: "# Heading",
+    group: "text",
+  },
+  {
+    id: "heading2",
+    label: "H2",
+    name: "Heading 2",
+    syntax: "## Heading",
+    group: "text",
+  },
+  {
+    id: "heading3",
+    label: "H3",
+    name: "Heading 3",
+    syntax: "### Heading",
+    group: "text",
+  },
+  {
+    id: "bullets",
+    label: "\u2022",
+    name: "Bulleted list",
+    syntax: "- item",
+    group: "blocks",
+  },
+  {
+    id: "numbers",
+    label: "1.",
+    name: "Numbered list",
+    syntax: "1. item",
+    group: "blocks",
+  },
+  {
+    id: "quote",
+    label: "\u00b6",
+    name: "Blockquote",
+    syntax: "> quoted",
+    group: "blocks",
+  },
+  {
+    id: "codeblock",
+    label: "{ }",
+    name: "Code block",
+    syntax: "```",
+    group: "blocks",
+  },
+  {
+    id: "link",
+    label: "\u2197",
+    name: "Link",
+    syntax: "[text](address)",
+    group: "blocks",
+  },
+  {
+    id: "image",
+    label: "\u25a3",
+    name: "Image",
+    syntax: "![alt](address)",
+    group: "blocks",
+  },
+  {
+    id: "table",
+    label: "\u229e",
+    name: "Table",
+    syntax: "| a | b |",
+    group: "blocks",
+  },
+  {
+    id: "rule",
+    label: "\u2014",
+    name: "Horizontal rule",
+    syntax: "---",
+    group: "blocks",
+  },
+  {
+    id: "clear",
+    label: "\u232b",
+    name: "Clear formatting",
+    syntax: "plain text",
+    group: "blocks",
+  },
 ];
 
 export function findTool(id: string): MarkdownTool | undefined {
@@ -91,9 +193,17 @@ export const CHANGE_LABELS: Record<MarkdownToolId, string> = {
  * that is not here has no pressed state to show.
  */
 export const ACTIVE_LABELS: readonly MarkdownToolId[] = [
-  "bold", "italic", "strike", "code",
-  "heading1", "heading2", "heading3",
-  "bullets", "numbers", "quote", "codeblock",
+  "bold",
+  "italic",
+  "strike",
+  "code",
+  "heading1",
+  "heading2",
+  "heading3",
+  "bullets",
+  "numbers",
+  "quote",
+  "codeblock",
 ];
 
 /** The inline markers, as pairs. */
@@ -129,13 +239,22 @@ export type MarkdownResult = { text: string; selection: TextSelection };
 
 /** A selection clamped to the text, with its ends in order. */
 function clampSelection(text: string, selection: TextSelection): TextSelection {
-  const start = Math.max(0, Math.min(selection.start, selection.end, text.length));
-  const end = Math.max(0, Math.min(Math.max(selection.start, selection.end), text.length));
+  const start = Math.max(
+    0,
+    Math.min(selection.start, selection.end, text.length),
+  );
+  const end = Math.max(
+    0,
+    Math.min(Math.max(selection.start, selection.end), text.length),
+  );
   return { start, end };
 }
 
 /** Character offsets of the line containing `position`, excluding its newline. */
-function lineBoundsAt(text: string, position: number): { start: number; end: number } {
+function lineBoundsAt(
+  text: string,
+  position: number,
+): { start: number; end: number } {
   const start = text.lastIndexOf("\n", Math.max(0, position - 1)) + 1;
   const nextBreak = text.indexOf("\n", position);
   return { start, end: nextBreak === -1 ? text.length : nextBreak };
@@ -147,7 +266,10 @@ function lineBoundsAt(text: string, position: number): { start: number; end: num
  * A selection that ends exactly on a line start does not include that line, which
  * is what stops a numbered list from numbering the empty line after it.
  */
-function selectedLines(text: string, selection: TextSelection): { start: number; end: number }[] {
+function selectedLines(
+  text: string,
+  selection: TextSelection,
+): { start: number; end: number }[] {
   const { start, end } = clampSelection(text, selection);
   const lines: { start: number; end: number }[] = [];
   let cursor = lineBoundsAt(text, start).start;
@@ -158,7 +280,8 @@ function selectedLines(text: string, selection: TextSelection): { start: number;
     cursor = bounds.end + 1;
   }
   // A caret on an empty line still has one line to act on.
-  if (lines.length === 0) lines.push(lineBoundsAt(text, Math.min(start, text.length)));
+  if (lines.length === 0)
+    lines.push(lineBoundsAt(text, Math.min(start, text.length)));
   return lines;
 }
 
@@ -168,35 +291,65 @@ function selectedLines(text: string, selection: TextSelection): { start: number;
  * The markers can be inside the selection or just outside it. Both are the same
  * edit to a writer, so both count as a wrapped run and the tool unwraps it.
  */
-function wrapOffsets(text: string, selection: TextSelection, marker: string): { outer: number; inner: number } | undefined {
+function wrapOffsets(
+  text: string,
+  selection: TextSelection,
+  marker: string,
+): { outer: number; inner: number } | undefined {
   const { start, end } = selection;
   const inner = text.slice(start, end);
-  if (inner.length >= marker.length * 2 && inner.startsWith(marker) && inner.endsWith(marker)) {
+  if (
+    inner.length >= marker.length * 2 &&
+    inner.startsWith(marker) &&
+    inner.endsWith(marker)
+  ) {
     return { outer: start, inner: end - start - marker.length * 2 };
   }
-  if (text.slice(start - marker.length, start) === marker && text.slice(end, end + marker.length) === marker) {
+  if (
+    text.slice(start - marker.length, start) === marker &&
+    text.slice(end, end + marker.length) === marker
+  ) {
     return { outer: start - marker.length, inner: end - start };
   }
   return undefined;
 }
 
 /** Wraps or unwraps an inline marker. */
-function toggleInline(text: string, selection: TextSelection, marker: string): MarkdownResult {
+function toggleInline(
+  text: string,
+  selection: TextSelection,
+  marker: string,
+): MarkdownResult {
   const { start, end } = selection;
   const wrapped = wrapOffsets(text, selection, marker);
   if (wrapped) {
-    const content = text.slice(wrapped.outer + marker.length, wrapped.outer + marker.length + wrapped.inner);
-    const next = text.slice(0, wrapped.outer) + content + text.slice(wrapped.outer + marker.length * 2 + wrapped.inner);
-    return { text: next, selection: { start: wrapped.outer, end: wrapped.outer + wrapped.inner } };
+    const content = text.slice(
+      wrapped.outer + marker.length,
+      wrapped.outer + marker.length + wrapped.inner,
+    );
+    const next =
+      text.slice(0, wrapped.outer) +
+      content +
+      text.slice(wrapped.outer + marker.length * 2 + wrapped.inner);
+    return {
+      text: next,
+      selection: { start: wrapped.outer, end: wrapped.outer + wrapped.inner },
+    };
   }
   if (end === start) {
     // Nothing selected: the markers go in and the caret lands between them, so
     // the next thing typed is marked up.
     const next = `${text.slice(0, start)}${marker}${marker}${text.slice(start)}`;
-    return { text: next, selection: { start: start + marker.length, end: start + marker.length } };
+    return {
+      text: next,
+      selection: { start: start + marker.length, end: start + marker.length },
+    };
   }
   const next = `${text.slice(0, start)}${marker}${text.slice(start, end)}${marker}${text.slice(end)}`;
-  return { text: next, selection: { start: start + marker.length, end: end + marker.length } };
+  return {
+    text: next,
+    selection: { start: start + marker.length, end: end + marker.length },
+  };
 }
 
 /** A line's heading markers, so a new level replaces the old one instead of stacking. */
@@ -211,16 +364,23 @@ function headingOf(line: string): string | undefined {
  * heading switches level rather than stacking a second marker, which is what
  * makes these buttons toggles rather than one-way doors.
  */
-function toggleLine(text: string, selection: TextSelection, marker: string, isHeading: boolean): MarkdownResult {
+function toggleLine(
+  text: string,
+  selection: TextSelection,
+  marker: string,
+  isHeading: boolean,
+): MarkdownResult {
   const lines = selectedLines(text, selection);
-  const current = (line: { start: number; end: number }) => text.slice(line.start, line.end);
+  const current = (line: { start: number; end: number }) =>
+    text.slice(line.start, line.end);
   const remove = lines.every((line) => current(line).startsWith(marker));
 
   const pieces = lines.map((line) => {
     const value = current(line);
     if (remove) return value.slice(marker.length);
     const existing = headingOf(value);
-    if (existing) return isHeading ? marker + value.slice(existing.length) : value;
+    if (existing)
+      return isHeading ? marker + value.slice(existing.length) : value;
     return marker + value;
   });
 
@@ -239,30 +399,51 @@ function toggleLine(text: string, selection: TextSelection, marker: string, isHe
 
   return {
     text: next,
-    selection: { start: selection.start + firstDelta, end: selection.end + delta },
+    selection: {
+      start: selection.start + firstDelta,
+      end: selection.end + delta,
+    },
   };
 }
 
 /** Inserts a block of markdown on its own lines, replacing the selection. */
-function insertBlock(text: string, selection: TextSelection, body: string): MarkdownResult {
+function insertBlock(
+  text: string,
+  selection: TextSelection,
+  body: string,
+): MarkdownResult {
   const { start, end } = clampSelection(text, selection);
   const before = text.slice(0, start);
   const after = text.slice(end);
-  const lead = before.length === 0 || before.endsWith("\n\n") ? "" : before.endsWith("\n") ? "\n" : "\n\n";
+  const lead =
+    before.length === 0 || before.endsWith("\n\n")
+      ? ""
+      : before.endsWith("\n")
+        ? "\n"
+        : "\n\n";
   const tail = after.startsWith("\n") ? "\n" : "\n\n";
   const caret = start + lead.length + body.length;
-  return { text: `${before}${lead}${body}${tail}${after}`, selection: { start: caret, end: caret } };
+  return {
+    text: `${before}${lead}${body}${tail}${after}`,
+    selection: { start: caret, end: caret },
+  };
 }
 
 /**
  * Strips every marker the editor writes from the selected lines: the block
  * marker at the start of a line and the inline markers anywhere in it.
  */
-function clearFormatting(text: string, selection: TextSelection): MarkdownResult {
+function clearFormatting(
+  text: string,
+  selection: TextSelection,
+): MarkdownResult {
   const lines = selectedLines(text, selection);
-  const pieces = lines.map((line) => text.slice(line.start, line.end)
-    .replace(/^(#{1,6}\s+|[-*]\s+|\d+\.\s+|>\s+|```.*$)/, "")
-    .replace(/(\*\*|~~|`|\*)/g, ""));
+  const pieces = lines.map((line) =>
+    text
+      .slice(line.start, line.end)
+      .replace(/^(#{1,6}\s+|[-*]\s+|\d+\.\s+|>\s+|```.*$)/, "")
+      .replace(/(\*\*|~~|`|\*)/g, ""),
+  );
   let next = "";
   let at = 0;
   let delta = 0;
@@ -277,17 +458,34 @@ function clearFormatting(text: string, selection: TextSelection): MarkdownResult
   next += text.slice(at);
   return {
     text: next,
-    selection: { start: selection.start + firstDelta, end: selection.end + delta },
+    selection: {
+      start: selection.start + firstDelta,
+      end: selection.end + delta,
+    },
   };
 }
 
 /** Applies one toolbar action and returns the document and where the caret belongs. */
-export function applyChange(text: string, selection: TextSelection, tool: MarkdownToolId, address?: string): MarkdownResult;
-export function applyChange(text: string, change: MarkdownChange): MarkdownResult;
-export function applyChange(text: string, selectionOrChange: TextSelection | MarkdownChange, tool?: MarkdownToolId, address?: string): MarkdownResult {
-  const change: MarkdownChange = "tool" in selectionOrChange
-    ? selectionOrChange
-    : { tool: tool as MarkdownToolId, selection: selectionOrChange, address };
+export function applyChange(
+  text: string,
+  selection: TextSelection,
+  tool: MarkdownToolId,
+  address?: string,
+): MarkdownResult;
+export function applyChange(
+  text: string,
+  change: MarkdownChange,
+): MarkdownResult;
+export function applyChange(
+  text: string,
+  selectionOrChange: TextSelection | MarkdownChange,
+  tool?: MarkdownToolId,
+  address?: string,
+): MarkdownResult {
+  const change: MarkdownChange =
+    "tool" in selectionOrChange
+      ? selectionOrChange
+      : { tool: tool as MarkdownToolId, selection: selectionOrChange, address };
   const clamped = clampSelection(text, change.selection);
   const { start, end } = clamped;
   const inner = text.slice(start, end);
@@ -297,33 +495,59 @@ export function applyChange(text: string, selectionOrChange: TextSelection | Mar
     case "italic":
     case "strike":
     case "code":
-      return toggleInline(text, clamped, INLINE.find((item) => item.id === change.tool)?.marker ?? "");
+      return toggleInline(
+        text,
+        clamped,
+        INLINE.find((item) => item.id === change.tool)?.marker ?? "",
+      );
     case "heading1":
     case "heading2":
     case "heading3":
     case "bullets":
     case "numbers":
     case "quote":
-      return toggleLine(text, clamped, LINE.find((item) => item.id === change.tool)?.marker ?? "", change.tool.startsWith("heading"));
+      return toggleLine(
+        text,
+        clamped,
+        LINE.find((item) => item.id === change.tool)?.marker ?? "",
+        change.tool.startsWith("heading"),
+      );
     case "codeblock": {
       const caret = start + 4 + inner.length;
-      return { text: `${text.slice(0, start)}\`\`\`\n${inner}\n\`\`\`${text.slice(end)}`, selection: { start: caret, end: caret } };
+      return {
+        text: `${text.slice(0, start)}\`\`\`\n${inner}\n\`\`\`${text.slice(end)}`,
+        selection: { start: caret, end: caret },
+      };
     }
     case "rule":
       return insertBlock(text, clamped, "---");
     case "table":
-      return insertBlock(text, clamped, "| Column | Column |\n| --- | --- |\n| Cell | Cell |");
+      return insertBlock(
+        text,
+        clamped,
+        "| Column | Column |\n| --- | --- |\n| Cell | Cell |",
+      );
     case "link": {
       const label = inner || "text";
       const rendered = `[${label}](${change.address ?? ""})`;
-      const caret = change.address ? start + rendered.length : start + label.length + 3;
-      return { text: `${text.slice(0, start)}${rendered}${text.slice(end)}`, selection: { start: caret, end: caret } };
+      const caret = change.address
+        ? start + rendered.length
+        : start + label.length + 3;
+      return {
+        text: `${text.slice(0, start)}${rendered}${text.slice(end)}`,
+        selection: { start: caret, end: caret },
+      };
     }
     case "image": {
       const alt = inner || "alt text";
       const rendered = `![${alt}](${change.address ?? ""})`;
-      const caret = change.address ? start + rendered.length : start + alt.length + 4;
-      return { text: `${text.slice(0, start)}${rendered}${text.slice(end)}`, selection: { start: caret, end: caret } };
+      const caret = change.address
+        ? start + rendered.length
+        : start + alt.length + 4;
+      return {
+        text: `${text.slice(0, start)}${rendered}${text.slice(end)}`,
+        selection: { start: caret, end: caret },
+      };
     }
     case "clear":
       return clearFormatting(text, clamped);
@@ -343,7 +567,11 @@ export function applyChange(text: string, selectionOrChange: TextSelection | Mar
  * has another one before the closing marker. A caret drawn just after a closing
  * marker still counts as being in that run, which is what a writer expects.
  */
-function isInsideMarker(text: string, position: number, marker: string): boolean {
+function isInsideMarker(
+  text: string,
+  position: number,
+  marker: string,
+): boolean {
   const opens = text.lastIndexOf(marker, position);
   if (opens === -1) return false;
   const closes = text.indexOf(marker, opens + marker.length);
@@ -368,7 +596,10 @@ function countMarkerRuns(text: string, marker: string): number {
 }
 
 /** Which tools the caret is currently inside, for the toolbar's pressed state. */
-export function detectActive(text: string, selection: TextSelection): MarkdownToolId[] {
+export function detectActive(
+  text: string,
+  selection: TextSelection,
+): MarkdownToolId[] {
   const position = Math.min(selection.start, text.length);
   const bounds = lineBoundsAt(text, position);
   const line = text.slice(bounds.start, bounds.end);
@@ -383,7 +614,10 @@ export function detectActive(text: string, selection: TextSelection): MarkdownTo
    * at the caret's line: every line inside a code block is in it, and none of
    * them carries a marker of its own.
    */
-  const fences = text.slice(0, position).split("\n").filter((item) => item.trimStart().startsWith("```")).length;
+  const fences = text
+    .slice(0, position)
+    .split("\n")
+    .filter((item) => item.trimStart().startsWith("```")).length;
   if (fences % 2 === 1) active.push("codeblock");
 
   for (const { id, marker } of INLINE) {
@@ -397,18 +631,32 @@ export function markupStyle(line: string): "body" | "heading" {
   return /^#{1,6}\s+/.test(line) ? "heading" : "body";
 }
 
-export type TextStats = { words: number; lines: number; characters: number; paragraphs: number };
+export type TextStats = {
+  words: number;
+  lines: number;
+  characters: number;
+  paragraphs: number;
+};
 
 /** What the status bar counts. An empty document has no lines, not one. */
 export function textStats(text: string): TextStats {
-  if (text.length === 0) return { words: 0, lines: 0, characters: 0, paragraphs: 0 };
+  if (text.length === 0)
+    return { words: 0, lines: 0, characters: 0, paragraphs: 0 };
   const words = text.split(/\s+/).filter((item) => item.length > 0).length;
-  const paragraphs = text.split(/\n\s*\n/).filter((item) => item.trim().length > 0).length;
-  return { words, lines: text.split("\n").length, characters: text.length, paragraphs };
+  const paragraphs = text
+    .split(/\n\s*\n/)
+    .filter((item) => item.trim().length > 0).length;
+  return {
+    words,
+    lines: text.split("\n").length,
+    characters: text.length,
+    paragraphs,
+  };
 }
 
 export function formatCounts(stats: TextStats): string {
-  const plural = (count: number, word: string) => `${count} ${word}${count === 1 ? "" : "s"}`;
+  const plural = (count: number, word: string) =>
+    `${count} ${word}${count === 1 ? "" : "s"}`;
   return `${plural(stats.words, "word")}, ${plural(stats.lines, "line")}, ${plural(stats.characters, "character")}`;
 }
 

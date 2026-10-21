@@ -17,7 +17,9 @@ function Sheet(props: React.ComponentProps<typeof SheetPrimitive.Root>) {
   return <SheetPrimitive.Root data-slot="sheet" {...props} />;
 }
 
-function SheetTrigger(props: React.ComponentProps<typeof SheetPrimitive.Trigger>) {
+function SheetTrigger(
+  props: React.ComponentProps<typeof SheetPrimitive.Trigger>,
+) {
   return <SheetPrimitive.Trigger data-slot="sheet-trigger" {...props} />;
 }
 
@@ -25,11 +27,16 @@ function SheetClose(props: React.ComponentProps<typeof SheetPrimitive.Close>) {
   return <SheetPrimitive.Close data-slot="sheet-close" {...props} />;
 }
 
-function SheetPortal(props: React.ComponentProps<typeof SheetPrimitive.Portal>) {
+function SheetPortal(
+  props: React.ComponentProps<typeof SheetPrimitive.Portal>,
+) {
   return <SheetPrimitive.Portal data-slot="sheet-portal" {...props} />;
 }
 
-function SheetOverlay({ className, ...props }: React.ComponentProps<typeof SheetPrimitive.Overlay>) {
+function SheetOverlay({
+  className,
+  ...props
+}: React.ComponentProps<typeof SheetPrimitive.Overlay>) {
   return (
     <SheetPrimitive.Overlay
       data-slot="sheet-overlay"
@@ -69,12 +76,19 @@ function SheetContent({
           {title}
         </SheetPrimitive.Title>
         {description ? (
-          <SheetPrimitive.Description data-slot="sheet-description" className="sr-only">
+          <SheetPrimitive.Description
+            data-slot="sheet-description"
+            className="sr-only"
+          >
             {description}
           </SheetPrimitive.Description>
         ) : null}
         {children}
-        <SheetPrimitive.Close data-slot="sheet-close" className="sheet-close" aria-label={closeLabel}>
+        <SheetPrimitive.Close
+          data-slot="sheet-close"
+          className="sheet-close"
+          aria-label={closeLabel}
+        >
           <X aria-hidden="true" size={18} />
         </SheetPrimitive.Close>
       </SheetPrimitive.Content>

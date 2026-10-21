@@ -24,7 +24,8 @@ import {
 const reader = translatorFor("reader");
 
 /** The count is the number of ranges; spelling it once keeps the tests readable. */
-const countMatches = (text: string, query: string) => matchRanges(text, query).length;
+const countMatches = (text: string, query: string) =>
+  matchRanges(text, query).length;
 
 describe("reader scale", () => {
   it("steps the text size in tens between eighty and one hundred and sixty", () => {
@@ -63,8 +64,9 @@ describe("reader vocabulary", () => {
   });
 
   it("uses a bureaucratic assessment scale instead of stars", () => {
-    expect(ASSESSMENT_SCALE.map((point) => assessmentLabel(point, reader)))
-      .toEqual(["—", "Marginal", "Adequate", "Sound", "Exemplary"]);
+    expect(
+      ASSESSMENT_SCALE.map((point) => assessmentLabel(point, reader)),
+    ).toEqual(["—", "Marginal", "Adequate", "Sound", "Exemplary"]);
     // The first point is the absence of a judgement, not the lowest one.
     expect(assessmentLabel(ASSESSMENT_SCALE[0], reader)).toBe("—");
   });
@@ -102,7 +104,10 @@ describe("reader search", () => {
   });
 
   it("reports where each match sits, so the sheet can highlight it", () => {
-    expect(matchRanges("a door and a door", "door")).toEqual([{ start: 2, end: 6 }, { start: 13, end: 17 }]);
+    expect(matchRanges("a door and a door", "door")).toEqual([
+      { start: 2, end: 6 },
+      { start: 13, end: 17 },
+    ]);
   });
 
   it("does not count a match twice when matches overlap", () => {
@@ -117,7 +122,9 @@ describe("reader search", () => {
 
   it("agrees with itself: the count is the number of ranges", () => {
     const text = "Interval. interval, INTERVAL.";
-    expect(countMatches(text, "interval")).toBe(matchRanges(text, "interval").length);
+    expect(countMatches(text, "interval")).toBe(
+      matchRanges(text, "interval").length,
+    );
   });
 });
 
@@ -127,8 +134,12 @@ describe("reader search readout", () => {
   });
 
   it("counts in the singular and in the plural", () => {
-    expect(describeMatches(1, "door plate", reader)).toBe("1 match for door plate.");
-    expect(describeMatches(3, "landing", reader)).toBe("3 matches for landing.");
+    expect(describeMatches(1, "door plate", reader)).toBe(
+      "1 match for door plate.",
+    );
+    expect(describeMatches(3, "landing", reader)).toBe(
+      "3 matches for landing.",
+    );
   });
 
   it("says so plainly when the term is not on the sheet", () => {
@@ -140,7 +151,10 @@ describe("reader search highlight", () => {
   it("styles the highlight it registers, because an unstyled one is painted as nothing", () => {
     // The count is written by hand and would read correctly either way, so this
     // is the only thing standing between a working search and a silent no-op.
-    const stylesheet = readFileSync(resolve(process.cwd(), "src/components/reader/reader.css"), "utf8");
+    const stylesheet = readFileSync(
+      resolve(process.cwd(), "src/components/reader/reader.css"),
+      "utf8",
+    );
     expect(READER_MATCH_HIGHLIGHT).toBe("reader-match");
     expect(stylesheet).toContain(`::highlight(${READER_MATCH_HIGHLIGHT})`);
   });

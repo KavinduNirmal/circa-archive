@@ -20,9 +20,9 @@ The scope is deliberately the markdown-specific tools, which is what the format 
 
 Sixteen buttons in two groups, each carrying the markdown it writes rather than a picture of the result. `B`, `I`, and `S` keep the word processor's own marks because those are the same in both languages; everything else prints its syntax, so the bar documents the format while it applies it. Each button's tooltip is the markdown it inserts, and each has the same fixed width, because a varying label like `{ }` would stagger the row.
 
-| Group | Tools |
-| --- | --- |
-| **Text** | bold, italic, strikethrough, inline code, heading 1 to 3 |
+| Group      | Tools                                                                                                       |
+| ---------- | ----------------------------------------------------------------------------------------------------------- |
+| **Text**   | bold, italic, strikethrough, inline code, heading 1 to 3                                                    |
 | **Blocks** | bulleted list, numbered list, blockquote, code block, link, image, table, horizontal rule, clear formatting |
 
 Every one of them toggles. Inline markup wraps a selection and unwraps it again; a heading marker replaces whatever heading was there instead of stacking a second `#`; a list marker added to a line that already has one removes it. The style box is a real control rather than a readout: choosing a level is the same edit the H1 to H3 buttons make.

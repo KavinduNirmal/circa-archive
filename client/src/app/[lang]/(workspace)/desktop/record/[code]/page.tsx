@@ -15,7 +15,9 @@ import { isRecordCode } from "@/lib/desktop-route";
  * param is decoded defensively so the page does not depend on which form the
  * router hands over.
  */
-type RecordPageProps = Readonly<{ params: Promise<{ lang: string; code: string }> }>;
+type RecordPageProps = Readonly<{
+  params: Promise<{ lang: string; code: string }>;
+}>;
 
 export const dynamicParams = false;
 

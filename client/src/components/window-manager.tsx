@@ -1,7 +1,12 @@
 "use client";
 
 import { useRef } from "react";
-import { WINDOW_MIN_SIZE, type DesktopArea, type WindowGeometry, type WorkstationWindowState } from "@/lib/desktop-types";
+import {
+  WINDOW_MIN_SIZE,
+  type DesktopArea,
+  type WindowGeometry,
+  type WorkstationWindowState,
+} from "@/lib/desktop-types";
 import { useWorkstationStore } from "@/stores/workstation-store-provider";
 import { DesktopIcon } from "./desktop-icons";
 
@@ -10,7 +15,11 @@ import { DesktopIcon } from "./desktop-icons";
  * and the pure route mapper can use them without importing a client component.
  * Re-exported here because this file is still the window manager's public face.
  */
-export type { DesktopArea, WindowGeometry, WorkstationWindowState } from "@/lib/desktop-types";
+export type {
+  DesktopArea,
+  WindowGeometry,
+  WorkstationWindowState,
+} from "@/lib/desktop-types";
 
 /**
  * Central window registry for the shell, read from the workstation store.
@@ -30,7 +39,16 @@ export function useWorkstationWindows() {
   const toggleMaximize = useWorkstationStore((state) => state.toggleMaximize);
   const setGeometry = useWorkstationStore((state) => state.setGeometry);
 
-  return { windows, lastFocused, open, close, focus, minimize, toggleMaximize, setGeometry };
+  return {
+    windows,
+    lastFocused,
+    open,
+    close,
+    focus,
+    minimize,
+    toggleMaximize,
+    setGeometry,
+  };
 }
 
 /**
@@ -44,7 +62,17 @@ export function useWorkstationWindows() {
  * gesture committed, which read as the window snapping somewhere else on
  * release. A gesture paints the frame directly and commits once on release.
  */
-export function WorkstationWindow({ window: item, area, active, children, onFocus, onClose, onMinimize, onMaximize, onGeometryChange }: {
+export function WorkstationWindow({
+  window: item,
+  area,
+  active,
+  children,
+  onFocus,
+  onClose,
+  onMinimize,
+  onMaximize,
+  onGeometryChange,
+}: {
   window: WorkstationWindowState;
   area: DesktopArea;
   active: boolean;
@@ -56,10 +84,26 @@ export function WorkstationWindow({ window: item, area, active, children, onFocu
   onGeometryChange: (geometry: WindowGeometry) => void;
 }) {
   const maximized = item.maximized;
-  const geometry = maximized ? { x: 0, y: 0, width: area.width, height: area.height } : item.geometry;
+  const geometry = maximized
+    ? { x: 0, y: 0, width: area.width, height: area.height }
+    : item.geometry;
   const frameRef = useRef<HTMLElement | null>(null);
-  const drag = useRef<{ pointerId: number; startX: number; startY: number; originX: number; originY: number; next: WindowGeometry } | null>(null);
-  const resize = useRef<{ pointerId: number; startX: number; startY: number; width: number; height: number; next: WindowGeometry } | null>(null);
+  const drag = useRef<{
+    pointerId: number;
+    startX: number;
+    startY: number;
+    originX: number;
+    originY: number;
+    next: WindowGeometry;
+  } | null>(null);
+  const resize = useRef<{
+    pointerId: number;
+    startX: number;
+    startY: number;
+    width: number;
+    height: number;
+    next: WindowGeometry;
+  } | null>(null);
 
   function paint(next: WindowGeometry) {
     const frame = frameRef.current;
@@ -82,9 +126,21 @@ export function WorkstationWindow({ window: item, area, active, children, onFocu
   function beginDrag(event: React.PointerEvent<HTMLElement>) {
     onFocus();
     // `button` is absent on some pointer events, so only reject an explicit secondary button.
-    if (maximized || event.button > 0 || (event.target as HTMLElement).closest("button")) return;
+    if (
+      maximized ||
+      event.button > 0 ||
+      (event.target as HTMLElement).closest("button")
+    )
+      return;
     event.currentTarget.setPointerCapture?.(event.pointerId);
-    drag.current = { pointerId: event.pointerId, startX: event.clientX, startY: event.clientY, originX: geometry.x, originY: geometry.y, next: geometry };
+    drag.current = {
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+      originX: geometry.x,
+      originY: geometry.y,
+      next: geometry,
+    };
     // Safety net for a release the frame never sees, so a gesture can never outlive its pointer.
     window.addEventListener("pointerup", endDrag);
   }
@@ -94,8 +150,14 @@ export function WorkstationWindow({ window: item, area, active, children, onFocu
     if (!state || state.pointerId !== event.pointerId) return;
     state.next = {
       ...state.next,
-      x: clampX(state.originX + (event.clientX - state.startX), state.next.width),
-      y: clampY(state.originY + (event.clientY - state.startY), state.next.height),
+      x: clampX(
+        state.originX + (event.clientX - state.startX),
+        state.next.width,
+      ),
+      y: clampY(
+        state.originY + (event.clientY - state.startY),
+        state.next.height,
+      ),
     };
     paint(state.next);
   }
@@ -104,7 +166,8 @@ export function WorkstationWindow({ window: item, area, active, children, onFocu
     const state = drag.current;
     drag.current = null;
     window.removeEventListener("pointerup", endDrag);
-    if (state && (state.next.x !== geometry.x || state.next.y !== geometry.y)) onGeometryChange(state.next);
+    if (state && (state.next.x !== geometry.x || state.next.y !== geometry.y))
+      onGeometryChange(state.next);
   }
 
   /** Starts a corner resize; the commit happens once on release, like the drag. */
@@ -113,15 +176,34 @@ export function WorkstationWindow({ window: item, area, active, children, onFocu
     onFocus();
     if (event.button > 0) return;
     event.currentTarget.setPointerCapture?.(event.pointerId);
-    resize.current = { pointerId: event.pointerId, startX: event.clientX, startY: event.clientY, width: geometry.width, height: geometry.height, next: geometry };
+    resize.current = {
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+      width: geometry.width,
+      height: geometry.height,
+      next: geometry,
+    };
     window.addEventListener("pointerup", endResize);
   }
 
   function moveResize(event: React.PointerEvent<HTMLElement>) {
     const state = resize.current;
     if (!state || state.pointerId !== event.pointerId) return;
-    const width = Math.max(WINDOW_MIN_SIZE.width, Math.min(area.width - geometry.x, state.width + (event.clientX - state.startX)));
-    const height = Math.max(WINDOW_MIN_SIZE.height, Math.min(area.height - geometry.y, state.height + (event.clientY - state.startY)));
+    const width = Math.max(
+      WINDOW_MIN_SIZE.width,
+      Math.min(
+        area.width - geometry.x,
+        state.width + (event.clientX - state.startX),
+      ),
+    );
+    const height = Math.max(
+      WINDOW_MIN_SIZE.height,
+      Math.min(
+        area.height - geometry.y,
+        state.height + (event.clientY - state.startY),
+      ),
+    );
     state.next = { ...state.next, width, height };
     paint(state.next);
   }
@@ -130,33 +212,71 @@ export function WorkstationWindow({ window: item, area, active, children, onFocu
     const state = resize.current;
     resize.current = null;
     window.removeEventListener("pointerup", endResize);
-    if (state && (state.next.width !== geometry.width || state.next.height !== geometry.height)) onGeometryChange(state.next);
+    if (
+      state &&
+      (state.next.width !== geometry.width ||
+        state.next.height !== geometry.height)
+    )
+      onGeometryChange(state.next);
   }
 
   return (
     <section
-      ref={(node) => { frameRef.current = node; }}
-      className={["workstation-window", "circa-raised", active ? "is-active" : "is-inactive"].join(" ")}
+      ref={(node) => {
+        frameRef.current = node;
+      }}
+      className={[
+        "workstation-window",
+        "circa-raised",
+        active ? "is-active" : "is-inactive",
+      ].join(" ")}
       role="dialog"
       aria-label={item.title}
       data-maximized={maximized ? "true" : undefined}
       data-minimized={item.minimized ? "true" : undefined}
       /* Hidden rather than unmounted, so the window keeps what it was holding. */
       hidden={item.minimized}
-      style={{ zIndex: item.z, left: geometry.x, top: geometry.y, width: geometry.width, height: geometry.height }}
+      style={{
+        zIndex: item.z,
+        left: geometry.x,
+        top: geometry.y,
+        width: geometry.width,
+        height: geometry.height,
+      }}
       onPointerDown={onFocus}
     >
-      <div className="window-titlebar" data-testid={`window-titlebar-${item.id}`}
-        onPointerDown={beginDrag} onPointerMove={moveDrag} onPointerUp={endDrag} onPointerCancel={endDrag}>
+      <div
+        className="window-titlebar"
+        data-testid={`window-titlebar-${item.id}`}
+        onPointerDown={beginDrag}
+        onPointerMove={moveDrag}
+        onPointerUp={endDrag}
+        onPointerCancel={endDrag}
+      >
         <span className="window-title">{item.title}</span>
         <div className="window-controls">
-          <button type="button" className="window-control circa-raised" aria-label={`Minimize ${item.title}`} onClick={onMinimize}>
+          <button
+            type="button"
+            className="window-control circa-raised"
+            aria-label={`Minimize ${item.title}`}
+            onClick={onMinimize}
+          >
             <span aria-hidden="true">_</span>
           </button>
-          <button type="button" className="window-control circa-raised" aria-label={`${maximized ? "Restore" : "Maximize"} ${item.title}`} onClick={onMaximize}>
+          <button
+            type="button"
+            className="window-control circa-raised"
+            aria-label={`${maximized ? "Restore" : "Maximize"} ${item.title}`}
+            onClick={onMaximize}
+          >
             <span aria-hidden="true">{maximized ? "❐" : "□"}</span>
           </button>
-          <button type="button" className="window-control window-control-close circa-raised" aria-label={`Close ${item.title}`} onClick={onClose}>
+          <button
+            type="button"
+            className="window-control window-control-close circa-raised"
+            aria-label={`Close ${item.title}`}
+            onClick={onClose}
+          >
             <span aria-hidden="true">×</span>
           </button>
         </div>
@@ -166,13 +286,17 @@ export function WorkstationWindow({ window: item, area, active, children, onFocu
           <span>{item.status}</span>
         </div>
       )}
-      <div className="window-body">
-        {children}
-      </div>
+      <div className="window-body">{children}</div>
       {!maximized && (
-        <div className="workstation-window-resize" role="presentation" aria-hidden="true"
-          onPointerDown={beginResize} onPointerMove={moveResize}
-          onPointerUp={endResize} onPointerCancel={endResize} />
+        <div
+          className="workstation-window-resize"
+          role="presentation"
+          aria-hidden="true"
+          onPointerDown={beginResize}
+          onPointerMove={moveResize}
+          onPointerUp={endResize}
+          onPointerCancel={endResize}
+        />
       )}
     </section>
   );
@@ -188,7 +312,13 @@ export function WorkstationWindow({ window: item, area, active, children, onFocu
  * the hiding, so assistive technology stops seeing the window at the same
  * moment the screen does.
  */
-export function WindowLayer({ windows, area, activeId, childrenFor, ...handlers }: {
+export function WindowLayer({
+  windows,
+  area,
+  activeId,
+  childrenFor,
+  ...handlers
+}: {
   windows: WorkstationWindowState[];
   area: DesktopArea;
   activeId: string | null;
@@ -201,16 +331,25 @@ export function WindowLayer({ windows, area, activeId, childrenFor, ...handlers 
 }) {
   return (
     <div className="window-layer">
-      {[...windows].sort((a, b) => a.z - b.z).map((item) => (
-        <WorkstationWindow key={item.id} window={item} area={area} active={item.id === activeId}
-          onFocus={() => handlers.onFocus(item.id)}
-          onClose={() => handlers.onClose(item.id)}
-          onMinimize={() => handlers.onMinimize(item.id)}
-          onMaximize={() => handlers.onMaximize(item.id)}
-          onGeometryChange={(geometry) => handlers.onGeometryChange(item.id, geometry)}>
-          {childrenFor(item)}
-        </WorkstationWindow>
-      ))}
+      {[...windows]
+        .sort((a, b) => a.z - b.z)
+        .map((item) => (
+          <WorkstationWindow
+            key={item.id}
+            window={item}
+            area={area}
+            active={item.id === activeId}
+            onFocus={() => handlers.onFocus(item.id)}
+            onClose={() => handlers.onClose(item.id)}
+            onMinimize={() => handlers.onMinimize(item.id)}
+            onMaximize={() => handlers.onMaximize(item.id)}
+            onGeometryChange={(geometry) =>
+              handlers.onGeometryChange(item.id, geometry)
+            }
+          >
+            {childrenFor(item)}
+          </WorkstationWindow>
+        ))}
     </div>
   );
 }
@@ -220,7 +359,11 @@ export function WindowLayer({ windows, area, activeId, childrenFor, ...handlers 
  * pressed while its window is open and pressed further while it holds focus, the
  * same way the Settings task item shows its own state.
  */
-export function TaskbarWindows({ windows, activeId, onSelect }: {
+export function TaskbarWindows({
+  windows,
+  activeId,
+  onSelect,
+}: {
   windows: WorkstationWindowState[];
   activeId: string | null;
   onSelect: (id: string) => void;
@@ -228,13 +371,22 @@ export function TaskbarWindows({ windows, activeId, onSelect }: {
   return (
     <>
       {windows.map((item) => (
-        <button key={item.id} type="button"
-          className={["taskbar-task-anchor", "taskbar-window", item.id === activeId ? "is-active" : null].filter(Boolean).join(" ")}
+        <button
+          key={item.id}
+          type="button"
+          className={[
+            "taskbar-task-anchor",
+            "taskbar-window",
+            item.id === activeId ? "is-active" : null,
+          ]
+            .filter(Boolean)
+            .join(" ")}
           aria-label={item.title}
           aria-pressed={item.minimized}
           data-open={item.minimized ? undefined : "true"}
           data-active={item.id === activeId ? "true" : undefined}
-          onClick={() => onSelect(item.id)}>
+          onClick={() => onSelect(item.id)}
+        >
           <span className="taskbar-task">
             <DesktopIcon icon={item.icon} className="taskbar-window-icon" />
             <span>{item.title}</span>

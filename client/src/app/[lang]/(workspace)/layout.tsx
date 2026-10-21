@@ -22,7 +22,9 @@ import { WorkstationStoreProvider } from "@/stores/workstation-store-provider";
  */
 type WorkspaceLayoutProps = Readonly<{ params: Promise<{ lang: string }> }>;
 
-export async function generateMetadata({ params }: WorkspaceLayoutProps): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: WorkspaceLayoutProps): Promise<Metadata> {
   const { lang } = await params;
   const t = await getTranslations({ locale: lang, namespace: "metadata" });
   return {
@@ -38,7 +40,9 @@ export async function generateMetadata({ params }: WorkspaceLayoutProps): Promis
   };
 }
 
-export default async function WorkspaceLayout({ params }: WorkspaceLayoutProps) {
+export default async function WorkspaceLayout({
+  params,
+}: WorkspaceLayoutProps) {
   const { lang } = await params;
   setRequestLocale(lang);
   return (
