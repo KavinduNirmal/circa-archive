@@ -19,7 +19,7 @@ Checks that ran from the repository root:
 Server-rendered evidence from the development server at port 3001:
 
 - `/desktop` markup contains all nine desktop shortcuts (`My PC`, `My Documents`, `Archive`, `Organizations`, `Inbox`, `CIRCA Word`, `Search`, `_EXPUNGED`, `Recycle Bin`) and both tray controls (`Notifications`, `Settings`), with `WRITE.exe` and a desktop-level `System` shortcut absent.
-- Exactly two `[data-shortcut]` markers render, on Archive and _EXPUNGED, each pointing at `/icons/overlay_shortcut-2.png`.
+- Exactly two `[data-shortcut]` markers render, on Archive and \_EXPUNGED, each pointing at `/icons/overlay_shortcut-2.png`.
 - Every `/icons/*.png` referenced by the markup returns `200 image/png`.
 - Compiled CSS confirms the reviewed values: 48px desktop icons, 24px shortcut marker, one-column 92px left rail, no wallpaper dimming gradient, no filled label plate, per-pixel `saturate(.4) brightness(.85)` icon filter, and no `mix-blend-mode` rule.
 

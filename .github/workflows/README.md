@@ -14,3 +14,5 @@ Run the repository's verification and security checks on every change, and publi
 ## Boundaries and usage
 
 Workflows are the automation of record: run the same commands locally from the repository root or `client/` before pushing. Keep the Bun version aligned with `packageManager` in `package.json` and `client/package.json`. Job names are referenced by repository rulesets, so rename them only alongside the ruleset. Do not add secrets to workflows; the project uses the default read-only `GITHUB_TOKEN` except where a job declares a narrower write permission.
+
+`ci.yml` also checks the independent Astro project (Node 24, Bun, lint, types, Vitest, static build and Chromium) and exercises real Nginx host routing through disposable Docker fixtures.
