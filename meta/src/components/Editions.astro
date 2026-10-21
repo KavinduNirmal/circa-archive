@@ -1,0 +1,29 @@
+---
+import { t, archiveHref, type Locale } from "../lib/site";
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+---
+
+<div class="editions">
+  <article>
+    <span class="eyebrow">01 / {t(locale, "readingNote")}</span>
+    <h3>{t(locale, "readingTitle")}</h3>
+    <p>{t(locale, "readingBody")}</p>
+    <a class="text-link" href={archiveHref(locale)}>
+      {t(locale, "readingLink")} <span aria-hidden="true">↗</span>
+    </a>
+  </article>
+  <article class="workstation-edition">
+    <span class="eyebrow">02 / {t(locale, "workstationNote")}</span>
+    <div class="terminal-label" aria-hidden="true">
+      CIRCA/OS<span>_</span>
+    </div>
+    <h3>{t(locale, "workstationTitle")}</h3>
+    <p>{t(locale, "workstationBody")}</p>
+    <a class="text-link" href={archiveHref(locale, "/desktop")}>
+      {t(locale, "workstationLink")} <span aria-hidden="true">↗</span>
+    </a>
+  </article>
+</div>
