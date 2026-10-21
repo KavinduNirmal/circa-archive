@@ -6,19 +6,19 @@
 
 아래 라우트가 공개 표면의 전부입니다. 모두 언어 세그먼트 아래에 있습니다.
 
-| 라우트 | 렌더링 |
-| --- | --- |
-| `/[lang]` | 위원회의 목소리로 된 공개 포털. |
-| `/[lang]/site` | 열람판의 첫 페이지. |
-| `/[lang]/site/records` | 기록 색인. q 매개변수는 서버에서 필터링됩니다. |
-| `/[lang]/site/records/[code]` | 색인의 모든 코드에 대해 미리 렌더링된 하나의 기록. |
-| `/[lang]/site/records/[code]/download` | 마크다운과 일반 텍스트 사본. 보류된 서류는 404. |
-| `/[lang]/site/organizations` | 조직 디렉터리. |
-| `/[lang]/site/random` | 무작위로 선택된 기록으로의 리다이렉트. |
-| `/[lang]/desktop` | CIRCA/OS 워크스테이션 프리뷰. |
-| `/[lang]/meta` | 프로젝트 랜딩 페이지. |
-| `/[lang]/meta/about` | 픽션 바깥의 프로젝트 기록. |
-| `/[lang]/meta/documentation` | 이 문서. |
+| 라우트                                 | 렌더링                                             |
+| -------------------------------------- | -------------------------------------------------- |
+| `/[lang]`                              | 위원회의 목소리로 된 공개 포털.                    |
+| `/[lang]/site`                         | 열람판의 첫 페이지.                                |
+| `/[lang]/site/records`                 | 기록 색인. q 매개변수는 서버에서 필터링됩니다.     |
+| `/[lang]/site/records/[code]`          | 색인의 모든 코드에 대해 미리 렌더링된 하나의 기록. |
+| `/[lang]/site/records/[code]/download` | 마크다운과 일반 텍스트 사본. 보류된 서류는 404.    |
+| `/[lang]/site/organizations`           | 조직 디렉터리.                                     |
+| `/[lang]/site/random`                  | 무작위로 선택된 기록으로의 리다이렉트.             |
+| `/[lang]/desktop`                      | CIRCA/OS 워크스테이션 프리뷰.                      |
+| `/[lang]/meta`                         | 프로젝트 랜딩 페이지.                              |
+| `/[lang]/meta/about`                   | 픽션 바깥의 프로젝트 기록.                         |
+| `/[lang]/meta/documentation`           | 이 문서.                                           |
 
 ## 언어는 경로에 있습니다
 

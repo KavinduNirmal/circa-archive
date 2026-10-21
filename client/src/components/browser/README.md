@@ -8,16 +8,16 @@ A record is the one thing this window does not open. Reading a record is the [re
 
 The fiction drives the interaction model. The local network permits one address and one tab, so every other browser affordance is present, correct, and refused with an in-world reason rather than hidden:
 
-| Affordance | Behaviour |
-| --- | --- |
-| The single tab | Permanent, never closable, always labelled `CIRCA Internal Archive`. Activating it returns to the index. |
-| **New tab** (`File`, and the `+` in the tab strip) | Refused: additional browser contexts are not permitted on the local network. |
-| Address bar | Editable, but only the archive address resolves. Any other host is refused and the field is taken back. |
-| Bookmarking | Disabled, with the reason on the item. |
-| **Stop** | Permanently disabled and labelled `No transfer in progress`: this browser never has a transfer to abort. |
-| Back / Forward | Real. A document stack with a cursor drives them, and they are disabled at the ends of that stack. A record is not a document in that stack: opening one leaves the index on screen. |
-| Refresh / Home | Real; both report what they did in the status bar. |
-| View → Text size | Real; scales the document through `data-text-size` without touching chrome. |
+| Affordance                                         | Behaviour                                                                                                                                                                            |
+| -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| The single tab                                     | Permanent, never closable, always labelled `CIRCA Internal Archive`. Activating it returns to the index.                                                                             |
+| **New tab** (`File`, and the `+` in the tab strip) | Refused: additional browser contexts are not permitted on the local network.                                                                                                         |
+| Address bar                                        | Editable, but only the archive address resolves. Any other host is refused and the field is taken back.                                                                              |
+| Bookmarking                                        | Disabled, with the reason on the item.                                                                                                                                               |
+| **Stop**                                           | Permanently disabled and labelled `No transfer in progress`: this browser never has a transfer to abort.                                                                             |
+| Back / Forward                                     | Real. A document stack with a cursor drives them, and they are disabled at the ends of that stack. A record is not a document in that stack: opening one leaves the index on screen. |
+| Refresh / Home                                     | Real; both report what they did in the status bar.                                                                                                                                   |
+| View → Text size                                   | Real; scales the document through `data-text-size` without touching chrome.                                                                                                          |
 
 ## Structure
 

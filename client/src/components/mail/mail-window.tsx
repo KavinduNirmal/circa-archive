@@ -31,7 +31,14 @@ import {
   type MailView,
 } from "./mail-chrome";
 import { MessageList } from "./message-list";
-import { ComposePane, ReadingEmpty, ReadingPane, draftFrom, type ComposeDraft, type ComposeKind } from "./message-view";
+import {
+  ComposePane,
+  ReadingEmpty,
+  ReadingPane,
+  draftFrom,
+  type ComposeDraft,
+  type ComposeKind,
+} from "./message-view";
 import { MailNotice, type MailNoticeKind } from "./mail-notice";
 import "./mail.css";
 
@@ -66,8 +73,11 @@ const PREPARED_KEYS: Record<ComposeKind, string> = {
  */
 export function MailWindow({ onCloseWindow }: { onCloseWindow: () => void }) {
   const t = useTranslations("mail");
-  const [messages, setMessages] = useState<readonly MailMessage[]>(MAILBOX_FIXTURE);
-  const [read, setRead] = useState<ReadonlySet<string>>(() => readIds(MAILBOX_FIXTURE));
+  const [messages, setMessages] =
+    useState<readonly MailMessage[]>(MAILBOX_FIXTURE);
+  const [read, setRead] = useState<ReadonlySet<string>>(() =>
+    readIds(MAILBOX_FIXTURE),
+  );
   const [folderId, setFolderId] = useState<MailFolderId>("inbox");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [sort, setSort] = useState<MailSort>(DEFAULT_SORT);
@@ -76,20 +86,35 @@ export function MailWindow({ onCloseWindow }: { onCloseWindow: () => void }) {
   const [query, setQuery] = useState("");
   const [compose, setCompose] = useState<ComposeDraft | null>(null);
   const [notice, setNotice] = useState<MailNoticeKind | null>(null);
-  const [report, setReport] = useState(() => t("ready", { count: MAILBOX_FIXTURE.length }));
+  const [report, setReport] = useState(() =>
+    t("ready", { count: MAILBOX_FIXTURE.length }),
+  );
 
-  const selected = compose || !selectedId ? null : messages.find((item) => item.id === selectedId) ?? null;
+  const selected =
+    compose || !selectedId
+      ? null
+      : (messages.find((item) => item.id === selectedId) ?? null);
 
-  const unreadByFolder = useMemo(() => Object.fromEntries(
-    MAIL_FOLDERS.map((folder) => [folder.id, unreadCount(folderMessages(messages, folder.id), read)]),
-  ) as Record<MailFolderId, number>, [messages, read]);
+  const unreadByFolder = useMemo(
+    () =>
+      Object.fromEntries(
+        MAIL_FOLDERS.map((folder) => [
+          folder.id,
+          unreadCount(folderMessages(messages, folder.id), read),
+        ]),
+      ) as Record<MailFolderId, number>,
+    [messages, read],
+  );
 
   /** The rows the grid is showing, after the view filter, find, and sort. */
   const listed = useMemo(() => {
     let items = folderMessages(messages, folderId);
     // A message stays listed in the unread view while it is open, so marking it
     // read does not make the row vanish under the cursor.
-    if (view === "unread") items = items.filter((item) => isUnread(item, read) || item.id === selectedId);
+    if (view === "unread")
+      items = items.filter(
+        (item) => isUnread(item, read) || item.id === selectedId,
+      );
     return sortMessages(findMessages(items, query), sort);
   }, [messages, folderId, view, query, sort, read, selectedId]);
 
@@ -107,20 +132,28 @@ export function MailWindow({ onCloseWindow }: { onCloseWindow: () => void }) {
   function select(message: MailMessage) {
     setSelectedId(message.id);
     setCompose(null);
-    setRead((current) => (current.has(message.id) ? current : new Set(current).add(message.id)));
+    setRead((current) =>
+      current.has(message.id) ? current : new Set(current).add(message.id),
+    );
     setReport(t("messageOpened", { subject: message.subject }));
   }
 
   function sortBy(column: MailSortColumn) {
-    setSort((current) => current.column === column
-      ? { column, direction: current.direction === "asc" ? "desc" : "asc" }
-      : { column, direction: column === "received" ? "desc" : "asc" });
+    setSort((current) =>
+      current.column === column
+        ? { column, direction: current.direction === "asc" ? "desc" : "asc" }
+        : { column, direction: column === "received" ? "desc" : "asc" },
+    );
     setReport(t("sortedBy", { column: t(SORTABLE_KEYS[column]) }));
   }
 
   function deleteSelected() {
     if (!selected) return;
-    setMessages((current) => current.map((item) => (item.id === selected.id ? { ...item, folder: "deleted" } : item)));
+    setMessages((current) =>
+      current.map((item) =>
+        item.id === selected.id ? { ...item, folder: "deleted" } : item,
+      ),
+    );
     setSelectedId(null);
     setReport(t("movedToDeleted", { subject: selected.subject }));
   }
@@ -143,7 +176,11 @@ export function MailWindow({ onCloseWindow }: { onCloseWindow: () => void }) {
 
   function sendReceive() {
     const waiting = countInFolder(messages, "outbox");
-    setReport(waiting === 0 ? t("transportIdle") : t("transportBlocked", { count: waiting }));
+    setReport(
+      waiting === 0
+        ? t("transportIdle")
+        : t("transportBlocked", { count: waiting }),
+    );
   }
 
   function startCompose(kind: ComposeKind) {
@@ -196,23 +233,59 @@ export function MailWindow({ onCloseWindow }: { onCloseWindow: () => void }) {
 
   return (
     <div className="mail">
-      <MailMenu folderId={folderId} view={view} findOpen={findOpen} hasSelection={selected !== null} actions={actions} />
-      <MailToolbar hasSelection={selected !== null} findOpen={findOpen} actions={actions} />
+      <MailMenu
+        folderId={folderId}
+        view={view}
+        findOpen={findOpen}
+        hasSelection={selected !== null}
+        actions={actions}
+      />
+      <MailToolbar
+        hasSelection={selected !== null}
+        findOpen={findOpen}
+        actions={actions}
+      />
       <div className="mail-body">
-        <MailFolders folderId={folderId} unread={unreadByFolder} onSelect={showFolder} />
+        <MailFolders
+          folderId={folderId}
+          unread={unreadByFolder}
+          onSelect={showFolder}
+        />
         <div className="mail-main">
-          {findOpen && <MailFindBar query={query} onQueryChange={setQuery} onClear={() => setQuery("")} />}
-          <MessageList messages={listed} read={read} selectedId={selectedId} sort={sort}
-            onSort={sortBy} onSelect={select} />
+          {findOpen && (
+            <MailFindBar
+              query={query}
+              onQueryChange={setQuery}
+              onClear={() => setQuery("")}
+            />
+          )}
+          <MessageList
+            messages={listed}
+            read={read}
+            selectedId={selectedId}
+            sort={sort}
+            onSort={sortBy}
+            onSelect={select}
+          />
           <div className="mail-view">
-            {compose
-              ? <ComposePane draft={compose} onChange={setCompose} onSend={sendDraft} onDiscard={() => {
-                setCompose(null);
-                setReport(t("messageDiscarded"));
-              }} />
-              : selected
-                ? <ReadingPane message={selected} />
-                : <ReadingEmpty folderLabel={folderLabel(t, folderId)} items={listed.length} />}
+            {compose ? (
+              <ComposePane
+                draft={compose}
+                onChange={setCompose}
+                onSend={sendDraft}
+                onDiscard={() => {
+                  setCompose(null);
+                  setReport(t("messageDiscarded"));
+                }}
+              />
+            ) : selected ? (
+              <ReadingPane message={selected} />
+            ) : (
+              <ReadingEmpty
+                folderLabel={folderLabel(t, folderId)}
+                items={listed.length}
+              />
+            )}
           </div>
         </div>
       </div>

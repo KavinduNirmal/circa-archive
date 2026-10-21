@@ -4,7 +4,9 @@ import { ArchiveExplorations } from "@/components/archive-site/archive-explorati
 import { SITE_INDEX } from "@/components/archive-site/archive-data";
 import { explorationsFor } from "@/components/reader/reader-correspondence";
 
-type ExplorationsPageProps = Readonly<{ params: Promise<{ lang: string; code: string }> }>;
+type ExplorationsPageProps = Readonly<{
+  params: Promise<{ lang: string; code: string }>;
+}>;
 
 /**
  * Only records that actually have explorations are prerendered. The count in a
@@ -12,14 +14,20 @@ type ExplorationsPageProps = Readonly<{ params: Promise<{ lang: string; code: st
  * no address worth generating; a direct visit still resolves to a 404.
  */
 export function generateStaticParams() {
-  return SITE_INDEX
-    .filter((entry) => explorationsFor(entry.code).length > 0)
-    .map((entry) => ({ code: entry.code }));
+  return SITE_INDEX.filter(
+    (entry) => explorationsFor(entry.code).length > 0,
+  ).map((entry) => ({ code: entry.code }));
 }
 
-export async function generateMetadata({ params }: ExplorationsPageProps): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: ExplorationsPageProps): Promise<Metadata> {
   const { lang, code } = await params;
-  if (!SITE_INDEX.some((entry) => entry.code === code) || explorationsFor(code).length === 0) return {};
+  if (
+    !SITE_INDEX.some((entry) => entry.code === code) ||
+    explorationsFor(code).length === 0
+  )
+    return {};
   const [metadata, site] = await Promise.all([
     getTranslations({ locale: lang, namespace: "metadata" }),
     getTranslations({ locale: lang, namespace: "site" }),
@@ -38,7 +46,9 @@ export async function generateMetadata({ params }: ExplorationsPageProps): Promi
   };
 }
 
-export default async function ExplorationsPage({ params }: ExplorationsPageProps) {
+export default async function ExplorationsPage({
+  params,
+}: ExplorationsPageProps) {
   const { lang, code } = await params;
   setRequestLocale(lang);
   return <ArchiveExplorations code={code} />;

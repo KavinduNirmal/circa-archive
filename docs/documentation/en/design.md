@@ -6,11 +6,11 @@ The repository speaks in three registers. Which one you are in decides almost ev
 
 CIRCA Archive is not one design system. It is three, each answering a different question.
 
-| System | Surface | Rule |
-| --- | --- | --- |
-| Workstation | `/desktop` | 1990s institutional software: steel, bevels, dense chrome, 12px. Never use it outside the desktop. |
-| Reading edition | `/site` | paper, ink, a serif masthead, filed documents. Depth is a bevel; no gradients. |
-| Project page | `/meta` | near-black, bone, ember, serif display, mono labels, a hairline field. Not bound by the workstation rules. |
+| System          | Surface    | Rule                                                                                                       |
+| --------------- | ---------- | ---------------------------------------------------------------------------------------------------------- |
+| Workstation     | `/desktop` | 1990s institutional software: steel, bevels, dense chrome, 12px. Never use it outside the desktop.         |
+| Reading edition | `/site`    | paper, ink, a serif masthead, filed documents. Depth is a bevel; no gradients.                             |
+| Project page    | `/meta`    | near-black, bone, ember, serif display, mono labels, a hairline field. Not bound by the workstation rules. |
 
 > [!NOTE]
 > The project page is the exception
@@ -21,16 +21,16 @@ CIRCA Archive is not one design system. It is three, each answering a different 
 
 The project page's tokens are declared once on .meta-page in components/meta/meta.css. Use them, and do not introduce a fourth accent.
 
-| Token | Use |
-| --- | --- |
-| `--meta-ink` | the near-black canvas behind every page. |
-| `--meta-bone` | primary text, the solid key, and the specimen sheet. |
-| `--meta-mist` | secondary text and labels; the smaller size is for captions. |
+| Token          | Use                                                                            |
+| -------------- | ------------------------------------------------------------------------------ |
+| `--meta-ink`   | the near-black canvas behind every page.                                       |
+| `--meta-bone`  | primary text, the solid key, and the specimen sheet.                           |
+| `--meta-mist`  | secondary text and labels; the smaller size is for captions.                   |
 | `--meta-ember` | index numerals, links, focus rings, and the one accent. Never the only signal. |
-| `--meta-line` | rules and borders at 14% bone; the soft variant divides sections. |
-| `--meta-serif` | the argument: display headlines, section titles, quotations, and names. |
-| `--meta-sans` | reading copy and controls; 16–17px for body text. |
-| `--meta-mono` | every label, index, caption, command, and code sample. |
+| `--meta-line`  | rules and borders at 14% bone; the soft variant divides sections.              |
+| `--meta-serif` | the argument: display headlines, section titles, quotations, and names.        |
+| `--meta-sans`  | reading copy and controls; 16–17px for body text.                              |
+| `--meta-mono`  | every label, index, caption, command, and code sample.                         |
 
 The meta scope also carries the shadcn variables, so a primitive from components/ui inherits this palette without restyling globals. Keep meta styles scoped: the workstation stylesheet must not reach in, and this one must not reach out.
 

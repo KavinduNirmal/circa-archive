@@ -13,13 +13,22 @@ export default defineConfig({
     {
       command: "dotnet run --project ../backend/tests/Circa.BrowserTestHost",
       url: "http://localhost:5041/api/v1/",
-      env: { DOTNET_PROCESSOR_COUNT: "1", DOTNET_CLI_USE_MSBUILD_SERVER: "0", MSBUILDDISABLENODEREUSE: "1" },
+      env: {
+        DOTNET_PROCESSOR_COUNT: "1",
+        DOTNET_CLI_USE_MSBUILD_SERVER: "0",
+        MSBUILDDISABLENODEREUSE: "1",
+      },
       timeout: 120000,
       gracefulShutdown: { signal: "SIGTERM", timeout: 10000 },
     },
     {
       command: "bunx next dev --hostname 127.0.0.1 --port 3101",
-      env: { API_ORIGIN: "http://localhost:5041", CIRCA_AUTH_E2E: "1", CIRCA_LOW_RESOURCE: "1", RAYON_NUM_THREADS: "1" },
+      env: {
+        API_ORIGIN: "http://localhost:5041",
+        CIRCA_AUTH_E2E: "1",
+        CIRCA_LOW_RESOURCE: "1",
+        RAYON_NUM_THREADS: "1",
+      },
       url: "http://127.0.0.1:3101/en/site",
       timeout: 120000,
     },

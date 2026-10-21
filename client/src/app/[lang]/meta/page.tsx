@@ -9,7 +9,9 @@ export function generateStaticParams() {
   return routing.locales.map((lang) => ({ lang }));
 }
 
-export async function generateMetadata({ params }: MetaHomePageProps): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: MetaHomePageProps): Promise<Metadata> {
   const { lang } = await params;
   const t = await getTranslations({ locale: lang, namespace: "metadata" });
   const title = t("metaHomeTitle");
@@ -17,7 +19,12 @@ export async function generateMetadata({ params }: MetaHomePageProps): Promise<M
   return {
     title: { absolute: title },
     description,
-    openGraph: { type: "website", siteName: t("registryName"), title, description },
+    openGraph: {
+      type: "website",
+      siteName: t("registryName"),
+      title,
+      description,
+    },
     twitter: { card: "summary", title, description },
   };
 }

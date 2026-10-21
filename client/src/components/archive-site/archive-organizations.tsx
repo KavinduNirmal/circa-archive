@@ -34,11 +34,19 @@ export function ArchiveOrganizations({ query = "" }: { query?: string }) {
       )
     : ORGANIZATIONS;
 
-  const filedDates = ORGANIZATIONS.map((organization) => organization.filed).sort();
-  const totalFilings = ORGANIZATIONS.reduce((sum, organization) => sum + filingsFor(organization.code), 0);
+  const filedDates = ORGANIZATIONS.map(
+    (organization) => organization.filed,
+  ).sort();
+  const totalFilings = ORGANIZATIONS.reduce(
+    (sum, organization) => sum + filingsFor(organization.code),
+    0,
+  );
 
   return (
-    <ArchiveChrome active="organizations" trail={[{ label: t("trailOrganizations") }]}>
+    <ArchiveChrome
+      active="organizations"
+      trail={[{ label: t("trailOrganizations") }]}
+    >
       <main id="site-content" tabIndex={-1} className={styles.page}>
         <header className={styles.pageHead}>
           <div className={styles.orgHead}>
@@ -64,7 +72,9 @@ export function ArchiveOrganizations({ query = "" }: { query?: string }) {
               </div>
               <div>
                 <dt>{t("ledgerLatest")}</dt>
-                <dd className="circa-mono">{filedDates[filedDates.length - 1]}</dd>
+                <dd className="circa-mono">
+                  {filedDates[filedDates.length - 1]}
+                </dd>
               </div>
             </dl>
           </div>
@@ -86,7 +96,10 @@ export function ArchiveOrganizations({ query = "" }: { query?: string }) {
                 aria-label={t("orgSearchLabel")}
                 autoComplete="off"
               />
-              <ArchiveButton type="submit" icon={<Search size={12} strokeWidth={2} aria-hidden="true" />}>
+              <ArchiveButton
+                type="submit"
+                icon={<Search size={12} strokeWidth={2} aria-hidden="true" />}
+              >
                 {t("searchButton")}
               </ArchiveButton>
             </div>
@@ -100,10 +113,15 @@ export function ArchiveOrganizations({ query = "" }: { query?: string }) {
             <p className={styles.resultBar}>
               <span className={styles.count}>
                 {term
-                  ? t("orgSearchResults", { count: entries.length, query: query.trim() })
+                  ? t("orgSearchResults", {
+                      count: entries.length,
+                      query: query.trim(),
+                    })
                   : t("orgCount", { count: ORGANIZATIONS.length })}
               </span>
-              {term ? <Link href="/site/organizations">{t("searchClear")}</Link> : null}
+              {term ? (
+                <Link href="/site/organizations">{t("searchClear")}</Link>
+              ) : null}
             </p>
 
             <ul className={styles.orgList}>
@@ -117,27 +135,54 @@ export function ArchiveOrganizations({ query = "" }: { query?: string }) {
 
                     <div className={styles.orgBody}>
                       <p className={styles.orgMeta}>
-                        <span className={styles.orgCode} data-klass="organization">{organization.code}</span>
-                        <span className={styles.statusChip} data-status={organization.status}>
+                        <span
+                          className={styles.orgCode}
+                          data-klass="organization"
+                        >
+                          {organization.code}
+                        </span>
+                        <span
+                          className={styles.statusChip}
+                          data-status={organization.status}
+                        >
                           {t(STATUS_MESSAGE_KEY[organization.status])}
                         </span>
-                        <span className={styles.orgFiled}>{organization.filed}</span>
+                        <span className={styles.orgFiled}>
+                          {organization.filed}
+                        </span>
                       </p>
                       <h2 className={styles.orgName}>
                         <Link href={`/site/records/${organization.code}`}>
                           {organization.designation ?? t("withheldDesignation")}
                         </Link>
                       </h2>
-                      <p className={styles.orgAbstract}>{organization.abstract}</p>
+                      <p className={styles.orgAbstract}>
+                        {organization.abstract}
+                      </p>
                     </div>
 
                     <div className={styles.orgTally}>
-                      <span className={styles.orgTallyValue}>{String(holdings).padStart(2, "0")}</span>
-                      <span className={styles.orgTallyLabel}>{t("ledgerFilings")}</span>
-                      <Link className={styles.orgOpen} href={`/site/records/${organization.code}`}>
-                        <FolderOpen size={12} strokeWidth={1.9} aria-hidden="true" />
+                      <span className={styles.orgTallyValue}>
+                        {String(holdings).padStart(2, "0")}
+                      </span>
+                      <span className={styles.orgTallyLabel}>
+                        {t("ledgerFilings")}
+                      </span>
+                      <Link
+                        className={styles.orgOpen}
+                        href={`/site/records/${organization.code}`}
+                      >
+                        <FolderOpen
+                          size={12}
+                          strokeWidth={1.9}
+                          aria-hidden="true"
+                        />
                         {t("orgOpen")}
-                        <ArrowRight size={11} strokeWidth={2.2} aria-hidden="true" />
+                        <ArrowRight
+                          size={11}
+                          strokeWidth={2.2}
+                          aria-hidden="true"
+                        />
                       </Link>
                     </div>
                   </li>
@@ -148,8 +193,16 @@ export function ArchiveOrganizations({ query = "" }: { query?: string }) {
         ) : (
           <div className={styles.emptyState} role="status">
             <Search size={20} strokeWidth={1.6} aria-hidden="true" />
-            <p className={styles.emptyTitle}>{t("orgSearchNone", { query: query.trim() })}</p>
-            <ArchiveButton tone="paper" href="/site/organizations" icon={<ArrowRight size={13} strokeWidth={1.9} aria-hidden="true" />}>
+            <p className={styles.emptyTitle}>
+              {t("orgSearchNone", { query: query.trim() })}
+            </p>
+            <ArchiveButton
+              tone="paper"
+              href="/site/organizations"
+              icon={
+                <ArrowRight size={13} strokeWidth={1.9} aria-hidden="true" />
+              }
+            >
               {t("searchClear")}
             </ArchiveButton>
           </div>

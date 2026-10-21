@@ -1,0 +1,9 @@
+---
+import AboutPage from "../../../components/AboutPage.astro";
+import { locales, type Locale } from "../../../lib/site";
+export function getStaticPaths() {
+  return locales.map((lang) => ({ params: { lang } }));
+}
+---
+
+<AboutPage locale={Astro.params.lang as Locale} page="terms" />

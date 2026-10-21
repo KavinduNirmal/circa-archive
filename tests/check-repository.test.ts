@@ -5,7 +5,13 @@ import {
   repositoryPaths,
 } from "../scripts/check-repository";
 import { execFileSync } from "node:child_process";
-import { existsSync, mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
+import {
+  existsSync,
+  mkdtempSync,
+  mkdirSync,
+  writeFileSync,
+  rmSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
@@ -23,13 +29,22 @@ import { join } from "node:path";
  * variable set here at runtime would never reach the child, and a test that set
  * one would pass without testing anything.
  */
-function scratchEnvironment(inherited: NodeJS.ProcessEnv = process.env): NodeJS.ProcessEnv {
-  return Object.fromEntries(Object.entries(inherited).filter(([key]) => !key.startsWith("GIT_")));
+function scratchEnvironment(
+  inherited: NodeJS.ProcessEnv = process.env,
+): NodeJS.ProcessEnv {
+  return Object.fromEntries(
+    Object.entries(inherited).filter(([key]) => !key.startsWith("GIT_")),
+  );
 }
 
-function scratchGit(cwd: string, inherited: NodeJS.ProcessEnv = process.env): (...args: string[]) => void {
+function scratchGit(
+  cwd: string,
+  inherited: NodeJS.ProcessEnv = process.env,
+): (...args: string[]) => void {
   const env = scratchEnvironment(inherited);
-  return (...args) => { execFileSync("git", args, { cwd, env }); };
+  return (...args) => {
+    execFileSync("git", args, { cwd, env });
+  };
 }
 
 describe("folder README policy", () => {
@@ -42,47 +57,70 @@ describe("folder README policy", () => {
   });
 
   test("accepts documented folders", () => {
-    expect(findMissingReadmes([
-      "README.md", "client/README.md", "client/app/README.md", "client/app/page.tsx",
-    ])).toEqual([]);
+    expect(
+      findMissingReadmes([
+        "README.md",
+        "client/README.md",
+        "client/app/README.md",
+        "client/app/page.tsx",
+      ]),
+    ).toEqual([]);
   });
 
   test("requires documentation in authored hidden directories", () => {
-    expect(findMissingReadmes(["README.md", ".internal/rules/tdd.md"])).toEqual([
-      ".internal/README.md", ".internal/rules/README.md",
-    ]);
+    expect(findMissingReadmes(["README.md", ".internal/rules/tdd.md"])).toEqual(
+      [".internal/README.md", ".internal/rules/README.md"],
+    );
   });
 
   test("exempts only .github's own README, not nested folders", () => {
-    expect(findMissingReadmes([
-      "README.md", ".github/ABOUT.md", ".github/workflows/ci.yml",
-    ])).toEqual([".github/workflows/README.md"]);
-    expect(findMissingReadmes([
-      "README.md", ".github/ABOUT.md", ".github/workflows/README.md", ".github/workflows/ci.yml",
-    ])).toEqual([]);
+    expect(
+      findMissingReadmes([
+        "README.md",
+        ".github/ABOUT.md",
+        ".github/workflows/ci.yml",
+      ]),
+    ).toEqual([".github/workflows/README.md"]);
+    expect(
+      findMissingReadmes([
+        "README.md",
+        ".github/ABOUT.md",
+        ".github/workflows/README.md",
+        ".github/workflows/ci.yml",
+      ]),
+    ).toEqual([]);
   });
 
   test("flags .github/README.md as a shadowing readme", () => {
-    expect(findShadowingRepositoryReadme(["README.md", ".github/README.md"])).toEqual([
-      ".github/README.md",
-    ]);
-    expect(findShadowingRepositoryReadme(["README.md", ".github/ABOUT.md"])).toEqual([]);
+    expect(
+      findShadowingRepositoryReadme(["README.md", ".github/README.md"]),
+    ).toEqual([".github/README.md"]);
+    expect(
+      findShadowingRepositoryReadme(["README.md", ".github/ABOUT.md"]),
+    ).toEqual([]);
   });
 
   test("does not require documentation for generated directories", () => {
-    expect(findMissingReadmes([
-      "README.md", "node_modules/example/index.js", ".husky/_/h", "backend/obj/cache.json",
-    ])).toEqual([]);
+    expect(
+      findMissingReadmes([
+        "README.md",
+        "node_modules/example/index.js",
+        ".husky/_/h",
+        "backend/obj/cache.json",
+      ]),
+    ).toEqual([]);
   });
 
   test("deduplicates missing READMEs across files", () => {
-    expect(findMissingReadmes(["README.md", "client/a.ts", "client/b.ts"])).toEqual([
-      "client/README.md",
-    ]);
+    expect(
+      findMissingReadmes(["README.md", "client/a.ts", "client/b.ts"]),
+    ).toEqual(["client/README.md"]);
   });
 
   test("requires the exact README.md spelling", () => {
-    expect(findMissingReadmes(["README.md", "docs/readme.md"])).toEqual(["docs/README.md"]);
+    expect(findMissingReadmes(["README.md", "docs/readme.md"])).toEqual([
+      "docs/README.md",
+    ]);
   });
 });
 
@@ -97,12 +135,20 @@ describe("staged snapshot", () => {
       writeFileSync(join(cwd, "module/code.ts"), "export const answer = 42;\n");
       writeFileSync(join(cwd, "module/README.md"), "# Module\n");
       git("add", "README.md", "module/code.ts");
-      expect(findMissingReadmes(repositoryPaths(true, cwd, scratchEnvironment()))).toEqual(["module/README.md"]);
-      expect(findMissingReadmes(repositoryPaths(false, cwd, scratchEnvironment()))).toEqual([]);
+      expect(
+        findMissingReadmes(repositoryPaths(true, cwd, scratchEnvironment())),
+      ).toEqual(["module/README.md"]);
+      expect(
+        findMissingReadmes(repositoryPaths(false, cwd, scratchEnvironment())),
+      ).toEqual([]);
       git("add", "module/README.md");
-      expect(findMissingReadmes(repositoryPaths(true, cwd, scratchEnvironment()))).toEqual([]);
+      expect(
+        findMissingReadmes(repositoryPaths(true, cwd, scratchEnvironment())),
+      ).toEqual([]);
       git("rm", "--cached", "--", "module/README.md");
-      expect(findMissingReadmes(repositoryPaths(true, cwd, scratchEnvironment()))).toEqual(["module/README.md"]);
+      expect(
+        findMissingReadmes(repositoryPaths(true, cwd, scratchEnvironment())),
+      ).toEqual(["module/README.md"]);
     } finally {
       rmSync(cwd, { recursive: true, force: true });
     }
@@ -122,7 +168,9 @@ describe("staged snapshot", () => {
       git("add", "module/code.ts");
       // The scratch repository's own index, not the committing repository's.
       expect(existsSync(exported)).toBe(false);
-      expect(repositoryPaths(true, cwd, scratchEnvironment(hook))).toEqual(["module/code.ts"]);
+      expect(repositoryPaths(true, cwd, scratchEnvironment(hook))).toEqual([
+        "module/code.ts",
+      ]);
     } finally {
       rmSync(cwd, { recursive: true, force: true });
     }

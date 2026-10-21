@@ -19,7 +19,19 @@ import {
 import { useId, type RefObject } from "react";
 import { useTranslations } from "next-intl";
 import { READER_NAME } from "./reader-identity";
-import { ASSESSMENT_SCALE, DOCUMENT_SIZES, READER_FONTS, READER_VIEWS, assessmentLabel, fontLabel, formatScale, scaleLimit, viewLabel, type ReaderFont, type ReaderView } from "./reader-model";
+import {
+  ASSESSMENT_SCALE,
+  DOCUMENT_SIZES,
+  READER_FONTS,
+  READER_VIEWS,
+  assessmentLabel,
+  fontLabel,
+  formatScale,
+  scaleLimit,
+  viewLabel,
+  type ReaderFont,
+  type ReaderView,
+} from "./reader-model";
 import type { ReaderVerdict } from "./reader-session";
 import "../ui/menubar.css";
 
@@ -71,7 +83,22 @@ export type ReaderActions = {
   closeWindow: () => void;
 };
 
-export function ReaderToolbar({ code, view, scale, font, fit, matchRef, canGoBack, canGoForward, assessment, verdict, searchOpen, query, onQueryChange, actions }: {
+export function ReaderToolbar({
+  code,
+  view,
+  scale,
+  font,
+  fit,
+  matchRef,
+  canGoBack,
+  canGoForward,
+  assessment,
+  verdict,
+  searchOpen,
+  query,
+  onQueryChange,
+  actions,
+}: {
   code: string | null;
   view: ReaderView;
   scale: number;
@@ -93,13 +120,38 @@ export function ReaderToolbar({ code, view, scale, font, fit, matchRef, canGoBac
   const t = useTranslations("reader");
   return (
     <>
-      <ReaderMenu view={view} scale={scale} font={font} fit={fit}
-        canGoBack={canGoBack} canGoForward={canGoForward} actions={actions} />
+      <ReaderMenu
+        view={view}
+        scale={scale}
+        font={font}
+        fit={fit}
+        canGoBack={canGoBack}
+        canGoForward={canGoForward}
+        actions={actions}
+      />
 
-      <div className="reader-toolbar" role="toolbar" aria-label={t("toolbarLabel")}>
+      <div
+        className="reader-toolbar"
+        role="toolbar"
+        aria-label={t("toolbarLabel")}
+      >
         <div className="reader-toolgroup">
-          <ReaderAction label={t("previousRecord")} short={t("backShort")} icon={ArrowLeft} disabled={!canGoBack} title={canGoBack ? undefined : t("firstRecordTitle")} onClick={actions.back} />
-          <ReaderAction label={t("nextRecord")} short={t("aheadShort")} icon={ArrowRight} disabled={!canGoForward} title={canGoForward ? undefined : t("noRecordAheadTitle")} onClick={actions.forward} />
+          <ReaderAction
+            label={t("previousRecord")}
+            short={t("backShort")}
+            icon={ArrowLeft}
+            disabled={!canGoBack}
+            title={canGoBack ? undefined : t("firstRecordTitle")}
+            onClick={actions.back}
+          />
+          <ReaderAction
+            label={t("nextRecord")}
+            short={t("aheadShort")}
+            icon={ArrowRight}
+            disabled={!canGoForward}
+            title={canGoForward ? undefined : t("noRecordAheadTitle")}
+            onClick={actions.forward}
+          />
         </div>
 
         <span className="reader-divider" aria-hidden="true" />
@@ -107,32 +159,88 @@ export function ReaderToolbar({ code, view, scale, font, fit, matchRef, canGoBac
         {/* How the sheet is set: the same cluster the word processor's format bar owns. */}
         <div className="reader-toolgroup">
           <span className="reader-legend circa-label">{t("sizeLegend")}</span>
-          <ReaderAction label={t("scaleDown")} short="" icon={ZoomOut} disabled={scaleLimit(scale, -1)} title={t("scaleMinTitle")} onClick={actions.zoomOut} />
-          <button type="button" className="reader-scale circa-sunken" title={t("resetScaleTitle")} onClick={actions.resetScale}>
+          <ReaderAction
+            label={t("scaleDown")}
+            short=""
+            icon={ZoomOut}
+            disabled={scaleLimit(scale, -1)}
+            title={t("scaleMinTitle")}
+            onClick={actions.zoomOut}
+          />
+          <button
+            type="button"
+            className="reader-scale circa-sunken"
+            title={t("resetScaleTitle")}
+            onClick={actions.resetScale}
+          >
             {/* The one flicker on open: a single frame of a scale that is not set. */}
-            <span className="reader-scale-blip" aria-hidden="true">102%</span>
+            <span className="reader-scale-blip" aria-hidden="true">
+              102%
+            </span>
             <span className="reader-scale-value">{formatScale(scale)}</span>
           </button>
-          <ReaderAction label={t("scaleUp")} short="" icon={ZoomIn} disabled={scaleLimit(scale, 1)} title={t("scaleMaxTitle")} onClick={actions.zoomIn} />
-          <ReaderAction label={t("fitToMargin")} short={t("fitShort")} icon={MoveHorizontal} pressed={fit} onClick={actions.toggleFit} />
+          <ReaderAction
+            label={t("scaleUp")}
+            short=""
+            icon={ZoomIn}
+            disabled={scaleLimit(scale, 1)}
+            title={t("scaleMaxTitle")}
+            onClick={actions.zoomIn}
+          />
+          <ReaderAction
+            label={t("fitToMargin")}
+            short={t("fitShort")}
+            icon={MoveHorizontal}
+            pressed={fit}
+            onClick={actions.toggleFit}
+          />
         </div>
 
         <span className="reader-divider" aria-hidden="true" />
 
         <div className="reader-toolgroup">
-          <ReaderAction label={t("rotate")} short="" icon={RotateCw} onClick={actions.inert} />
-          <ReaderAction label={t("print")} short="" icon={Printer} onClick={actions.inert} />
-          <ReaderAction label={t("download")} short="" icon={Download} title={t("downloadTitle")} onClick={actions.inert} />
+          <ReaderAction
+            label={t("rotate")}
+            short=""
+            icon={RotateCw}
+            onClick={actions.inert}
+          />
+          <ReaderAction
+            label={t("print")}
+            short=""
+            icon={Printer}
+            onClick={actions.inert}
+          />
+          <ReaderAction
+            label={t("download")}
+            short=""
+            icon={Download}
+            title={t("downloadTitle")}
+            onClick={actions.inert}
+          />
         </div>
 
         <span className="reader-divider" aria-hidden="true" />
 
         <div className="reader-toolgroup">
-          <ReaderAction label={t("search")} short="" icon={TextSearch} pressed={searchOpen} onClick={actions.toggleSearch} />
+          <ReaderAction
+            label={t("search")}
+            short=""
+            icon={TextSearch}
+            pressed={searchOpen}
+            onClick={actions.toggleSearch}
+          />
           {searchOpen && (
             <span className="reader-search circa-sunken">
-              <input className="reader-search-input" type="search" aria-label={t("searchThisRecord")} spellCheck={false}
-                autoComplete="off" value={query} onChange={(event) => onQueryChange(event.target.value)} />
+              <input
+                className="reader-search-input"
+                type="search"
+                aria-label={t("searchThisRecord")}
+                spellCheck={false}
+                autoComplete="off"
+                value={query}
+                onChange={(event) => onQueryChange(event.target.value)}
+              />
             </span>
           )}
           {/*
@@ -140,7 +248,12 @@ export function ReaderToolbar({ code, view, scale, font, fit, matchRef, canGoBac
             than by React, because the only thing that knows what is on the sheet
             is the sheet, and the renderer mounted in the slot is not ours.
           */}
-          <span className="reader-match-count circa-mono" data-testid="reader-match-count" ref={matchRef} aria-live="polite" />
+          <span
+            className="reader-match-count circa-mono"
+            data-testid="reader-match-count"
+            ref={matchRef}
+            aria-live="polite"
+          />
         </div>
 
         <span className="reader-toolbar-spacer" />
@@ -151,33 +264,87 @@ export function ReaderToolbar({ code, view, scale, font, fit, matchRef, canGoBac
             well, which is what a form's rating field looked like; the two votes
             are plates outside it. Neither can be read as the other.
           */}
-          <div className="reader-assessment" role="radiogroup" aria-labelledby={assessmentLabelId}>
-            <span className="reader-assessment-label circa-label" id={assessmentLabelId}>{t("assessment")}</span>
+          <div
+            className="reader-assessment"
+            role="radiogroup"
+            aria-labelledby={assessmentLabelId}
+          >
+            <span
+              className="reader-assessment-label circa-label"
+              id={assessmentLabelId}
+            >
+              {t("assessment")}
+            </span>
             <span className="reader-assessment-well circa-sunken">
               <span className="reader-points">
                 {ASSESSMENT_SCALE.map((label, value) => (
                   // The blocks fill up to the grade reached, so the row reads as one
                   // scale rather than as five unrelated buttons. The dash is the
                   // absence of a judgement, so it is never part of the fill.
-                  <label className="reader-point" key={label} data-checked={assessment === value ? "true" : undefined}
-                    data-lit={value > 0 && assessment !== undefined && value <= assessment ? "true" : undefined}>
+                  <label
+                    className="reader-point"
+                    key={label}
+                    data-checked={assessment === value ? "true" : undefined}
+                    data-lit={
+                      value > 0 &&
+                      assessment !== undefined &&
+                      value <= assessment
+                        ? "true"
+                        : undefined
+                    }
+                  >
                     {/* A real radio, so the scale keeps its arrow keys and its roving tab stop. */}
-                    <input className="reader-point-input" type="radio" name={`reader-assessment-${code ?? "none"}`}
-                      value={value} checked={assessment === value} onChange={() => actions.assess(value)} />
-                    <span className="reader-point-word">{assessmentLabel(label, t)}</span>
+                    <input
+                      className="reader-point-input"
+                      type="radio"
+                      name={`reader-assessment-${code ?? "none"}`}
+                      value={value}
+                      checked={assessment === value}
+                      onChange={() => actions.assess(value)}
+                    />
+                    <span className="reader-point-word">
+                      {assessmentLabel(label, t)}
+                    </span>
                   </label>
                 ))}
               </span>
-              <span className="reader-assessment-score circa-mono" data-testid="reader-assessment-score">{assessment ?? 0}/5</span>
+              <span
+                className="reader-assessment-score circa-mono"
+                data-testid="reader-assessment-score"
+              >
+                {assessment ?? 0}/5
+              </span>
             </span>
           </div>
-          <ReaderAction label={t("comment")} short="" icon={MessageSquare} onClick={actions.comment} />
-        <ReaderAction label={t("corroborate")} icon={Check} tone="affirm" pressed={verdict === "corroborate"} onClick={actions.corroborate} />
-          <ReaderAction label={t("contest")} icon={X} tone="deny" pressed={verdict === "contest"} onClick={actions.contest} />
+          <ReaderAction
+            label={t("comment")}
+            short=""
+            icon={MessageSquare}
+            onClick={actions.comment}
+          />
+          <ReaderAction
+            label={t("corroborate")}
+            icon={Check}
+            tone="affirm"
+            pressed={verdict === "corroborate"}
+            onClick={actions.corroborate}
+          />
+          <ReaderAction
+            label={t("contest")}
+            icon={X}
+            tone="deny"
+            pressed={verdict === "contest"}
+            onClick={actions.contest}
+          />
         </div>
 
         <span className="reader-divider" aria-hidden="true" />
-        <ReaderAction label={t("closeReader")} short="" icon={X} onClick={actions.closeWindow} />
+        <ReaderAction
+          label={t("closeReader")}
+          short=""
+          icon={X}
+          onClick={actions.closeWindow}
+        />
       </div>
     </>
   );
@@ -193,7 +360,15 @@ export function ReaderToolbar({ code, view, scale, font, fit, matchRef, canGoBac
  * the two arrows at the far left also walk. A fifth menu would be a menu that
  * cannot act, which this shell does not ship.
  */
-function ReaderMenu({ view, scale, font, fit, canGoBack, canGoForward, actions }: {
+function ReaderMenu({
+  view,
+  scale,
+  font,
+  fit,
+  canGoBack,
+  canGoForward,
+  actions,
+}: {
   view: ReaderView;
   scale: number;
   font: ReaderFont;
@@ -206,36 +381,61 @@ function ReaderMenu({ view, scale, font, fit, canGoBack, canGoForward, actions }
   return (
     <Menubar.Root className="circa-menubar" aria-label={t("menubarLabel")}>
       <Menubar.Menu>
-        <Menubar.Trigger className="circa-menutitle">{t("menuFile")}</Menubar.Trigger>
+        <Menubar.Trigger className="circa-menutitle">
+          {t("menuFile")}
+        </Menubar.Trigger>
         <Menubar.Portal>
           <Menubar.Content className="circa-menu" align="start" sideOffset={0}>
-            <Menubar.Item className="circa-menuitem" onSelect={actions.closeWindow}>
-              {t("closeReader")}<span className="circa-menukey">Esc</span>
+            <Menubar.Item
+              className="circa-menuitem"
+              onSelect={actions.closeWindow}
+            >
+              {t("closeReader")}
+              <span className="circa-menukey">Esc</span>
             </Menubar.Item>
           </Menubar.Content>
         </Menubar.Portal>
       </Menubar.Menu>
 
       <Menubar.Menu>
-        <Menubar.Trigger className="circa-menutitle">{t("view")}</Menubar.Trigger>
+        <Menubar.Trigger className="circa-menutitle">
+          {t("view")}
+        </Menubar.Trigger>
         <Menubar.Portal>
           <Menubar.Content className="circa-menu" align="start" sideOffset={0}>
-            <Menubar.Label className="circa-menulabel">{t("pageArrangement")}</Menubar.Label>
-            <Menubar.RadioGroup value={view} onValueChange={(next) => actions.setView(next as ReaderView)}>
+            <Menubar.Label className="circa-menulabel">
+              {t("pageArrangement")}
+            </Menubar.Label>
+            <Menubar.RadioGroup
+              value={view}
+              onValueChange={(next) => actions.setView(next as ReaderView)}
+            >
               {READER_VIEWS.map((mode) => (
-                <Menubar.RadioItem key={mode} className="circa-menuitem" value={mode}>
+                <Menubar.RadioItem
+                  key={mode}
+                  className="circa-menuitem"
+                  value={mode}
+                >
                   {viewLabel(mode, t)}
                 </Menubar.RadioItem>
               ))}
             </Menubar.RadioGroup>
             <Menubar.Separator className="circa-menuseparator" />
             {/* The measure is a state, so it is a tick rather than a command. */}
-            <Menubar.CheckboxItem className="circa-menuitem" checked={fit} onSelect={actions.toggleFit}>
+            <Menubar.CheckboxItem
+              className="circa-menuitem"
+              checked={fit}
+              onSelect={actions.toggleFit}
+            >
               {t("fitToMargin")}
             </Menubar.CheckboxItem>
             <Menubar.Separator className="circa-menuseparator" />
             {/* Two-up needs a margin wide enough for two columns, and says so rather than folding silently. */}
-            <Menubar.Item className="circa-menuitem" disabled title={t("twoUpTitle")}>
+            <Menubar.Item
+              className="circa-menuitem"
+              disabled
+              title={t("twoUpTitle")}
+            >
               {t("pageSizeFollows")}
             </Menubar.Item>
           </Menubar.Content>
@@ -243,21 +443,40 @@ function ReaderMenu({ view, scale, font, fit, canGoBack, canGoForward, actions }
       </Menubar.Menu>
 
       <Menubar.Menu>
-        <Menubar.Trigger className="circa-menutitle">{t("text")}</Menubar.Trigger>
+        <Menubar.Trigger className="circa-menutitle">
+          {t("text")}
+        </Menubar.Trigger>
         <Menubar.Portal>
           <Menubar.Content className="circa-menu" align="start" sideOffset={0}>
-            <Menubar.Label className="circa-menulabel">{t("typeSize", { scale: formatScale(scale) })}</Menubar.Label>
+            <Menubar.Label className="circa-menulabel">
+              {t("typeSize", { scale: formatScale(scale) })}
+            </Menubar.Label>
             {DOCUMENT_SIZES.map((size) => (
-              <Menubar.Item key={size.scale} className="circa-menuitem" onSelect={() => actions.setScale(size.scale)}>
+              <Menubar.Item
+                key={size.scale}
+                className="circa-menuitem"
+                onSelect={() => actions.setScale(size.scale)}
+              >
                 {t(size.key)}
-                <span className="circa-menuvalue">{formatScale(size.scale)}</span>
+                <span className="circa-menuvalue">
+                  {formatScale(size.scale)}
+                </span>
               </Menubar.Item>
             ))}
             <Menubar.Separator className="circa-menuseparator" />
-            <Menubar.Label className="circa-menulabel">{t("typeface")}</Menubar.Label>
-            <Menubar.RadioGroup value={font} onValueChange={(next) => actions.setFont(next as ReaderFont)}>
+            <Menubar.Label className="circa-menulabel">
+              {t("typeface")}
+            </Menubar.Label>
+            <Menubar.RadioGroup
+              value={font}
+              onValueChange={(next) => actions.setFont(next as ReaderFont)}
+            >
               {READER_FONTS.map((choice) => (
-                <Menubar.RadioItem key={choice} className="circa-menuitem" value={choice}>
+                <Menubar.RadioItem
+                  key={choice}
+                  className="circa-menuitem"
+                  value={choice}
+                >
                   {fontLabel(choice, t)}
                 </Menubar.RadioItem>
               ))}
@@ -267,13 +486,23 @@ function ReaderMenu({ view, scale, font, fit, canGoBack, canGoForward, actions }
       </Menubar.Menu>
 
       <Menubar.Menu>
-        <Menubar.Trigger className="circa-menutitle">{t("menuGo")}</Menubar.Trigger>
+        <Menubar.Trigger className="circa-menutitle">
+          {t("menuGo")}
+        </Menubar.Trigger>
         <Menubar.Portal>
           <Menubar.Content className="circa-menu" align="start" sideOffset={0}>
-            <Menubar.Item className="circa-menuitem" disabled={!canGoBack} onSelect={actions.back}>
+            <Menubar.Item
+              className="circa-menuitem"
+              disabled={!canGoBack}
+              onSelect={actions.back}
+            >
               {t("previousRecord")}
             </Menubar.Item>
-            <Menubar.Item className="circa-menuitem" disabled={!canGoForward} onSelect={actions.forward}>
+            <Menubar.Item
+              className="circa-menuitem"
+              disabled={!canGoForward}
+              onSelect={actions.forward}
+            >
               {t("nextRecord")}
             </Menubar.Item>
           </Menubar.Content>
@@ -289,7 +518,16 @@ function ReaderMenu({ view, scale, font, fit, canGoBack, canGoForward, actions }
  * plate prints; an empty `short` leaves the glyph to speak, which is what the
  * tools whose icons already say the word get.
  */
-function ReaderAction({ label, short, icon: Icon, pressed, tone, disabled, title, onClick }: {
+function ReaderAction({
+  label,
+  short,
+  icon: Icon,
+  pressed,
+  tone,
+  disabled,
+  title,
+  onClick,
+}: {
   label: string;
   short?: string;
   icon: typeof ArrowLeft;
@@ -302,10 +540,18 @@ function ReaderAction({ label, short, icon: Icon, pressed, tone, disabled, title
 }) {
   const printed = short ?? label;
   return (
-    <button type="button" className="reader-action" data-pressed={pressed ? "true" : undefined}
-      data-tone={tone} data-glyph-only={printed === "" ? "true" : undefined}
-      aria-label={label} aria-pressed={pressed === undefined ? undefined : pressed}
-      disabled={disabled} title={title} onClick={onClick}>
+    <button
+      type="button"
+      className="reader-action"
+      data-pressed={pressed ? "true" : undefined}
+      data-tone={tone}
+      data-glyph-only={printed === "" ? "true" : undefined}
+      aria-label={label}
+      aria-pressed={pressed === undefined ? undefined : pressed}
+      disabled={disabled}
+      title={title}
+      onClick={onClick}
+    >
       <Icon className="reader-action-glyph" aria-hidden="true" />
       {printed !== "" && <span className="reader-action-label">{printed}</span>}
     </button>
@@ -317,32 +563,49 @@ function ReaderAction({ label, short, icon: Icon, pressed, tone, disabled, title
  * in: the workstation already holds the credential, and the prompt is the
  * institution asking whether this is really the person at the desk.
  */
-export function ReaderCredentials({ open, onEnter, onClose }: {
+export function ReaderCredentials({
+  open,
+  onEnter,
+  onClose,
+}: {
   open: boolean;
   onEnter: () => void;
   onClose: () => void;
 }) {
   const t = useTranslations("reader");
   return (
-    <AlertDialog.Root open={open} onOpenChange={(next) => { if (!next) onClose(); }}>
+    <AlertDialog.Root
+      open={open}
+      onOpenChange={(next) => {
+        if (!next) onClose();
+      }}
+    >
       <AlertDialog.Portal>
         <AlertDialog.Overlay className="message-box-backdrop" />
         <AlertDialog.Content className="message-box reader-credentials circa-raised">
           <div className="message-box-titlebar">
-            <AlertDialog.Title className="message-box-title">{READER_NAME}</AlertDialog.Title>
+            <AlertDialog.Title className="message-box-title">
+              {READER_NAME}
+            </AlertDialog.Title>
           </div>
           <div className="message-box-body">
             <span className="message-box-glyph" aria-hidden="true">
               <FileKey className="message-box-icon" />
             </span>
             <AlertDialog.Description className="message-box-text">
-              <span className="message-box-heading">{t("credentialsHeading")}</span>
+              <span className="message-box-heading">
+                {t("credentialsHeading")}
+              </span>
               {t("credentialsBody")}
             </AlertDialog.Description>
           </div>
-          <p className="message-box-detail circa-mono">{t("credentialsDetail")}</p>
+          <p className="message-box-detail circa-mono">
+            {t("credentialsDetail")}
+          </p>
           <div className="message-box-actions">
-            <AlertDialog.Action className="reader-enter" onClick={onEnter}>{t("enter")}</AlertDialog.Action>
+            <AlertDialog.Action className="reader-enter" onClick={onEnter}>
+              {t("enter")}
+            </AlertDialog.Action>
           </div>
         </AlertDialog.Content>
       </AlertDialog.Portal>

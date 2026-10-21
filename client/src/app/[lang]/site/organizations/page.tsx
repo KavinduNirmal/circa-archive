@@ -12,10 +12,15 @@ export function generateStaticParams() {
   return routing.locales.map((lang) => ({ lang }));
 }
 
-export async function generateMetadata({ params }: OrganizationsPageProps): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: OrganizationsPageProps): Promise<Metadata> {
   const { lang } = await params;
   const t = await getTranslations({ locale: lang, namespace: "metadata" });
-  return { title: { absolute: t("siteOrganizationsTitle") }, description: t("siteOrganizationsDescription") };
+  return {
+    title: { absolute: t("siteOrganizationsTitle") },
+    description: t("siteOrganizationsDescription"),
+  };
 }
 
 /** The first value of a repeated parameter, or an empty string. */
@@ -23,7 +28,10 @@ function first(value: string | string[] | undefined) {
   return (Array.isArray(value) ? value[0] : value) ?? "";
 }
 
-export default async function OrganizationsPage({ params, searchParams }: OrganizationsPageProps) {
+export default async function OrganizationsPage({
+  params,
+  searchParams,
+}: OrganizationsPageProps) {
   const { lang } = await params;
   const { q } = await searchParams;
   setRequestLocale(lang);

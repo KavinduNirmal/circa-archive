@@ -34,31 +34,31 @@ CIRCA Archive is in pre-release development. The public archive and CIRCA/OS wor
 
 ## Stack
 
-| Area | Technology |
-| --- | --- |
-| Frontend | Next.js 16, React 19, TypeScript, Tailwind CSS 4, shadcn/ui |
-| Tooling | Bun 1.3.14, ESLint, Vitest, Playwright |
-| Backend | .NET 10 Minimal APIs, EF Core, PostgreSQL; SignalR and S3-compatible storage planned |
+| Area     | Technology                                                                           |
+| -------- | ------------------------------------------------------------------------------------ |
+| Frontend | Next.js 16, React 19, TypeScript, Tailwind CSS 4, shadcn/ui                          |
+| Tooling  | Bun 1.3.14, ESLint, Vitest, Playwright                                               |
+| Backend  | .NET 10 Minimal APIs, EF Core, PostgreSQL; SignalR and S3-compatible storage planned |
 
 ## Repository layout
 
-| Path | Purpose |
-| --- | --- |
-| [client/](client/README.md) | Next.js application: public archive, project pages, and CIRCA/OS workstation |
-| [infra/](infra/README.md) | Local ingress configuration and forwarding trust boundary |
-| [backend/](backend/README.md) | Modular monolith API and persistence, including the integrated authentication service |
-| [admin/](admin/README.md) | Reserved for administration tooling |
-| [docs/](docs/README.md) | Branch model, architecture decision records, publishing checklist, and setting documentation |
-| [scripts/](scripts/README.md) | Repository README and whitespace checks |
-| [tests/](tests/README.md) | Bun tests for repository tooling |
-| [.github/](.github/ABOUT.md) | Workflows, issue and pull request templates, and review routing |
-| [ARCHITECTURE.md](ARCHITECTURE.md) | Draft architecture, schema, and API contracts |
-| [CHANGELOG.md](CHANGELOG.md) | Notable changes and release notes |
-| [CONTRIBUTING.md](CONTRIBUTING.md) | Contribution workflow and verification requirements |
-| [SECURITY.md](SECURITY.md) | Private vulnerability reporting and contributor security practices |
-| [SUPPORT.md](SUPPORT.md) | Where to ask questions and report problems |
-| [NOTICE](NOTICE) | Third-party asset licensing |
-| [LICENSE](LICENSE) | MIT license for original code and documentation |
+| Path                               | Purpose                                                                                      |
+| ---------------------------------- | -------------------------------------------------------------------------------------------- |
+| [client/](client/README.md)        | Next.js application: public archive, project pages, and CIRCA/OS workstation                 |
+| [infra/](infra/README.md)          | Local ingress configuration and forwarding trust boundary                                    |
+| [backend/](backend/README.md)      | Modular monolith API and persistence, including the integrated authentication service        |
+| [admin/](admin/README.md)          | Reserved for administration tooling                                                          |
+| [docs/](docs/README.md)            | Branch model, architecture decision records, publishing checklist, and setting documentation |
+| [scripts/](scripts/README.md)      | Repository README and whitespace checks                                                      |
+| [tests/](tests/README.md)          | Bun tests for repository tooling                                                             |
+| [.github/](.github/ABOUT.md)       | Workflows, issue and pull request templates, and review routing                              |
+| [ARCHITECTURE.md](ARCHITECTURE.md) | Draft architecture, schema, and API contracts                                                |
+| [CHANGELOG.md](CHANGELOG.md)       | Notable changes and release notes                                                            |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | Contribution workflow and verification requirements                                          |
+| [SECURITY.md](SECURITY.md)         | Private vulnerability reporting and contributor security practices                           |
+| [SUPPORT.md](SUPPORT.md)           | Where to ask questions and report problems                                                   |
+| [NOTICE](NOTICE)                   | Third-party asset licensing                                                                  |
+| [LICENSE](LICENSE)                 | MIT license for original code and documentation                                              |
 
 Empty placeholder folders may not appear in a fresh clone; Git tracks files rather than directories.
 
@@ -74,12 +74,12 @@ fresh clone, copy `.env.example` to `.env` at the repository root and set
 docker compose up --build --detach --wait
 ```
 
-| Service | Local address | Container address |
-| --- | --- | --- |
-| Website gateway | <http://localhost:3001> | `circa-gateway:8080` |
-| Next.js | Internal only | `circa-client:3001` |
-| API | <http://localhost:5040/api/v1/> | `circa-api:8080` |
-| PostgreSQL | `localhost:5432` | `circa-db:5432` |
+| Service         | Local address                   | Container address    |
+| --------------- | ------------------------------- | -------------------- |
+| Website gateway | <http://localhost:3001>         | `circa-gateway:8080` |
+| Next.js         | Internal only                   | `circa-client:3001`  |
+| API             | <http://localhost:5040/api/v1/> | `circa-api:8080`     |
+| PostgreSQL      | `localhost:5432`                | `circa-db:5432`      |
 
 Compose sets server-only `API_ORIGIN=http://circa-api:8080`. Browser `/api/*`
 requests stay on the website origin and the gateway forwards them to the API. A frontend

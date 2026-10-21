@@ -40,13 +40,13 @@ bun run --cwd=client dev
 # http://localhost:3001 -> /en
 ```
 
-| Route | Surface |
-| --- | --- |
-| `/en` | Public portal, in the Commission's voice |
-| `/en/site` | Reading edition of the archive |
-| `/en/meta` | Project landing page |
-| `/en/meta/documentation` | This documentation |
-| `/en/desktop` | Workstation preview |
+| Route                    | Surface                                  |
+| ------------------------ | ---------------------------------------- |
+| `/en`                    | Public portal, in the Commission's voice |
+| `/en/site`               | Reading edition of the archive           |
+| `/en/meta`               | Project landing page                     |
+| `/en/meta/documentation` | This documentation                       |
+| `/en/desktop`            | Workstation preview                      |
 
 A production build is bun run --cwd=client build, then bun run --cwd=client start.
 

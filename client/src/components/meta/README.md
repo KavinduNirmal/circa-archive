@@ -6,19 +6,19 @@ The one part of the client outside the fiction: the project landing report, the
 dossier, and the documentation. It is allowed to look unlike the archive, because
 it answers a different question.
 
-| File | Owns |
-| --- | --- |
-| `meta-chrome.tsx` | The frame shared by every project route: skip link, project identity strip, navigation, framed `<main>`, and footer. A server component; the two client islands are `MetaNav` and the language switcher. |
-| `meta-nav.tsx` | The shadcn NavigationMenu (documentation panel) and the mobile Sheet, with grouped mobile documentation and a global documentation-search entry. Client component. |
-| `meta-home.tsx` | The landing report: the hero field with its faded seal, premise and specimen, editions, the specifications and field guides, the machinery, contribution, and the questions. Six sections and no closing pitch. |
-| `meta-about.tsx` | The dossier: the register, the nine-section index, and the long-form premise, editions, build, contribution, roster, support, questions, contact, and licence. |
-| `meta-sections.tsx` | The dossier's nine sections, each an open band and a landmark with its own heading. |
-| `meta-parts.tsx` | The shared section band, specimen card, and two edition panels. |
-| `../ui/avatar.tsx` | The shadcn avatar primitive and its group, used for the contributor profiles. |
-| `meta-plate.tsx` | The dossier's seal as a character plate, pasted as a string. Generated from `public/circa_eye.png`, never at request time. The landing hero uses the same artwork as a faded silhouette instead. |
-| `meta-links.ts` | The addresses the project points at: repository, funding, the three issue destinations, and the two licence deeds. |
-| `meta.css` | The system: palette, the framed composition, the hero field, the band, the docs pillars, the dossier, the docs surface, the footer, and the responsive rules. |
-| `docs/` | The documentation registry, GitHub Markdown renderer, global search, pager, and source actions. See its [README](docs/README.md). |
+| File                | Owns                                                                                                                                                                                                            |
+| ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `meta-chrome.tsx`   | The frame shared by every project route: skip link, project identity strip, navigation, framed `<main>`, and footer. A server component; the two client islands are `MetaNav` and the language switcher.        |
+| `meta-nav.tsx`      | The shadcn NavigationMenu (documentation panel) and the mobile Sheet, with grouped mobile documentation and a global documentation-search entry. Client component.                                              |
+| `meta-home.tsx`     | The landing report: the hero field with its faded seal, premise and specimen, editions, the specifications and field guides, the machinery, contribution, and the questions. Six sections and no closing pitch. |
+| `meta-about.tsx`    | The dossier: the register, the nine-section index, and the long-form premise, editions, build, contribution, roster, support, questions, contact, and licence.                                                  |
+| `meta-sections.tsx` | The dossier's nine sections, each an open band and a landmark with its own heading.                                                                                                                             |
+| `meta-parts.tsx`    | The shared section band, specimen card, and two edition panels.                                                                                                                                                 |
+| `../ui/avatar.tsx`  | The shadcn avatar primitive and its group, used for the contributor profiles.                                                                                                                                   |
+| `meta-plate.tsx`    | The dossier's seal as a character plate, pasted as a string. Generated from `public/circa_eye.png`, never at request time. The landing hero uses the same artwork as a faded silhouette instead.                |
+| `meta-links.ts`     | The addresses the project points at: repository, funding, the three issue destinations, and the two licence deeds.                                                                                              |
+| `meta.css`          | The system: palette, the framed composition, the hero field, the band, the docs pillars, the dossier, the docs surface, the footer, and the responsive rules.                                                   |
+| `docs/`             | The documentation registry, GitHub Markdown renderer, global search, pager, and source actions. See its [README](docs/README.md).                                                                               |
 
 Everything is server-rendered except the navigation drawer, the docs search, the
 copy key, and the language switcher. A reader without JavaScript gets the whole

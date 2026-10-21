@@ -30,25 +30,39 @@ export function ArchiveExplorations({ code }: { code: string }) {
   if (!parent || entries.length === 0) notFound();
 
   return (
-    <ArchiveChrome active="records" trail={[
-      { label: t("trailRecords"), href: "/site/records" },
-      { label: parent.code, href: `/site/records/${parent.code}` },
-      { label: t("recordExplorations") },
-    ]}>
+    <ArchiveChrome
+      active="records"
+      trail={[
+        { label: t("trailRecords"), href: "/site/records" },
+        { label: parent.code, href: `/site/records/${parent.code}` },
+        { label: t("recordExplorations") },
+      ]}
+    >
       <main id="site-content" tabIndex={-1} className={styles.page}>
         <header className={styles.pageHead}>
-          <p className={styles.kicker}>{t("explorationsKicker", { code: parent.code })}</p>
+          <p className={styles.kicker}>
+            {t("explorationsKicker", { code: parent.code })}
+          </p>
           <h1 className={styles.title}>
-            {t("explorationsHeading", { designation: parent.designation ?? parent.code })}
+            {t("explorationsHeading", {
+              designation: parent.designation ?? parent.code,
+            })}
           </h1>
-          <p className={styles.lede}>{t("explorationsLede", { count: entries.length })}</p>
+          <p className={styles.lede}>
+            {t("explorationsLede", { count: entries.length })}
+          </p>
           <p className={styles.note}>{t("explorationsNote")}</p>
         </header>
 
-        <RecordTable entries={entries} label={t("explorationsTable", { code: parent.code })} />
+        <RecordTable
+          entries={entries}
+          label={t("explorationsTable", { code: parent.code })}
+        />
 
         <p className={styles.back}>
-          <Link href={`/site/records/${parent.code}`}>{t("explorationsBack", { code: parent.code })}</Link>
+          <Link href={`/site/records/${parent.code}`}>
+            {t("explorationsBack", { code: parent.code })}
+          </Link>
         </p>
       </main>
     </ArchiveChrome>

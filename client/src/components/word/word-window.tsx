@@ -1,12 +1,31 @@
 "use client";
 
-import { useCallback, useEffect, useLayoutEffect, useReducer, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useReducer,
+  useRef,
+  useState,
+} from "react";
 import { useTranslations } from "next-intl";
 import { type MarkdownToolId } from "./document-model";
 import { WORD_NAME, WORD_WINDOW_TITLE } from "./word-identity";
-import { TOOL_CHANGE_KEYS, WordMenu, WordRuler, WordStatus, WordToolbar, type WordActions } from "./word-chrome";
+import {
+  TOOL_CHANGE_KEYS,
+  WordMenu,
+  WordRuler,
+  WordStatus,
+  WordToolbar,
+  type WordActions,
+} from "./word-chrome";
 import { WordNotice, type WordNoticeKind } from "./word-notice";
-import { cursorPosition, editorReducer, editorStats, initialState } from "./editor-state";
+import {
+  cursorPosition,
+  editorReducer,
+  editorStats,
+  initialState,
+} from "./editor-state";
 import "./word.css";
 
 /** The body a new document starts with, so the tools have something to act on. */
@@ -24,7 +43,10 @@ const STARTER = [
 ].join("\n");
 
 /** The one place the editor reads a selection out of or writes one into the DOM. */
-function readSelection(element: HTMLTextAreaElement): { start: number; end: number } {
+function readSelection(element: HTMLTextAreaElement): {
+  start: number;
+  end: number;
+} {
   return { start: element.selectionStart, end: element.selectionEnd };
 }
 
@@ -37,12 +59,19 @@ function readSelection(element: HTMLTextAreaElement): { start: number; end: numb
  * `.pdf` is the reader's job and a second renderer would be a second thing to
  * keep in step with the first.
  */
-export function WordWindow({ onCloseWindow, initialBody = STARTER }: {
+export function WordWindow({
+  onCloseWindow,
+  initialBody = STARTER,
+}: {
   onCloseWindow: () => void;
   /** The document to open with. Tests use a short one, and a new file starts empty. */
   initialBody?: string;
 }) {
-  const [state, dispatch] = useReducer(editorReducer, initialBody, initialState);
+  const [state, dispatch] = useReducer(
+    editorReducer,
+    initialBody,
+    initialState,
+  );
   const [notice, setNotice] = useState<WordNoticeKind | null>(null);
   const t = useTranslations("word");
   const area = useRef<HTMLTextAreaElement | null>(null);
@@ -99,13 +128,24 @@ export function WordWindow({ onCloseWindow, initialBody = STARTER }: {
     const pending = state.address;
     if (!pending) return;
     applyTool(pending.tool, pending.value.trim());
-    dispatch({ type: "report", message: { key: TOOL_CHANGE_KEYS[pending.tool] } });
+    dispatch({
+      type: "report",
+      message: { key: TOOL_CHANGE_KEYS[pending.tool] },
+    });
     dispatch({ type: "focus", focused: true });
   }
 
   /** The style box writes the same heading edit the H1 to H3 tools write. */
   function applyStyle(style: "body" | "h1" | "h2" | "h3") {
-    runTool(style === "body" ? "clear" : style === "h1" ? "heading1" : style === "h2" ? "heading2" : "heading3");
+    runTool(
+      style === "body"
+        ? "clear"
+        : style === "h1"
+          ? "heading1"
+          : style === "h2"
+            ? "heading2"
+            : "heading3",
+    );
   }
 
   /** The action set both bars share. The menu and the toolbar own the same editor. */
@@ -140,7 +180,11 @@ export function WordWindow({ onCloseWindow, initialBody = STARTER }: {
   const caret = cursorPosition(state.present, state.selection);
   // The counts cell is interface chrome, so the plural forms come from the
   // catalog rather than from the model's English-only formatter.
-  const counts = t("statusCounts", { words: stats.words, lines: stats.lines, characters: stats.characters });
+  const counts = t("statusCounts", {
+    words: stats.words,
+    lines: stats.lines,
+    characters: stats.characters,
+  });
   const summary = `${counts} | ${t("statusCaret", { line: caret.line, column: caret.column })}`;
   const tool = state.active[0];
 
@@ -185,26 +229,62 @@ export function WordWindow({ onCloseWindow, initialBody = STARTER }: {
   }
 
   return (
-    <div className="word" data-size={state.size} data-ruler={state.ruler ? "true" : "false"}>
+    <div
+      className="word"
+      data-size={state.size}
+      data-ruler={state.ruler ? "true" : "false"}
+    >
       <WordMenu state={state} actions={actions} />
       <WordToolbar state={state} actions={actions} />
       {state.address && (
-        <form className="word-addressbar" aria-label={state.address.tool === "link" ? t("addressFormLink") : t("addressFormImage")}
-          onSubmit={(event) => { event.preventDefault(); insertAddress(); }}>
+        <form
+          className="word-addressbar"
+          aria-label={
+            state.address.tool === "link"
+              ? t("addressFormLink")
+              : t("addressFormImage")
+          }
+          onSubmit={(event) => {
+            event.preventDefault();
+            insertAddress();
+          }}
+        >
           <label className="word-addresslabel" htmlFor="word-address">
-            {state.address.tool === "link" ? t("addressLinkTo") : t("addressImageAt")}
+            {state.address.tool === "link"
+              ? t("addressLinkTo")
+              : t("addressImageAt")}
           </label>
-          <input id="word-address" ref={address} className="word-addressinput circa-mono" type="text" spellCheck={false}
-            autoComplete="off" value={state.address.value} placeholder={t("addressPlaceholder")}
-            onChange={(event) => dispatch({ type: "addressValue", value: event.target.value })} />
-          <button type="submit" className="word-addressbutton">{t("addressInsert")}</button>
-          <button type="button" className="word-addressbutton" onClick={() => dispatch({ type: "address", tool: null })}>{t("addressCancel")}</button>
+          <input
+            id="word-address"
+            ref={address}
+            className="word-addressinput circa-mono"
+            type="text"
+            spellCheck={false}
+            autoComplete="off"
+            value={state.address.value}
+            placeholder={t("addressPlaceholder")}
+            onChange={(event) =>
+              dispatch({ type: "addressValue", value: event.target.value })
+            }
+          />
+          <button type="submit" className="word-addressbutton">
+            {t("addressInsert")}
+          </button>
+          <button
+            type="button"
+            className="word-addressbutton"
+            onClick={() => dispatch({ type: "address", tool: null })}
+          >
+            {t("addressCancel")}
+          </button>
         </form>
       )}
       {state.ruler && <WordRuler />}
       <div className="word-desk">
         <div className="word-page">
-          <label className="sr-only" htmlFor="word-document">{t("documentLabel")}</label>
+          <label className="sr-only" htmlFor="word-document">
+            {t("documentLabel")}
+          </label>
           <textarea
             key={state.revision}
             id="word-document"
@@ -215,21 +295,49 @@ export function WordWindow({ onCloseWindow, initialBody = STARTER }: {
             aria-describedby="word-document-note"
             onFocus={() => dispatch({ type: "focus", focused: true })}
             onBlur={() => dispatch({ type: "focus", focused: false })}
-            onClick={(event) => dispatch({ type: "selection", selection: readSelection(event.currentTarget) })}
-            onKeyUp={(event) => dispatch({ type: "selection", selection: readSelection(event.currentTarget) })}
-            onSelect={(event) => dispatch({ type: "selection", selection: readSelection(event.currentTarget) })}
-            onChange={(event) => dispatch({ type: "change", text: event.target.value, selection: readSelection(event.currentTarget) })}
+            onClick={(event) =>
+              dispatch({
+                type: "selection",
+                selection: readSelection(event.currentTarget),
+              })
+            }
+            onKeyUp={(event) =>
+              dispatch({
+                type: "selection",
+                selection: readSelection(event.currentTarget),
+              })
+            }
+            onSelect={(event) =>
+              dispatch({
+                type: "selection",
+                selection: readSelection(event.currentTarget),
+              })
+            }
+            onChange={(event) =>
+              dispatch({
+                type: "change",
+                text: event.target.value,
+                selection: readSelection(event.currentTarget),
+              })
+            }
             onKeyDown={onKeyDown}
           />
           <span className="sr-only" id="word-document-note">
             {t("documentNote")}
           </span>
-          <span className="word-page-stamp" aria-hidden="true">{t("draftStamp")}</span>
+          <span className="word-page-stamp" aria-hidden="true">
+            {t("draftStamp")}
+          </span>
         </div>
       </div>
-      <WordStatus state={state} summary={tool ? `${summary} | ${state.active.join(", ")}` : summary} />
+      <WordStatus
+        state={state}
+        summary={tool ? `${summary} | ${state.active.join(", ")}` : summary}
+      />
       <WordNotice kind={notice} onClose={() => setNotice(null)} />
-      <span className="sr-only">{t("windowLabel", { name: WORD_NAME, title: WORD_WINDOW_TITLE })}</span>
+      <span className="sr-only">
+        {t("windowLabel", { name: WORD_NAME, title: WORD_WINDOW_TITLE })}
+      </span>
     </div>
   );
 }

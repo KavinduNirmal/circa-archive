@@ -50,7 +50,8 @@ function recordHandlers(mode: RedactionMode = "labelled"): Handlers {
     },
     figure(state, node) {
       void state;
-      const align = node.align === "left" || node.align === "right" ? node.align : "full";
+      const align =
+        node.align === "left" || node.align === "right" ? node.align : "full";
       return {
         type: "element",
         tagName: "figure",
@@ -80,16 +81,24 @@ function recordHandlers(mode: RedactionMode = "labelled"): Handlers {
 
 const COMPONENTS: Components = {
   mark: ({ children }) => <PaperRedaction>{children}</PaperRedaction>,
-  figure: ({ className, children }) => <PaperFigure className={className}>{children}</PaperFigure>,
+  figure: ({ className, children }) => (
+    <PaperFigure className={className}>{children}</PaperFigure>
+  ),
   img: RecordImage,
 };
 
-export function RecordMarkdown({ source, redactionMode = "labelled" }: {
+export function RecordMarkdown({
+  source,
+  redactionMode = "labelled",
+}: {
   source: string;
   /** Policy, not styling: `hidden` leaves a redaction with nothing to reveal. */
   redactionMode?: RedactionMode;
 }) {
-  const handlers = useMemo(() => recordHandlers(redactionMode), [redactionMode]);
+  const handlers = useMemo(
+    () => recordHandlers(redactionMode),
+    [redactionMode],
+  );
   // The repair has to run on the string, before `react-markdown` parses it.
   const normalised = useMemo(() => normaliseTableRedactions(source), [source]);
   return (

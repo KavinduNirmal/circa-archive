@@ -2,60 +2,20 @@
 
 ## Responsibility and structure
 
-The public developer manual served at `/{lang}/meta/documentation`.
-[en/](en/README.md) and [ko/](ko/README.md) contain the same nine topics in
-English and Korean. The Markdown files own the article text, formatting, and
-headings; the client registry owns navigation labels and reading order.
+Public technical articles for the independent [Astro project website](../../meta/README.md). [en/](en/README.md) and [ko/](ko/README.md) contain translated articles. The website's explicit registry groups them into Overview, Lore, Contribution and Building, alongside the public lore index and author guide.
 
-## Boundaries and decisions
+## Authoring and boundaries
 
-These files replace article bodies previously embedded in JSX and translation
-catalogs. They document implemented client behavior; platform plans remain in
-[ARCHITECTURE.md](../../ARCHITECTURE.md), and fictional lore remains in
-[../lore/](../lore/README.md).
+Article prose, headings and formatting live in these Markdown files. UI labels and reading order live in the Astro package. Documentation describes implemented behavior; platform plans remain in [ARCHITECTURE.md](../../ARCHITECTURE.md), and public fictional knowledge remains in [lore](../lore/README.md). Private lore is never a build input.
 
-The website fetches public raw files from GitHub's `develop` branch, using
-`PROJECT_REPOSITORY_URL` and optional `PROJECT_DOCUMENTATION_REF` server settings.
-The repository override must be an HTTPS GitHub owner/repository address.
-Set overrides in the client runtime environment (or `client/.env.local`).
-Next.js caches successful fetches and revalidates after 300 seconds; requests
-have a ten-second timeout. New files must be published to the configured ref
-before the website can display them. There is no embedded content fallback.
-Loading and failure messages are localized, with retry and source links.
+The site builds from the checked-out registry sources. Edit locally, restart development to refresh the collection, and build/deploy to publish. There are no runtime GitHub fetches or embedded fallbacks. Missing registered documents fail the build. `PROJECT_DOCUMENTATION_REF` controls GitHub source/edit links only. Last-updated dates use available build-time Git history and are omitted when unverifiable.
 
-Each page loads the registered documents for its locale concurrently. Search
-matches titles and raw Markdown across those documents; the project header opens
-it from any meta page, and Ctrl/Cmd+K focuses it,
-including opening the mobile contents disclosure. Escape clears the query.
-Unavailable articles remain navigable by title and a partial-search notice
-explains missing content. Reading order and previous/next links never change.
+Registered relative links remain in the reader's language, retaining fragments and queries. Other public repository files link to GitHub. The registered lore diagram is served locally. Keep assets explicitly registered; never copy all documentation or private notes into public output. Use GFM, tables, tasks, footnotes, fenced code, GitHub alerts, highlighting and the existing brand blocks. Raw HTML is inert; fictional record redaction transforms never run on documentation examples. Heading IDs are assigned before the source H1 is removed, so existing links remain stable.
 
-Relative document links stay in the localized manual when the target is
-registered. Other relative files open on GitHub at the same ref; images resolve
-to raw files relative to their source. Fragments and query strings survive.
-Use GFM tables, tasks, strikethrough and footnotes, fenced code, and GitHub
-`[!NOTE]`, `[!TIP]`, `[!IMPORTANT]`, `[!WARNING]`, `[!CAUTION]` blockquotes.
-Frontmatter is hidden, raw HTML is not executed, and code examples remain literal.
-The contents rail and heading links derive from the rendered Markdown pipeline.
+The four chapter groups collapse while articles stay expanded. Search lazily loads a generated per-language index. Ctrl/Cmd+K focuses it; Escape clears it. Search opens matching groups and restores their prior state when cleared. The current chapter is open on arrival; session storage remembers other choices. Navigation and reading work without JavaScript; search and clipboard controls are enhancements.
 
-The title is followed by compact Copy Markdown and Open in ChatGPT actions.
-Copy Markdown copies the unmodified fetched source with success/failure feedback.
-Open in ChatGPT starts copying the source URL and Markdown as question context
-and opens ChatGPT in a new tab. The reader pastes the context and writes their
-question; nothing is automatically sent. Clipboard failures remain visible on
-this page.
-
-The article footer places the last-updated date on the left and Edit documentation
-on the right. Editing opens the exact locale file in GitHub's editor. Dates come
-from the latest commit affecting that source path at the configured ref, formatted
-in the reader's locale using UTC. File history is cached for one hour to limit
-unauthenticated GitHub API requests. Missing history, rate limits, and malformed
-dates omit the timestamp; they never prevent reading the article.
+Copy Markdown copies the exact built source. Open in ChatGPT copies context and opens ChatGPT for manual pasting; nothing is sent automatically. The article footer links to the exact source editor. Unavailable search or clipboard access produces visible recovery feedback.
 
 ## Usage and verification
 
-Edit both language files when content changes. Use relative Markdown links such
-as `[Rendering](rendering.md)`. Add a topic to the client registry and both
-language directories together. Run `bun run check`, `bun run check:client`, and
-`bun run --cwd=client build`. The source and experience tests cover fetching,
-relative links, rendering, search, keyboard focus and clipboard behavior.
+Add articles in both languages and register them in `meta/src/lib/registry.ts`. Run `bun run check`, `bun run check:meta`, `bun run --cwd meta build`, and `bun run --cwd meta test:e2e`. Run client checks when modifying the archive. See the [Building guide](en/building.md).

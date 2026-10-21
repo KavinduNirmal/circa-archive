@@ -25,10 +25,15 @@ export function generateStaticParams() {
   return routing.locales.map((lang) => ({ lang }));
 }
 
-export async function generateMetadata({ params }: RecordsPageProps): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: RecordsPageProps): Promise<Metadata> {
   const { lang } = await params;
   const t = await getTranslations({ locale: lang, namespace: "metadata" });
-  return { title: { absolute: t("siteRecordsTitle") }, description: t("siteRecordsDescription") };
+  return {
+    title: { absolute: t("siteRecordsTitle") },
+    description: t("siteRecordsDescription"),
+  };
 }
 
 /** The first value of a repeated parameter, or an empty string. */
@@ -44,19 +49,34 @@ function first(value: string | string[] | undefined) {
  * explain, and the same guard keeps `searchArchive` from being handed a class it
  * has no branch for.
  */
-function pick<T extends string>(allowed: readonly string[], value: string, fallback: T): T {
+function pick<T extends string>(
+  allowed: readonly string[],
+  value: string,
+  fallback: T,
+): T {
   return (allowed.includes(value) ? value : fallback) as T;
 }
 
-export default async function RecordsPage({ params, searchParams }: RecordsPageProps) {
+export default async function RecordsPage({
+  params,
+  searchParams,
+}: RecordsPageProps) {
   const { lang } = await params;
   const { q, class: klassParam, status, period } = await searchParams;
   setRequestLocale(lang);
   return (
     <ArchiveRecords
       query={first(q)}
-      klass={pick<ArchiveClass | "all">(["all", ...ARCHIVE_CLASSES], first(klassParam), "all")}
-      status={pick<ArchiveStatus | "all">(["all", ...ARCHIVE_STATUSES], first(status), "all")}
+      klass={pick<ArchiveClass | "all">(
+        ["all", ...ARCHIVE_CLASSES],
+        first(klassParam),
+        "all",
+      )}
+      status={pick<ArchiveStatus | "all">(
+        ["all", ...ARCHIVE_STATUSES],
+        first(status),
+        "all",
+      )}
       period={pick<ArchivePeriod>(ARCHIVE_PERIODS, first(period), "any")}
     />
   );

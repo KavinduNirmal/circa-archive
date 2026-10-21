@@ -21,7 +21,7 @@ action, so routing stays in one component instead of spreading through the shell
 
 The store holds no translated copy and no routing. Window titles arrive with their
 `WindowSpec`; the URL is written by `DesktopUrlSync`, which reads `historyIntent`
-and clears it. Actions that change *which document is focused* set an intent —
+and clears it. Actions that change _which document is focused_ set an intent —
 `"push"` for a newly opened document, `"replace"` for a focus change, minimize, or
 close — while geometry, maximize, and the screen filter set none.
 

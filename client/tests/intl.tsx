@@ -3,7 +3,10 @@ import { resolve } from "node:path";
 import { NextIntlClientProvider, createTranslator } from "next-intl";
 import type { AbstractIntlMessages } from "next-intl";
 import { render, type RenderOptions } from "@testing-library/react";
-import { createWorkstationStore, type WorkstationStoreApi } from "@/stores/workstation-store";
+import {
+  createWorkstationStore,
+  type WorkstationStoreApi,
+} from "@/stores/workstation-store";
 import { WorkstationStoreProvider } from "@/stores/workstation-store-provider";
 
 /**
@@ -32,12 +35,17 @@ function readCatalog(locale: TestLocale): TestCatalog {
   const catalog: TestCatalog = {};
   for (const file of readdirSync(`${catalogRoot}/${locale}`)) {
     if (!file.endsWith(".json")) continue;
-    catalog[file.replace(/\.json$/, "")] = JSON.parse(readFileSync(`${catalogRoot}/${locale}/${file}`, "utf8"));
+    catalog[file.replace(/\.json$/, "")] = JSON.parse(
+      readFileSync(`${catalogRoot}/${locale}/${file}`, "utf8"),
+    );
   }
   return catalog;
 }
 
-const catalogs: Record<TestLocale, TestCatalog> = { en: readCatalog("en"), ko: readCatalog("ko") };
+const catalogs: Record<TestLocale, TestCatalog> = {
+  en: readCatalog("en"),
+  ko: readCatalog("ko"),
+};
 
 export function catalogFor(locale: TestLocale): TestCatalog {
   return catalogs[locale];
@@ -54,7 +62,13 @@ export function clientMessages(locale: TestLocale): AbstractIntlMessages {
   return catalogFor(locale) as unknown as AbstractIntlMessages;
 }
 
-export function IntlProvider({ locale = "en", children }: { locale?: TestLocale; children: React.ReactNode }) {
+export function IntlProvider({
+  locale = "en",
+  children,
+}: {
+  locale?: TestLocale;
+  children: React.ReactNode;
+}) {
   return (
     <NextIntlClientProvider locale={locale} messages={clientMessages(locale)}>
       {children}
@@ -63,10 +77,15 @@ export function IntlProvider({ locale = "en", children }: { locale?: TestLocale;
 }
 
 /** `render`, with the message provider wrapped around the subject. */
-export function renderWithIntl(ui: React.ReactElement, options: RenderOptions & { locale?: TestLocale } = {}) {
+export function renderWithIntl(
+  ui: React.ReactElement,
+  options: RenderOptions & { locale?: TestLocale } = {},
+) {
   const { locale = "en", ...rest } = options;
   return render(ui, {
-    wrapper: ({ children }) => <IntlProvider locale={locale}>{children}</IntlProvider>,
+    wrapper: ({ children }) => (
+      <IntlProvider locale={locale}>{children}</IntlProvider>
+    ),
     ...rest,
   });
 }
@@ -79,14 +98,18 @@ export function renderWithIntl(ui: React.ReactElement, options: RenderOptions & 
  * would be asserting on a crash. A store can be injected to assert on or drive
  * the exact state the shell is showing.
  */
-export function workstationWrapper(options: { locale?: TestLocale; store?: WorkstationStoreApi } = {}) {
+export function workstationWrapper(
+  options: { locale?: TestLocale; store?: WorkstationStoreApi } = {},
+) {
   // Each wrapper gets its own plain store unless one is injected, so tests never
   // share a workspace (or a storage key) by accident.
   const { locale = "en", store = createWorkstationStore() } = options;
   function WorkstationTestWrapper({ children }: { children: React.ReactNode }) {
     return (
       <IntlProvider locale={locale}>
-        <WorkstationStoreProvider store={store}>{children}</WorkstationStoreProvider>
+        <WorkstationStoreProvider store={store}>
+          {children}
+        </WorkstationStoreProvider>
       </IntlProvider>
     );
   }
@@ -96,10 +119,16 @@ export function workstationWrapper(options: { locale?: TestLocale; store?: Works
 /** `renderWorkstation` for the shell; `renderWithIntl` stays store-free for single components. */
 export function renderWorkstation(
   ui: React.ReactElement,
-  options: RenderOptions & { locale?: TestLocale; store?: WorkstationStoreApi } = {},
+  options: RenderOptions & {
+    locale?: TestLocale;
+    store?: WorkstationStoreApi;
+  } = {},
 ) {
   const { locale = "en", store = createWorkstationStore(), ...rest } = options;
-  return render(ui, { wrapper: workstationWrapper({ locale, store }), ...rest });
+  return render(ui, {
+    wrapper: workstationWrapper({ locale, store }),
+    ...rest,
+  });
 }
 
 /**

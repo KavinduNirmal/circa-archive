@@ -12,13 +12,13 @@ Prioritise authorization, lifecycle transitions, vote uniqueness, and visibility
 
 Vitest runs in jsdom. Tests live in client/tests/ and are named for the surface or module they hold.
 
-| File | Holds |
-| --- | --- |
-| `markdown-pipeline.test.ts` | parse, redactions, figures, warnings, and the corpus contract. |
-| `archive-site.test.tsx` | the reading edition, record pages, downloads, and the project pages. |
-| `i18n-messages.test.ts` | catalog key parity, placeholders, rich tags, and empty values. |
-| `desktop.test.tsx` | the workstation shell, its windows, and their interactions. |
-| `window-manager.test.tsx` | geometry, stacking, minimize, maximize, and drag state. |
+| File                        | Holds                                                                |
+| --------------------------- | -------------------------------------------------------------------- |
+| `markdown-pipeline.test.ts` | parse, redactions, figures, warnings, and the corpus contract.       |
+| `archive-site.test.tsx`     | the reading edition, record pages, downloads, and the project pages. |
+| `i18n-messages.test.ts`     | catalog key parity, placeholders, rich tags, and empty values.       |
+| `desktop.test.tsx`          | the workstation shell, its windows, and their interactions.          |
+| `window-manager.test.tsx`   | geometry, stacking, minimize, maximize, and drag state.              |
 
 Components that read copy need the provider. Use renderWithIntl from tests/intl.tsx, which loads the real catalogs, so a test asserts the sentence a reader sees rather than a message key.
 

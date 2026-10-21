@@ -1,17 +1,26 @@
-import { loadDocumentation, loadDocumentUpdatedAt } from "@/components/meta/docs/docs-source";
+import {
+  loadDocumentation,
+  loadDocumentUpdatedAt,
+} from "@/components/meta/docs/docs-source";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { DocsPage } from "@/components/meta/docs/docs-page";
 import { DOC_SLUGS, docTopic } from "@/components/meta/docs/docs-topics";
 
-type DocsTopicPageProps = Readonly<{ params: Promise<{ lang: string; slug: string }> }>;
+type DocsTopicPageProps = Readonly<{
+  params: Promise<{ lang: string; slug: string }>;
+}>;
 
 export function generateStaticParams() {
-  return DOC_SLUGS.filter((slug) => slug !== "overview").map((slug) => ({ slug }));
+  return DOC_SLUGS.filter((slug) => slug !== "overview").map((slug) => ({
+    slug,
+  }));
 }
 
-export async function generateMetadata({ params }: DocsTopicPageProps): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: DocsTopicPageProps): Promise<Metadata> {
   const { lang, slug } = await params;
   const topic = docTopic(slug);
   if (!topic) return {};
@@ -24,7 +33,12 @@ export async function generateMetadata({ params }: DocsTopicPageProps): Promise<
   return {
     title: { absolute: title },
     description,
-    openGraph: { type: "article", siteName: t("registryName"), title, description },
+    openGraph: {
+      type: "article",
+      siteName: t("registryName"),
+      title,
+      description,
+    },
   };
 }
 
@@ -35,6 +49,16 @@ export default async function DocsTopicPage({ params }: DocsTopicPageProps) {
   const topic = docTopic(slug);
   if (!topic) notFound();
 
-  const [documents, updatedAt] = await Promise.all([loadDocumentation(lang), loadDocumentUpdatedAt(topic, lang)]);
-  return <DocsPage topic={topic} documents={documents} locale={lang} updatedAt={updatedAt} />;
+  const [documents, updatedAt] = await Promise.all([
+    loadDocumentation(lang),
+    loadDocumentUpdatedAt(topic, lang),
+  ]);
+  return (
+    <DocsPage
+      topic={topic}
+      documents={documents}
+      locale={lang}
+      updatedAt={updatedAt}
+    />
+  );
 }

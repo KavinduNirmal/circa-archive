@@ -2,7 +2,7 @@
 
 ## Responsibility
 
-The workstation's file browser, opened by every folder destination on the desktop: **My PC**, **My Documents**, **My Work**, **Archive**, **Organizations**, **System Files**, the **Recycle Bin**, and **_EXPUNGED**. One component serves all of them, because a 1998 file manager does not change its behaviour when you double-click a different drive: a scope decides where the window opens and which mount it claims, and the navigation, listing, sorting, and selection behaviour are identical everywhere.
+The workstation's file browser, opened by every folder destination on the desktop: **My PC**, **My Documents**, **My Work**, **Archive**, **Organizations**, **System Files**, the **Recycle Bin**, and **\_EXPUNGED**. One component serves all of them, because a 1998 file manager does not change its behaviour when you double-click a different drive: a scope decides where the window opens and which mount it claims, and the navigation, listing, sorting, and selection behaviour are identical everywhere.
 
 It exists so a folder can be used twice. The archive index is a browsable tree as well as a search form, the same records appear in My Documents and My Work, and every desktop container now opens a real screen instead of a placeholder pane.
 
@@ -25,12 +25,12 @@ Every component here is a client component and reads its copy with `useTranslati
 
 The archive mount is read only, so the five file operations are present, correct, and refused with a named policy rather than hidden. A missing control is indistinguishable from a broken one; a refused control with a reference is a rule of the world.
 
-| Operation | Refusal |
-| --- | --- |
-| New folder | `LN-POLICY-23 / FS_READ_ONLY_VOLUME`: folders are created by the filing service when a case is opened |
-| Cut, Copy, Paste | `LN-POLICY-24 / FS_FILING_BY_SERVICE`: records are referenced by their case, not copied between folders |
+| Operation                 | Refusal                                                                                                                                             |
+| ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| New folder                | `LN-POLICY-23 / FS_READ_ONLY_VOLUME`: folders are created by the filing service when a case is opened                                               |
+| Cut, Copy, Paste          | `LN-POLICY-24 / FS_FILING_BY_SERVICE`: records are referenced by their case, not copied between folders                                             |
 | Delete, Empty Recycle Bin | `LN-POLICY-19 / FS_NO_DISPOSAL_LINE`: disposal is a scheduled act with a named officer; the retention schedule has no disposal line for this volume |
-| Rename | `LN-POLICY-25 / FS_NAME_IS_KEY`: a record's name carries its case code and the index is keyed on that name |
+| Rename                    | `LN-POLICY-25 / FS_NAME_IS_KEY`: a record's name carries its case code and the index is keyed on that name                                          |
 
 Everything that is not a write is real. Navigation records history, Back and Forward replay it, Up respects the root, the tree pane walks the whole store, the columns sort, the rows and folder branches select, and the status bar reports exactly what happened including a jump the scope refused.
 
@@ -42,7 +42,7 @@ The fixture follows the case rules in `ARCHITECTURE.md` §5.3: a case folder is 
 
 Two deliberate departures from a literal Explorer, both because the fiction is stronger without them:
 
-- **_EXPUNGED is empty and reports a count.** Expunged records are removed from discoverability, so there is no listing to open; the folder shows `47 records expunged.` and says why. This is the one scope whose empty state is a rule rather than an accident.
+- **\_EXPUNGED is empty and reports a count.** Expunged records are removed from discoverability, so there is no listing to open; the folder shows `47 records expunged.` and says why. This is the one scope whose empty state is a rule rather than an accident.
 - **The window title is not retitled per folder.** The shell names a window once when it opens, so a browser-style retitle would need a registry write on every navigation. My Computer opens at `C:\` rather than at the root above it, which means the pane and the listing always agree about where the window is.
 
 ## Visual contract

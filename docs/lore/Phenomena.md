@@ -22,12 +22,12 @@ Actors from other stories may rarely appear within a [connected or nested Incide
 
 ## Observed behavior
 
-| Description | Observations |
-| --- | --- |
-| **Reactive** | Responds to conditions without apparent awareness. |
-| **Adaptive** | Changes behavior in response to repeated investigations. |
-| **Intelligent** | Demonstrates memory, intention, and strategic behavior. |
-| **Indeterminate** | Shows inconsistent signs of awareness. |
+| Description       | Observations                                             |
+| ----------------- | -------------------------------------------------------- |
+| **Reactive**      | Responds to conditions without apparent awareness.       |
+| **Adaptive**      | Changes behavior in response to repeated investigations. |
+| **Intelligent**   | Demonstrates memory, intention, and strategic behavior.  |
+| **Indeterminate** | Shows inconsistent signs of awareness.                   |
 
 Describe the evidence for the term used. These descriptions do not form a ladder that every Incident must climb. An adaptive response does not, on its own, establish an intelligent actor.
 

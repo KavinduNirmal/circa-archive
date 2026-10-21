@@ -16,23 +16,39 @@
   .tooltip-content {
     padding: 4px 7px;
     border: 1px solid;
-    border-color: var(--circa-bevel-light) var(--circa-bevel-shadow) var(--circa-bevel-shadow) var(--circa-bevel-light);
+    border-color: var(--circa-bevel-light) var(--circa-bevel-shadow)
+      var(--circa-bevel-shadow) var(--circa-bevel-light);
     background: #101a24;
     color: #a4c2e6;
-    box-shadow: 2px 2px 0 rgb(8 17 25 / 55%), inset 1px 1px 0 rgb(164 194 230 / 12%);
+    box-shadow:
+      2px 2px 0 rgb(8 17 25 / 55%),
+      inset 1px 1px 0 rgb(164 194 230 / 12%);
   }
   .tooltip-content[data-state="delayed-open"],
   .tooltip-content[data-state="instant-open"] {
     animation: circa-tooltip-in 90ms steps(2, end);
   }
-  .tooltip-arrow { display: block; }
-  .tooltip-arrow-fill { fill: #101a24; }
-  .tooltip-arrow-stroke { fill: none; stroke: var(--circa-bevel-shadow); stroke-width: 1; }
+  .tooltip-arrow {
+    display: block;
+  }
+  .tooltip-arrow-fill {
+    fill: #101a24;
+  }
+  .tooltip-arrow-stroke {
+    fill: none;
+    stroke: var(--circa-bevel-shadow);
+    stroke-width: 1;
+  }
   @keyframes circa-tooltip-in {
-    from { opacity: 0; transform: translate(1px, 1px); }
+    from {
+      opacity: 0;
+      transform: translate(1px, 1px);
+    }
   }
   @media (prefers-reduced-motion: reduce) {
     .tooltip-content[data-state="delayed-open"],
-    .tooltip-content[data-state="instant-open"] { animation: none; }
+    .tooltip-content[data-state="instant-open"] {
+      animation: none;
+    }
   }
 }

@@ -19,7 +19,10 @@ import "./boot.css";
 
 export type BootLine = { label: string; detail: string };
 
-type BootTranslate = (key: string, values?: Record<string, string | number>) => string;
+type BootTranslate = (
+  key: string,
+  values?: Record<string, string | number>,
+) => string;
 
 /** One line per step, then a hold on the final line before the shell takes over. */
 export const BOOT_STEP_MS = 260;
@@ -46,7 +49,10 @@ export function bootLines(t: BootTranslate): readonly BootLine[] {
     },
     { label: t("volumeDLabel"), detail: t("volumeDDetail") },
     { label: t("mailLabel"), detail: t("mailDetail", { letters }) },
-    { label: t("archiveLabel"), detail: t("archiveDetail", { entries: ARCHIVE_INDEX.length }) },
+    {
+      label: t("archiveLabel"),
+      detail: t("archiveDetail", { entries: ARCHIVE_INDEX.length }),
+    },
     { label: t("clearanceLabel"), detail: t("clearanceDetail") },
     { label: t("shellLabel"), detail: t("shellDetail") },
   ];
@@ -67,7 +73,11 @@ function motionReduced(): boolean {
 
 const PROGRESS_CELLS = 44;
 
-function BootScreen({ lines, revealed, onSkip }: {
+function BootScreen({
+  lines,
+  revealed,
+  onSkip,
+}: {
   lines: readonly BootLine[];
   revealed: number;
   onSkip: () => void;
@@ -88,7 +98,11 @@ function BootScreen({ lines, revealed, onSkip }: {
         </div>
         <ol className="boot-lines">
           {lines.map((line, index) => (
-            <li key={line.label} className="boot-line" data-revealed={index < revealed ? "true" : "false"}>
+            <li
+              key={line.label}
+              className="boot-line"
+              data-revealed={index < revealed ? "true" : "false"}
+            >
               <span className="boot-label circa-mono">{line.label}</span>
               <span className="boot-detail circa-mono">{line.detail}</span>
               <span className="boot-mark circa-mono" aria-hidden="true">
@@ -107,7 +121,11 @@ function BootScreen({ lines, revealed, onSkip }: {
           aria-valuetext={t("progressText", { revealed, total: lines.length })}
         >
           {Array.from({ length: PROGRESS_CELLS }, (_, index) => (
-            <span key={index} className="boot-cell" data-on={index < filled ? "true" : "false"} />
+            <span
+              key={index}
+              className="boot-cell"
+              data-on={index < filled ? "true" : "false"}
+            />
           ))}
         </div>
         <div className="boot-foot">
@@ -126,7 +144,8 @@ function BootScreen({ lines, revealed, onSkip }: {
 
 /** Subscribes to the motion preference so a mid-session change is honoured. */
 function subscribeToMotion(onChange: () => void) {
-  if (typeof window === "undefined" || typeof window.matchMedia !== "function") return () => {};
+  if (typeof window === "undefined" || typeof window.matchMedia !== "function")
+    return () => {};
   const query = window.matchMedia("(prefers-reduced-motion: reduce)");
   query.addEventListener("change", onChange);
   return () => query.removeEventListener("change", onChange);
@@ -139,7 +158,11 @@ export function WorkstationBoot({ children }: { children: React.ReactNode }) {
    * effect: an operator who asked for reduced motion must never be shown the
    * post screen at all, and the server snapshot keeps hydration honest.
    */
-  const reduced = useSyncExternalStore(subscribeToMotion, motionReduced, () => false);
+  const reduced = useSyncExternalStore(
+    subscribeToMotion,
+    motionReduced,
+    () => false,
+  );
   const [revealed, setRevealed] = useState(0);
   const [handedOver, setHandedOver] = useState(false);
   const booting = !reduced && !handedOver;
@@ -153,7 +176,10 @@ export function WorkstationBoot({ children }: { children: React.ReactNode }) {
      * for twice the intended time. The words are read in render instead.
      */
     const timers = Array.from({ length: BOOT_LINE_COUNT }, (_, index) =>
-      window.setTimeout(() => setRevealed(index + 1), BOOT_STEP_MS * (index + 1)),
+      window.setTimeout(
+        () => setRevealed(index + 1),
+        BOOT_STEP_MS * (index + 1),
+      ),
     );
     timers.push(window.setTimeout(() => setHandedOver(true), bootDurationMs()));
     return () => timers.forEach((timer) => window.clearTimeout(timer));
@@ -174,10 +200,16 @@ export function WorkstationBoot({ children }: { children: React.ReactNode }) {
         The shell mounts behind the post so the swap does not flash, and stays
         out of the accessibility tree and out of the tab order until it is up.
       */}
-      <div className="boot-stage" aria-hidden={booting || undefined} inert={booting}>
+      <div
+        className="boot-stage"
+        aria-hidden={booting || undefined}
+        inert={booting}
+      >
         {children}
       </div>
-      {booting && <BootScreen lines={bootLines(t)} revealed={revealed} onSkip={skip} />}
+      {booting && (
+        <BootScreen lines={bootLines(t)} revealed={revealed} onSkip={skip} />
+      )}
     </>
   );
 }

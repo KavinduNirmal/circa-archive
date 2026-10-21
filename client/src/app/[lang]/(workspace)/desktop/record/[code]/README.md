@@ -9,7 +9,7 @@ sibling pages, it is a URL marker: the workspace layout owns the shell, and
 ## Structure
 
 - `page.tsx`: `generateStaticParams` over `ARCHIVE_INDEX`, `dynamicParams =
-  false`, and an `isRecordCode` guard that calls `notFound()`. It renders `null`.
+false`, and an `isRecordCode` guard that calls `notFound()`. It renders `null`.
 
 ## Boundaries
 

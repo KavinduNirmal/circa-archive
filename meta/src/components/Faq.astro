@@ -1,0 +1,25 @@
+---
+import { t, type Locale } from "../lib/site";
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const keys = ["Real", "Write", "Notes", "Reuse", "Language", "Roadmap"];
+---
+
+<div class="faq-list">
+  {keys.map((key, index) => (
+    <details>
+      <>
+        <summary>
+          <span class="folio">{String(index + 1).padStart(2, "0")}</span>
+          {t(locale, `faq${key}Q`)}
+          <span class="disclosure-plus" aria-hidden="true">
+            +
+          </span>
+        </summary>
+        <p>{t(locale, `faq${key}A`)}</p>
+      </>
+    </details>
+  ))}
+</div>

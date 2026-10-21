@@ -6,7 +6,10 @@ import { MetaChrome } from "@/components/meta/meta-chrome";
 import { routing } from "@/i18n/routing";
 import "@/components/meta/meta.css";
 
-type MetaLayoutProps = Readonly<{ children: React.ReactNode; params: Promise<{ lang: string }> }>;
+type MetaLayoutProps = Readonly<{
+  children: React.ReactNode;
+  params: Promise<{ lang: string }>;
+}>;
 
 export function generateStaticParams() {
   return routing.locales.map((lang) => ({ lang }));
@@ -20,7 +23,10 @@ export function generateStaticParams() {
  * header, and the footer cannot render unstyled on one route. It stays scoped to
  * `.meta-page`; the archive and the workstation never inherit it.
  */
-export default async function MetaLayout({ children, params }: MetaLayoutProps) {
+export default async function MetaLayout({
+  children,
+  params,
+}: MetaLayoutProps) {
   const { lang } = await params;
   setRequestLocale(lang);
 

@@ -1,4 +1,11 @@
-import { ARCHIVE_INDEX, CLASS_LABELS, STATUS_LABELS, type ArchiveClass, type ArchiveEntry, type ArchiveStatus } from "../browser/archive-index";
+import {
+  ARCHIVE_INDEX,
+  CLASS_LABELS,
+  STATUS_LABELS,
+  type ArchiveClass,
+  type ArchiveEntry,
+  type ArchiveStatus,
+} from "../browser/archive-index";
 
 /**
  * The archive site's view of the index.
@@ -35,7 +42,9 @@ export const STATUS_ENGLISH: Record<ArchiveStatus, string> = STATUS_LABELS;
 export const SITE_INDEX: readonly ArchiveEntry[] = ARCHIVE_INDEX;
 
 /** The bodies entered in the directory: a class, not a claim about their nature. */
-export const ORGANIZATIONS: readonly ArchiveEntry[] = ARCHIVE_INDEX.filter((entry) => entry.klass === "organization");
+export const ORGANIZATIONS: readonly ArchiveEntry[] = ARCHIVE_INDEX.filter(
+  (entry) => entry.klass === "organization",
+);
 
 /**
  * Consultations, as the reading room records them.
@@ -67,16 +76,23 @@ export const CONSULTATIONS: Readonly<Record<string, number>> = {
 };
 
 /** The most consulted entries, newest count first and archive order breaking ties. */
-export function mostConsulted(count = 5): { entry: ArchiveEntry; consultations: number }[] {
-  return SITE_INDEX
-    .map((entry) => ({ entry, consultations: CONSULTATIONS[entry.code] ?? 0 }))
+export function mostConsulted(
+  count = 5,
+): { entry: ArchiveEntry; consultations: number }[] {
+  return SITE_INDEX.map((entry) => ({
+    entry,
+    consultations: CONSULTATIONS[entry.code] ?? 0,
+  }))
     .sort((a, b) => b.consultations - a.consultations)
     .slice(0, count);
 }
 
 /** A record the reader has not chosen. The route that uses it redirects to the page. */
 export function randomRecordCode(random: () => number = Math.random): string {
-  const at = Math.min(SITE_INDEX.length - 1, Math.floor(random() * SITE_INDEX.length));
+  const at = Math.min(
+    SITE_INDEX.length - 1,
+    Math.floor(random() * SITE_INDEX.length),
+  );
   return SITE_INDEX[Math.max(0, at)].code;
 }
 
@@ -92,7 +108,10 @@ export function filingsFor(code: string): number {
  * than of the page: a reader walking the site reads it in the same order the
  * archive files it.
  */
-export function neighboursOf(code: string): { previous?: ArchiveEntry; next?: ArchiveEntry } {
+export function neighboursOf(code: string): {
+  previous?: ArchiveEntry;
+  next?: ArchiveEntry;
+} {
   const at = ARCHIVE_INDEX.findIndex((entry) => entry.code === code);
   if (at < 0) return {};
   return {

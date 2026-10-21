@@ -13,9 +13,20 @@ import { WORD_NAME } from "./word-identity";
  */
 export type WordNoticeKind = "save" | "policy" | "about";
 
-type NoticeCopy = { title: string; heading: string; body: string; reference: string };
+type NoticeCopy = {
+  title: string;
+  heading: string;
+  body: string;
+  reference: string;
+};
 
-export function WordNotice({ kind, onClose }: { kind: WordNoticeKind | null; onClose: () => void }) {
+export function WordNotice({
+  kind,
+  onClose,
+}: {
+  kind: WordNoticeKind | null;
+  onClose: () => void;
+}) {
   const t = useTranslations("word");
   // The copy is read here rather than from a table of English strings, so the
   // notice a reader sees is the one their language's catalog holds. The brand

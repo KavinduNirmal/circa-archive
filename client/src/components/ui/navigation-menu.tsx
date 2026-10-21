@@ -21,11 +21,16 @@ function NavigationMenu({
   children,
   viewport = true,
   ...props
-}: React.ComponentProps<typeof NavigationMenuPrimitive.Root> & { viewport?: boolean }) {
+}: React.ComponentProps<typeof NavigationMenuPrimitive.Root> & {
+  viewport?: boolean;
+}) {
   return (
     <NavigationMenuPrimitive.Root
       data-slot="navigation-menu"
-      className={cn("group/navigation-menu relative flex max-w-max flex-1 items-center justify-center", className)}
+      className={cn(
+        "group/navigation-menu relative flex max-w-max flex-1 items-center justify-center",
+        className,
+      )}
       {...props}
     >
       {children}
@@ -41,7 +46,10 @@ function NavigationMenuList({
   return (
     <NavigationMenuPrimitive.List
       data-slot="navigation-menu-list"
-      className={cn("group flex flex-1 list-none items-center justify-center gap-1", className)}
+      className={cn(
+        "group flex flex-1 list-none items-center justify-center gap-1",
+        className,
+      )}
       {...props}
     />
   );
@@ -90,10 +98,7 @@ function NavigationMenuContent({
   return (
     <NavigationMenuPrimitive.Content
       data-slot="navigation-menu-content"
-      className={cn(
-        "absolute top-0 left-0 w-auto p-0 outline-none",
-        className,
-      )}
+      className={cn("absolute top-0 left-0 w-auto p-0 outline-none", className)}
       {...props}
     />
   );

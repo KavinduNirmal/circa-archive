@@ -1,6 +1,11 @@
 import { useCallback, useState } from "react";
 import { REVIEWER_HANDLE } from "./reader-identity";
-import { ANNOTATIONS, notesFor, type ReaderAnnotation, type ReaderReply } from "./reader-correspondence";
+import {
+  ANNOTATIONS,
+  notesFor,
+  type ReaderAnnotation,
+  type ReaderReply,
+} from "./reader-correspondence";
 import type { ReaderSection } from "./reader-model";
 
 /**
@@ -35,7 +40,12 @@ export type ReaderSession = {
   assessments: Record<string, number>;
   verdicts: Record<string, ReaderVerdict>;
   signIn: () => void;
-  fileNote: (code: string, sectionId: string, body: string, replyTo?: string) => void;
+  fileNote: (
+    code: string,
+    sectionId: string,
+    body: string,
+    replyTo?: string,
+  ) => void;
   endorse: (id: string) => void;
   assess: (code: string, value: number) => void;
   verdict: (code: string, value: ReaderVerdict) => void;
@@ -71,45 +81,63 @@ export function useReaderSession(): ReaderSession {
     setState((current) => ({ ...current, reviewer: REVIEWER_HANDLE }));
   }, []);
 
-  const fileNote = useCallback((code: string, sectionId: string, body: string, replyTo?: string) => {
-    const text = body.trim();
-    if (!text) return;
-    setState((current) => {
-      if (replyTo) {
-        const reply: ReaderReply = {
-          id: `reply-filed-${Object.keys(current.replies).length + 1}-${current.filed.length}`,
+  const fileNote = useCallback(
+    (code: string, sectionId: string, body: string, replyTo?: string) => {
+      const text = body.trim();
+      if (!text) return;
+      setState((current) => {
+        if (replyTo) {
+          const reply: ReaderReply = {
+            id: `reply-filed-${Object.keys(current.replies).length + 1}-${current.filed.length}`,
+            author: REVIEWER_HANDLE,
+            when: "Just now",
+            body: text,
+            noted: 0,
+          };
+          return {
+            ...current,
+            replies: {
+              ...current.replies,
+              [replyTo]: [...(current.replies[replyTo] ?? []), reply],
+            },
+          };
+        }
+        const note: ReaderAnnotation = {
+          id: `note-filed-${current.filed.length + 1}`,
+          code,
+          sectionId,
           author: REVIEWER_HANDLE,
           when: "Just now",
+          filed: today(),
           body: text,
+          replies: [],
           noted: 0,
         };
-        return { ...current, replies: { ...current.replies, [replyTo]: [...(current.replies[replyTo] ?? []), reply] } };
-      }
-      const note: ReaderAnnotation = {
-        id: `note-filed-${current.filed.length + 1}`,
-        code,
-        sectionId,
-        author: REVIEWER_HANDLE,
-        when: "Just now",
-        filed: today(),
-        body: text,
-        replies: [],
-        noted: 0,
-      };
-      return { ...current, filed: [...current.filed, note] };
-    });
-  }, []);
+        return { ...current, filed: [...current.filed, note] };
+      });
+    },
+    [],
+  );
 
   const endorse = useCallback((id: string) => {
-    setState((current) => ({ ...current, endorsed: { ...current.endorsed, [id]: (current.endorsed[id] ?? 0) + 1 } }));
+    setState((current) => ({
+      ...current,
+      endorsed: { ...current.endorsed, [id]: (current.endorsed[id] ?? 0) + 1 },
+    }));
   }, []);
 
   const assess = useCallback((code: string, value: number) => {
-    setState((current) => ({ ...current, assessments: { ...current.assessments, [code]: value } }));
+    setState((current) => ({
+      ...current,
+      assessments: { ...current.assessments, [code]: value },
+    }));
   }, []);
 
   const verdict = useCallback((code: string, value: ReaderVerdict) => {
-    setState((current) => ({ ...current, verdicts: { ...current.verdicts, [code]: value } }));
+    setState((current) => ({
+      ...current,
+      verdicts: { ...current.verdicts, [code]: value },
+    }));
   }, []);
 
   return {
@@ -139,14 +167,20 @@ export function isReviewer(session: ReaderSession): boolean {
  * New notes go last rather than being sorted into place, because a margin is
  * written in order and the note you just filed is the one at the bottom.
  */
-export function sessionNotes(session: ReaderSession, code: string, sections: readonly ReaderSection[]): ReaderAnnotation[] {
+export function sessionNotes(
+  session: ReaderSession,
+  code: string,
+  sections: readonly ReaderSection[],
+): ReaderAnnotation[] {
   const withEndorsements = (note: ReaderAnnotation): ReaderAnnotation => ({
     ...note,
     noted: note.noted + (session.endorsed[note.id] ?? 0),
-    replies: [...note.replies, ...(session.replies[note.id] ?? [])].map((reply) => ({
-      ...reply,
-      noted: reply.noted + (session.endorsed[reply.id] ?? 0),
-    })),
+    replies: [...note.replies, ...(session.replies[note.id] ?? [])].map(
+      (reply) => ({
+        ...reply,
+        noted: reply.noted + (session.endorsed[reply.id] ?? 0),
+      }),
+    ),
   });
   return [
     ...notesFor(ANNOTATIONS, code, sections).map(withEndorsements),

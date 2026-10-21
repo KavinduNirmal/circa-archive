@@ -1,0 +1,22 @@
+---
+import { t, archiveHref, type Locale } from "../lib/site";
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+---
+
+<figure class="specimen">
+  <div class="specimen-register">
+    <span>CIRCA / INCIDENT REVIEW</span>
+    <img src="/seal.svg" alt="" width="42" height="44" />
+  </div>
+  <p class="specimen-code">{t(locale, "specimenCode")}</p>
+  <h2>{t(locale, "specimenTitle")}</h2>
+  <p class="specimen-meta">{t(locale, "specimenMeta")}</p>
+  <blockquote>{t(locale, "specimenText")}</blockquote>
+  <a href={archiveHref(locale, `/site/records/${t(locale, "specimenCode")}`)}>
+    {t(locale, "specimenLink")} <span aria-hidden="true">↗</span>
+  </a>
+  <figcaption>{t(locale, "specimenNote")}</figcaption>
+</figure>

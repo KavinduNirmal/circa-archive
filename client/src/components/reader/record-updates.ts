@@ -26,20 +26,45 @@ export type RecordUpdate = {
  * The updates filed against a record. A record with no entry has no history:
  * neither surface then shows a section, which is a real state of the archive.
  */
-export const RECORD_UPDATES: Readonly<Record<string, readonly RecordUpdate[]>> = {
-  "CIRCA-S-03007": [
-    { filed: "2004-09-14", text: "The severity has been changed from A to S.", tone: "changed" },
-    { filed: "2004-09-13", text: "[Daydream Inc.] has claimed this record was erased.", tone: "claimed" },
-    { filed: "2004-09-12", text: "Filed by H. Kim under CIRCA-S-03007.", tone: "neutral" },
-  ],
-  "INC-00042": [
-    { filed: "2001-03-05", text: "The disposition has been sealed at Level 5.", tone: "changed" },
-    { filed: "2001-03-04", text: "The severity has been changed from B to A.", tone: "changed" },
-  ],
-  "ORG-A-020748": [
-    { filed: "1961-03-12", text: "The Commission has claimed this record under the standing commission.", tone: "claimed" },
-  ],
-};
+export const RECORD_UPDATES: Readonly<Record<string, readonly RecordUpdate[]>> =
+  {
+    "CIRCA-S-03007": [
+      {
+        filed: "2004-09-14",
+        text: "The severity has been changed from A to S.",
+        tone: "changed",
+      },
+      {
+        filed: "2004-09-13",
+        text: "[Daydream Inc.] has claimed this record was erased.",
+        tone: "claimed",
+      },
+      {
+        filed: "2004-09-12",
+        text: "Filed by H. Kim under CIRCA-S-03007.",
+        tone: "neutral",
+      },
+    ],
+    "INC-00042": [
+      {
+        filed: "2001-03-05",
+        text: "The disposition has been sealed at Level 5.",
+        tone: "changed",
+      },
+      {
+        filed: "2001-03-04",
+        text: "The severity has been changed from B to A.",
+        tone: "changed",
+      },
+    ],
+    "ORG-A-020748": [
+      {
+        filed: "1961-03-12",
+        text: "The Commission has claimed this record under the standing commission.",
+        tone: "claimed",
+      },
+    ],
+  };
 
 /**
  * A record's updates, newest first.
@@ -48,5 +73,7 @@ export const RECORD_UPDATES: Readonly<Record<string, readonly RecordUpdate[]>> =
  * never reorder the fixture by accident.
  */
 export function updatesFor(code: string): readonly RecordUpdate[] {
-  return [...(RECORD_UPDATES[code] ?? [])].sort((a, b) => b.filed.localeCompare(a.filed));
+  return [...(RECORD_UPDATES[code] ?? [])].sort((a, b) =>
+    b.filed.localeCompare(a.filed),
+  );
 }

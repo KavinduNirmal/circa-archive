@@ -10,11 +10,11 @@ The **Founding Author**, called the **Originator** in archival language, creates
 
 Before writing a follow-up, distinguish three categories:
 
-| Category | What it protects or describes | How another author may respond |
-| --- | --- | --- |
-| **Core Rules / Foundational Constraints** | The Incident's core identity and non-negotiable creative boundaries, including its primary actors. | Do not invalidate them without an authorized Foundational Amendment. A branch is not an exemption. |
-| **Established Observations** | Findings supported by exploration records. They can still be incomplete or mistaken. | Challenge or revise them through new evidence. |
-| **Unverified Claims** | Speculation, testimony, rumors, hypotheses, and disputed conclusions. | Question, contradict, or reinterpret them while respecting Core Rules and collaboration permissions. |
+| Category                                  | What it protects or describes                                                                      | How another author may respond                                                                       |
+| ----------------------------------------- | -------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| **Core Rules / Foundational Constraints** | The Incident's core identity and non-negotiable creative boundaries, including its primary actors. | Do not invalidate them without an authorized Foundational Amendment. A branch is not an exemption.   |
+| **Established Observations**              | Findings supported by exploration records. They can still be incomplete or mistaken.               | Challenge or revise them through new evidence.                                                       |
+| **Unverified Claims**                     | Speculation, testimony, rumors, hypotheses, and disputed conclusions.                              | Question, contradict, or reinterpret them while respecting Core Rules and collaboration permissions. |
 
 Not every apparent rule discovered in an exploration becomes foundational. A narrator's certainty does not grant permission to rewrite another author's protected premise.
 
@@ -37,11 +37,11 @@ Use **Filed**, **Independent**, **Adopted**, and **Divergent** rather than decla
 
 ## Keep three kinds of status separate
 
-| Question | Examples | What it does not decide |
-| --- | --- | --- |
-| **Publication** | Draft or published. | Whether claims are supported or a continuity has adopted the record. |
-| **Evidence** | Unverified, corroborated, or disputed. | Who may change Core Rules or whether a record belongs to a timeline. |
-| **Continuity** | Independent, adopted into a named continuity, or part of a divergent continuity. | Whether every interpretation in the record is true. |
+| Question        | Examples                                                                         | What it does not decide                                              |
+| --------------- | -------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| **Publication** | Draft or published.                                                              | Whether claims are supported or a continuity has adopted the record. |
+| **Evidence**    | Unverified, corroborated, or disputed.                                           | Who may change Core Rules or whether a record belongs to a timeline. |
+| **Continuity**  | Independent, adopted into a named continuity, or part of a divergent continuity. | Whether every interpretation in the record is true.                  |
 
 A published, corroborated, independent record has evidence but has not been adopted. A published, disputed, adopted record can belong to a timeline while its interpretation remains contested.
 
@@ -67,11 +67,11 @@ A record fork preserves its source lineage. Creating a branch additionally ident
 
 ## Characters and consent
 
-| Declared permission | What another author may do |
-| --- | --- |
-| **Open Character** | Use and develop the character within the declared scope and general platform rules. A death may be written in a divergent continuity without ending the character in other timelines. |
-| **Permission Required — default** | Seek approval before substantial appearances, major developments, or a death not already permitted. Consent may be limited to one record. |
-| **Reference Only** | Mention known actions or a historical role without controlling the character. |
+| Declared permission               | What another author may do                                                                                                                                                            |
+| --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Open Character**                | Use and develop the character within the declared scope and general platform rules. A death may be written in a divergent continuity without ending the character in other timelines. |
+| **Permission Required — default** | Seek approval before substantial appearances, major developments, or a death not already permitted. Consent may be limited to one record.                                             |
+| **Reference Only**                | Mention known actions or a historical role without controlling the character.                                                                                                         |
 
 Declare permissions clearly and respect any narrower scope. Creating an original investigator remains an option when another character is unavailable for substantial use.
 

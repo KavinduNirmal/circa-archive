@@ -14,7 +14,7 @@ and the plain-text export are testable on their own. Presentation lives in
 ## Structure
 
 - `pipeline.ts`: the shared plugin list and `parseRecord()`. The plugin list is
-  exported so the React viewer can hand the *same* transforms to
+  exported so the React viewer can hand the _same_ transforms to
   `react-markdown`; only then can the sheet and an export be the same document.
 - `normalise-redactions.ts`: the pre-parse repair. In a GFM table row `|` is the
   cell divider, so `||redacted||` shatters the row into empty cells before any
@@ -40,12 +40,12 @@ and the plain-text export are testable on their own. Presentation lives in
 
 ## The record conventions
 
-| Convention | Meaning |
-| --- | --- |
-| YAML frontmatter | The record's fields. Parsed to data, never printed. |
-| `## Heading` | A section boundary; the reader frame navigates these. An `###` stays inside its section. |
-| `\|\|text\|\|` | A redaction. Resolved to a `redaction` node wherever it appears, including inside a table cell. |
-| `![left\|right\|full\|caption](path)` | A figure with an alignment and a caption. |
+| Convention                            | Meaning                                                                                         |
+| ------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| YAML frontmatter                      | The record's fields. Parsed to data, never printed.                                             |
+| `## Heading`                          | A section boundary; the reader frame navigates these. An `###` stays inside its section.        |
+| `\|\|text\|\|`                        | A redaction. Resolved to a `redaction` node wherever it appears, including inside a table cell. |
+| `![left\|right\|full\|caption](path)` | A figure with an alignment and a caption.                                                       |
 
 ## Boundaries
 
@@ -67,7 +67,7 @@ import { parseRecord } from "@/lib/markdown/pipeline";
 import { renderText } from "@/lib/markdown/emitters/to-text";
 
 const parsed = parseRecord({ markdown, assetBaseUrl }); // mdast + metadata + warnings
-const text = renderText({ markdown }).output;           // .txt export
+const text = renderText({ markdown }).output; // .txt export
 ```
 
 From `client/`, run `bun run test` for the corpus tests and

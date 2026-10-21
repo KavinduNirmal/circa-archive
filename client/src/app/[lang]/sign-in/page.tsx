@@ -5,7 +5,9 @@ import type { Locale } from "@/i18n/routing";
 
 type PageProps = { params: Promise<{ lang: Locale }> };
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: PageProps): Promise<Metadata> {
   const { lang } = await params;
   const t = await getTranslations({ locale: lang, namespace: "auth" });
   return { title: t("signIn"), robots: { index: false, follow: false } };

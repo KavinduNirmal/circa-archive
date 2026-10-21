@@ -21,8 +21,11 @@
   --meta-ember: #c9762f;
   --meta-line: rgb(242 238 229 / 14%);
   --meta-line-soft: rgb(242 238 229 / 7%);
-  --meta-serif: "Instrument Serif", "Libre Baskerville", Georgia, "Times New Roman", serif;
-  --meta-sans: "DM Sans", system-ui, -apple-system, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --meta-serif:
+    "Instrument Serif", "Libre Baskerville", Georgia, "Times New Roman", serif;
+  --meta-sans:
+    "DM Sans", system-ui, -apple-system, "Apple SD Gothic Neo", "Malgun Gothic",
+    sans-serif;
   --meta-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", monospace;
 
   /*
@@ -78,9 +81,6 @@
   -webkit-font-smoothing: antialiased;
 }
 
-
-
-
 .meta-topline {
   border-bottom: 1px solid var(--meta-line-soft);
   background: #08090b;
@@ -114,7 +114,6 @@
 .meta-topline-sep {
   color: var(--meta-line);
 }
-
 
 /* Korean needs a serif that actually exists in Hangul, and looser leading. */
 .meta-page:lang(ko) {
@@ -247,7 +246,9 @@
   line-height: 1;
   text-transform: uppercase;
   color: var(--meta-mist);
-  transition: color 160ms ease, border-color 160ms ease;
+  transition:
+    color 160ms ease,
+    border-color 160ms ease;
 }
 
 .meta-page .meta-nav-link:hover,
@@ -286,7 +287,9 @@
   background: rgb(10 11 13);
   backdrop-filter: blur(24px) saturate(140%);
   -webkit-backdrop-filter: blur(24px) saturate(140%);
-  box-shadow: 0 30px 60px -20px rgb(0 0 0 / 95%), 0 0 0 1px rgb(242 238 229 / 6%);
+  box-shadow:
+    0 30px 60px -20px rgb(0 0 0 / 95%),
+    0 0 0 1px rgb(242 238 229 / 6%);
 }
 
 .meta-nav-panel {
@@ -574,7 +577,9 @@
   --meta-ember: #c9762f;
   --meta-line: rgb(242 238 229 / 14%);
   --meta-line-soft: rgb(242 238 229 / 7%);
-  --meta-sans: "DM Sans", system-ui, -apple-system, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --meta-sans:
+    "DM Sans", system-ui, -apple-system, "Apple SD Gothic Neo", "Malgun Gothic",
+    sans-serif;
   --meta-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", monospace;
 
   top: 0;
@@ -632,7 +637,9 @@
   height: 36px;
   border: 1px solid var(--meta-line);
   color: var(--meta-mist);
-  transition: color 160ms ease, border-color 160ms ease;
+  transition:
+    color 160ms ease,
+    border-color 160ms ease;
 }
 
 .meta-sheet .sheet-close:hover {
@@ -649,8 +656,16 @@
   overflow-y: auto;
   overscroll-behavior: contain;
   scrollbar-width: thin;
-  -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 28px), transparent 100%);
-  mask-image: linear-gradient(to bottom, #000 calc(100% - 28px), transparent 100%);
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    #000 calc(100% - 28px),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    #000 calc(100% - 28px),
+    transparent 100%
+  );
 }
 
 .meta-sheet-title {
@@ -850,10 +865,6 @@
   font-variant-numeric: tabular-nums;
 }
 
-
-
-
-
 /* Dossier and documentation page introductions share the hero's grammar at a
    smaller scale: a field, a breadcrumb, a display line, and a facts rail. */
 .meta-intro {
@@ -862,7 +873,6 @@
   overflow: hidden;
   border-bottom: 1px solid var(--meta-line-soft);
 }
-
 
 .meta-breadcrumb {
   display: flex;
@@ -903,11 +913,8 @@
   scroll-margin-top: 64px;
 }
 
-
-
 @media (min-width: 901px) {
 }
-
 
 .meta-index {
   font-family: var(--meta-mono);
@@ -931,7 +938,6 @@
   color: var(--meta-mist-2);
 }
 
-
 .meta-prose {
   max-width: 62ch;
   color: rgb(242 238 229 / 76%);
@@ -946,7 +952,6 @@
 .meta-prose p:last-child {
   margin-bottom: 0;
 }
-
 
 .meta-note {
   max-width: 58ch;
@@ -996,7 +1001,11 @@
   letter-spacing: 0;
   white-space: pre;
   color: rgb(201 118 47 / 62%);
-  -webkit-mask-image: radial-gradient(125% 110% at 50% 50%, #000 52%, transparent 100%);
+  -webkit-mask-image: radial-gradient(
+    125% 110% at 50% 50%,
+    #000 52%,
+    transparent 100%
+  );
   mask-image: radial-gradient(125% 110% at 50% 50%, #000 52%, transparent 100%);
 }
 
@@ -1031,8 +1040,6 @@
 }
 
 /* -------------------------------------------------------------- specimen -- */
-
-
 
 .meta-specimen {
   padding: clamp(26px, 3.4vw, 50px);
@@ -1108,7 +1115,9 @@
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: #14161c;
-  transition: color 160ms ease, border-color 160ms ease;
+  transition:
+    color 160ms ease,
+    border-color 160ms ease;
 }
 
 .meta-specimen-link:hover {
@@ -1134,7 +1143,9 @@
   padding: clamp(24px, 3vw, 40px);
   border: 1px solid var(--meta-line);
   background: rgb(242 238 229 / 2%);
-  transition: border-color 200ms ease, transform 200ms ease;
+  transition:
+    border-color 200ms ease,
+    transform 200ms ease;
 }
 
 .meta-edition:hover {
@@ -1219,7 +1230,6 @@
 .meta-edition[data-tone="workstation"] .meta-edition-link:hover {
   color: #8a4a12;
 }
-
 
 /* --------------------------------------------------------------- ledger -- */
 
@@ -1366,7 +1376,9 @@
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--meta-mist);
-  transition: color 160ms ease, border-color 160ms ease;
+  transition:
+    color 160ms ease,
+    border-color 160ms ease;
 }
 
 .meta-aside-link a:hover {
@@ -1391,7 +1403,9 @@
   letter-spacing: 0.1em;
   line-height: 1;
   text-transform: uppercase;
-  transition: background 160ms ease, transform 160ms ease;
+  transition:
+    background 160ms ease,
+    transform 160ms ease;
 }
 
 .meta-button:hover {
@@ -1420,7 +1434,9 @@
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--meta-bone);
-  transition: border-color 160ms ease, color 160ms ease;
+  transition:
+    border-color 160ms ease,
+    color 160ms ease;
 }
 
 .meta-text-link svg {
@@ -1601,7 +1617,9 @@
   gap: 8px;
   padding-bottom: 4px;
   border-bottom: 1px solid var(--meta-line);
-  transition: color 160ms ease, border-color 160ms ease;
+  transition:
+    color 160ms ease,
+    border-color 160ms ease;
 }
 
 .meta-licence-name a:hover {
@@ -1764,7 +1782,9 @@
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--meta-bone);
-  transition: color 160ms ease, border-color 160ms ease;
+  transition:
+    color 160ms ease,
+    border-color 160ms ease;
 }
 
 .meta-channel-link:hover {
@@ -1809,7 +1829,6 @@
   text-transform: uppercase;
   color: var(--meta-mist-2);
 }
-
 
 /* ------------------------------------------------------------ build flow -- */
 
@@ -1872,27 +1891,9 @@
   color: var(--meta-mist-2);
 }
 
-
-
 /* --------------------------------------------------------- open-source ledger -- */
 
-
-
-
-
-
-
-
-
 /* ---------------------------------------------------------------- cta band -- */
-
-
-
-
-
-
-
-
 
 /* ------------------------------------------------------------ docs surface -- */
 
@@ -1913,7 +1914,6 @@
   margin-bottom: clamp(20px, 3vw, 30px);
 }
 
-
 .meta-docs-lede {
   max-width: 62ch;
   margin: 16px 0 0;
@@ -1932,9 +1932,6 @@
   letter-spacing: -0.02em;
   text-wrap: balance;
 }
-
-
-
 
 .meta-docs-grid {
   display: grid;
@@ -1969,7 +1966,6 @@
   display: grid;
   gap: 6px;
 }
-
 
 .meta-docs-search-field {
   position: relative;
@@ -2074,7 +2070,10 @@
   font-size: 0.89rem;
   line-height: 1.4;
   color: rgb(242 238 229 / 64%);
-  transition: color 160ms ease, border-color 160ms ease, background 160ms ease;
+  transition:
+    color 160ms ease,
+    border-color 160ms ease,
+    background 160ms ease;
 }
 
 .meta-page .meta-docs-link:hover {
@@ -2099,8 +2098,6 @@
   min-width: 0;
   max-width: 76ch;
 }
-
-
 
 .meta-doc-section {
   padding-top: clamp(30px, 3.4vw, 40px);
@@ -2203,7 +2200,9 @@
   padding-bottom: 1px;
   border-bottom: 1px solid var(--meta-ember-soft);
   color: var(--meta-ember);
-  transition: color 160ms ease, border-color 160ms ease;
+  transition:
+    color 160ms ease,
+    border-color 160ms ease;
 }
 
 .meta-doc-inline-link:hover {
@@ -2220,7 +2219,9 @@
 }
 
 .meta-doc-callout[data-tone="warning"] {
-  background: linear-gradient(90deg, rgb(201 118 47 / 7%), transparent 65%), var(--meta-panel);
+  background:
+    linear-gradient(90deg, rgb(201 118 47 / 7%), transparent 65%),
+    var(--meta-panel);
 }
 
 .meta-doc-callout-title {
@@ -2446,7 +2447,9 @@
   padding: 15px 16px;
   border: 1px solid var(--meta-line);
   background: rgb(242 238 229 / 2%);
-  transition: border-color 160ms ease, background 160ms ease;
+  transition:
+    border-color 160ms ease,
+    background 160ms ease;
 }
 
 .meta-doc-pager-link[data-dir="next"] {
@@ -2566,7 +2569,9 @@
   letter-spacing: 0.09em;
   line-height: 1;
   text-transform: uppercase;
-  transition: background 160ms ease, transform 160ms ease;
+  transition:
+    background 160ms ease,
+    transform 160ms ease;
 }
 
 .meta-page .meta-button:hover {
@@ -2590,7 +2595,9 @@
   letter-spacing: 0.12em;
   line-height: 1;
   text-transform: uppercase;
-  transition: border-color 160ms ease, background 160ms ease;
+  transition:
+    border-color 160ms ease,
+    background 160ms ease;
 }
 
 .meta-button-outline:hover {
@@ -2610,7 +2617,9 @@
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--meta-bone);
-  transition: border-color 160ms ease, color 160ms ease;
+  transition:
+    border-color 160ms ease,
+    color 160ms ease;
 }
 
 .meta-page .meta-text-link svg {
@@ -2638,7 +2647,6 @@
   .meta-hero-copy {
     animation: meta-arrive 620ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
   }
-
 
   .meta-hero-foot {
     animation: meta-arrive 620ms 160ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
@@ -2682,13 +2690,21 @@
 }
 
 @keyframes meta-fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes meta-fade-out {
-  from { opacity: 1; }
-  to { opacity: 0; }
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -2728,7 +2744,6 @@
   .meta-footer-top {
     grid-template-columns: minmax(0, 1fr);
   }
-
 }
 
 @media (max-width: 900px) {
@@ -2762,8 +2777,6 @@
     gap: 34px;
   }
 
-
-
   .meta-hero-foot {
     align-items: flex-start;
   }
@@ -2774,12 +2787,6 @@
     gap: 16px 20px;
     width: 100%;
   }
-
-
-
-
-
-
 
   .meta-editions {
     grid-template-columns: minmax(0, 1fr);
@@ -2841,9 +2848,6 @@
   .meta-flow-step:nth-child(3)::before {
     display: none;
   }
-
-
-
 
   .meta-docs-grid {
     grid-template-columns: minmax(0, 1fr);
@@ -2911,7 +2915,6 @@
     max-height: 52vh;
     overflow-y: auto;
   }
-
 }
 
 @media (max-width: 720px) {
@@ -2936,13 +2939,11 @@
     justify-content: center;
   }
 
-
   .meta-intro-facts {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 14px 24px;
   }
-
 
   .meta-doc-pager {
     grid-template-columns: minmax(0, 1fr);
@@ -2980,7 +2981,6 @@
   .meta-doc-table tbody th {
     width: 38%;
   }
-
 }
 
 @media (max-width: 620px) {
@@ -3010,7 +3010,6 @@
     padding-top: 36px;
   }
 
-
   .meta-display {
     font-size: clamp(2.2rem, 10.6vw, 3.1rem);
   }
@@ -3027,8 +3026,6 @@
   .meta-stats dd {
     font-size: 1.3rem;
   }
-
-
 
   .meta-section {
     padding-block: 56px;
@@ -3064,11 +3061,6 @@
   .meta-docs-band h1 {
     font-size: clamp(2.1rem, 9.4vw, 2.9rem);
   }
-
-
-
-
-
 
   .meta-doc-section h2 {
     font-size: 1.6rem;
@@ -3111,13 +3103,9 @@
     font-size: 0.88rem;
   }
 
-
-
-
   .meta-sheet {
     padding: 18px;
   }
-
 }
 
 @media (max-width: 400px) {
@@ -3133,7 +3121,6 @@
   .meta-docs-band h1 {
     font-size: 1.95rem;
   }
-
 
   .meta-footer-nav {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -3252,7 +3239,11 @@
   position: absolute;
   inset: 0;
   display: block;
-  background-image: radial-gradient(circle, rgb(201 118 47 / 90%) 1px, transparent 1.4px);
+  background-image: radial-gradient(
+    circle,
+    rgb(201 118 47 / 90%) 1px,
+    transparent 1.4px
+  );
   pointer-events: none;
 }
 
@@ -3271,10 +3262,18 @@
 
 .meta-hero-dots-coarse {
   background-size: 15px 15px;
-  background-image: radial-gradient(circle, rgb(224 138 65 / 80%) 1.1px, transparent 1.5px);
+  background-image: radial-gradient(
+    circle,
+    rgb(224 138 65 / 80%) 1.1px,
+    transparent 1.5px
+  );
   background-position: 5px 7px;
   opacity: 0.38;
-  -webkit-mask-image: radial-gradient(46% 60% at 86% 56%, #000 0%, transparent 74%);
+  -webkit-mask-image: radial-gradient(
+    46% 60% at 86% 56%,
+    #000 0%,
+    transparent 74%
+  );
   mask-image: radial-gradient(46% 60% at 86% 56%, #000 0%, transparent 74%);
 }
 
@@ -3309,7 +3308,8 @@
   justify-content: center;
   width: min(64ch, 64%);
   min-width: 0;
-  padding: clamp(64px, 7.4vw, 104px) clamp(32px, 5vw, 80px) clamp(56px, 6vw, 84px) 0;
+  padding: clamp(64px, 7.4vw, 104px) clamp(32px, 5vw, 80px)
+    clamp(56px, 6vw, 84px) 0;
 }
 
 .meta-display {
@@ -3322,7 +3322,9 @@
 
 /* The dossier's own measure predates this override; restate it so the later
    `.meta-display` rule cannot narrow the opening title back to the hero's. */
-.meta-display-intro { max-width: 22ch; }
+.meta-display-intro {
+  max-width: 22ch;
+}
 
 .meta-hero-lede {
   max-width: 46ch;
@@ -3658,10 +3660,19 @@
   z-index: 0;
   width: clamp(360px, 44vw, 620px);
   aspect-ratio: 1;
-  background-image: radial-gradient(circle, rgb(201 118 47 / 72%) 1px, transparent 1.45px);
+  background-image: radial-gradient(
+    circle,
+    rgb(201 118 47 / 72%) 1px,
+    transparent 1.45px
+  );
   background-size: 9px 9px;
   opacity: 0.42;
-  -webkit-mask-image: radial-gradient(closest-side, #000 0%, #000 20%, transparent 68%);
+  -webkit-mask-image: radial-gradient(
+    closest-side,
+    #000 0%,
+    #000 20%,
+    transparent 68%
+  );
   mask-image: radial-gradient(closest-side, #000 0%, #000 20%, transparent 68%);
   pointer-events: none;
 }
@@ -3682,7 +3693,9 @@
   border: 1px solid var(--meta-line);
   border-radius: 0;
   background: rgb(242 238 229 / 2%);
-  transition: border-color 160ms ease, background 160ms ease;
+  transition:
+    border-color 160ms ease,
+    background 160ms ease;
 }
 
 .meta-docs-pillar:hover {
@@ -3764,7 +3777,8 @@
   display: flex;
   flex-direction: column;
   gap: 9px;
-  padding: clamp(20px, 2.2vw, 28px) clamp(16px, 2.2vw, 28px) clamp(22px, 2.4vw, 30px);
+  padding: clamp(20px, 2.2vw, 28px) clamp(16px, 2.2vw, 28px)
+    clamp(22px, 2.4vw, 30px);
   border-left: 1px solid var(--meta-line-soft);
 }
 
@@ -3863,7 +3877,8 @@
 }
 
 .meta-step {
-  padding: clamp(22px, 2.6vw, 30px) clamp(20px, 2.6vw, 34px) clamp(26px, 3vw, 34px);
+  padding: clamp(22px, 2.6vw, 30px) clamp(20px, 2.6vw, 34px)
+    clamp(26px, 3vw, 34px);
   border-top: 0;
   border-left: 1px solid var(--meta-line-soft);
 }
@@ -3984,7 +3999,8 @@
   flex-direction: column;
   gap: 10px;
   min-width: 0;
-  padding: clamp(24px, 2.8vw, 32px) clamp(24px, 3vw, 36px) clamp(26px, 3vw, 34px);
+  padding: clamp(24px, 2.8vw, 32px) clamp(24px, 3vw, 36px)
+    clamp(26px, 3vw, 34px);
   border-left: 1px solid var(--meta-line-soft);
 }
 
@@ -4031,7 +4047,9 @@
   font-size: var(--meta-label);
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  transition: color 160ms ease, border-color 160ms ease;
+  transition:
+    color 160ms ease,
+    border-color 160ms ease;
 }
 
 .meta-profile-link:hover {
@@ -4045,11 +4063,23 @@
 }
 
 /* Standalone text links are small type on purpose; the target is not. */
-.meta-page :is(.meta-text-link, .meta-profile-link, .meta-aside-link a, .meta-channel-link) {
+.meta-page
+  :is(
+    .meta-text-link,
+    .meta-profile-link,
+    .meta-aside-link a,
+    .meta-channel-link
+  ) {
   position: relative;
 }
 
-.meta-page :is(.meta-text-link, .meta-profile-link, .meta-aside-link a, .meta-channel-link)::after {
+.meta-page
+  :is(
+    .meta-text-link,
+    .meta-profile-link,
+    .meta-aside-link a,
+    .meta-channel-link
+  )::after {
   content: "";
   position: absolute;
   inset: -12px -8px;
@@ -4243,7 +4273,8 @@
 .meta-doc {
   min-width: 0;
   max-width: none;
-  padding: clamp(34px, 4vw, 52px) clamp(26px, 3.4vw, 52px) clamp(56px, 7vw, 96px);
+  padding: clamp(34px, 4vw, 52px) clamp(26px, 3.4vw, 52px)
+    clamp(56px, 7vw, 96px);
   border-left: 1px solid var(--meta-line-soft);
 }
 
@@ -4678,8 +4709,6 @@
     letter-spacing: 0.16em;
   }
 
-
-
   .meta-footer-nav {
     grid-template-columns: minmax(0, 1fr);
   }
@@ -4687,7 +4716,14 @@
 
 /* Hangul wraps at spaces, not inside a word. Latin display text keeps its own
    wrapping; code and identifiers are allowed to break. */
-.meta-page:lang(ko) :is(.meta-display, .meta-band h2, .meta-docs-band h1, .meta-doc-section h2, .meta-intro-facts dd) {
+.meta-page:lang(ko)
+  :is(
+    .meta-display,
+    .meta-band h2,
+    .meta-docs-band h1,
+    .meta-doc-section h2,
+    .meta-intro-facts dd
+  ) {
   word-break: keep-all;
   overflow-wrap: normal;
 }
@@ -4741,8 +4777,14 @@
   letter-spacing: -0.02em;
   color: var(--meta-bone);
 }
-.meta-doc-actions { margin-top: 1.5rem; }
-.meta-doc-action-buttons { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.meta-doc-actions {
+  margin-top: 1.5rem;
+}
+.meta-doc-action-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
 .meta-doc-action-buttons > :is(button, a) {
   display: inline-flex;
   align-items: center;
@@ -4756,12 +4798,26 @@
   color: var(--meta-bone);
   font: 500 0.75rem var(--meta-sans);
   text-decoration: none;
-  transition: border-color 150ms, background-color 150ms;
+  transition:
+    border-color 150ms,
+    background-color 150ms;
 }
-.meta-doc-action-buttons > :is(button, a):hover { border-color: var(--meta-ember); background: var(--meta-panel); }
-.meta-doc-action-buttons > :is(button, a):focus-visible { outline: 2px solid var(--meta-ember); outline-offset: 3px; }
-.meta-doc-action-status { display: block; color: var(--meta-mist); font: 0.75rem/1.5 var(--meta-sans); }
-.meta-doc-action-status:not(:empty) { margin-top: 0.75rem; }
+.meta-doc-action-buttons > :is(button, a):hover {
+  border-color: var(--meta-ember);
+  background: var(--meta-panel);
+}
+.meta-doc-action-buttons > :is(button, a):focus-visible {
+  outline: 2px solid var(--meta-ember);
+  outline-offset: 3px;
+}
+.meta-doc-action-status {
+  display: block;
+  color: var(--meta-mist);
+  font: 0.75rem/1.5 var(--meta-sans);
+}
+.meta-doc-action-status:not(:empty) {
+  margin-top: 0.75rem;
+}
 .meta-doc-source-footer {
   display: flex;
   flex-wrap: wrap;
@@ -4774,11 +4830,23 @@
   color: var(--meta-mist);
   font: 0.75rem/1.5 var(--meta-sans);
 }
-.meta-doc-source-footer a { display: inline-flex; align-items: center; gap: 0.5rem; color: var(--meta-bone); }
-.meta-doc-source-footer a:hover { color: var(--meta-ember); }
+.meta-doc-source-footer a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--meta-bone);
+}
+.meta-doc-source-footer a:hover {
+  color: var(--meta-ember);
+}
 
-.meta-doc-markdown { line-height: 1.8; overflow-wrap: anywhere; }
-.meta-doc-markdown > * + * { margin-top: 1.25rem; }
+.meta-doc-markdown {
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+}
+.meta-doc-markdown > * + * {
+  margin-top: 1.25rem;
+}
 
 /* Links: primary, underlined, with outgoing icons */
 .meta-doc-markdown a.meta-doc-link {
@@ -4789,7 +4857,9 @@
   text-decoration: underline;
   text-underline-offset: 0.25em;
   text-decoration-color: var(--meta-ember);
-  transition: color 150ms ease, text-decoration-color 150ms ease;
+  transition:
+    color 150ms ease,
+    text-decoration-color 150ms ease;
 }
 .meta-doc-markdown a.meta-doc-link:hover {
   color: var(--meta-ember);
@@ -4840,11 +4910,21 @@
   letter-spacing: 0.01em;
   color: var(--meta-bone);
 }
-.meta-doc-markdown :is(h2, h3) { scroll-margin-top: 6rem; }
-.meta-doc-markdown :is(ul, ol) { padding-left: 1.5rem; }
-.meta-doc-markdown ul { list-style: disc; }
-.meta-doc-markdown ol { list-style: decimal; }
-.meta-doc-markdown li + li { margin-top: 0.5rem; }
+.meta-doc-markdown :is(h2, h3) {
+  scroll-margin-top: 6rem;
+}
+.meta-doc-markdown :is(ul, ol) {
+  padding-left: 1.5rem;
+}
+.meta-doc-markdown ul {
+  list-style: disc;
+}
+.meta-doc-markdown ol {
+  list-style: decimal;
+}
+.meta-doc-markdown li + li {
+  margin-top: 0.5rem;
+}
 
 /* Inline code with lighter orange fill */
 .meta-doc-markdown :not(pre) > code {
@@ -4876,8 +4956,16 @@ blockquote[data-brand="callout"] {
   border: 1px solid rgb(201 118 47 / 35%);
   border-left: 4px solid var(--meta-ember);
   border-radius: 4px;
-  background: radial-gradient(ellipse at top left, rgb(201 118 47 / 14%) 0%, transparent 70%), #101317;
-  box-shadow: 0 0 35px -8px rgb(201 118 47 / 20%), inset 0 0 20px rgb(201 118 47 / 5%);
+  background:
+    radial-gradient(
+      ellipse at top left,
+      rgb(201 118 47 / 14%) 0%,
+      transparent 70%
+    ),
+    #101317;
+  box-shadow:
+    0 0 35px -8px rgb(201 118 47 / 20%),
+    inset 0 0 20px rgb(201 118 47 / 5%);
   color: var(--meta-bone);
   overflow: hidden;
 }
@@ -4927,7 +5015,11 @@ blockquote[data-brand="list"] > ul > li {
   border: 1px solid var(--meta-line);
   border-radius: 4px;
   background: rgb(242 238 229 / 2.5%);
-  transition: border-color 160ms ease, background-color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
+  transition:
+    border-color 160ms ease,
+    background-color 160ms ease,
+    transform 160ms ease,
+    box-shadow 160ms ease;
   margin: 0;
 }
 .meta-doc-brand-list-grid > ul > li:hover,
@@ -4943,7 +5035,10 @@ blockquote[data-brand="list"] > ul > li::before {
 }
 
 /* Standard Callout / Alert */
-.meta-doc-markdown blockquote { border-left: 2px solid var(--meta-line); padding: 1rem 1.5rem; }
+.meta-doc-markdown blockquote {
+  border-left: 2px solid var(--meta-line);
+  padding: 1rem 1.5rem;
+}
 .meta-doc-markdown blockquote[data-alert] {
   margin: 1.5rem 0;
   padding: 1.25rem 1.5rem;
@@ -4951,8 +5046,14 @@ blockquote[data-brand="list"] > ul > li::before {
   background: rgb(201 118 47 / 6%);
   border-radius: 0 4px 4px 0;
 }
-.meta-doc-markdown img { max-width: 100%; height: auto; }
-.meta-doc-markdown pre { white-space: pre; overflow-x: auto; }
+.meta-doc-markdown img {
+  max-width: 100%;
+  height: auto;
+}
+.meta-doc-markdown pre {
+  white-space: pre;
+  overflow-x: auto;
+}
 
 /* Navigation styling: active items, sticky sidebar, header panel */
 .meta-docs-aside {
@@ -4964,7 +5065,10 @@ blockquote[data-brand="list"] > ul > li::before {
   overscroll-behavior: contain;
   scrollbar-width: thin;
 }
-.meta-docs-group-title kbd { font-size: 0.65rem; float: right; }
+.meta-docs-group-title kbd {
+  font-size: 0.65rem;
+  float: right;
+}
 .meta-page .meta-docs-link {
   border-left: 2px solid transparent;
   padding-left: 8px;
@@ -4985,7 +5089,8 @@ blockquote[data-brand="list"] > ul > li::before {
   color: var(--meta-ember);
   font-weight: 700;
 }
-.meta-nav-panel-link[aria-current="page"], .meta-sheet-link[aria-current="page"] {
+.meta-nav-panel-link[aria-current="page"],
+.meta-sheet-link[aria-current="page"] {
   color: var(--meta-ember);
   font-weight: 700;
   border-left-color: var(--meta-ember);

@@ -28,7 +28,14 @@ import { FOLLOW_UP_PREVIEW_LIMIT } from "./reader-model";
  * style, so the lists leave the accessibility tree with the pixels.
  */
 
-export function FollowUpStrip({ code, inbound, outbound, collapsed, onToggle, onOpen }: {
+export function FollowUpStrip({
+  code,
+  inbound,
+  outbound,
+  collapsed,
+  onToggle,
+  onOpen,
+}: {
   /** The record on the sheet, named in the message box that explains the cap. */
   code: string | null;
   inbound: readonly ReaderFollowUp[];
@@ -41,45 +48,88 @@ export function FollowUpStrip({ code, inbound, outbound, collapsed, onToggle, on
   const [overflow, setOverflow] = useState<{ heading: string } | null>(null);
   const total = inbound.length + outbound.length;
   return (
-    <section className="reader-followups" data-collapsed={collapsed ? "true" : undefined}
-      aria-label={t("followUps")}>
+    <section
+      className="reader-followups"
+      data-collapsed={collapsed ? "true" : undefined}
+      aria-label={t("followUps")}
+    >
       <div className="reader-followups-head">
         <h2 className="reader-followups-title circa-label">{t("followUps")}</h2>
-        <span className="reader-followups-count circa-mono" data-testid="reader-followup-count">
+        <span
+          className="reader-followups-count circa-mono"
+          data-testid="reader-followup-count"
+        >
           {total === 0 ? t("noneOnFile") : t("onFile", { count: total })}
         </span>
-        <button type="button" className="reader-followups-toggle" aria-expanded={!collapsed}
-          aria-controls={collapsed ? undefined : "reader-followup-lists"} onClick={onToggle}>
-          <PanelBottom className="reader-followups-toggle-glyph" aria-hidden="true" />
-          <span className="sr-only">{collapsed ? t("showFollowUps") : t("hideFollowUps")}</span>
+        <button
+          type="button"
+          className="reader-followups-toggle"
+          aria-expanded={!collapsed}
+          aria-controls={collapsed ? undefined : "reader-followup-lists"}
+          onClick={onToggle}
+        >
+          <PanelBottom
+            className="reader-followups-toggle-glyph"
+            aria-hidden="true"
+          />
+          <span className="sr-only">
+            {collapsed ? t("showFollowUps") : t("hideFollowUps")}
+          </span>
         </button>
       </div>
 
       {!collapsed && (
         <div className="reader-followups-body" id="reader-followup-lists">
-          {total === 0
-            ? <p className="reader-followups-empty">{t("emptyFollowUps")}</p>
-            : (
-              <div className="reader-followups-groups">
-                <FollowUpGroup label={t("filedAgainst")} cards={inbound} onOpen={onOpen}
-                  onOverflow={() => setOverflow({ heading: t("overflowFiledAgainst", { count: inbound.length }) })} />
-                <FollowUpGroup label={t("citedIn")} cards={outbound} onOpen={onOpen}
-                  onOverflow={() => setOverflow({ heading: t("overflowCitedIn", { count: outbound.length }) })} />
-              </div>
-            )}
+          {total === 0 ? (
+            <p className="reader-followups-empty">{t("emptyFollowUps")}</p>
+          ) : (
+            <div className="reader-followups-groups">
+              <FollowUpGroup
+                label={t("filedAgainst")}
+                cards={inbound}
+                onOpen={onOpen}
+                onOverflow={() =>
+                  setOverflow({
+                    heading: t("overflowFiledAgainst", {
+                      count: inbound.length,
+                    }),
+                  })
+                }
+              />
+              <FollowUpGroup
+                label={t("citedIn")}
+                cards={outbound}
+                onOpen={onOpen}
+                onOverflow={() =>
+                  setOverflow({
+                    heading: t("overflowCitedIn", { count: outbound.length }),
+                  })
+                }
+              />
+            </div>
+          )}
         </div>
       )}
 
-      <MessageBox open={overflow !== null} title={READER_NAME} tone="info"
+      <MessageBox
+        open={overflow !== null}
+        title={READER_NAME}
+        tone="info"
         heading={overflow?.heading ?? ""}
         body={t("overflowBody", { limit: FOLLOW_UP_PREVIEW_LIMIT })}
         detail={code}
-        onClose={() => setOverflow(null)} />
+        onClose={() => setOverflow(null)}
+      />
     </section>
   );
 }
 
-function FollowUpGroup({ label, cards, onOpen, onOverflow }: {
+function FollowUpGroup({
+  label,
+  cards,
+  onOpen,
+  onOverflow,
+}: {
   label: string;
   cards: readonly ReaderFollowUp[];
   onOpen: (code: string) => void;
@@ -89,43 +139,72 @@ function FollowUpGroup({ label, cards, onOpen, onOverflow }: {
   const shown = cards.slice(0, FOLLOW_UP_PREVIEW_LIMIT);
   const hidden = cards.length - shown.length;
   return (
-    <div className="reader-followup-group" data-empty={cards.length === 0 ? "true" : undefined}>
+    <div
+      className="reader-followup-group"
+      data-empty={cards.length === 0 ? "true" : undefined}
+    >
       <div className="reader-followup-head">
         <h3 className="reader-followup-label circa-label">
           {label}
-          <span className="reader-followup-tally circa-mono">{cards.length}</span>
+          <span className="reader-followup-tally circa-mono">
+            {cards.length}
+          </span>
         </h3>
         {hidden > 0 && (
-          <button type="button" className="reader-followup-more" onClick={onOverflow}>{t("notShown", { count: hidden })}</button>
+          <button
+            type="button"
+            className="reader-followup-more"
+            onClick={onOverflow}
+          >
+            {t("notShown", { count: hidden })}
+          </button>
         )}
       </div>
-      {cards.length === 0
-        ? <p className="reader-followup-none">{t("noneFiled")}</p>
-        : (
-          <ul className="reader-cards" aria-label={label}>
-            {shown.map((card) => (
-              <li key={card.code}>
-                <FollowUpCard card={card} onOpen={onOpen} />
-              </li>
-            ))}
-          </ul>
-        )}
+      {cards.length === 0 ? (
+        <p className="reader-followup-none">{t("noneFiled")}</p>
+      ) : (
+        <ul className="reader-cards" aria-label={label}>
+          {shown.map((card) => (
+            <li key={card.code}>
+              <FollowUpCard card={card} onOpen={onOpen} />
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }
 
 /** One citing record, as a file card: code, holder, how it was filed, and a line of it. */
-function FollowUpCard({ card, onOpen }: { card: ReaderFollowUp; onOpen: (code: string) => void }) {
+function FollowUpCard({
+  card,
+  onOpen,
+}: {
+  card: ReaderFollowUp;
+  onOpen: (code: string) => void;
+}) {
   const t = useTranslations("reader");
   const kind = FOLLOW_UP_LABELS[card.type].toLowerCase();
   return (
-    <button type="button" className="reader-card" data-type={card.type} onClick={() => onOpen(card.code)}
+    <button
+      type="button"
+      className="reader-card"
+      data-type={card.type}
+      onClick={() => onOpen(card.code)}
       /* The card is four stacked runs of text, which reads as one unbroken string
          without this: the button says its own sentence instead. */
-      aria-label={t("cardLabel", { code: card.code, organization: card.organization, kind, preview: card.preview })}>
+      aria-label={t("cardLabel", {
+        code: card.code,
+        organization: card.organization,
+        kind,
+        preview: card.preview,
+      })}
+    >
       <span className="reader-card-top">
         <span className="reader-card-code circa-mono">{card.code}</span>
-        <span className="reader-card-type circa-label">{FOLLOW_UP_LABELS[card.type]}</span>
+        <span className="reader-card-type circa-label">
+          {FOLLOW_UP_LABELS[card.type]}
+        </span>
       </span>
       <span className="reader-card-org">{card.organization}</span>
       <span className="reader-card-preview">{card.preview}</span>

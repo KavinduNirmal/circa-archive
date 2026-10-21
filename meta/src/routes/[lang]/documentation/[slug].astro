@@ -1,0 +1,14 @@
+---
+import Document from "../../../components/Document.astro";
+import { DOC_TOPICS } from "../../../lib/documents";
+import { locales, type Locale } from "../../../lib/site";
+export function getStaticPaths() {
+  return locales.flatMap((lang) =>
+    DOC_TOPICS.filter((topic) => topic.slug !== "overview").map((topic) => ({
+      params: { lang, slug: topic.slug },
+    })),
+  );
+}
+---
+
+<Document locale={Astro.params.lang as Locale} slug={Astro.params.slug!} />

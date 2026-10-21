@@ -3,7 +3,12 @@
 import { useEffect, useMemo, useRef } from "react";
 import { useTranslations } from "next-intl";
 import { usePathname, useRouter } from "@/i18n/navigation";
-import { focusedResource, pathForResource, resourceFromPath, resourceKey } from "@/lib/desktop-route";
+import {
+  focusedResource,
+  pathForResource,
+  resourceFromPath,
+  resourceKey,
+} from "@/lib/desktop-route";
 import { specForDestination } from "@/lib/desktop-windows";
 import { useWorkstationStore } from "@/stores/workstation-store-provider";
 
@@ -40,7 +45,9 @@ export function DesktopUrlSync() {
   const historyIntent = useWorkstationStore((state) => state.historyIntent);
   const open = useWorkstationStore((state) => state.open);
   const openRecord = useWorkstationStore((state) => state.openRecord);
-  const clearHistoryIntent = useWorkstationStore((state) => state.clearHistoryIntent);
+  const clearHistoryIntent = useWorkstationStore(
+    (state) => state.clearHistoryIntent,
+  );
 
   const focused = useMemo(
     () => focusedResource(windows, lastFocused, readerTrail),
@@ -75,7 +82,9 @@ export function DesktopUrlSync() {
    * would silently stop following the desktop.
    */
   useEffect(() => {
-    const supersede = () => { pending.current = null; };
+    const supersede = () => {
+      pending.current = null;
+    };
     window.addEventListener("popstate", supersede);
     return () => window.removeEventListener("popstate", supersede);
   }, []);
@@ -155,7 +164,17 @@ export function DesktopUrlSync() {
       pending.current = { url: next, key: focusKey };
       router.replace(next);
     }
-  }, [pathname, hydrated, focused, historyIntent, open, openRecord, clearHistoryIntent, router, t]);
+  }, [
+    pathname,
+    hydrated,
+    focused,
+    historyIntent,
+    open,
+    openRecord,
+    clearHistoryIntent,
+    router,
+    t,
+  ]);
 
   return null;
 }

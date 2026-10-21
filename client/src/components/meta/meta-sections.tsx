@@ -1,7 +1,13 @@
 import { useTranslations } from "next-intl";
 import { ArrowRight, ArrowUpRight, Bug, Lightbulb, Mail } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarGroup } from "../ui/avatar";
-import { EXTERNAL, ISSUES, LICENCES, MAINTAINER, PROJECT_LINKS } from "./meta-links";
+import {
+  EXTERNAL,
+  ISSUES,
+  LICENCES,
+  MAINTAINER,
+  PROJECT_LINKS,
+} from "./meta-links";
 import { SEAL_PLATE } from "./meta-plate";
 import { EditionCards, SectionBand, SpecimenCard } from "./meta-parts";
 
@@ -25,12 +31,32 @@ const FACTS = [
 ] as const;
 
 const STEPS = [
-  { index: "01", title: "stepGuideTitle", body: "stepGuideBody", command: null },
-  { index: "02", title: "stepChangeTitle", body: "stepChangeBody", command: null },
-  { index: "03", title: "stepChecksTitle", body: "stepChecksBody", command: "stepChecksCommand" },
+  {
+    index: "01",
+    title: "stepGuideTitle",
+    body: "stepGuideBody",
+    command: null,
+  },
+  {
+    index: "02",
+    title: "stepChangeTitle",
+    body: "stepChangeBody",
+    command: null,
+  },
+  {
+    index: "03",
+    title: "stepChecksTitle",
+    body: "stepChecksBody",
+    command: "stepChecksCommand",
+  },
 ] as const;
 
-const TERMS = ["licenceFiction", "licenceAccounts", "licenceCookie", "licenceWarranty"] as const;
+const TERMS = [
+  "licenceFiction",
+  "licenceAccounts",
+  "licenceCookie",
+  "licenceWarranty",
+] as const;
 
 const QUESTIONS = [
   ["faqRealQ", "faqRealA"],
@@ -72,9 +98,18 @@ export function MetaPremise() {
   const t = useTranslations("meta");
 
   return (
-    <section className="meta-section" id="premise" aria-labelledby="meta-premise-title">
+    <section
+      className="meta-section"
+      id="premise"
+      aria-labelledby="meta-premise-title"
+    >
       <div className="meta-shell">
-        <SectionBand id="meta-premise-title" index={t("premiseIndex")} kicker={t("premiseKicker")} title={t("premiseTitle")} />
+        <SectionBand
+          id="meta-premise-title"
+          index={t("premiseIndex")}
+          kicker={t("premiseKicker")}
+          title={t("premiseTitle")}
+        />
 
         <div className="meta-premise-grid">
           <div className="meta-prose">
@@ -121,7 +156,11 @@ export function MetaEditions() {
   const t = useTranslations("meta");
 
   return (
-    <section className="meta-section" id="editions" aria-labelledby="meta-editions-title">
+    <section
+      className="meta-section"
+      id="editions"
+      aria-labelledby="meta-editions-title"
+    >
       <div className="meta-shell">
         <SectionBand
           id="meta-editions-title"
@@ -141,7 +180,11 @@ export function MetaBuilt() {
   const t = useTranslations("meta");
 
   return (
-    <section className="meta-section" id="built" aria-labelledby="meta-built-title">
+    <section
+      className="meta-section"
+      id="built"
+      aria-labelledby="meta-built-title"
+    >
       <div className="meta-shell">
         <SectionBand
           id="meta-built-title"
@@ -169,7 +212,11 @@ export function MetaContribute() {
   const t = useTranslations("meta");
 
   return (
-    <section className="meta-section" id="contribute" aria-labelledby="meta-contribute-title">
+    <section
+      className="meta-section"
+      id="contribute"
+      aria-labelledby="meta-contribute-title"
+    >
       <div className="meta-shell">
         <SectionBand
           id="meta-contribute-title"
@@ -198,7 +245,11 @@ export function MetaContribute() {
         </ol>
 
         <div className="meta-contribute-foot">
-          <a className="meta-button" href={PROJECT_LINKS.repository} {...EXTERNAL}>
+          <a
+            className="meta-button"
+            href={PROJECT_LINKS.repository}
+            {...EXTERNAL}
+          >
             {t("contributeRepository")}
             <ArrowUpRight size={15} aria-hidden="true" />
           </a>
@@ -224,7 +275,11 @@ export function MetaContributors() {
   const t = useTranslations("meta");
 
   return (
-    <section className="meta-section" id="contributors" aria-labelledby="meta-contributors-title">
+    <section
+      className="meta-section"
+      id="contributors"
+      aria-labelledby="meta-contributors-title"
+    >
       <div className="meta-shell">
         <SectionBand
           id="meta-contributors-title"
@@ -235,12 +290,19 @@ export function MetaContributors() {
         />
 
         <div className="meta-people">
-          <div className="meta-people-index" role="group" aria-label={t("contributorsOnFile")}>
+          <div
+            className="meta-people-index"
+            role="group"
+            aria-label={t("contributorsOnFile")}
+          >
             <AvatarGroup className="meta-avatar-group">
               <Avatar className="meta-avatar">
                 <AvatarFallback>{initialsOf(MAINTAINER)}</AvatarFallback>
               </Avatar>
-              <Avatar className="meta-avatar meta-avatar-open" aria-hidden="true">
+              <Avatar
+                className="meta-avatar meta-avatar-open"
+                aria-hidden="true"
+              >
                 <AvatarFallback>+</AvatarFallback>
               </Avatar>
             </AvatarGroup>
@@ -249,10 +311,18 @@ export function MetaContributors() {
 
           <ul className="meta-profiles">
             <li className="meta-profile">
-              <p className="meta-profile-role">{t("contributorsMaintainerRole")}</p>
+              <p className="meta-profile-role">
+                {t("contributorsMaintainerRole")}
+              </p>
               <h3>{MAINTAINER}</h3>
-              <p className="meta-profile-body">{t("contributorsMaintainerWork")}</p>
-              <a className="meta-profile-link" href={PROJECT_LINKS.repository} {...EXTERNAL}>
+              <p className="meta-profile-body">
+                {t("contributorsMaintainerWork")}
+              </p>
+              <a
+                className="meta-profile-link"
+                href={PROJECT_LINKS.repository}
+                {...EXTERNAL}
+              >
                 {t("contributorsProfile")}
                 <ArrowUpRight size={14} aria-hidden="true" />
               </a>
@@ -279,7 +349,11 @@ export function MetaSupport() {
   const t = useTranslations("meta");
 
   return (
-    <section className="meta-section" id="support" aria-labelledby="meta-support-title">
+    <section
+      className="meta-section"
+      id="support"
+      aria-labelledby="meta-support-title"
+    >
       <div className="meta-shell">
         <SectionBand
           id="meta-support-title"
@@ -292,7 +366,11 @@ export function MetaSupport() {
         <div className="meta-support-card">
           <h3>{t("supportSponsorTitle")}</h3>
           <p>{t("supportSponsorBody")}</p>
-          <a className="meta-button meta-button-ember" href={PROJECT_LINKS.sponsor} {...EXTERNAL}>
+          <a
+            className="meta-button meta-button-ember"
+            href={PROJECT_LINKS.sponsor}
+            {...EXTERNAL}
+          >
             {t("supportSponsorLink")}
             <ArrowUpRight size={15} aria-hidden="true" />
           </a>
@@ -314,7 +392,11 @@ export function MetaQuestions() {
   const t = useTranslations("meta");
 
   return (
-    <section className="meta-section" id="questions" aria-labelledby="meta-questions-title">
+    <section
+      className="meta-section"
+      id="questions"
+      aria-labelledby="meta-questions-title"
+    >
       <div className="meta-shell">
         <SectionBand
           id="meta-questions-title"
@@ -326,7 +408,11 @@ export function MetaQuestions() {
 
         <div className="meta-faq">
           {QUESTIONS.map(([question, answer]) => (
-            <details className="meta-faq-item" name="meta-questions" key={question}>
+            <details
+              className="meta-faq-item"
+              name="meta-questions"
+              key={question}
+            >
               <summary>{t(question)}</summary>
               <p>{t(answer)}</p>
             </details>
@@ -341,7 +427,11 @@ export function MetaContact() {
   const t = useTranslations("meta");
 
   return (
-    <section className="meta-section" id="contact" aria-labelledby="meta-contact-title">
+    <section
+      className="meta-section"
+      id="contact"
+      aria-labelledby="meta-contact-title"
+    >
       <div className="meta-shell">
         <SectionBand
           id="meta-contact-title"
@@ -355,13 +445,21 @@ export function MetaContact() {
           {CHANNELS.map((channel) => {
             const Icon = channel.icon;
             return (
-              <article className="meta-channel" data-tone={channel.tone} key={channel.tone}>
+              <article
+                className="meta-channel"
+                data-tone={channel.tone}
+                key={channel.tone}
+              >
                 <p className="meta-channel-icon" aria-hidden="true">
                   <Icon size={20} strokeWidth={1.5} />
                 </p>
                 <h3>{t(channel.title)}</h3>
                 <p className="meta-channel-body">{t(channel.body)}</p>
-                <a className="meta-channel-link" href={channel.href} {...EXTERNAL}>
+                <a
+                  className="meta-channel-link"
+                  href={channel.href}
+                  {...EXTERNAL}
+                >
                   {t(channel.action)}
                   <ArrowUpRight size={14} aria-hidden="true" />
                 </a>
@@ -379,7 +477,11 @@ export function MetaLicence() {
   const t = useTranslations("meta");
 
   return (
-    <section className="meta-section" id="licence" aria-labelledby="meta-licence-title">
+    <section
+      className="meta-section"
+      id="licence"
+      aria-labelledby="meta-licence-title"
+    >
       <div className="meta-shell">
         <SectionBand
           id="meta-licence-title"

@@ -16,14 +16,14 @@ The current design is described in [ARCHITECTURE.md](../../ARCHITECTURE.md). The
 - `NNN-slug.md`: one decision per file. Numbering starts at `001`, is sequential, and is never reused. The slug is lower-case and hyphenated.
 - Decisions recorded so far:
 
-| ADR | Decision | Status |
-| --- | --- | --- |
-| [001](001-locale-prefixed-routing.md) | Every page carries its language in the path | Accepted |
-| [002](002-two-reading-surfaces.md) | A server-rendered archive and a client-side workstation over one corpus | Accepted |
-| [003](003-markdown-records-no-pdf.md) | Records are Markdown rendered as paper; no PDF generation | Accepted |
-| [004](004-fixture-backed-client.md) | The client runs on local fixtures until the backend exists | Accepted |
-| [005](005-modular-monolith-backend.md) | The backend is a .NET modular monolith | Accepted, authentication implemented |
-| [006](006-session-tokens-in-http-only-cookies.md) | Sessions with short-lived JWTs in HttpOnly cookies | Accepted, implemented |
+| ADR                                               | Decision                                                                | Status                               |
+| ------------------------------------------------- | ----------------------------------------------------------------------- | ------------------------------------ |
+| [001](001-locale-prefixed-routing.md)             | Every page carries its language in the path                             | Accepted                             |
+| [002](002-two-reading-surfaces.md)                | A server-rendered archive and a client-side workstation over one corpus | Accepted                             |
+| [003](003-markdown-records-no-pdf.md)             | Records are Markdown rendered as paper; no PDF generation               | Accepted                             |
+| [004](004-fixture-backed-client.md)               | The client runs on local fixtures until the backend exists              | Accepted                             |
+| [005](005-modular-monolith-backend.md)            | The backend is a .NET modular monolith                                  | Accepted, authentication implemented |
+| [006](006-session-tokens-in-http-only-cookies.md) | Sessions with short-lived JWTs in HttpOnly cookies                      | Accepted, implemented                |
 
 ## Boundaries
 

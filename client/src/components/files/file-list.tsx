@@ -25,7 +25,8 @@ export function nodeIcon(node: FileNode): string {
     if (node.id === "dir-recycle") return FOLDER_ICONS.recycle;
     if (node.id === "dir-expunged") return FOLDER_ICONS.expunged;
     if (node.id === "dir-system") return FOLDER_ICONS.system;
-    if (node.id === "dir-work" || node.id.startsWith("case-")) return FOLDER_ICONS.work;
+    if (node.id === "dir-work" || node.id.startsWith("case-"))
+      return FOLDER_ICONS.work;
     return FOLDER_ICONS.closed;
   }
   return FILE_TYPES[node.ext]?.icon ?? FOLDER_ICONS.closed;
@@ -65,7 +66,9 @@ export const SORT_LABEL_KEYS: Record<FileSortKey, string> = {
  * the cells printed name, size, type, so every value sat under the wrong
  * heading. Reading one list twice is what makes that impossible.
  */
-const COLUMNS: readonly FileSortKey[] = SORT_KEYS.filter((key) => key !== "name");
+const COLUMNS: readonly FileSortKey[] = SORT_KEYS.filter(
+  (key) => key !== "name",
+);
 
 /**
  * The listing, in the three layouts the View menu offers.
@@ -75,7 +78,16 @@ const COLUMNS: readonly FileSortKey[] = SORT_KEYS.filter((key) => key !== "name"
  * All and Invert selection have something to act on even though the volume
  * refuses every write.
  */
-export function FileList({ view, nodes, sort, direction, selected, openFolder, onToggleSelected, onSort }: {
+export function FileList({
+  view,
+  nodes,
+  sort,
+  direction,
+  selected,
+  openFolder,
+  onToggleSelected,
+  onSort,
+}: {
   view: FileView;
   nodes: readonly FileNode[];
   sort: FileSortKey;
@@ -101,9 +113,24 @@ export function FileList({ view, nodes, sort, direction, selected, openFolder, o
         <ul className="files-icons" role="list" aria-label={t("files")}>
           {nodes.map((node) => (
             <li key={node.id}>
-              <button type="button" className="files-icon" data-node={node.id} aria-pressed={isSelected(node.id)}
-                onDoubleClick={() => openFolder(node)} onClick={() => onToggleSelected(node, !isSelected(node.id))} onKeyDown={keyOpen(node)}>
-                <Image className="files-icon-art" src={iconUrl(nodeIcon(node))} alt="" width={32} height={32} draggable={false} unoptimized />
+              <button
+                type="button"
+                className="files-icon"
+                data-node={node.id}
+                aria-pressed={isSelected(node.id)}
+                onDoubleClick={() => openFolder(node)}
+                onClick={() => onToggleSelected(node, !isSelected(node.id))}
+                onKeyDown={keyOpen(node)}
+              >
+                <Image
+                  className="files-icon-art"
+                  src={iconUrl(nodeIcon(node))}
+                  alt=""
+                  width={32}
+                  height={32}
+                  draggable={false}
+                  unoptimized
+                />
                 <span className="files-icon-label">{node.name}</span>
               </button>
             </li>
@@ -119,9 +146,24 @@ export function FileList({ view, nodes, sort, direction, selected, openFolder, o
         <ul className="files-rows" role="list" aria-label={t("files")}>
           {nodes.map((node) => (
             <li key={node.id}>
-              <button type="button" className="files-row" data-node={node.id} aria-pressed={isSelected(node.id)}
-                onDoubleClick={() => openFolder(node)} onClick={() => onToggleSelected(node, !isSelected(node.id))} onKeyDown={keyOpen(node)}>
-                <Image className="files-row-art" src={iconUrl(nodeIcon(node))} alt="" width={16} height={16} draggable={false} unoptimized />
+              <button
+                type="button"
+                className="files-row"
+                data-node={node.id}
+                aria-pressed={isSelected(node.id)}
+                onDoubleClick={() => openFolder(node)}
+                onClick={() => onToggleSelected(node, !isSelected(node.id))}
+                onKeyDown={keyOpen(node)}
+              >
+                <Image
+                  className="files-row-art"
+                  src={iconUrl(nodeIcon(node))}
+                  alt=""
+                  width={16}
+                  height={16}
+                  draggable={false}
+                  unoptimized
+                />
                 <span className="files-row-name">{node.name}</span>
               </button>
             </li>
@@ -133,24 +175,54 @@ export function FileList({ view, nodes, sort, direction, selected, openFolder, o
 
   return (
     <div className="files-listing" data-view="details">
-      <table className="files-table" role="grid" aria-label={t("files")} data-nodes={nodes.length}>
+      <table
+        className="files-table"
+        role="grid"
+        aria-label={t("files")}
+        data-nodes={nodes.length}
+      >
         <thead>
           <tr>
-            <th scope="col" className="files-col-check" aria-label={t("selectionColumn")} />
+            <th
+              scope="col"
+              className="files-col-check"
+              aria-label={t("selectionColumn")}
+            />
             {/* The name header sorts the listing but has no cell in the body loop. */}
-            <th scope="col" className="files-col-name" aria-sort={sort === "name" ? direction : "none"}>
-              <button type="button" className="files-sort" data-active={sort === "name" ? "true" : undefined} onClick={() => onSort("name")}>
+            <th
+              scope="col"
+              className="files-col-name"
+              aria-sort={sort === "name" ? direction : "none"}
+            >
+              <button
+                type="button"
+                className="files-sort"
+                data-active={sort === "name" ? "true" : undefined}
+                onClick={() => onSort("name")}
+              >
                 <SortGlyph active={sort === "name"} direction={direction} />
-                <span className="files-sort-label">{t(SORT_LABEL_KEYS.name)}</span>
+                <span className="files-sort-label">
+                  {t(SORT_LABEL_KEYS.name)}
+                </span>
               </button>
             </th>
             {COLUMNS.map((column) => (
-              <th key={column} scope="col" className={`files-col-${column}`}
-                aria-sort={sort === column ? direction : "none"}>
-                <button type="button" className="files-sort" data-active={sort === column ? "true" : undefined}
-                  onClick={() => onSort(column)}>
+              <th
+                key={column}
+                scope="col"
+                className={`files-col-${column}`}
+                aria-sort={sort === column ? direction : "none"}
+              >
+                <button
+                  type="button"
+                  className="files-sort"
+                  data-active={sort === column ? "true" : undefined}
+                  onClick={() => onSort(column)}
+                >
                   <SortGlyph active={sort === column} direction={direction} />
-                  <span className="files-sort-label">{t(SORT_LABEL_KEYS[column])}</span>
+                  <span className="files-sort-label">
+                    {t(SORT_LABEL_KEYS[column])}
+                  </span>
                 </button>
               </th>
             ))}
@@ -158,10 +230,22 @@ export function FileList({ view, nodes, sort, direction, selected, openFolder, o
         </thead>
         <tbody>
           {nodes.map((node) => (
-            <tr key={node.id} className="files-tr" data-node={node.id} aria-selected={isSelected(node.id)}>
+            <tr
+              key={node.id}
+              className="files-tr"
+              data-node={node.id}
+              aria-selected={isSelected(node.id)}
+            >
               <td className="files-col-check">
-                <input type="checkbox" className="files-check" checked={isSelected(node.id)}
-                  aria-label={t("selectNode", { name: node.name })} onChange={(event) => onToggleSelected(node, event.target.checked)} />
+                <input
+                  type="checkbox"
+                  className="files-check"
+                  checked={isSelected(node.id)}
+                  aria-label={t("selectNode", { name: node.name })}
+                  onChange={(event) =>
+                    onToggleSelected(node, event.target.checked)
+                  }
+                />
               </td>
               <td className="files-namecell">
                 {/*
@@ -169,23 +253,41 @@ export function FileList({ view, nodes, sort, direction, selected, openFolder, o
                   button inside a table cell replaces the cell in the
                   accessibility tree, so the row would lose its name cell.
                 */}
-                <span className="files-namebutton" role="button" tabIndex={0}
+                <span
+                  className="files-namebutton"
+                  role="button"
+                  tabIndex={0}
                   onDoubleClick={() => openFolder(node)}
-                  onClick={() => (isFolder(node) ? openFolder(node) : onToggleSelected(node, !isSelected(node.id)))}
+                  onClick={() =>
+                    isFolder(node)
+                      ? openFolder(node)
+                      : onToggleSelected(node, !isSelected(node.id))
+                  }
                   onKeyDown={(event) => {
                     if (event.key !== "Enter" && event.key !== " ") return;
                     event.preventDefault();
                     if (isFolder(node)) openFolder(node);
                     else onToggleSelected(node, !isSelected(node.id));
-                  }}>
-                  <Image className="files-row-art" src={iconUrl(nodeIcon(node))} alt="" width={16} height={16} draggable={false} unoptimized />
+                  }}
+                >
+                  <Image
+                    className="files-row-art"
+                    src={iconUrl(nodeIcon(node))}
+                    alt=""
+                    width={16}
+                    height={16}
+                    draggable={false}
+                    unoptimized
+                  />
                   <span className="files-row-name">{node.name}</span>
                 </span>
               </td>
               {COLUMNS.map((column) => (
                 <td key={column} className={`files-col-${column}`}>
                   {column === "size"
-                    ? (isFolder(node) ? countLabel(node.id, t) : formatSize(node.size))
+                    ? isFolder(node)
+                      ? countLabel(node.id, t)
+                      : formatSize(node.size)
                     : column === "type"
                       ? describeNode(node, t)
                       : formatModified(node)}
@@ -200,9 +302,18 @@ export function FileList({ view, nodes, sort, direction, selected, openFolder, o
 }
 
 /** The header glyph: up, down, or the neutral double arrow when the column is idle. */
-function SortGlyph({ active, direction }: { active: boolean; direction: SortDirection }) {
-  if (!active) return <ChevronsUpDown className="files-sort-glyph" aria-hidden="true" />;
-  return direction === "ascending"
-    ? <ChevronUp className="files-sort-glyph" aria-hidden="true" />
-    : <ChevronDown className="files-sort-glyph" aria-hidden="true" />;
+function SortGlyph({
+  active,
+  direction,
+}: {
+  active: boolean;
+  direction: SortDirection;
+}) {
+  if (!active)
+    return <ChevronsUpDown className="files-sort-glyph" aria-hidden="true" />;
+  return direction === "ascending" ? (
+    <ChevronUp className="files-sort-glyph" aria-hidden="true" />
+  ) : (
+    <ChevronDown className="files-sort-glyph" aria-hidden="true" />
+  );
 }

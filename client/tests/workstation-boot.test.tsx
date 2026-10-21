@@ -2,7 +2,13 @@ import { act, fireEvent, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { DesktopShell } from "@/components/desktop-shell";
 import { FILE_TREE } from "@/components/files/files-index";
-import { WorkstationBoot, BOOT_LINE_COUNT, BOOT_STEP_MS, bootDurationMs, bootLines } from "@/components/site/boot-sequence";
+import {
+  WorkstationBoot,
+  BOOT_LINE_COUNT,
+  BOOT_STEP_MS,
+  bootDurationMs,
+  bootLines,
+} from "@/components/site/boot-sequence";
 import { catalogFor, renderWorkstation, translatorFor } from "./intl";
 
 /**
@@ -56,7 +62,9 @@ describe("workstation boot", () => {
     expect(boot).toBeVisible();
     // The shell is mounted behind the boot screen so the swap does not flash,
     // but it is out of the accessibility tree until the post passes.
-    expect(screen.queryByRole("navigation", { name: english.shell.foldersLabel })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("navigation", { name: english.shell.foldersLabel }),
+    ).not.toBeInTheDocument();
     // The post counts the index it mounted as it goes, so the number is the real one.
     act(() => {
       vi.advanceTimersByTime(BOOT_STEP_MS * 2);
@@ -67,31 +75,49 @@ describe("workstation boot", () => {
     act(() => {
       vi.advanceTimersByTime(ready);
     });
-    expect(screen.queryByRole("region", { name: english.boot.regionLabel })).not.toBeInTheDocument();
-    expect(screen.getByRole("navigation", { name: english.shell.foldersLabel })).toBeVisible();
+    expect(
+      screen.queryByRole("region", { name: english.boot.regionLabel }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole("navigation", { name: english.shell.foldersLabel }),
+    ).toBeVisible();
   });
 
   it("lets the operator skip the post", () => {
     renderPostedWorkstation();
     fireEvent.keyDown(window, { key: "Enter" });
-    expect(screen.queryByRole("region", { name: english.boot.regionLabel })).not.toBeInTheDocument();
-    expect(screen.getByRole("navigation", { name: english.shell.foldersLabel })).toBeVisible();
+    expect(
+      screen.queryByRole("region", { name: english.boot.regionLabel }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole("navigation", { name: english.shell.foldersLabel }),
+    ).toBeVisible();
   });
 
   it("does not hold a reduced-motion operator at the post screen", () => {
     motionAllowed(true);
     renderPostedWorkstation();
-    expect(screen.queryByRole("region", { name: english.boot.regionLabel })).not.toBeInTheDocument();
-    expect(screen.getByRole("navigation", { name: english.shell.foldersLabel })).toBeVisible();
+    expect(
+      screen.queryByRole("region", { name: english.boot.regionLabel }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole("navigation", { name: english.shell.foldersLabel }),
+    ).toBeVisible();
   });
 
   it("prints the post in Korean when the request resolves to Korean", () => {
     motionAllowed(true); // Hand over at once; the shell's own copy is what is under test.
     renderPostedWorkstation("ko");
     const korean = catalogFor("ko");
-    expect(screen.getByRole("main", { name: korean.shell.desktopLabel })).toBeVisible();
-    expect(screen.getByRole("navigation", { name: korean.shell.foldersLabel })).toBeVisible();
-    expect(screen.getByRole("button", { name: korean.shell.startLabel })).toBeVisible();
+    expect(
+      screen.getByRole("main", { name: korean.shell.desktopLabel }),
+    ).toBeVisible();
+    expect(
+      screen.getByRole("navigation", { name: korean.shell.foldersLabel }),
+    ).toBeVisible();
+    expect(
+      screen.getByRole("button", { name: korean.shell.startLabel }),
+    ).toBeVisible();
   });
 
   it("keeps the declared line count in step with the lines the post actually prints", () => {
@@ -105,6 +131,8 @@ describe("workstation boot", () => {
     expect(lines).toHaveLength(BOOT_LINE_COUNT);
     // The counts are data, so they must not change with the language.
     expect(lines[1].detail).toContain(String(FILE_TREE.length));
-    expect(lines[0].detail).not.toBe(bootLines(translatorFor("boot"))[0].detail);
+    expect(lines[0].detail).not.toBe(
+      bootLines(translatorFor("boot"))[0].detail,
+    );
   });
 });

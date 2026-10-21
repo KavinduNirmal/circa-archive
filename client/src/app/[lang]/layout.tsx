@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
-import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
+import {
+  getMessages,
+  getTranslations,
+  setRequestLocale,
+} from "next-intl/server";
 import "@fontsource/dm-sans/400.css";
 import "@fontsource/dm-sans/600.css";
 import "@fontsource/dm-sans/700.css";
@@ -29,19 +33,27 @@ import "../globals.css";
  * built ahead of time, and `setRequestLocale` is what tells next-intl which one
  * a given build is for.
  */
-type LanguageLayoutProps = Readonly<{ children: React.ReactNode; params: Promise<{ lang: string }> }>;
+type LanguageLayoutProps = Readonly<{
+  children: React.ReactNode;
+  params: Promise<{ lang: string }>;
+}>;
 
 export function generateStaticParams() {
   return routing.locales.map((lang) => ({ lang }));
 }
 
-export async function generateMetadata({ params }: LanguageLayoutProps): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: LanguageLayoutProps): Promise<Metadata> {
   const { lang } = await params;
   const t = await getTranslations({ locale: lang, namespace: "metadata" });
   return { title: t("rootTitle"), description: t("rootDescription") };
 }
 
-export default async function LanguageLayout({ children, params }: LanguageLayoutProps) {
+export default async function LanguageLayout({
+  children,
+  params,
+}: LanguageLayoutProps) {
   const { lang } = await params;
   // A segment that is not one of our languages is a 404, not a silent English page.
   if (!hasLocale(routing.locales, lang)) notFound();
@@ -58,7 +70,8 @@ export default async function LanguageLayout({ children, params }: LanguageLayou
    */
   const clientMessages: typeof messages = {};
   for (const [namespace, catalog] of Object.entries(messages)) {
-    if (namespace !== "landing" && namespace !== "site" && namespace !== "meta") clientMessages[namespace] = catalog;
+    if (namespace !== "landing" && namespace !== "site" && namespace !== "meta")
+      clientMessages[namespace] = catalog;
   }
 
   return (

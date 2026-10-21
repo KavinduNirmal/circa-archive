@@ -13,14 +13,37 @@ import type { FileFolder, FileNode } from "./files-index";
  * explain. The box itself is the shared in-world message box; only the copy and
  * the properties listing belong here.
  */
-export type FileNoticeKind = "create" | "clipboard" | "delete" | "rename" | "about" | "policy" | "empty" | "properties";
+export type FileNoticeKind =
+  | "create"
+  | "clipboard"
+  | "delete"
+  | "rename"
+  | "about"
+  | "policy"
+  | "empty"
+  | "properties";
 
-type NoticeCopy = { title: string; heading: string; body: string; reference: string };
+type NoticeCopy = {
+  title: string;
+  heading: string;
+  body: string;
+  reference: string;
+};
 
 /** Counts and clearance for the Properties box, which is the one notice with data in it. */
-export type FolderProperties = { node: FileFolder; items: number; folders: number; files: number; clearance: string | null };
+export type FolderProperties = {
+  node: FileFolder;
+  items: number;
+  folders: number;
+  files: number;
+  clearance: string | null;
+};
 
-export function FileNotice({ kind, properties, onClose }: {
+export function FileNotice({
+  kind,
+  properties,
+  onClose,
+}: {
   kind: FileNoticeKind | null;
   /** Supplied when the notice is a folder's Properties sheet. */
   properties?: FolderProperties | null;
@@ -28,7 +51,9 @@ export function FileNotice({ kind, properties, onClose }: {
 }) {
   const t = useTranslations("files");
   if (kind === "properties" && properties) {
-    const clearance = properties.clearance ? t("propertiesClearance", { clearance: properties.clearance }) : "";
+    const clearance = properties.clearance
+      ? t("propertiesClearance", { clearance: properties.clearance })
+      : "";
     return (
       <MessageBox
         open
@@ -47,13 +72,33 @@ export function FileNotice({ kind, properties, onClose }: {
   // stays the constant the rest of the app reads; the archive codes stay codes.
   let copy: NoticeCopy | null = null;
   if (kind === "create") {
-    copy = { title: EXPLORER_NAME, heading: t("noticeCreateHeading"), body: t("noticeCreateBody"), reference: t("referenceReadOnly") };
+    copy = {
+      title: EXPLORER_NAME,
+      heading: t("noticeCreateHeading"),
+      body: t("noticeCreateBody"),
+      reference: t("referenceReadOnly"),
+    };
   } else if (kind === "clipboard") {
-    copy = { title: EXPLORER_NAME, heading: t("noticeClipboardHeading"), body: t("noticeClipboardBody"), reference: t("referenceFiling") };
+    copy = {
+      title: EXPLORER_NAME,
+      heading: t("noticeClipboardHeading"),
+      body: t("noticeClipboardBody"),
+      reference: t("referenceFiling"),
+    };
   } else if (kind === "delete") {
-    copy = { title: EXPLORER_NAME, heading: t("noticeDeleteHeading"), body: t("noticeDeleteBody"), reference: t("referenceDisposal") };
+    copy = {
+      title: EXPLORER_NAME,
+      heading: t("noticeDeleteHeading"),
+      body: t("noticeDeleteBody"),
+      reference: t("referenceDisposal"),
+    };
   } else if (kind === "rename") {
-    copy = { title: EXPLORER_NAME, heading: t("noticeRenameHeading"), body: t("noticeRenameBody"), reference: t("referenceNameKey") };
+    copy = {
+      title: EXPLORER_NAME,
+      heading: t("noticeRenameHeading"),
+      body: t("noticeRenameBody"),
+      reference: t("referenceNameKey"),
+    };
   } else if (kind === "about") {
     copy = {
       title: t("aboutExplorer", { name: EXPLORER_NAME }),
@@ -62,9 +107,19 @@ export function FileNotice({ kind, properties, onClose }: {
       reference: t("referenceAbout"),
     };
   } else if (kind === "policy") {
-    copy = { title: EXPLORER_NAME, heading: t("storagePolicy"), body: t("noticePolicyBody"), reference: t("referenceStorage") };
+    copy = {
+      title: EXPLORER_NAME,
+      heading: t("storagePolicy"),
+      body: t("noticePolicyBody"),
+      reference: t("referenceStorage"),
+    };
   } else if (kind === "empty") {
-    copy = { title: EXPLORER_NAME, heading: t("noticeEmptyHeading"), body: t("noticeEmptyBody"), reference: t("referenceDisposal") };
+    copy = {
+      title: EXPLORER_NAME,
+      heading: t("noticeEmptyHeading"),
+      body: t("noticeEmptyBody"),
+      reference: t("referenceDisposal"),
+    };
   }
   return (
     <MessageBox
@@ -80,7 +135,17 @@ export function FileNotice({ kind, properties, onClose }: {
 }
 
 /** The Properties sheet for a folder, derived from the tree rather than stored on it. */
-export function propertiesFor(node: FileNode, folders: number, files: number): FolderProperties | null {
+export function propertiesFor(
+  node: FileNode,
+  folders: number,
+  files: number,
+): FolderProperties | null {
   if (node.kind !== "folder") return null;
-  return { node, items: folders + files, folders, files, clearance: node.clearance ?? null };
+  return {
+    node,
+    items: folders + files,
+    folders,
+    files,
+    clearance: node.clearance ?? null,
+  };
 }

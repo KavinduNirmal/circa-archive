@@ -16,7 +16,9 @@ import { catalogFor, renderWorkstation } from "./intl";
 function koreanFor(namespace: string, english: string): string {
   const englishCatalog = catalogFor("en")[namespace];
   const koreanCatalog = catalogFor("ko")[namespace];
-  const key = Object.keys(englishCatalog).find((candidate) => englishCatalog[candidate] === english);
+  const key = Object.keys(englishCatalog).find(
+    (candidate) => englishCatalog[candidate] === english,
+  );
   if (!key) throw new Error(`no ${namespace} message reads "${english}"`);
   return koreanCatalog[key];
 }
@@ -24,7 +26,10 @@ function koreanFor(namespace: string, english: string): string {
 /** A translated string that is genuinely translated, not a stub the two catalogs share. */
 function translatedFor(namespace: string, english: string): string {
   const korean = koreanFor(namespace, english);
-  expect(korean, `${namespace}: "${english}" is identical in both catalogs`).not.toBe(english);
+  expect(
+    korean,
+    `${namespace}: "${english}" is identical in both catalogs`,
+  ).not.toBe(english);
   return korean;
 }
 
@@ -36,7 +41,9 @@ describe("every application window speaks the reader's language", () => {
     renderWorkstation(<DesktopShell />, { locale: "ko" });
     await user.click(screen.getByRole("button", { name: shell.archiveLabel }));
 
-    const frame = screen.getByRole("dialog", { name: `${shell.archiveLabel} - ${shell.explorerSuffix}` });
+    const frame = screen.getByRole("dialog", {
+      name: `${shell.archiveLabel} - ${shell.explorerSuffix}`,
+    });
     expect(frame).toHaveTextContent(translatedFor("files", "File"));
     expect(frame).toHaveTextContent(translatedFor("files", "Edit"));
   });
@@ -52,7 +59,9 @@ describe("every application window speaks the reader's language", () => {
     // names are chrome, read from the catalog rather than from the store. The
     // button announces its unread count too, so only the name is matched.
     const inbox = translatedFor("mail", "Inbox");
-    expect(within(frame).getByRole("button", { name: new RegExp(`^${inbox}`) })).toBeVisible();
+    expect(
+      within(frame).getByRole("button", { name: new RegExp(`^${inbox}`) }),
+    ).toBeVisible();
   });
 
   it("opens the record editor with Korean chrome", async () => {
@@ -72,7 +81,11 @@ describe("every application window speaks the reader's language", () => {
 
     const frame = screen.getByRole("dialog", { name: shell.browserTitle });
     expect(frame).toHaveTextContent(translatedFor("browser", "File"));
-    expect(within(frame).getByRole("button", { name: translatedFor("browser", "Search archive") })).toBeVisible();
+    expect(
+      within(frame).getByRole("button", {
+        name: translatedFor("browser", "Search archive"),
+      }),
+    ).toBeVisible();
   });
 
   it("opens the record reader with the reviewer's own Korean vocabulary", async () => {
@@ -80,7 +93,9 @@ describe("every application window speaks the reader's language", () => {
     renderWorkstation(<DesktopShell />, { locale: "ko" });
     await user.click(screen.getByRole("button", { name: shell.searchLabel }));
     const browser = screen.getByRole("dialog", { name: shell.browserTitle });
-    await user.click(within(browser).getByRole("button", { name: "INC-00907" }));
+    await user.click(
+      within(browser).getByRole("button", { name: "INC-00907" }),
+    );
 
     const reader = screen.getByRole("dialog", { name: shell.readerTitle });
     // The vocabulary is the part of this app that must not be flattened, so the

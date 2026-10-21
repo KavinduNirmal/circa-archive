@@ -11,7 +11,12 @@ import type { DesktopIconSpec } from "@/components/desktop-icons";
  */
 
 /** Pixel geometry of a workstation window, in desktop-layer coordinates. */
-export type WindowGeometry = { x: number; y: number; width: number; height: number };
+export type WindowGeometry = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+};
 
 /** Bounds of the desktop area, excluding the status strip and the taskbar. */
 export type DesktopArea = { width: number; height: number };

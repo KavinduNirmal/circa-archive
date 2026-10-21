@@ -112,7 +112,11 @@ export const ANNOTATIONS: readonly ReaderAnnotation[] = [
  * because the viewer reads two of them, the preview's own correspondence and
  * whatever the reviewer has filed this session.
  */
-export function notesFor(pool: readonly ReaderAnnotation[], code: string, sections: readonly ReaderSection[]): ReaderAnnotation[] {
+export function notesFor(
+  pool: readonly ReaderAnnotation[],
+  code: string,
+  sections: readonly ReaderSection[],
+): ReaderAnnotation[] {
   const present = new Set(sections.map((section) => section.id));
   return pool
     .filter((note) => note.code === code && present.has(note.sectionId))
@@ -197,7 +201,12 @@ function cardFor(code: string): ReaderFollowUp | undefined {
   const entry = ARCHIVE_INDEX.find((item) => item.code === code);
   const type = FILING_TYPES[code];
   if (!entry || !type) return undefined;
-  return { code: entry.code, organization: entry.organization, type, preview: entry.abstract };
+  return {
+    code: entry.code,
+    organization: entry.organization,
+    type,
+    preview: entry.abstract,
+  };
 }
 
 /**
@@ -208,7 +217,10 @@ function cardFor(code: string): ReaderFollowUp | undefined {
  * apart because the first is the interesting one, and merging them would hide
  * which way a citation runs.
  */
-export function followUpsFor(code: string): { inbound: ReaderFollowUp[]; outbound: ReaderFollowUp[] } {
+export function followUpsFor(code: string): {
+  inbound: ReaderFollowUp[];
+  outbound: ReaderFollowUp[];
+} {
   const inbound: ReaderFollowUp[] = [];
   const outbound: ReaderFollowUp[] = [];
   for (const citation of CITATIONS) {
@@ -220,9 +232,14 @@ export function followUpsFor(code: string): { inbound: ReaderFollowUp[]; outboun
       if (card) outbound.push(card);
     }
   }
-  const filedOn = (code: string) => ARCHIVE_INDEX.find((entry) => entry.code === code)?.filed ?? "";
-  const newestFirst = (a: ReaderFollowUp, b: ReaderFollowUp) => filedOn(b.code).localeCompare(filedOn(a.code));
-  return { inbound: inbound.sort(newestFirst), outbound: outbound.sort(newestFirst) };
+  const filedOn = (code: string) =>
+    ARCHIVE_INDEX.find((entry) => entry.code === code)?.filed ?? "";
+  const newestFirst = (a: ReaderFollowUp, b: ReaderFollowUp) =>
+    filedOn(b.code).localeCompare(filedOn(a.code));
+  return {
+    inbound: inbound.sort(newestFirst),
+    outbound: outbound.sort(newestFirst),
+  };
 }
 
 /**
@@ -235,5 +252,7 @@ export function followUpsFor(code: string): { inbound: ReaderFollowUp[]; outboun
  * and a rumor is not an exploration, so neither belongs here.
  */
 export function explorationsFor(code: string): ReaderFollowUp[] {
-  return followUpsFor(code).inbound.filter((item) => item.type === "EXPLORATION");
+  return followUpsFor(code).inbound.filter(
+    (item) => item.type === "EXPLORATION",
+  );
 }

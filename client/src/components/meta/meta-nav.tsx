@@ -61,16 +61,24 @@ export function MetaNav({ labels, groups, repositoryUrl }: MetaNavProps) {
 
   /* The nav is the one place that knows where the reader is; it reads the path
      it is already rendered under rather than being told by four layouts. */
-  const current =
-    pathname.startsWith("/meta/documentation") ? "docs"
-    : pathname.startsWith("/meta/about") ? "about"
-    : pathname.startsWith("/site") ? "archive"
-    : pathname.startsWith("/desktop") ? "workstation"
-    : "home";
+  const current = pathname.startsWith("/meta/documentation")
+    ? "docs"
+    : pathname.startsWith("/meta/about")
+      ? "about"
+      : pathname.startsWith("/site")
+        ? "archive"
+        : pathname.startsWith("/desktop")
+          ? "workstation"
+          : "home";
 
   React.useEffect(() => {
     function openSearch(event: KeyboardEvent) {
-      if (current === "docs" || !(event.ctrlKey || event.metaKey) || event.key.toLowerCase() !== "k") return;
+      if (
+        current === "docs" ||
+        !(event.ctrlKey || event.metaKey) ||
+        event.key.toLowerCase() !== "k"
+      )
+        return;
       event.preventDefault();
       searchLink.current?.click();
     }
@@ -78,20 +86,45 @@ export function MetaNav({ labels, groups, repositoryUrl }: MetaNavProps) {
     return () => window.removeEventListener("keydown", openSearch);
   }, [current]);
 
-  type TopLink = Readonly<{ key: string; label: string; href: string; current: boolean }>;
+  type TopLink = Readonly<{
+    key: string;
+    label: string;
+    href: string;
+    current: boolean;
+  }>;
 
   /* Home lives at the language root's meta page, not at the locale root, which
      is the fiction's portal; the reader must be able to come back here. */
-  const homeLink: TopLink = { key: "home", label: labels.home, href: "/meta", current: current === "home" };
+  const homeLink: TopLink = {
+    key: "home",
+    label: labels.home,
+    href: "/meta",
+    current: current === "home",
+  };
   const sectionLinks: readonly TopLink[] = [
-    { key: "about", label: labels.about, href: "/meta/about", current: current === "about" },
-    { key: "workstation", label: labels.workstation, href: "/desktop", current: current === "workstation" },
+    {
+      key: "about",
+      label: labels.about,
+      href: "/meta/about",
+      current: current === "about",
+    },
+    {
+      key: "workstation",
+      label: labels.workstation,
+      href: "/desktop",
+      current: current === "workstation",
+    },
   ];
 
   const sheetLinks: readonly TopLink[] = [
     homeLink,
     sectionLinks[0],
-    { key: "archive", label: labels.archive, href: "/site", current: current === "archive" },
+    {
+      key: "archive",
+      label: labels.archive,
+      href: "/site",
+      current: current === "archive",
+    },
     sectionLinks[1],
   ];
 
@@ -122,17 +155,31 @@ export function MetaNav({ labels, groups, repositoryUrl }: MetaNavProps) {
     <header className="meta-header">
       <div className="meta-shell meta-header-inner">
         <Link className="meta-brand" href="/meta" aria-label={labels.brand}>
-          <Image className="meta-brand-mark" src="/circa_eye.svg" alt="" width={26} height={24} unoptimized />
+          <Image
+            className="meta-brand-mark"
+            src="/circa_eye.svg"
+            alt=""
+            width={26}
+            height={24}
+            unoptimized
+          />
           <span className="meta-brand-word">CIRCA</span>
           <span className="meta-brand-tail">{labels.brandTail}</span>
         </Link>
 
-        <NavigationMenu className="meta-nav-desktop" aria-label={labels.menuLabel} viewport={false}>
+        <NavigationMenu
+          className="meta-nav-desktop"
+          aria-label={labels.menuLabel}
+          viewport={false}
+        >
           <NavigationMenuList className="meta-nav-list">
             {navLink(homeLink)}
 
             <NavigationMenuItem>
-              <NavigationMenuTrigger className="meta-nav-link" data-active={current === "docs" ? "true" : undefined}>
+              <NavigationMenuTrigger
+                className="meta-nav-link"
+                data-active={current === "docs" ? "true" : undefined}
+              >
                 <span className="meta-nav-slash" aria-hidden="true">
                   /
                 </span>
@@ -151,7 +198,9 @@ export function MetaNav({ labels, groups, repositoryUrl }: MetaNavProps) {
                                 <Link
                                   className="meta-nav-panel-link"
                                   href={item.href}
-                                  aria-current={pathname === item.href ? "page" : undefined}
+                                  aria-current={
+                                    pathname === item.href ? "page" : undefined
+                                  }
                                 >
                                   {item.label}
                                 </Link>
@@ -174,10 +223,14 @@ export function MetaNav({ labels, groups, repositoryUrl }: MetaNavProps) {
                             <Link
                               className="meta-nav-extra-card"
                               href={firstItem.href}
-                              aria-current={pathname === firstItem.href ? "page" : undefined}
+                              aria-current={
+                                pathname === firstItem.href ? "page" : undefined
+                              }
                             >
                               <div className="meta-nav-extra-card-head">
-                                <span className="meta-nav-extra-card-title">{group.label}</span>
+                                <span className="meta-nav-extra-card-title">
+                                  {group.label}
+                                </span>
                                 {isMulti && (
                                   <span className="meta-nav-extra-badge">
                                     {group.items.length} topics
@@ -197,11 +250,19 @@ export function MetaNav({ labels, groups, repositoryUrl }: MetaNavProps) {
 
                   <div className="meta-nav-panel-foot">
                     <NavigationMenuLink asChild>
-                      <Link className="meta-nav-panel-overview" href="/meta/documentation">
+                      <Link
+                        className="meta-nav-panel-overview"
+                        href="/meta/documentation"
+                      >
                         {labels.docs} →
                       </Link>
                     </NavigationMenuLink>
-                    <a className="meta-nav-panel-source" href={repositoryUrl} target="_blank" rel="noreferrer">
+                    <a
+                      className="meta-nav-panel-source"
+                      href={repositoryUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
                       {labels.sourceCta}
                       <ArrowUpRight aria-hidden="true" size={12} />
                     </a>
@@ -247,8 +308,19 @@ export function MetaNav({ labels, groups, repositoryUrl }: MetaNavProps) {
               className="meta-sheet"
             >
               <div className="meta-sheet-head">
-                <Link className="meta-brand" href="/meta" onClick={() => setOpen(false)}>
-                  <Image className="meta-brand-mark" src="/circa_eye.svg" alt="" width={26} height={24} unoptimized />
+                <Link
+                  className="meta-brand"
+                  href="/meta"
+                  onClick={() => setOpen(false)}
+                >
+                  <Image
+                    className="meta-brand-mark"
+                    src="/circa_eye.svg"
+                    alt=""
+                    width={26}
+                    height={24}
+                    unoptimized
+                  />
                   <span className="meta-brand-word">CIRCA</span>
                   <span className="meta-brand-tail">{labels.brandTail}</span>
                 </Link>
@@ -275,7 +347,9 @@ export function MetaNav({ labels, groups, repositoryUrl }: MetaNavProps) {
                   <p className="meta-sheet-title">{labels.docs}</p>
                   {groups.map((group) => {
                     const isCompact = group.items.length > 4;
-                    const itemsToShow = isCompact ? group.items.slice(0, 3) : group.items;
+                    const itemsToShow = isCompact
+                      ? group.items.slice(0, 3)
+                      : group.items;
                     return (
                       <div key={group.label} className="meta-sheet-subgroup">
                         <p className="meta-sheet-title">{group.label}</p>
@@ -285,7 +359,9 @@ export function MetaNav({ labels, groups, repositoryUrl }: MetaNavProps) {
                             className="meta-sheet-link"
                             href={item.href}
                             onClick={() => setOpen(false)}
-                            aria-current={pathname === item.href ? "page" : undefined}
+                            aria-current={
+                              pathname === item.href ? "page" : undefined
+                            }
                           >
                             {item.label}
                           </Link>
@@ -296,7 +372,8 @@ export function MetaNav({ labels, groups, repositoryUrl }: MetaNavProps) {
                             href={group.items[0]?.href ?? "/meta/documentation"}
                             onClick={() => setOpen(false)}
                           >
-                            + {group.items.length - itemsToShow.length} more in {group.label} →
+                            + {group.items.length - itemsToShow.length} more in{" "}
+                            {group.label} →
                           </Link>
                         )}
                       </div>
@@ -307,11 +384,20 @@ export function MetaNav({ labels, groups, repositoryUrl }: MetaNavProps) {
 
               <div className="meta-sheet-foot">
                 <LanguageSwitcher className="meta-sheet-language" short />
-                <Link className="meta-button meta-sheet-cta" href="/site" onClick={() => setOpen(false)}>
+                <Link
+                  className="meta-button meta-sheet-cta"
+                  href="/site"
+                  onClick={() => setOpen(false)}
+                >
                   {labels.archiveCta}
                   <ArrowUpRight aria-hidden="true" size={14} />
                 </Link>
-                <a className="meta-sheet-source" href={repositoryUrl} target="_blank" rel="noreferrer">
+                <a
+                  className="meta-sheet-source"
+                  href={repositoryUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                >
                   {labels.sourceCta}
                   <ArrowUpRight aria-hidden="true" size={12} />
                 </a>
