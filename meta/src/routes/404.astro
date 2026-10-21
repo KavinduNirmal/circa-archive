@@ -1,0 +1,23 @@
+---
+import Shell from "../layouts/Shell.astro";
+import { t, projectHref } from "../lib/site";
+---
+
+<Shell
+  locale="en"
+  title={t("en", "notFoundTitle")}
+  description={t("en", "notFoundBody")}
+  noindex
+>
+  <section class="page-intro error-page">
+    <p class="eyebrow">404 / CIRCA ARCHIVE</p>
+    <h1>{t("en", "notFoundTitle")}</h1>
+    <p class="lede">{t("en", "notFoundBody")}</p>
+    <a class="button primary" href={projectHref("en", "documentation")}>
+      {t("en", "navDocs")} ↗
+    </a>
+    <a class="text-link" href={projectHref("ko")}>
+      한국어 ↗
+    </a>
+  </section>
+</Shell>

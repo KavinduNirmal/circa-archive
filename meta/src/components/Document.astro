@@ -1,0 +1,239 @@
+---
+import { getCollection } from "astro:content";
+import Shell from "../layouts/Shell.astro";
+import { DOC_GROUPS, DOC_TOPICS, docHref, docTopic } from "../lib/documents";
+import { renderDocument } from "../lib/markdown";
+import { t, sourceUrl, projectHref, type Locale } from "../lib/site";
+interface Props {
+  locale: Locale;
+  slug: string;
+}
+const { locale, slug } = Astro.props;
+const entry = (await getCollection("documents")).find(
+  (doc) => doc.id === `${locale}/${slug}`,
+)!;
+const doc = entry.data;
+const topic = docTopic(slug)!;
+const rendered = await renderDocument(doc.markdown, doc.sourcePath, locale);
+const position = DOC_TOPICS.findIndex((item) => item.slug === slug);
+const previous = DOC_TOPICS[position - 1];
+const next = DOC_TOPICS[position + 1];
+const title = rendered.title || t(locale, topic.titleKey);
+const source = projectHref(locale, `source/${slug}.md`).replace(/\/$/, "");
+---
+
+<Shell
+  locale={locale}
+  title={title}
+  description={t(locale, topic.ledeKey)}
+  wide
+>
+  <div
+    class="docs-layout"
+    data-docs
+    data-index={`/${locale}/search.json`}
+    data-loading={t(locale, "searchLoading")}
+    data-error={t(locale, "searchError")}
+    data-empty={t(locale, "docsSearchEmpty")}
+    data-results={t(locale, "searchCount")}
+  >
+    <aside class="docs-sidebar">
+      <details class="chapter-disclosure">
+        <summary>
+          {t(locale, "contentsLabel")}
+          <span aria-hidden="true">⌄</span>
+        </summary>
+        <div class="sidebar-inner">
+          <p class="eyebrow sidebar-title">
+            {t(locale, "navDocs")}
+            <span>⌘ K</span>
+          </p>
+          <form class="docs-search" role="search" onsubmit="return false">
+            <label for="documentation-search" class="sr-only">
+              {t(locale, "docsSearchLabel")}
+            </label>
+            <input
+              id="documentation-search"
+              type="search"
+              placeholder={t(locale, "docsSearchPlaceholder")}
+              autocomplete="off"
+              aria-keyshortcuts="Control+k Meta+k"
+            />
+            <span aria-hidden="true">⌕</span>
+          </form>
+          <p
+            class="search-status"
+            role="status"
+            aria-live="polite"
+            data-search-status
+          ></p>
+          <button class="text-link search-retry" data-search-retry hidden>
+            {t(locale, "retry")}
+          </button>
+          <nav aria-label={t(locale, "contentsLabel")} class="chapter-groups">
+            {DOC_GROUPS.map((group, index) => (
+              <details data-chapter={group.id} open={topic.group === group.id}>
+                <>
+                  <summary>
+                    <span class="folio">0{index + 1}</span>
+                    {t(locale, group.labelKey)}
+                    <span class="chevron" aria-hidden="true">
+                      ⌄
+                    </span>
+                  </summary>
+                  <ul>
+                    {group.slugs.map((item) => {
+                      const candidate = docTopic(item)!;
+                      return (
+                        <li data-topic={item}>
+                          <a
+                            href={docHref(locale, item)}
+                            aria-current={item === slug ? "page" : undefined}
+                          >
+                            {t(locale, candidate.navKey)}
+                          </a>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </>
+              </details>
+            ))}
+          </nav>
+          <noscript>
+            <p class="fineprint">{t(locale, "searchHint")} — JavaScript</p>
+          </noscript>
+        </div>
+      </details>
+    </aside>
+    <article
+      class="doc-article"
+      aria-labelledby="doc-title"
+      data-document-source={source}
+      data-source-url={sourceUrl(doc.sourcePath)}
+      data-copy-label={t(locale, "copyCode")}
+      data-copied={t(locale, "docsCopied")}
+      data-failed={t(locale, "docsMarkdownCopyFailed")}
+      data-paste={t(locale, "docsChatGPTPaste")}
+      data-context={t(locale, "docsChatGPTContext")}
+    >
+      <header class="doc-header">
+        <nav class="breadcrumbs" aria-label={t(locale, "breadcrumbLabel")}>
+          <a href={projectHref(locale)}>{t(locale, "navHome")}</a>
+          <span>/</span>
+          <a href={docHref(locale, "overview")}>{t(locale, "navDocs")}</a>
+          <span>/</span>
+          <span>
+            {t(
+              locale,
+              DOC_GROUPS.find((group) => group.id === topic.group)!.labelKey,
+            )}
+          </span>
+        </nav>
+        <h1 id="doc-title">{title}</h1>
+        {rendered.lead !== t(locale, topic.ledeKey) && (
+          <p class="doc-lede">{t(locale, topic.ledeKey)}</p>
+        )}
+        <div class="doc-actions">
+          <button data-copy-markdown>
+            {t(locale, "docsCopyMarkdown")}
+            <span aria-hidden="true">⧉</span>
+          </button>
+          <a href={source}>{t(locale, "sourceLabel")} ↗</a>
+          <a
+            href="https://chatgpt.com/"
+            target="_blank"
+            rel="noreferrer"
+            data-chat
+            title={t(locale, "docsChatGPTHelp")}
+          >
+            {t(locale, "docsChatGPT")} ↗
+          </a>
+        </div>
+        <p class="copy-status" role="status" data-copy-status></p>
+      </header>
+      {doc.contentLocale !== locale && (
+        <p class="language-notice" role="note">
+          EN / {t(locale, "sourceLanguage")}
+        </p>
+      )}
+      <details class="mobile-toc">
+        <summary>
+          {t(locale, "readingLabel")}
+          <span aria-hidden="true">⌄</span>
+        </summary>
+        <ol>
+          {rendered.headings.map((heading) => (
+            <li class:list={[{ nested: heading.depth === 3 }]}>
+              <a href={`#${heading.id}`}>{heading.title}</a>
+            </li>
+          ))}
+        </ol>
+      </details>
+      <div class="prose" lang={doc.contentLocale} set:html={rendered.html} />
+      <footer class="doc-source">
+        <span>
+          {doc.updatedAt && (
+            <time datetime={doc.updatedAt}>
+              {t(locale, "updatedLabel")} /{" "}
+              {new Intl.DateTimeFormat(locale, {
+                dateStyle: "medium",
+                timeZone: "UTC",
+              }).format(new Date(doc.updatedAt))}
+            </time>
+          )}
+        </span>
+        <a
+          href={sourceUrl(doc.sourcePath, "edit")}
+          target="_blank"
+          rel="noreferrer"
+        >
+          {t(locale, "docsEdit")} ↗
+        </a>
+      </footer>
+      <nav class="doc-pager" aria-label={t(locale, "docsPager")}>
+        {previous ? (
+          <a href={docHref(locale, previous.slug)}>
+            <>
+              <span class="eyebrow">← {t(locale, "previous")}</span>
+              <strong>{t(locale, previous.navKey)}</strong>
+            </>
+          </a>
+        ) : (
+          <span />
+        )}
+        {next && (
+          <a href={docHref(locale, next.slug)}>
+            <>
+              <span class="eyebrow">{t(locale, "next")} →</span>
+              <strong>{t(locale, next.navKey)}</strong>
+            </>
+          </a>
+        )}
+      </nav>
+    </article>
+    <aside class="doc-toc">
+      <nav aria-label={t(locale, "docsOnThisPage")}>
+        <p class="eyebrow">{t(locale, "readingLabel")}</p>
+        <ol>
+          {rendered.headings.map((heading) => (
+            <li class:list={[{ nested: heading.depth === 3 }]}>
+              <a href={`#${heading.id}`}>{heading.title}</a>
+            </li>
+          ))}
+        </ol>
+      </nav>
+      <a
+        class="toc-edit text-link"
+        href={sourceUrl(doc.sourcePath, "edit")}
+        target="_blank"
+        rel="noreferrer"
+      >
+        {t(locale, "docsEdit")} ↗
+      </a>
+    </aside>
+  </div>
+  <script>
+    import "../scripts/document";
+  </script>
+</Shell>

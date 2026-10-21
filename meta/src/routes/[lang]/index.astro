@@ -1,0 +1,205 @@
+---
+import Shell from "../../layouts/Shell.astro";
+import SectionHeading from "../../components/SectionHeading.astro";
+import Specimen from "../../components/Specimen.astro";
+import Editions from "../../components/Editions.astro";
+import Faq from "../../components/Faq.astro";
+import BitmapSeal from "../../components/BitmapSeal.astro";
+import {
+  locales,
+  t,
+  projectHref,
+  archiveHref,
+  chapterLinks,
+  REPOSITORY,
+  type Locale,
+} from "../../lib/site";
+export function getStaticPaths() {
+  return locales.map((lang) => ({ params: { lang } }));
+}
+const locale = Astro.params.lang as Locale;
+const descriptions = [
+  "docsOverviewLede",
+  "docsPillarLoreBody",
+  "chapterContributionLede",
+  "chapterBuildingLede",
+];
+---
+
+<Shell
+  locale={locale}
+  title={t(locale, "brand")}
+  description={t(locale, "homeLede")}
+>
+  <section class="home-hero" data-section="hero" aria-labelledby="home-title">
+    <p class="eyebrow">
+      <span class="folio">CIRCA</span> / {t(locale, "homeKicker")}
+    </p>
+    <h1 id="home-title">
+      {t(locale, "heroTitleA")}
+      <span>{t(locale, "heroTitleB")}</span>
+    </h1>
+    <div class="hero-register">
+      <p>{t(locale, "heroNote")}</p>
+      <div class="action-row">
+        <a class="button primary" href={projectHref(locale, "documentation")}>
+          {t(locale, "heroPrimary")} <span aria-hidden="true">↗</span>
+        </a>
+        <a class="button" href={archiveHref(locale)}>
+          {t(locale, "heroSecondary")} <span aria-hidden="true">↗</span>
+        </a>
+      </div>
+    </div>
+  </section>
+  <section
+    class="identity-section"
+    data-section="identity"
+    aria-labelledby="agency-name"
+  >
+    <div class="seal-field">
+      <BitmapSeal />
+    </div>
+    <div class="identity-copy">
+      <p class="eyebrow">{t(locale, "identityLabel")}</p>
+      <h2 id="agency-name">{t(locale, "agencyName")}</h2>
+      <p class="agency-motto">{t(locale, "agencyMotto")}</p>
+      <p class="identity-doctrine">{t(locale, "quote")}</p>
+    </div>
+  </section>
+  <section
+    class="section"
+    data-section="introduction"
+    aria-labelledby="introduction-title"
+  >
+    <SectionHeading
+      id="introduction-title"
+      index="01"
+      label={t(locale, "premiseKicker")}
+      title={t(locale, "introductionTitle")}
+    />
+    <div class="introduction-grid">
+      <div class="editorial-prose">
+        <p class="lede">{t(locale, "introductionBody")}</p>
+        <p>{t(locale, "introductionSecond")}</p>
+        <a class="text-link" href={projectHref(locale, "about/project")}>
+          {t(locale, "navProject")} ↗
+        </a>
+      </div>
+      <div class="introduction-specimen">
+        <p class="eyebrow">{t(locale, "specimenLabel")} / CIRCA-S-03007</p>
+        <Specimen locale={locale} />
+      </div>
+    </div>
+  </section>
+  <section
+    class="section"
+    data-section="editions"
+    aria-labelledby="editions-title"
+  >
+    <SectionHeading
+      id="editions-title"
+      index="02"
+      label={t(locale, "editionsKicker")}
+      title={t(locale, "editionsTitle")}
+      description={t(locale, "editionsLede")}
+    />
+    <Editions locale={locale} />
+    <p class="section-note">{t(locale, "editionsNote")}</p>
+  </section>
+  <section
+    class="section chapter-index"
+    data-section="documentation"
+    aria-labelledby="chapters-title"
+  >
+    <SectionHeading
+      id="chapters-title"
+      index="03"
+      label={t(locale, "navDocs")}
+      title={t(locale, "homeIndex")}
+      description={t(locale, "homeIndexLede")}
+    />
+    <div class="chapter-rows">
+      {chapterLinks(locale).map((link, i) => (
+        <a href={link.href}>
+          <span class="folio">0{i + 1}</span>
+          <h3>{link.label}</h3>
+          <p>{t(locale, descriptions[i])}</p>
+          <span class="row-arrow" aria-hidden="true">
+            ↗
+          </span>
+        </a>
+      ))}
+    </div>
+  </section>
+  <section
+    class="section"
+    data-section="building"
+    aria-labelledby="building-title"
+  >
+    <SectionHeading
+      id="building-title"
+      index="04"
+      label={t(locale, "builtKicker")}
+      title={t(locale, "builtTitle")}
+      description={t(locale, "constructionLede")}
+    />
+    <dl class="fact-register">
+      {["Website", "Archive", "Source"].map((key) => (
+        <div>
+          <dt>{t(locale, `fact${key}`)}</dt>
+          <dd>{t(locale, `fact${key}Body`)}</dd>
+        </div>
+      ))}
+    </dl>
+    <a class="text-link" href={projectHref(locale, "documentation/building")}>
+      {t(locale, "chapterBuilding")} ↗
+    </a>
+  </section>
+  <section
+    class="section"
+    data-section="contribution"
+    aria-labelledby="contribution-title"
+  >
+    <SectionHeading
+      id="contribution-title"
+      index="05"
+      label={t(locale, "contributeKicker")}
+      title={t(locale, "contributeTitle")}
+      description={t(locale, "contributeLede")}
+    />
+    <ol class="contribution-ledger">
+      {["Guide", "Change", "Checks"].map((key, i) => (
+        <li>
+          <span class="folio">0{i + 1}</span>
+          <h3>{t(locale, `step${key}Title`)}</h3>
+          <p>{t(locale, `step${key}Body`)}</p>
+        </li>
+      ))}
+    </ol>
+    <div class="action-row">
+      <a
+        class="text-link"
+        href={projectHref(locale, "documentation/contribution")}
+      >
+        {t(locale, "contributorsLink")} ↗
+      </a>
+      <a class="text-link" href={REPOSITORY} target="_blank" rel="noreferrer">
+        {t(locale, "contributeRepository")} ↗
+      </a>
+    </div>
+  </section>
+  <section
+    class="section faq-section"
+    data-section="questions"
+    aria-labelledby="faq-title"
+  >
+    <SectionHeading
+      id="faq-title"
+      index="06"
+      label={t(locale, "faqKicker")}
+      title={t(locale, "faqTitle")}
+      description={t(locale, "faqLede")}
+    />
+    <Faq locale={locale} />
+  </section>
+</Shell>

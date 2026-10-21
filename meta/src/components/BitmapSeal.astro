@@ -1,0 +1,49 @@
+---
+import { SEAL_PLATE } from "../lib/seal";
+
+// Sample the original plotted artwork into square halftone cells. This stays
+// static, font-independent and crisp at every viewport without a canvas runtime.
+const rows = SEAL_PLATE.split("\n");
+const ramp = " .:-=+*#%@";
+const cell = 6;
+const width = Math.max(...rows.map((row) => row.length)) * cell;
+// Character rows are twice as tall as columns in the original plotted seal.
+const height = rows.length * cell * 2;
+const pixels = rows.flatMap((row, y) =>
+  [...row].flatMap((character, x) => {
+    const density = ramp.indexOf(character);
+    if (density <= 0) return [];
+    const size = Math.max(1, Math.round((density / (ramp.length - 1)) * 5));
+    return [0, 1].map((offset) => ({
+      x: x * cell + Math.floor((cell - size) / 2),
+      y: (y * 2 + offset) * cell + Math.floor((cell - size) / 2),
+      size,
+    }));
+  }),
+);
+---
+
+<div class="bitmap-plate" aria-hidden="true">
+  <span class="plate-registration">C / R</span>
+  <svg
+    class="bitmap-seal"
+    viewBox={`0 0 ${width} ${height}`}
+    fill="currentColor"
+    shape-rendering="crispEdges"
+    focusable="false"
+  >
+    {pixels.map((pixel) => (
+      <rect x={pixel.x} y={pixel.y} width={pixel.size} height={pixel.size} />
+    ))}
+  </svg>
+  <span class="plate-scale">
+    <i></i>
+    <i></i>
+    <i></i>
+    <i></i>
+    <i></i>
+    <i></i>
+    <i></i>
+    <i></i>
+  </span>
+</div>

@@ -1,0 +1,18 @@
+# Root build context: opt in only the static application's public inputs.
+**
+!meta/
+!meta/**
+meta/node_modules/
+meta/.astro/
+meta/dist/
+meta/.env*
+meta/playwright-report/
+meta/test-results/
+!docs/
+!docs/documentation/
+!docs/documentation/**
+!docs/AUTHOR_GUIDE.md
+!docs/lore/
+!docs/lore/*.md
+!docs/lore/*.png
+docs/lore/private/
