@@ -41,3 +41,6 @@ test-results/
 
 # Playwright browser installs, when the default cache is not writable
 .pw-browsers/
+
+# Astro generated types and content cache
+.astro/

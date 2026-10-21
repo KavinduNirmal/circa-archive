@@ -1,0 +1,20 @@
+#!/bin/sh
+# Sourced by the official Nginx entrypoint before its envsubst step.
+: "${PROJECT_SITE_ORIGIN:=http://project.localhost:3001}"
+: "${ARCHIVE_SITE_ORIGIN:=http://localhost:3001}"
+site_host() {
+    case "$1" in http://*|https://*) ;; *) echo "Site origins must use HTTP(S)" >&2; return 1 ;; esac
+    authority=${1#*://}
+    case "$authority" in ''|*[!A-Za-z0-9.:-]*) echo "Site origins must contain only a DNS name or IPv4 address and optional port" >&2; return 1 ;; esac
+    host=${authority%%:*}
+    case "$host" in ''|.*|*..*) echo "Invalid site hostname" >&2; return 1 ;; esac
+    printf '%s' "$host"
+}
+export PROJECT_HOST="$(site_host "$PROJECT_SITE_ORIGIN")"
+export ARCHIVE_HOST="$(site_host "$ARCHIVE_SITE_ORIGIN")"
+[ -n "$PROJECT_HOST" ] && [ -n "$ARCHIVE_HOST" ] && [ "$PROJECT_HOST" != "$ARCHIVE_HOST" ] || {
+    echo "Project and archive origins must use separate hostnames" >&2
+    exit 1
+}
+export PROJECT_SITE_ORIGIN
+export NGINX_ENVSUBST_FILTER='^(PROJECT_SITE_ORIGIN|PROJECT_HOST|ARCHIVE_HOST)$'
