@@ -42,6 +42,15 @@ services:
       circa-db:
         condition: service_healthy
 
+  circa-meta:
+    build:
+      context: .
+      dockerfile: meta/Dockerfile
+      args:
+        PROJECT_SITE_ORIGIN: ${PROJECT_SITE_ORIGIN:-http://project.localhost:3001}
+        ARCHIVE_SITE_ORIGIN: ${ARCHIVE_SITE_ORIGIN:-http://localhost:3001}
+    networks: [ingress]
+
   circa-client:
     build:
       context: ./client
@@ -74,8 +83,12 @@ services:
     image: nginx:stable-alpine
     ports:
       - "127.0.0.1:${CIRCA_CLIENT_PORT:-3001}:8080"
+    environment:
+      PROJECT_SITE_ORIGIN: ${PROJECT_SITE_ORIGIN:-http://project.localhost:3001}
+      ARCHIVE_SITE_ORIGIN: ${ARCHIVE_SITE_ORIGIN:-http://localhost:3001}
     volumes:
-      - ./infra/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./infra/nginx.conf:/etc/nginx/templates/default.conf.template:ro
+      - ./infra/15-site-origins.envsh:/docker-entrypoint.d/15-site-origins.envsh:ro
     networks:
       ingress:
         ipv4_address: ${CIRCA_PROXY_NETWORK_PREFIX:-172.30.0}.10
@@ -93,6 +106,8 @@ services:
       retries: 12
     depends_on:
       circa-client:
+        condition: service_healthy
+      circa-meta:
         condition: service_healthy
 
 networks:
