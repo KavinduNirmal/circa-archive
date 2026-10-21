@@ -1,15 +1,50 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, useSyncExternalStore, type CSSProperties, type ReactNode } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useSyncExternalStore,
+  type CSSProperties,
+  type ReactNode,
+} from "react";
 import { useTranslations } from "next-intl";
 import type { RecordTrail } from "@/lib/record-trail";
-import { CLASS_LABELS, STATUS_LABELS, type ArchiveStatus } from "../browser/archive-index";
-import { ReaderCredentials, ReaderToolbar, type ReaderActions } from "./reader-chrome";
+import {
+  CLASS_LABELS,
+  STATUS_LABELS,
+  type ArchiveStatus,
+} from "../browser/archive-index";
+import {
+  ReaderCredentials,
+  ReaderToolbar,
+  type ReaderActions,
+} from "./reader-chrome";
 import { followUpsFor } from "./reader-correspondence";
-import { FONT_STACKS, READER_MATCH_HIGHLIGHT, SCALE_DEFAULT, clampScale, describeMatches, formatScale, matchRanges, sectionAnchor, stepScale, viewLabel, type ReaderFont, type ReaderSection, type ReaderView } from "./reader-model";
+import {
+  FONT_STACKS,
+  READER_MATCH_HIGHLIGHT,
+  SCALE_DEFAULT,
+  clampScale,
+  describeMatches,
+  formatScale,
+  matchRanges,
+  sectionAnchor,
+  stepScale,
+  viewLabel,
+  type ReaderFont,
+  type ReaderSection,
+  type ReaderView,
+} from "./reader-model";
 import { AnnotationRail, SectionRail, type RailState } from "./reader-rails";
 import { FollowUpStrip } from "./reader-references";
-import { isReviewer, sessionNotes, type ReaderSession, type ReaderVerdict } from "./reader-session";
+import {
+  isReviewer,
+  sessionNotes,
+  type ReaderSession,
+  type ReaderVerdict,
+} from "./reader-session";
 import { RecordStatusCells } from "./record-status-menu";
 import { recordDocument } from "./record-filings";
 import "./reader.css";
@@ -46,7 +81,12 @@ import "./reader.css";
 export type { RecordTrail } from "@/lib/record-trail";
 
 /** The states a section's status earns it. An ordinary filing is not stamped. */
-const STATUS_STAMPS: Partial<Record<ArchiveStatus, "stampContested" | "stampSealed" | "stampRestricted" | "stampErased">> = {
+const STATUS_STAMPS: Partial<
+  Record<
+    ArchiveStatus,
+    "stampContested" | "stampSealed" | "stampRestricted" | "stampErased"
+  >
+> = {
   contested: "stampContested",
   sealed: "stampSealed",
   restricted: "stampRestricted",
@@ -56,12 +96,14 @@ const STATUS_STAMPS: Partial<Record<ArchiveStatus, "stampContested" | "stampSeal
 const NARROW_QUERY = "(max-width: 1023px)";
 
 function narrowViewport(): boolean {
-  if (typeof window === "undefined" || typeof window.matchMedia !== "function") return false;
+  if (typeof window === "undefined" || typeof window.matchMedia !== "function")
+    return false;
   return window.matchMedia(NARROW_QUERY).matches;
 }
 
 function subscribeToViewport(onChange: () => void): () => void {
-  if (typeof window === "undefined" || typeof window.matchMedia !== "function") return () => {};
+  if (typeof window === "undefined" || typeof window.matchMedia !== "function")
+    return () => {};
   const list = window.matchMedia(NARROW_QUERY);
   list.addEventListener?.("change", onChange);
   return () => list.removeEventListener?.("change", onChange);
@@ -97,9 +139,15 @@ function collectMatchRanges(sheet: HTMLElement, query: string): Range[] {
  * throw the renderer's bookkeeping away on every keystroke. Where the API is
  * missing the count still reports, and only the paint is skipped.
  */
-type HighlightRegistry = { set: (name: string, value: object) => void; delete: (name: string) => void };
+type HighlightRegistry = {
+  set: (name: string, value: object) => void;
+  delete: (name: string) => void;
+};
 type HighlightConstructor = new (...ranges: Range[]) => object;
-type HighlightGlobals = { CSS?: { highlights?: HighlightRegistry }; Highlight?: HighlightConstructor };
+type HighlightGlobals = {
+  CSS?: { highlights?: HighlightRegistry };
+  Highlight?: HighlightConstructor;
+};
 
 function highlightRegistry(): HighlightRegistry | undefined {
   return (globalThis as unknown as HighlightGlobals).CSS?.highlights;
@@ -116,7 +164,14 @@ function paintMatches(ranges: readonly Range[]): void {
   registry.set(READER_MATCH_HIGHLIGHT, new Constructor(...ranges));
 }
 
-export function RecordReader({ trail, session, onOpenRecord, onTravel, onCloseWindow, renderSection }: {
+export function RecordReader({
+  trail,
+  session,
+  onOpenRecord,
+  onTravel,
+  onCloseWindow,
+  renderSection,
+}: {
   /** The records open in the viewer and the one on the screen. */
   trail: RecordTrail;
   session: ReaderSession;
@@ -135,13 +190,21 @@ export function RecordReader({ trail, session, onOpenRecord, onTravel, onCloseWi
   const [rightRail, setRightRail] = useState<RailState>("auto");
   // Both of these name the record they belong to, so moving to another record
   // simply stops matching one instead of needing to be cleaned up.
-  const [selected, setSelected] = useState<{ code: string; sectionId: string } | null>(null);
-  const [reply, setReply] = useState<{ code: string; noteId: string } | null>(null);
+  const [selected, setSelected] = useState<{
+    code: string;
+    sectionId: string;
+  } | null>(null);
+  const [reply, setReply] = useState<{ code: string; noteId: string } | null>(
+    null,
+  );
   const [followUpsCollapsed, setFollowUpsCollapsed] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [draft, setDraft] = useState("");
-  const [notice, setNotice] = useState<{ code: string | null; text: string } | null>(null);
+  const [notice, setNotice] = useState<{
+    code: string | null;
+    text: string;
+  } | null>(null);
   const [credentialsOpen, setCredentialsOpen] = useState(false);
   const [pending, setPending] = useState<(() => void) | null>(null);
   const sheetRef = useRef<HTMLDivElement | null>(null);
@@ -151,14 +214,26 @@ export function RecordReader({ trail, session, onOpenRecord, onTravel, onCloseWi
   const t = useTranslations("reader");
 
   const code = trail.codes[trail.at] ?? null;
-  const record = useMemo(() => (code ? recordDocument(code) : undefined), [code]);
+  const record = useMemo(
+    () => (code ? recordDocument(code) : undefined),
+    [code],
+  );
   const sections = useMemo(() => record?.sections ?? [], [record]);
-  const active = selected && selected.code === code && sections.some((section) => section.id === selected.sectionId)
-    ? selected.sectionId
-    : sections[0]?.id ?? null;
+  const active =
+    selected &&
+    selected.code === code &&
+    sections.some((section) => section.id === selected.sectionId)
+      ? selected.sectionId
+      : (sections[0]?.id ?? null);
   const replyTo = reply && reply.code === code ? reply.noteId : null;
-  const notes = useMemo(() => sessionNotes(session, code ?? "", sections), [session, code, sections]);
-  const followUps = useMemo(() => (code ? followUpsFor(code) : { inbound: [], outbound: [] }), [code]);
+  const notes = useMemo(
+    () => sessionNotes(session, code ?? "", sections),
+    [session, code, sections],
+  );
+  const followUps = useMemo(
+    () => (code ? followUpsFor(code) : { inbound: [], outbound: [] }),
+    [code],
+  );
 
   /*
    * The only thing that can see what is on the sheet is the sheet. The host's
@@ -170,13 +245,16 @@ export function RecordReader({ trail, session, onOpenRecord, onTravel, onCloseWi
   useEffect(() => {
     const sheet = sheetRef.current;
     const ranges = sheet ? collectMatchRanges(sheet, query) : [];
-    if (matchRef.current) matchRef.current.textContent = describeMatches(ranges.length, query, t);
+    if (matchRef.current)
+      matchRef.current.textContent = describeMatches(ranges.length, query, t);
     paintMatches(ranges);
   }, [query, code, view, t]);
 
   function selectSection(id: string) {
     setSelected({ code: code ?? "", sectionId: id });
-    const node = sheetRef.current?.querySelector<HTMLElement>(`#${sectionAnchor(id)}`);
+    const node = sheetRef.current?.querySelector<HTMLElement>(
+      `#${sectionAnchor(id)}`,
+    );
     // The sheet's own styles decide whether that movement is smooth, so a
     // reader who has asked for less motion gets none of it.
     node?.scrollIntoView?.({ block: "start" });
@@ -189,10 +267,13 @@ export function RecordReader({ trail, session, onOpenRecord, onTravel, onCloseWi
     const top = sheet.scrollTop + 32;
     let found = active;
     for (const section of sections) {
-      const node = sheet.querySelector<HTMLElement>(`#${sectionAnchor(section.id)}`);
+      const node = sheet.querySelector<HTMLElement>(
+        `#${sectionAnchor(section.id)}`,
+      );
       if (node && node.offsetTop <= top) found = section.id;
     }
-    if (found !== active) setSelected({ code: code ?? "", sectionId: found ?? "" });
+    if (found !== active)
+      setSelected({ code: code ?? "", sectionId: found ?? "" });
   }
 
   /** Anything a guest may not do is asked for once, and then done. */
@@ -221,8 +302,10 @@ export function RecordReader({ trail, session, onOpenRecord, onTravel, onCloseWi
       composerRef.current?.focus();
     },
     assess: (value) => gate(() => session.assess(code ?? "", value)),
-    corroborate: () => gate(() => session.verdict(code ?? "", "corroborate" as ReaderVerdict)),
-    contest: () => gate(() => session.verdict(code ?? "", "contest" as ReaderVerdict)),
+    corroborate: () =>
+      gate(() => session.verdict(code ?? "", "corroborate" as ReaderVerdict)),
+    contest: () =>
+      gate(() => session.verdict(code ?? "", "contest" as ReaderVerdict)),
     // Rotate, Print, and Download land here and stop.
     inert: () => {},
     closeWindow: onCloseWindow,
@@ -243,38 +326,85 @@ export function RecordReader({ trail, session, onOpenRecord, onTravel, onCloseWi
       session.fileNote(code, section, draft, replyTo ?? undefined);
       setDraft("");
       setReply(null);
-      setNotice({ code, text: t("statusNoteFiled", { code: record?.code ?? code }) });
+      setNotice({
+        code,
+        text: t("statusNoteFiled", { code: record?.code ?? code }),
+      });
     });
   }
 
   const total = followUps.inbound.length + followUps.outbound.length;
   const stampKey = record ? STATUS_STAMPS[record.status] : undefined;
-  const status = notice && notice.code === code
-    ? notice.text
-    : !code
-      ? t("statusNoRecord")
-      : record
-        ? t("statusOpened", { code: record.code, sections: record.sections.length, annotations: notes.length })
-        : t("statusNotIndexed", { code });
-  const shown = view === "single" ? sections.filter((section) => section.id === active) : sections;
+  const status =
+    notice && notice.code === code
+      ? notice.text
+      : !code
+        ? t("statusNoRecord")
+        : record
+          ? t("statusOpened", {
+              code: record.code,
+              sections: record.sections.length,
+              annotations: notes.length,
+            })
+          : t("statusNotIndexed", { code });
+  const shown =
+    view === "single"
+      ? sections.filter((section) => section.id === active)
+      : sections;
 
   return (
     <div className="reader">
-      <ReaderToolbar code={code} view={view} scale={scale} font={font} fit={fit} matchRef={matchRef}
-        canGoBack={trail.at > 0} canGoForward={trail.at < trail.codes.length - 1}
+      <ReaderToolbar
+        code={code}
+        view={view}
+        scale={scale}
+        font={font}
+        fit={fit}
+        matchRef={matchRef}
+        canGoBack={trail.at > 0}
+        canGoForward={trail.at < trail.codes.length - 1}
         assessment={code ? session.assessments[code] : undefined}
-        verdict={code ? session.verdicts[code] ?? null : null}
-        searchOpen={searchOpen} query={query} onQueryChange={setQuery} actions={actions} />
+        verdict={code ? (session.verdicts[code] ?? null) : null}
+        searchOpen={searchOpen}
+        query={query}
+        onQueryChange={setQuery}
+        actions={actions}
+      />
 
       <div className="reader-main">
-        <SectionRail sections={sections} activeId={active} rail={leftRail} collapsed={leftRail === "auto" ? narrow : leftRail === "closed"}
-          onSelect={selectSection} onToggle={() => setLeftRail(leftRail === "closed" || (leftRail === "auto" && narrow) ? "open" : "closed")} />
+        <SectionRail
+          sections={sections}
+          activeId={active}
+          rail={leftRail}
+          collapsed={leftRail === "auto" ? narrow : leftRail === "closed"}
+          onSelect={selectSection}
+          onToggle={() =>
+            setLeftRail(
+              leftRail === "closed" || (leftRail === "auto" && narrow)
+                ? "open"
+                : "closed",
+            )
+          }
+        />
 
         <div className="reader-sheetwrap">
-          <div className="reader-sheet" id="reader-content" data-testid="reader-sheet" ref={sheetRef}
-            data-view={view} data-fit={fit ? "margin" : "measured"} data-font={font} tabIndex={0}
-            style={{ "--reader-scale": String(scale / 100), "--reader-document-font": FONT_STACKS[font] } as CSSProperties}
-            onScroll={onSheetScroll}>
+          <div
+            className="reader-sheet"
+            id="reader-content"
+            data-testid="reader-sheet"
+            ref={sheetRef}
+            data-view={view}
+            data-fit={fit ? "margin" : "measured"}
+            data-font={font}
+            tabIndex={0}
+            style={
+              {
+                "--reader-scale": String(scale / 100),
+                "--reader-document-font": FONT_STACKS[font],
+              } as CSSProperties
+            }
+            onScroll={onSheetScroll}
+          >
             {/* Everything on the sheet shares one measure, set here rather than
                 on each child: `ch` resolves against the font of the element that
                 uses it, so a heading set smaller would otherwise measure itself
@@ -290,18 +420,30 @@ export function RecordReader({ trail, session, onOpenRecord, onTravel, onCloseWi
 
                   <header className="reader-leaf">
                     <div className="reader-leaf-text">
-                      <p className="reader-leaf-code circa-mono">{record.code}</p>
+                      <p className="reader-leaf-code circa-mono">
+                        {record.code}
+                      </p>
                       <h1 className="reader-leaf-title">
-                        {record.designation ?? <span className="reader-redaction" role="img" aria-label={t("designationWithheld")} />}
+                        {record.designation ?? (
+                          <span
+                            className="reader-redaction"
+                            role="img"
+                            aria-label={t("designationWithheld")}
+                          />
+                        )}
                       </h1>
                       <p className="reader-leaf-line">
                         <span>{CLASS_LABELS[record.klass]}</span>
                         <span className="reader-leaf-sep" aria-hidden="true" />
-                        <span className="circa-mono">{t("filedOn", { date: record.filed })}</span>
+                        <span className="circa-mono">
+                          {t("filedOn", { date: record.filed })}
+                        </span>
                         <span className="reader-leaf-sep" aria-hidden="true" />
                         <span>{STATUS_LABELS[record.status]}</span>
                         <span className="reader-leaf-sep" aria-hidden="true" />
-                        <span className="circa-mono">{record.organization}</span>
+                        <span className="circa-mono">
+                          {record.organization}
+                        </span>
                         <span className="reader-leaf-sep" aria-hidden="true" />
                         <span>{record.clearance}</span>
                       </p>
@@ -309,16 +451,25 @@ export function RecordReader({ trail, session, onOpenRecord, onTravel, onCloseWi
                     {stampKey && (
                       // The status is on the stamp as data, so the sheet can give a state
                       // its own treatment without the frame styling it here.
-                      <span className="reader-stamp" data-status={record.status}>{t(stampKey)}</span>
+                      <span
+                        className="reader-stamp"
+                        data-status={record.status}
+                      >
+                        {t(stampKey)}
+                      </span>
                     )}
                   </header>
 
                   <div className="reader-sections">
                     {shown.map((section) => (
-                      <section className="reader-section" key={section.id} id={sectionAnchor(section.id)}
+                      <section
+                        className="reader-section"
+                        key={section.id}
+                        id={sectionAnchor(section.id)}
                         aria-label={section.heading}
                         data-active={section.id === active ? "true" : undefined}
-                        data-withheld={section.withheld ? "true" : undefined}>
+                        data-withheld={section.withheld ? "true" : undefined}
+                      >
                         {/* The slot. The frame renders nothing here but the host's bytes. */}
                         {renderSection?.(section)}
                       </section>
@@ -328,17 +479,24 @@ export function RecordReader({ trail, session, onOpenRecord, onTravel, onCloseWi
                   {/* The running foot: the same lens, with what the sheet is and who may read it. */}
                   <p className="reader-running-foot">
                     <span>{record.organization}</span>
-                    <span>{CLASS_LABELS[record.klass]} · {record.clearance}</span>
+                    <span>
+                      {CLASS_LABELS[record.klass]} · {record.clearance}
+                    </span>
                   </p>
 
                   <p className="reader-fixture">
-                    {t("fixture")}{t("fixtureNote")}
+                    {t("fixture")}
+                    {t("fixtureNote")}
                   </p>
                 </>
               ) : (
                 <div className="reader-empty">
-                  <h1 className="reader-empty-title">{code ? t("noEntry") : t("noRecordOpen")}</h1>
-                  {code && <p className="reader-empty-code circa-mono">{code}</p>}
+                  <h1 className="reader-empty-title">
+                    {code ? t("noEntry") : t("noRecordOpen")}
+                  </h1>
+                  {code && (
+                    <p className="reader-empty-code circa-mono">{code}</p>
+                  )}
                   <p className="reader-empty-note">
                     {code ? t("noEntryNote") : t("noRecordNote")}
                   </p>
@@ -348,28 +506,73 @@ export function RecordReader({ trail, session, onOpenRecord, onTravel, onCloseWi
           </div>
         </div>
 
-        <AnnotationRail notes={notes} sections={sections} activeHeading={sections.find((section) => section.id === active)?.heading ?? null}
-          rail={rightRail} collapsed={rightRail === "auto" ? narrow : rightRail === "closed"}
-          draft={draft} replyTo={replyTo} composerRef={composerRef}
-          onDraftChange={setDraft} onReply={(noteId) => setReply(noteId ? { code: code ?? "", noteId } : null)}
-          onFile={fileNote} onEndorse={(id) => gate(() => session.endorse(id))}
-          onToggle={() => setRightRail(rightRail === "closed" || (rightRail === "auto" && narrow) ? "open" : "closed")} />
+        <AnnotationRail
+          notes={notes}
+          sections={sections}
+          activeHeading={
+            sections.find((section) => section.id === active)?.heading ?? null
+          }
+          rail={rightRail}
+          collapsed={rightRail === "auto" ? narrow : rightRail === "closed"}
+          draft={draft}
+          replyTo={replyTo}
+          composerRef={composerRef}
+          onDraftChange={setDraft}
+          onReply={(noteId) =>
+            setReply(noteId ? { code: code ?? "", noteId } : null)
+          }
+          onFile={fileNote}
+          onEndorse={(id) => gate(() => session.endorse(id))}
+          onToggle={() =>
+            setRightRail(
+              rightRail === "closed" || (rightRail === "auto" && narrow)
+                ? "open"
+                : "closed",
+            )
+          }
+        />
       </div>
 
-      <FollowUpStrip code={code} inbound={followUps.inbound} outbound={followUps.outbound}
-        collapsed={followUpsCollapsed} onToggle={() => setFollowUpsCollapsed((current) => !current)} onOpen={onOpenRecord} />
+      <FollowUpStrip
+        code={code}
+        inbound={followUps.inbound}
+        outbound={followUps.outbound}
+        collapsed={followUpsCollapsed}
+        onToggle={() => setFollowUpsCollapsed((current) => !current)}
+        onOpen={onOpenRecord}
+      />
 
       <div className="reader-statusbar">
-        <span className="reader-status-text" role="status">{status}</span>
-        {code ? <RecordStatusCells key={code} code={code} onOpenRecord={onOpenRecord} /> : null}
-        <span className="reader-status-cell circa-mono">{formatScale(scale)}</span>
+        <span className="reader-status-text" role="status">
+          {status}
+        </span>
+        {code ? (
+          <RecordStatusCells
+            key={code}
+            code={code}
+            onOpenRecord={onOpenRecord}
+          />
+        ) : null}
+        <span className="reader-status-cell circa-mono">
+          {formatScale(scale)}
+        </span>
         <span className="reader-status-cell">{viewLabel(view, t)}</span>
-        <span className="reader-status-cell circa-mono">{t("followUpCount", { count: total })}</span>
-        <span className="reader-status-cell reader-status-fixture">{t("fixture")}</span>
+        <span className="reader-status-cell circa-mono">
+          {t("followUpCount", { count: total })}
+        </span>
+        <span className="reader-status-cell reader-status-fixture">
+          {t("fixture")}
+        </span>
       </div>
 
-      <ReaderCredentials open={credentialsOpen} onEnter={verifyAndAct}
-        onClose={() => { setCredentialsOpen(false); setPending(null); }} />
+      <ReaderCredentials
+        open={credentialsOpen}
+        onEnter={verifyAndAct}
+        onClose={() => {
+          setCredentialsOpen(false);
+          setPending(null);
+        }}
+      />
     </div>
   );
 }

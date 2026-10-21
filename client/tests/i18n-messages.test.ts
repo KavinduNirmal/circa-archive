@@ -28,14 +28,20 @@ function leafKeys(value: unknown, prefix: string, leaves: Map<string, string>) {
 }
 
 function namespaceFiles(locale: string): string[] {
-  return readdirSync(`${catalogRoot}/${locale}`).filter((name) => name.endsWith(".json")).sort();
+  return readdirSync(`${catalogRoot}/${locale}`)
+    .filter((name) => name.endsWith(".json"))
+    .sort();
 }
 
 function readCatalog(locale: string): Map<string, string> {
   const leaves = new Map<string, string>();
   for (const file of namespaceFiles(locale)) {
     const namespace = file.replace(/\.json$/, "");
-    leafKeys(JSON.parse(readFileSync(`${catalogRoot}/${locale}/${file}`, "utf8")), namespace, leaves);
+    leafKeys(
+      JSON.parse(readFileSync(`${catalogRoot}/${locale}/${file}`, "utf8")),
+      namespace,
+      leaves,
+    );
   }
   return leaves;
 }
@@ -51,7 +57,9 @@ function placeholders(text: string): string[] {
  * a tag left open in one language would swallow the rest of the paragraph.
  */
 function richTags(text: string): string[] {
-  return [...text.matchAll(/<(\/?)(\w+)>/g)].map((match) => `${match[1]}${match[2]}`).sort();
+  return [...text.matchAll(/<(\/?)(\w+)>/g)]
+    .map((match) => `${match[1]}${match[2]}`)
+    .sort();
 }
 
 /** Well-formed nested markup and matched braces. */
@@ -80,35 +88,63 @@ describe("message catalogs", () => {
   });
 
   it("has no empty translations", () => {
-    for (const [locale, leaves] of [["en", english], ["ko", korean]] as const) {
-      const empty = [...leaves].filter(([, text]) => text.trim() === "").map(([key]) => key);
+    for (const [locale, leaves] of [
+      ["en", english],
+      ["ko", korean],
+    ] as const) {
+      const empty = [...leaves]
+        .filter(([, text]) => text.trim() === "")
+        .map(([key]) => key);
       expect(empty, `${locale} has empty messages`).toEqual([]);
     }
   });
 
   it("keeps every ICU placeholder in the translation", () => {
     const mismatched = [...english]
-      .filter(([key, text]) => placeholders(korean.get(key) ?? "").join(",") !== placeholders(text).join(","))
+      .filter(
+        ([key, text]) =>
+          placeholders(korean.get(key) ?? "").join(",") !==
+          placeholders(text).join(","),
+      )
       .map(([key]) => key);
-    expect(mismatched, "translated messages disagree about their placeholders").toEqual([]);
+    expect(
+      mismatched,
+      "translated messages disagree about their placeholders",
+    ).toEqual([]);
   });
 
   it("keeps every rich-text tag in the translation", () => {
     const mismatched = [...english]
-      .filter(([key, text]) => richTags(korean.get(key) ?? "").join(",") !== richTags(text).join(","))
+      .filter(
+        ([key, text]) =>
+          richTags(korean.get(key) ?? "").join(",") !==
+          richTags(text).join(","),
+      )
       .map(([key]) => key);
-    expect(mismatched, "translated messages disagree about their rich-text tags").toEqual([]);
+    expect(
+      mismatched,
+      "translated messages disagree about their rich-text tags",
+    ).toEqual([]);
   });
 
   it("leaves no unbalanced tag or brace in either language", () => {
-    for (const [locale, leaves] of [["en", english], ["ko", korean]] as const) {
-      const broken = [...leaves].filter(([, text]) => !balanced(text)).map(([key]) => key);
+    for (const [locale, leaves] of [
+      ["en", english],
+      ["ko", korean],
+    ] as const) {
+      const broken = [...leaves]
+        .filter(([, text]) => !balanced(text))
+        .map(([key]) => key);
       expect(broken, `${locale} has malformed markup`).toEqual([]);
     }
   });
 
   it("actually translates the shell and the landing page", () => {
-    for (const key of ["landing.enterArchive", "shell.startLabel", "boot.posting"]) {
+    for (const key of [
+      "landing.enterArchive",
+      "shell.startLabel",
+      "boot.posting",
+    ]) {
       expect(english.has(key), `en is missing ${key}`).toBe(true);
       expect(korean.get(key), `ko is missing ${key}`).toBeTruthy();
     }
@@ -125,7 +161,9 @@ describe("message catalogs", () => {
       "boot.posting",
     ];
     for (const key of prose) {
-      expect(korean.get(key), `${key} is still English`).not.toBe(english.get(key));
+      expect(korean.get(key), `${key} is still English`).not.toBe(
+        english.get(key),
+      );
     }
   });
 });

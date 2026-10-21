@@ -23,7 +23,10 @@ import { GHOST_STORY } from "./ghost-story";
 
 function heldUnder(code: string): { total: number; continuities: number } {
   const held = ARCHIVE_INDEX.filter((entry) => entry.organization === code);
-  return { total: held.length, continuities: held.filter((entry) => entry.klass === "continuity").length };
+  return {
+    total: held.length,
+    continuities: held.filter((entry) => entry.klass === "continuity").length,
+  };
 }
 
 /** Counted rather than asserted, so the sentence cannot overstate the index. */
@@ -118,7 +121,9 @@ Read-only since 1992, and open to new filings only through a continuity. The cod
 
 /** The Markdown for a record the preview has released, if it has one. */
 export function recordSource(code: string): string | undefined {
-  return Object.prototype.hasOwnProperty.call(RECORD_SOURCES, code) ? RECORD_SOURCES[code] : undefined;
+  return Object.prototype.hasOwnProperty.call(RECORD_SOURCES, code)
+    ? RECORD_SOURCES[code]
+    : undefined;
 }
 
 export type RecordSourceSection = {
@@ -155,6 +160,9 @@ export function recordSections(markdown: string): RecordSourceSection[] {
 
   return sections.map((section) => ({
     heading: section.heading,
-    source: section.body.join("\n").replace(/\n*-{3,}\s*$/, "").trim(),
+    source: section.body
+      .join("\n")
+      .replace(/\n*-{3,}\s*$/, "")
+      .trim(),
   }));
 }

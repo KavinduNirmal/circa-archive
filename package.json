@@ -8,9 +8,18 @@
     "check": "bun run scripts/check-repository.ts",
     "check:staged": "bun run scripts/check-repository.ts --staged",
     "check:client": "bun run --cwd=client lint && bun run --cwd=client typecheck && bun run --cwd=client test",
-    "precommit": "bun run check:staged && bun run test && bun run check:client"
+    "precommit": "bun run format:staged && bun run check:staged && bun run test && bun run check:client",
+    "format:staged": "lint-staged --config package.json",
+    "format": "bun run scripts/format.ts",
+    "format:check": "bun run scripts/format.ts --check"
   },
   "devDependencies": {
-    "husky": "9.1.7"
+    "husky": "9.1.7",
+    "lint-staged": "^17.6.0",
+    "prettier": "^3.9.10",
+    "prettier-plugin-astro": "^1.1.1"
+  },
+  "lint-staged": {
+    "*": "bunx --no-install prettier --write --ignore-unknown"
   }
 }

@@ -9,10 +9,15 @@ export function generateStaticParams() {
   return routing.locales.map((lang) => ({ lang }));
 }
 
-export async function generateMetadata({ params }: MetaAboutPageProps): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: MetaAboutPageProps): Promise<Metadata> {
   const { lang } = await params;
   const t = await getTranslations({ locale: lang, namespace: "metadata" });
-  return { title: { absolute: t("metaAboutTitle") }, description: t("metaAboutDescription") };
+  return {
+    title: { absolute: t("metaAboutTitle") },
+    description: t("metaAboutDescription"),
+  };
 }
 
 export default async function MetaAboutPage({ params }: MetaAboutPageProps) {

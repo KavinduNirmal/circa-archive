@@ -1,8 +1,18 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  type ReactNode,
+} from "react";
 import { useStore } from "zustand";
-import { createPersistedWorkstationStore, type WorkstationStore, type WorkstationStoreApi } from "./workstation-store";
+import {
+  createPersistedWorkstationStore,
+  type WorkstationStore,
+  type WorkstationStoreApi,
+} from "./workstation-store";
 
 /**
  * One workstation store per mounted workspace.
@@ -19,11 +29,16 @@ import { createPersistedWorkstationStore, type WorkstationStore, type Workstatio
  */
 const WorkstationStoreContext = createContext<WorkstationStoreApi | null>(null);
 
-export function WorkstationStoreProvider({ children, store }: {
+export function WorkstationStoreProvider({
+  children,
+  store,
+}: {
   children: ReactNode;
   store?: WorkstationStoreApi;
 }) {
-  const [created] = useState<WorkstationStoreApi>(() => store ?? createPersistedWorkstationStore());
+  const [created] = useState<WorkstationStoreApi>(
+    () => store ?? createPersistedWorkstationStore(),
+  );
 
   /*
    * Rehydration happens after mount, never during render, and validation is the
@@ -41,7 +56,9 @@ export function WorkstationStoreProvider({ children, store }: {
     };
     if (persistApi.hasHydrated()) {
       finish();
-      return () => { cancelled = true; };
+      return () => {
+        cancelled = true;
+      };
     }
     const unsubscribe = persistApi.onFinishHydration(finish);
     void persistApi.rehydrate();
@@ -59,10 +76,14 @@ export function WorkstationStoreProvider({ children, store }: {
 }
 
 /** Select one slice of workstation state. The selector must be stable enough not to re-render on every action. */
-export function useWorkstationStore<T>(selector: (state: WorkstationStore) => T): T {
+export function useWorkstationStore<T>(
+  selector: (state: WorkstationStore) => T,
+): T {
   const store = useContext(WorkstationStoreContext);
   if (!store) {
-    throw new Error("useWorkstationStore must be used inside a WorkstationStoreProvider");
+    throw new Error(
+      "useWorkstationStore must be used inside a WorkstationStoreProvider",
+    );
   }
   return useStore(store, selector);
 }

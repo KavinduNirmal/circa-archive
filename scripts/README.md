@@ -13,3 +13,5 @@
 ## Boundaries
 
 Keep repository automation here; application business logic belongs in its module. These checks verify documentation presence, not README quality, license compliance, or application correctness. Extend checks when application tooling is configured.
+
+`format.ts` formats Git-tracked and unignored files with the root Prettier configuration. It respects per-clone exclusions, passes filenames as arguments without shell interpolation, and batches calls to avoid command-length limits. Use `bun run format` or `bun run format:check`. Staged formatting is handled separately by lint-staged in the root package configuration.

@@ -3,8 +3,14 @@ import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 import { escapeTemplate, renderBundle } from "../scripts/sync-corpus";
 
-const CORPUS = readFileSync(resolve(process.cwd(), "public/Ghost_story.md"), "utf8");
-const BUNDLE = readFileSync(resolve(process.cwd(), "src/components/reader/ghost-story.ts"), "utf8");
+const CORPUS = readFileSync(
+  resolve(process.cwd(), "public/Ghost_story.md"),
+  "utf8",
+);
+const BUNDLE = readFileSync(
+  resolve(process.cwd(), "src/components/reader/ghost-story.ts"),
+  "utf8",
+);
 
 describe("corpus sync", () => {
   it("generates the committed bundle from the published corpus", () => {

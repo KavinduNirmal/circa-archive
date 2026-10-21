@@ -12,13 +12,13 @@
 
 Vitest는 jsdom에서 실행됩니다. 테스트는 client/tests/에 있고, 붙드는 표면이나 모듈의 이름을 따릅니다.
 
-| 파일 | 내용 |
-| --- | --- |
-| `markdown-pipeline.test.ts` | 파싱, 비공개 처리, 도판, 경고, 코퍼스 계약. |
-| `archive-site.test.tsx` | 열람판, 기록 페이지, 다운로드, 프로젝트 페이지. |
-| `i18n-messages.test.ts` | 카탈로그 키 일치, 플레이스홀더, 리치 태그, 빈 값. |
-| `desktop.test.tsx` | 워크스테이션 셸, 창, 상호작용. |
-| `window-manager.test.tsx` | 지오메트리, 스태킹, 최소화, 최대화, 드래그 상태. |
+| 파일                        | 내용                                              |
+| --------------------------- | ------------------------------------------------- |
+| `markdown-pipeline.test.ts` | 파싱, 비공개 처리, 도판, 경고, 코퍼스 계약.       |
+| `archive-site.test.tsx`     | 열람판, 기록 페이지, 다운로드, 프로젝트 페이지.   |
+| `i18n-messages.test.ts`     | 카탈로그 키 일치, 플레이스홀더, 리치 태그, 빈 값. |
+| `desktop.test.tsx`          | 워크스테이션 셸, 창, 상호작용.                    |
+| `window-manager.test.tsx`   | 지오메트리, 스태킹, 최소화, 최대화, 드래그 상태.  |
 
 카피를 읽는 컴포넌트에는 공급자가 필요합니다. 실제 카탈로그를 불러오는 tests/intl.tsx의 renderWithIntl을 쓰세요. 메시지 키가 아니라 독자가 보는 문장을 검증하게 됩니다.
 

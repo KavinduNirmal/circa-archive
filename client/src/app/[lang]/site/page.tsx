@@ -9,10 +9,15 @@ export function generateStaticParams() {
   return routing.locales.map((lang) => ({ lang }));
 }
 
-export async function generateMetadata({ params }: SitePageProps): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: SitePageProps): Promise<Metadata> {
   const { lang } = await params;
   const t = await getTranslations({ locale: lang, namespace: "metadata" });
-  return { title: { absolute: t("siteHomeTitle") }, description: t("siteHomeDescription") };
+  return {
+    title: { absolute: t("siteHomeTitle") },
+    description: t("siteHomeDescription"),
+  };
 }
 
 /** The public archive's front page: a plain page, in the reader's own language. */

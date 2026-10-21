@@ -10,4 +10,5 @@ import { routing } from "./routing";
  * originals anywhere a destination is built; a raw `next/link` would silently
  * drop the prefix and bounce the reader through the proxy redirect.
  */
-export const { Link, redirect, usePathname, useRouter, getPathname } = createNavigation(routing);
+export const { Link, redirect, usePathname, useRouter, getPathname } =
+  createNavigation(routing);

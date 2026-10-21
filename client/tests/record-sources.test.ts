@@ -2,10 +2,17 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 import { GHOST_STORY } from "@/components/reader/ghost-story";
-import { RECORD_SOURCES, recordSections, recordSource } from "@/components/reader/record-sources";
+import {
+  RECORD_SOURCES,
+  recordSections,
+  recordSource,
+} from "@/components/reader/record-sources";
 import { parseRecord } from "@/lib/markdown/pipeline";
 
-const CORPUS = readFileSync(resolve(process.cwd(), "public/Ghost_story.md"), "utf8");
+const CORPUS = readFileSync(
+  resolve(process.cwd(), "public/Ghost_story.md"),
+  "utf8",
+);
 
 describe("record sources", () => {
   it("keeps the bundled corpus byte-identical to the file the plan names", () => {
@@ -39,7 +46,12 @@ describe("record sources", () => {
   it("authors every filed body as Markdown the pipeline accepts", () => {
     for (const [code, markdown] of Object.entries(RECORD_SOURCES)) {
       const parsed = parseRecord({ markdown });
-      expect(parsed.warnings.filter((warning) => warning.code === "unmatched-redaction"), code).toEqual([]);
+      expect(
+        parsed.warnings.filter(
+          (warning) => warning.code === "unmatched-redaction",
+        ),
+        code,
+      ).toEqual([]);
       expect(recordSections(markdown).length, code).toBeGreaterThan(1);
     }
   });

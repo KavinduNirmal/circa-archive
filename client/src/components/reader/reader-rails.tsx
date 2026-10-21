@@ -25,7 +25,14 @@ export type RailState = "auto" | "open" | "closed";
  * actually does and the only anchoring that survives a re-render.
  */
 
-export function SectionRail({ sections, activeId, rail, collapsed, onSelect, onToggle }: {
+export function SectionRail({
+  sections,
+  activeId,
+  rail,
+  collapsed,
+  onSelect,
+  onToggle,
+}: {
   sections: readonly ReaderSection[];
   activeId: string | null;
   /** What the reader asked for: `auto` follows the window, the rest is a decision. */
@@ -36,13 +43,25 @@ export function SectionRail({ sections, activeId, rail, collapsed, onSelect, onT
 }) {
   const t = useTranslations("reader");
   return (
-    <nav className="reader-rail reader-rail-left" data-rail={rail} data-collapsed={collapsed ? "true" : undefined}
-      aria-label={t("sections")}>
+    <nav
+      className="reader-rail reader-rail-left"
+      data-rail={rail}
+      data-collapsed={collapsed ? "true" : undefined}
+      aria-label={t("sections")}
+    >
       <div className="reader-rail-head">
         <h2 className="reader-rail-title circa-label">{t("sections")}</h2>
-        <button type="button" className="reader-rail-toggle" aria-expanded={!collapsed} aria-controls="reader-sections" onClick={onToggle}>
+        <button
+          type="button"
+          className="reader-rail-toggle"
+          aria-expanded={!collapsed}
+          aria-controls="reader-sections"
+          onClick={onToggle}
+        >
           <PanelLeft className="reader-rail-toggle-glyph" aria-hidden="true" />
-          <span className="sr-only">{collapsed ? t("showSections") : t("hideSections")}</span>
+          <span className="sr-only">
+            {collapsed ? t("showSections") : t("hideSections")}
+          </span>
         </button>
       </div>
       {/*
@@ -52,7 +71,9 @@ export function SectionRail({ sections, activeId, rail, collapsed, onSelect, onT
         so nothing has to remember that it happened.
       */}
       <div className="reader-preview-phantom" aria-hidden="true">
-        <span className="reader-thumb"><span className="reader-thumb-page" /></span>
+        <span className="reader-thumb">
+          <span className="reader-thumb-page" />
+        </span>
         <span className="reader-preview-text">
           <span className="reader-preview-index circa-mono">00</span>
           <span className="reader-preview-heading">{t("phantomHeading")}</span>
@@ -61,25 +82,51 @@ export function SectionRail({ sections, activeId, rail, collapsed, onSelect, onT
       <ol className="reader-previews" id="reader-sections">
         {sections.map((section) => (
           <li key={section.id}>
-            <button type="button" className="reader-preview" aria-label={`${section.index} ${section.heading}`}
+            <button
+              type="button"
+              className="reader-preview"
+              aria-label={`${section.index} ${section.heading}`}
               aria-current={section.id === activeId ? "true" : undefined}
               data-withheld={section.withheld ? "true" : undefined}
-              onClick={() => onSelect(section.id)}>
-              <span className="reader-thumb"><span className="reader-thumb-page" /></span>
+              onClick={() => onSelect(section.id)}
+            >
+              <span className="reader-thumb">
+                <span className="reader-thumb-page" />
+              </span>
               <span className="reader-preview-text">
-                <span className="reader-preview-index circa-mono">{section.index}</span>
-                <span className="reader-preview-heading">{section.heading}</span>
+                <span className="reader-preview-index circa-mono">
+                  {section.index}
+                </span>
+                <span className="reader-preview-heading">
+                  {section.heading}
+                </span>
               </span>
             </button>
           </li>
         ))}
       </ol>
-      {sections.length === 0 && <p className="reader-rail-none">{t("noSections")}</p>}
+      {sections.length === 0 && (
+        <p className="reader-rail-none">{t("noSections")}</p>
+      )}
     </nav>
   );
 }
 
-export function AnnotationRail({ notes, sections, activeHeading, rail, collapsed, draft, replyTo, composerRef, onDraftChange, onReply, onFile, onEndorse, onToggle }: {
+export function AnnotationRail({
+  notes,
+  sections,
+  activeHeading,
+  rail,
+  collapsed,
+  draft,
+  replyTo,
+  composerRef,
+  onDraftChange,
+  onReply,
+  onFile,
+  onEndorse,
+  onToggle,
+}: {
   notes: readonly ReaderAnnotation[];
   sections: readonly ReaderSection[];
   activeHeading: string | null;
@@ -96,25 +143,47 @@ export function AnnotationRail({ notes, sections, activeHeading, rail, collapsed
 }) {
   const t = useTranslations("reader");
   const threads = notes.flatMap((note) => [note, ...note.replies]);
-  const replyTarget = replyTo ? threads.find((entry) => entry.id === replyTo) : undefined;
+  const replyTarget = replyTo
+    ? threads.find((entry) => entry.id === replyTo)
+    : undefined;
   /*
    * Notes are grouped by the section they were written beside, in the record's
    * own order rather than the order they were filed, so the margin reads down
    * the page the same way the sheet does.
    */
   const groups = sections
-    .map((section) => ({ section, items: notes.filter((note) => note.sectionId === section.id) }))
+    .map((section) => ({
+      section,
+      items: notes.filter((note) => note.sectionId === section.id),
+    }))
     .filter((group) => group.items.length > 0);
 
   return (
-    <aside className="reader-rail reader-rail-right" data-rail={rail} data-collapsed={collapsed ? "true" : undefined}
-      aria-label={t("annotations")}>
+    <aside
+      className="reader-rail reader-rail-right"
+      data-rail={rail}
+      data-collapsed={collapsed ? "true" : undefined}
+      aria-label={t("annotations")}
+    >
       <div className="reader-rail-head">
         <h2 className="reader-rail-title circa-label">{t("annotations")}</h2>
-        <span className="reader-annotation-count circa-mono" data-testid="reader-annotation-count">{notes.length}</span>
-        <button type="button" className="reader-rail-toggle" aria-expanded={!collapsed} aria-controls="reader-annotations" onClick={onToggle}>
+        <span
+          className="reader-annotation-count circa-mono"
+          data-testid="reader-annotation-count"
+        >
+          {notes.length}
+        </span>
+        <button
+          type="button"
+          className="reader-rail-toggle"
+          aria-expanded={!collapsed}
+          aria-controls="reader-annotations"
+          onClick={onToggle}
+        >
           <PanelRight className="reader-rail-toggle-glyph" aria-hidden="true" />
-          <span className="sr-only">{collapsed ? t("showAnnotations") : t("hideAnnotations")}</span>
+          <span className="sr-only">
+            {collapsed ? t("showAnnotations") : t("hideAnnotations")}
+          </span>
         </button>
       </div>
 
@@ -127,11 +196,17 @@ export function AnnotationRail({ notes, sections, activeHeading, rail, collapsed
         )}
         {groups.map(({ section, items }) => (
           <div className="reader-note-group" key={section.id}>
-            <h3 className="reader-note-group-heading circa-label">{section.heading}</h3>
+            <h3 className="reader-note-group-heading circa-label">
+              {section.heading}
+            </h3>
             <ul className="reader-note-thread">
               {items.map((note) => (
                 <li key={note.id}>
-                  <NoteBlock note={note} onEndorse={onEndorse} onReply={onReply} />
+                  <NoteBlock
+                    note={note}
+                    onEndorse={onEndorse}
+                    onReply={onReply}
+                  />
                 </li>
               ))}
             </ul>
@@ -139,17 +214,39 @@ export function AnnotationRail({ notes, sections, activeHeading, rail, collapsed
         ))}
       </div>
 
-      <form className="reader-composer" onSubmit={(event) => { event.preventDefault(); onFile(); }}>
+      <form
+        className="reader-composer"
+        onSubmit={(event) => {
+          event.preventDefault();
+          onFile();
+        }}
+      >
         <p className="reader-composer-where circa-label">
-          {replyTarget ? t("replyTo", { author: replyTarget.author }) : t("filingAgainst", { heading: activeHeading ?? t("theRecord") })}
+          {replyTarget
+            ? t("replyTo", { author: replyTarget.author })
+            : t("filingAgainst", { heading: activeHeading ?? t("theRecord") })}
         </p>
-        <textarea className="reader-composer-input" ref={composerRef} rows={3} value={draft}
-          placeholder={t("notePlaceholder")} aria-label={t("notePlaceholder")}
-          onChange={(event) => onDraftChange(event.target.value)} />
+        <textarea
+          className="reader-composer-input"
+          ref={composerRef}
+          rows={3}
+          value={draft}
+          placeholder={t("notePlaceholder")}
+          aria-label={t("notePlaceholder")}
+          onChange={(event) => onDraftChange(event.target.value)}
+        />
         <div className="reader-composer-actions">
-          <button type="submit" className="reader-composer-file">{t("fileNote")}</button>
+          <button type="submit" className="reader-composer-file">
+            {t("fileNote")}
+          </button>
           {replyTarget && (
-            <button type="button" className="reader-composer-cancel" onClick={() => onReply(null)}>{t("cancel")}</button>
+            <button
+              type="button"
+              className="reader-composer-cancel"
+              onClick={() => onReply(null)}
+            >
+              {t("cancel")}
+            </button>
           )}
         </div>
       </form>
@@ -169,7 +266,11 @@ export function AnnotationRail({ notes, sections, activeHeading, rail, collapsed
  * cannot see. The nodes stay in the document, which is what lets the fold
  * control keep naming the region it folds.
  */
-function NoteBlock({ note, onEndorse, onReply }: {
+function NoteBlock({
+  note,
+  onEndorse,
+  onReply,
+}: {
   note: ReaderAnnotation;
   onEndorse: (id: string) => void;
   onReply: (noteId: string | null) => void;
@@ -179,13 +280,30 @@ function NoteBlock({ note, onEndorse, onReply }: {
   const bodyId = useId();
   return (
     <article className="reader-note" data-folded={folded ? "true" : undefined}>
-      <NoteHead author={note.author} when={note.when}
-        fold={{ folded, controls: bodyId, onToggle: () => setFolded((current) => !current) }} />
+      <NoteHead
+        author={note.author}
+        when={note.when}
+        fold={{
+          folded,
+          controls: bodyId,
+          onToggle: () => setFolded((current) => !current),
+        }}
+      />
       <div className="reader-note-rest" id={bodyId} hidden={folded}>
         <NoteBody body={note.body} />
         <div className="reader-note-actions">
-          <EndorseButton id={note.id} count={note.noted} onEndorse={onEndorse} />
-          <button type="button" className="reader-note-reply" onClick={() => onReply(note.id)}>{t("reply")}</button>
+          <EndorseButton
+            id={note.id}
+            count={note.noted}
+            onEndorse={onEndorse}
+          />
+          <button
+            type="button"
+            className="reader-note-reply"
+            onClick={() => onReply(note.id)}
+          >
+            {t("reply")}
+          </button>
         </div>
         {note.replies.length > 0 && (
           <ul className="reader-replies">
@@ -195,7 +313,11 @@ function NoteBlock({ note, onEndorse, onReply }: {
                   <NoteHead author={reply.author} when={reply.when} />
                   <NoteBody body={reply.body} />
                   <div className="reader-note-actions">
-                    <EndorseButton id={reply.id} count={reply.noted} onEndorse={onEndorse} />
+                    <EndorseButton
+                      id={reply.id}
+                      count={reply.noted}
+                      onEndorse={onEndorse}
+                    />
                   </div>
                 </article>
               </li>
@@ -215,7 +337,11 @@ function NoteBlock({ note, onEndorse, onReply }: {
  * reply: a reply is folded by the note above it, and giving it a control of its
  * own would suggest it can be put away on its own.
  */
-function NoteHead({ author, when, fold }: {
+function NoteHead({
+  author,
+  when,
+  fold,
+}: {
   author: string;
   when: string;
   fold?: { folded: boolean; controls: string; onToggle: () => void };
@@ -225,11 +351,23 @@ function NoteHead({ author, when, fold }: {
   return (
     <header className="reader-note-head">
       {fold && (
-        <button type="button" className="reader-note-fold" aria-expanded={!fold.folded} aria-controls={fold.controls} onClick={fold.onToggle}>
-          {fold.folded
-            ? <ChevronRight className="reader-note-caret" aria-hidden="true" />
-            : <ChevronDown className="reader-note-caret" aria-hidden="true" />}
-          <span className="sr-only">{fold.folded ? t("showNoteFrom", { author }) : t("hideNoteFrom", { author })}</span>
+        <button
+          type="button"
+          className="reader-note-fold"
+          aria-expanded={!fold.folded}
+          aria-controls={fold.controls}
+          onClick={fold.onToggle}
+        >
+          {fold.folded ? (
+            <ChevronRight className="reader-note-caret" aria-hidden="true" />
+          ) : (
+            <ChevronDown className="reader-note-caret" aria-hidden="true" />
+          )}
+          <span className="sr-only">
+            {fold.folded
+              ? t("showNoteFrom", { author })
+              : t("hideNoteFrom", { author })}
+          </span>
         </button>
       )}
       <span className="reader-note-who">
@@ -252,21 +390,40 @@ function NoteHead({ author, when, fold }: {
  * indentation of a pasted block.
  */
 function NoteBody({ body }: { body: string }) {
-  const paragraphs = body.split(/\n{2,}/).map((paragraph) => paragraph.trim()).filter(Boolean);
+  const paragraphs = body
+    .split(/\n{2,}/)
+    .map((paragraph) => paragraph.trim())
+    .filter(Boolean);
   return (
     <>
       {paragraphs.map((paragraph, position) => (
-        <p className="reader-note-body" key={`${position}-${paragraph.length}`}>{paragraph}</p>
+        <p className="reader-note-body" key={`${position}-${paragraph.length}`}>
+          {paragraph}
+        </p>
       ))}
     </>
   );
 }
 
-function EndorseButton({ id, count, onEndorse }: { id: string; count: number; onEndorse: (id: string) => void }) {
+function EndorseButton({
+  id,
+  count,
+  onEndorse,
+}: {
+  id: string;
+  count: number;
+  onEndorse: (id: string) => void;
+}) {
   const t = useTranslations("reader");
   return (
-    <button type="button" className="reader-note-noted" aria-label={t("notedCount", { count })} onClick={() => onEndorse(id)}>
-      {t("noted")} <span className="reader-note-noted-count circa-mono">{count}</span>
+    <button
+      type="button"
+      className="reader-note-noted"
+      aria-label={t("notedCount", { count })}
+      onClick={() => onEndorse(id)}
+    >
+      {t("noted")}{" "}
+      <span className="reader-note-noted-count circa-mono">{count}</span>
     </button>
   );
 }

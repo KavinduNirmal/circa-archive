@@ -20,14 +20,14 @@ There are two React renderers, not two pipelines: record-prose.tsx renders the t
 
 ## The plugin list
 
-| Plugin | What it does |
-| --- | --- |
-| `remark-frontmatter` | parses the YAML header and removes the node, so it never reaches the renderers. |
-| `remark-gfm` | tables, strikethrough, autolinks, and task lists. |
-| `normalise-redactions` | escapes double pipes inside a table cell before GFM can split the row. |
-| `redaction-plugin` | turns paired double pipes into redaction nodes in text and inline code. |
+| Plugin                   | What it does                                                                                |
+| ------------------------ | ------------------------------------------------------------------------------------------- |
+| `remark-frontmatter`     | parses the YAML header and removes the node, so it never reaches the renderers.             |
+| `remark-gfm`             | tables, strikethrough, autolinks, and task lists.                                           |
+| `normalise-redactions`   | escapes double pipes inside a table cell before GFM can split the row.                      |
+| `redaction-plugin`       | turns paired double pipes into redaction nodes in text and inline code.                     |
 | `image-directive-plugin` | turns an alignment directive into a figure node, and strips the alignment from the caption. |
-| `heading-ids-plugin` | gives each heading a per-parse, collision-free anchor. |
+| `heading-ids-plugin`     | gives each heading a per-parse, collision-free anchor.                                      |
 
 Add a plugin to the shared list, then make every renderer and emitter handle the node it produces. A transform that exists only in the viewer is not part of the pipeline.
 

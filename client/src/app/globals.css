@@ -65,7 +65,7 @@
   --circa-link-visited: #55385f;
   --circa-stamp: #8a4a12;
   /* The commission's seal, shared by the workstation wallpaper and the public docket. */
-  --circa-seal: url('/Government_agency_emblem_seal_de…_2K_20261014194612.jpg');
+  --circa-seal: url("/Government_agency_emblem_seal_de…_2K_20261014194612.jpg");
   /* Native form controls, which would otherwise paint themselves system blue. */
   accent-color: var(--primary);
 }
@@ -75,7 +75,10 @@
  * default to the system blue, which is the one colour in this interface that
  * belongs to somebody else's system; both are pulled into the phosphor pair.
  */
-::selection { background: var(--primary); color: var(--primary-foreground); }
+::selection {
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
 
 @theme inline {
   --color-background: var(--background);
@@ -130,13 +133,21 @@
  * `.agents/brain/DESIGN.md`.
  */
 :lang(ko) {
-  --font-sans: "DM Sans", "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", sans-serif;
-  --font-mono: "IBM Plex Mono", "Nanum Gothic Coding", "Apple SD Gothic Neo", "Malgun Gothic", monospace;
+  --font-sans:
+    "DM Sans", "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR",
+    sans-serif;
+  --font-mono:
+    "IBM Plex Mono", "Nanum Gothic Coding", "Apple SD Gothic Neo",
+    "Malgun Gothic", monospace;
 }
 
 @layer base {
-  html { scroll-padding-bottom: calc(var(--circa-cookie-notice-height, 0px) + 16px); }
-  * { @apply border-border outline-ring/50; }
+  html {
+    scroll-padding-bottom: calc(var(--circa-cookie-notice-height, 0px) + 16px);
+  }
+  * {
+    @apply border-border outline-ring/50;
+  }
   body {
     @apply bg-background text-foreground font-sans;
     margin: 0;
@@ -147,18 +158,23 @@
     letter-spacing: 0.01em;
     font-feature-settings: "tnum" 1;
   }
-  :focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
 }
 
 @layer utilities {
   .circa-raised {
     border: 1px solid;
-    border-color: var(--circa-bevel-light) var(--circa-bevel-shadow) var(--circa-bevel-shadow) var(--circa-bevel-light);
+    border-color: var(--circa-bevel-light) var(--circa-bevel-shadow)
+      var(--circa-bevel-shadow) var(--circa-bevel-light);
     background: var(--secondary);
   }
   .circa-sunken {
     border: 1px solid;
-    border-color: var(--circa-bevel-shadow) var(--border) var(--border) var(--circa-bevel-shadow);
+    border-color: var(--circa-bevel-shadow) var(--border) var(--border)
+      var(--circa-bevel-shadow);
     background: var(--card);
   }
   .circa-label {
@@ -169,7 +185,13 @@
     text-transform: uppercase;
   }
   .circa-scanlines {
-    background-image: repeating-linear-gradient(0deg, rgb(0 0 0 / 18%) 0px, rgb(0 0 0 / 18%) 1px, transparent 1px, transparent 2px);
+    background-image: repeating-linear-gradient(
+      0deg,
+      rgb(0 0 0 / 18%) 0px,
+      rgb(0 0 0 / 18%) 1px,
+      transparent 1px,
+      transparent 2px
+    );
     pointer-events: none;
   }
 }
@@ -184,4 +206,6 @@
  * `font-family: inherit` would out-rank this rule by source order and a field
  * carrying `.circa-mono` would silently lose its machine face.
  */
-.circa-mono { font-family: var(--font-mono); }
+.circa-mono {
+  font-family: var(--font-mono);
+}

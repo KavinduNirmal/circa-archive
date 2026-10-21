@@ -29,21 +29,21 @@ Users interact with a diegetic desktop environment. Records are authored in Mark
 
 ## 2. Glossary
 
-| Term | Definition |
-|------|------------|
-| **CIRCA** | Commission for Incident Review and Corrective Action. Ancient continuity, not a government agency. |
-| **Incident** | An anchored supernatural system, distinct from its actors. Code: `INC-XXXXX`. |
-| **Record** | A filed artifact. Code: `CIRCA-X-XXXX`. Types: INCIDENT, DISCOVERY, EXPLORATION, RUMOR. |
-| **Org** | A recognized organization. Code: `ORG-X-XXXX`. |
-| **Dossier** | Community-editable wiki page for an org. |
-| **Continuity** | A connected sequence for an Incident or organization. Principal and divergent sequences coexist. |
-| **Primary Claim** | Display convention for an incident's master file. Singular, cedeable. |
-| **Contested** | Valid state when two orgs claim primary on an incident. |
-| **Tombstoned** | A record removed from discoverability for meta violations. |
-| **Erased** | An org rejected from the directory. Code: `CIRCA-R-XXXX`. |
-| **Reinstated** | An erased org returned to the directory after appeal. |
-| **Flair** | Cosmetic org badge on a user's profile. |
-| **Record Tag** | The org lens on a specific record. |
+| Term              | Definition                                                                                         |
+| ----------------- | -------------------------------------------------------------------------------------------------- |
+| **CIRCA**         | Commission for Incident Review and Corrective Action. Ancient continuity, not a government agency. |
+| **Incident**      | An anchored supernatural system, distinct from its actors. Code: `INC-XXXXX`.                      |
+| **Record**        | A filed artifact. Code: `CIRCA-X-XXXX`. Types: INCIDENT, DISCOVERY, EXPLORATION, RUMOR.            |
+| **Org**           | A recognized organization. Code: `ORG-X-XXXX`.                                                     |
+| **Dossier**       | Community-editable wiki page for an org.                                                           |
+| **Continuity**    | A connected sequence for an Incident or organization. Principal and divergent sequences coexist.   |
+| **Primary Claim** | Display convention for an incident's master file. Singular, cedeable.                              |
+| **Contested**     | Valid state when two orgs claim primary on an incident.                                            |
+| **Tombstoned**    | A record removed from discoverability for meta violations.                                         |
+| **Erased**        | An org rejected from the directory. Code: `CIRCA-R-XXXX`.                                          |
+| **Reinstated**    | An erased org returned to the directory after appeal.                                              |
+| **Flair**         | Cosmetic org badge on a user's profile.                                                            |
+| **Record Tag**    | The org lens on a specific record.                                                                 |
 
 ---
 
@@ -51,15 +51,15 @@ Users interact with a diegetic desktop environment. Records are authored in Mark
 
 ### 3.1 Technology Stack
 
-| Layer | Technology |
-|-------|------------|
-| Frontend | Next.js (App Router), React, Zustand, `react-rnd` / `winbox`, `react-markdown` + `remark-gfm` |
-| Backend | .NET 10 Minimal APIs, EF Core |
-| Database | PostgreSQL |
-| Real-time | SignalR |
-| Storage | S3-compatible object storage (images) |
-| Auth | JWT |
-| Search | PostgreSQL full-text search (`tsvector`) |
+| Layer     | Technology                                                                                    |
+| --------- | --------------------------------------------------------------------------------------------- |
+| Frontend  | Next.js (App Router), React, Zustand, `react-rnd` / `winbox`, `react-markdown` + `remark-gfm` |
+| Backend   | .NET 10 Minimal APIs, EF Core                                                                 |
+| Database  | PostgreSQL                                                                                    |
+| Real-time | SignalR                                                                                       |
+| Storage   | S3-compatible object storage (images)                                                         |
+| Auth      | JWT                                                                                           |
+| Search    | PostgreSQL full-text search (`tsvector`)                                                      |
 
 ### 3.2 High-Level Architecture
 
@@ -350,79 +350,79 @@ All endpoints are versioned via the URL path segment (`/api/v{version}/...`). Th
 
 ### 4.1 Authentication
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/v1/auth/register` | Create account |
-| POST | `/api/v1/auth/login` | Login, sets HttpOnly access and refresh cookies; returns user summary |
-| POST | `/api/v1/auth/refresh` | Rotate refresh cookie and issue access cookie (204) |
-| GET | `/api/v1/auth/me` | Current user profile |
+| Method | Endpoint                | Description                                                           |
+| ------ | ----------------------- | --------------------------------------------------------------------- |
+| POST   | `/api/v1/auth/register` | Create account                                                        |
+| POST   | `/api/v1/auth/login`    | Login, sets HttpOnly access and refresh cookies; returns user summary |
+| POST   | `/api/v1/auth/refresh`  | Rotate refresh cookie and issue access cookie (204)                   |
+| GET    | `/api/v1/auth/me`       | Current user profile                                                  |
 
 ### 4.2 Records
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/v1/records` | List records with filters (incident, org, type, author, status) |
-| GET | `/api/v1/records/{id}` | Get record by ID |
-| GET | `/api/v1/records/by-code/{circaCode}` | Get record by CIRCA code |
-| POST | `/api/v1/records` | Create new record |
-| PATCH | `/api/v1/records/{id}` | Update record (author only, limited fields) |
-| DELETE | `/api/v1/records/{id}` | Soft-delete (move to Recycle Bin) |
-| POST | `/api/v1/records/{id}/fork` | Fork record |
-| POST | `/api/v1/records/{id}/vote` | Vote +1/-1 |
-| POST | `/api/v1/records/{id}/report` | Report meta violation |
+| Method | Endpoint                              | Description                                                     |
+| ------ | ------------------------------------- | --------------------------------------------------------------- |
+| GET    | `/api/v1/records`                     | List records with filters (incident, org, type, author, status) |
+| GET    | `/api/v1/records/{id}`                | Get record by ID                                                |
+| GET    | `/api/v1/records/by-code/{circaCode}` | Get record by CIRCA code                                        |
+| POST   | `/api/v1/records`                     | Create new record                                               |
+| PATCH  | `/api/v1/records/{id}`                | Update record (author only, limited fields)                     |
+| DELETE | `/api/v1/records/{id}`                | Soft-delete (move to Recycle Bin)                               |
+| POST   | `/api/v1/records/{id}/fork`           | Fork record                                                     |
+| POST   | `/api/v1/records/{id}/vote`           | Vote +1/-1                                                      |
+| POST   | `/api/v1/records/{id}/report`         | Report meta violation                                           |
 
 ### 4.3 Incidents
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/v1/incidents` | List incidents |
-| GET | `/api/v1/incidents/{id}` | Get incident with aggregated records |
-| POST | `/api/v1/incidents` | Create incident (INCIDENT record) |
-| PATCH | `/api/v1/incidents/{id}/primary-claim` | Set primary claim org (originator, 30-day window) |
-| GET | `/api/v1/incidents/{id}/designations` | Get org designations |
+| Method | Endpoint                               | Description                                       |
+| ------ | -------------------------------------- | ------------------------------------------------- |
+| GET    | `/api/v1/incidents`                    | List incidents                                    |
+| GET    | `/api/v1/incidents/{id}`               | Get incident with aggregated records              |
+| POST   | `/api/v1/incidents`                    | Create incident (INCIDENT record)                 |
+| PATCH  | `/api/v1/incidents/{id}/primary-claim` | Set primary claim org (originator, 30-day window) |
+| GET    | `/api/v1/incidents/{id}/designations`  | Get org designations                              |
 
 ### 4.4 Organizations
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/v1/orgs` | List orgs (filter by status, code) |
-| GET | `/api/v1/orgs/{id}` | Get org with dossier |
-| POST | `/api/v1/orgs` | Submit org identification (Brief, Voice, Seed) |
-| POST | `/api/v1/orgs/{id}/vote` | Vote +1/-1 |
-| POST | `/api/v1/orgs/{id}/appeal` | Submit Reclassification Petition |
-| GET | `/api/v1/orgs/{id}/dossier` | Get dossier |
-| PATCH | `/api/v1/orgs/{id}/dossier` | Edit dossier (community wiki) |
-| GET | `/api/v1/orgs/{id}/mentions` | Get records mentioning org |
+| Method | Endpoint                     | Description                                    |
+| ------ | ---------------------------- | ---------------------------------------------- |
+| GET    | `/api/v1/orgs`               | List orgs (filter by status, code)             |
+| GET    | `/api/v1/orgs/{id}`          | Get org with dossier                           |
+| POST   | `/api/v1/orgs`               | Submit org identification (Brief, Voice, Seed) |
+| POST   | `/api/v1/orgs/{id}/vote`     | Vote +1/-1                                     |
+| POST   | `/api/v1/orgs/{id}/appeal`   | Submit Reclassification Petition               |
+| GET    | `/api/v1/orgs/{id}/dossier`  | Get dossier                                    |
+| PATCH  | `/api/v1/orgs/{id}/dossier`  | Edit dossier (community wiki)                  |
+| GET    | `/api/v1/orgs/{id}/mentions` | Get records mentioning org                     |
 
 ### 4.5 Emails
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/v1/emails` | List emails (filter by type, folder) |
-| GET | `/api/v1/emails/{id}` | Get email |
-| POST | `/api/v1/emails/{id}/file` | File email into case folder |
-| PATCH | `/api/v1/emails/{id}/read` | Mark read |
+| Method | Endpoint                   | Description                          |
+| ------ | -------------------------- | ------------------------------------ |
+| GET    | `/api/v1/emails`           | List emails (filter by type, folder) |
+| GET    | `/api/v1/emails/{id}`      | Get email                            |
+| POST   | `/api/v1/emails/{id}/file` | File email into case folder          |
+| PATCH  | `/api/v1/emails/{id}/read` | Mark read                            |
 
 ### 4.6 Moderation
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/v1/moderation/log` | Public moderation log (anonymized) |
-| POST | `/api/v1/moderation/tombstone` | Tombstone record (moderator only) |
-| GET | `/api/v1/moderation/expunged/count` | Count of expunged records |
+| Method | Endpoint                            | Description                        |
+| ------ | ----------------------------------- | ---------------------------------- |
+| GET    | `/api/v1/moderation/log`            | Public moderation log (anonymized) |
+| POST   | `/api/v1/moderation/tombstone`      | Tombstone record (moderator only)  |
+| GET    | `/api/v1/moderation/expunged/count` | Count of expunged records          |
 
 ### 4.7 Search
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/v1/search` | Full-text search across records, incidents, orgs |
+| Method | Endpoint         | Description                                      |
+| ------ | ---------------- | ------------------------------------------------ |
+| GET    | `/api/v1/search` | Full-text search across records, incidents, orgs |
 
 ### 4.8 Real-time (SignalR)
 
-| Hub | Events |
-|-----|--------|
-| `EmailHub` | `NewEmail`, `EmailFiled` |
-| `VoteHub` | `VoteCountUpdated` |
+| Hub           | Events                         |
+| ------------- | ------------------------------ |
+| `EmailHub`    | `NewEmail`, `EmailFiled`       |
+| `VoteHub`     | `VoteCountUpdated`             |
 | `AdoptionHub` | `RecordAdopted`, `OrgPromoted` |
 
 ---
@@ -452,17 +452,17 @@ The desktop is the root interface. It contains icons, a taskbar, and a system tr
 
 ### 5.2 Desktop Icons
 
-| Icon | Name | Type | Description |
-|------|------|------|-------------|
-| 📧 | Inbox | App | Email client. Hub for discovery. |
-| 📁 | Archive | Folder | Every case ever filed. |
-| 📁 | Organizations | Folder | Org dossiers. |
-| 📝 | My Records | App | Dashboard of user's written records. |
-| 🔍 | Search | App | Global search. |
-| 📄 | WRITE.exe | App | Record editor. Creates new records. |
-| 🗑️ | Recycle Bin | Folder | User's deleted drafts and records. Recoverable 30 days. |
-| 📁 | _EXPUNGED | Folder | Always empty. Shows count of tombstoned records. |
-| ⚙️ | System | Folder | CIRCA/OS lore files, help, corrupted files. |
+| Icon | Name          | Type   | Description                                             |
+| ---- | ------------- | ------ | ------------------------------------------------------- |
+| 📧   | Inbox         | App    | Email client. Hub for discovery.                        |
+| 📁   | Archive       | Folder | Every case ever filed.                                  |
+| 📁   | Organizations | Folder | Org dossiers.                                           |
+| 📝   | My Records    | App    | Dashboard of user's written records.                    |
+| 🔍   | Search        | App    | Global search.                                          |
+| 📄   | WRITE.exe     | App    | Record editor. Creates new records.                     |
+| 🗑️   | Recycle Bin   | Folder | User's deleted drafts and records. Recoverable 30 days. |
+| 📁   | _EXPUNGED     | Folder | Always empty. Shows count of tombstoned records.        |
+| ⚙️   | System        | Folder | CIRCA/OS lore files, help, corrupted files.             |
 
 ### 5.3 Case Folder Structure
 
@@ -487,6 +487,7 @@ When a user opens a case folder, they see:
 ```
 
 **Rules:**
+
 - Case folder name is the CIRCA code. Subtitle is the common name.
 - Maximum two levels of nesting inside a case.
 - Evidence sits flat.
@@ -495,24 +496,24 @@ When a user opens a case folder, they see:
 
 ### 5.4 File Types and Icons
 
-| Icon | Extension | What it is | Storage |
-|------|-----------|------------|---------|
-| 📄 | `.pdf` | Record (incident, discovery, exploration) | Markdown in DB, rendered as paper |
-| 📧 | `.eml` | Email filed into a case | Markdown in DB |
-| 📝 | `.txt` | Loose note, rumor, scrap | Markdown in DB |
-| 🖼️ | `.jpg` / `.png` | Evidence photo | S3 |
-| 🎵 | `.wav` | Audio evidence | S3 |
-| 📁 | — | Folder | DB row |
+| Icon | Extension       | What it is                                | Storage                           |
+| ---- | --------------- | ----------------------------------------- | --------------------------------- |
+| 📄   | `.pdf`          | Record (incident, discovery, exploration) | Markdown in DB, rendered as paper |
+| 📧   | `.eml`          | Email filed into a case                   | Markdown in DB                    |
+| 📝   | `.txt`          | Loose note, rumor, scrap                  | Markdown in DB                    |
+| 🖼️   | `.jpg` / `.png` | Evidence photo                            | S3                                |
+| 🎵   | `.wav`          | Audio evidence                            | S3                                |
+| 📁   | —               | Folder                                    | DB row                            |
 
 ### 5.5 Email Client
 
 The email client is a desktop app. It has four folders:
 
-| Folder | Description |
-|--------|-------------|
-| **Inbox** | Unread and recent emails. Default view. |
-| **Filed** | Emails filed into cases. Auto-archived. |
-| **Digests** | Moderation reports, system notices. |
+| Folder           | Description                                                              |
+| ---------------- | ------------------------------------------------------------------------ |
+| **Inbox**        | Unread and recent emails. Default view.                                  |
+| **Filed**        | Emails filed into cases. Auto-archived.                                  |
+| **Digests**      | Moderation reports, system notices.                                      |
 | **Dead Letters** | Emails from accounts that no longer exist. Anomalous emails appear here. |
 
 **Filing emails:** Drag an email to a case folder, or right-click → "File to case...". Once filed, it appears in the case folder as `.eml` and is removed from Inbox.
@@ -582,12 +583,12 @@ The interface ships in English and Korean. This is implemented, in `client/src/i
 
 ### 6.1 Types
 
-| Type | Description | Who can create | Constraints |
-|------|-------------|----------------|-------------|
-| **INCIDENT** | Original ghost story. May establish or hint at foundational constraints; narrator knowledge remains distinct. | Originator | Once per incident. |
-| **DISCOVERY** | First org contact. Establishes primary claim by default. | Any author | Any org. |
-| **EXPLORATION** | Everything after. Containment, follow-ups, rule-establishment. | Any author | Any org. |
-| **RUMOR** | Propaganda, misinformation, unverified claims. | Any author | Attach to incident or org. |
+| Type            | Description                                                                                                   | Who can create | Constraints                |
+| --------------- | ------------------------------------------------------------------------------------------------------------- | -------------- | -------------------------- |
+| **INCIDENT**    | Original ghost story. May establish or hint at foundational constraints; narrator knowledge remains distinct. | Originator     | Once per incident.         |
+| **DISCOVERY**   | First org contact. Establishes primary claim by default.                                                      | Any author     | Any org.                   |
+| **EXPLORATION** | Everything after. Containment, follow-ups, rule-establishment.                                                | Any author     | Any org.                   |
+| **RUMOR**       | Propaganda, misinformation, unverified claims.                                                                | Any author     | Attach to incident or org. |
 
 ### 6.2 Creation Flow
 
@@ -645,13 +646,13 @@ The authoring framework separates those three axes. A published record can be co
 
 ### 7.1 States
 
-| State | Code | Directory | Can adopt | Notes |
-|-------|------|-----------|-----------|-------|
-| Tag | None | No | No | Free to create. |
-| Eligible | None | No | No | Crossed threshold. |
-| Promoted | `ORG-X-XXXX` | Yes | Yes | Recognized. |
-| Rejected | `CIRCA-R-XXXX` | No | No | Erased. |
-| Reinstated | `ORG-X-XXXX` | Yes | Yes | After successful appeal. |
+| State      | Code           | Directory | Can adopt | Notes                    |
+| ---------- | -------------- | --------- | --------- | ------------------------ |
+| Tag        | None           | No        | No        | Free to create.          |
+| Eligible   | None           | No        | No        | Crossed threshold.       |
+| Promoted   | `ORG-X-XXXX`   | Yes       | Yes       | Recognized.              |
+| Rejected   | `CIRCA-R-XXXX` | No        | No        | Erased.                  |
+| Reinstated | `ORG-X-XXXX`   | Yes       | Yes       | After successful appeal. |
 
 ### 7.2 Code Structure
 
@@ -739,6 +740,7 @@ This older organization-code scheme is distinct from the newer [Incident classif
 ### 9.1 Meta vs In-World
 
 **Meta violations — tombstoned:**
+
 - Harassment
 - Spam
 - Plagiarism
@@ -747,6 +749,7 @@ This older organization-code scheme is distinct from the newer [Incident classif
 - Rating gaming
 
 **In-world content — filed:**
+
 - Propaganda
 - Contradictions
 - Low-effort
@@ -821,16 +824,16 @@ This older organization-code scheme is distinct from the newer [Incident classif
 
 ## 13. Open Questions
 
-1. Can another recognized org adopt an erased org's rumors? *Leaning yes.*
+1. Can another recognized org adopt an erased org's rumors? _Leaning yes._
 2. Can an org be rejected again after reinstatement?
 3. Can an author delete their own record permanently?
 4. Should rules be extracted into a `RuleProposal` table?
-5. Does the primary claim holder get notified when a new org files on their incident? *Leaning yes.*
+5. Does the primary claim holder get notified when a new org files on their incident? _Leaning yes._
 6. Public moderation record format not yet finalized.
 7. Character pages: threshold for auto-generation not set.
 8. First three seeded orgs: names, codes, voices not written.
 9. First incident: not written.
-10. Taskbar behavior: single-window or multi-window? *Leaning multi-window.*
+10. Taskbar behavior: single-window or multi-window? _Leaning multi-window._
 
 ---
 
@@ -838,23 +841,23 @@ This older organization-code scheme is distinct from the newer [Incident classif
 
 ### 14.1 ID Formats
 
-| Entity | Format | Example |
-|--------|--------|---------|
-| Incident | `INC-{Number}` | `INC-081323` |
-| Record | `CIRCA-{Type}-{Number}` | `CIRCA-R-081323` |
-| Org (pre-promotion) | `CIRCA-ID-{Number}` | `CIRCA-ID-0813` |
-| Org (post-promotion) | `ORG-{Letter}-{Number}` | `ORG-A-081323` |
-| Org (rejected) | `CIRCA-R-{Number}` | `CIRCA-R-1000` |
+| Entity               | Format                  | Example          |
+| -------------------- | ----------------------- | ---------------- |
+| Incident             | `INC-{Number}`          | `INC-081323`     |
+| Record               | `CIRCA-{Type}-{Number}` | `CIRCA-R-081323` |
+| Org (pre-promotion)  | `CIRCA-ID-{Number}`     | `CIRCA-ID-0813`  |
+| Org (post-promotion) | `ORG-{Letter}-{Number}` | `ORG-A-081323`   |
+| Org (rejected)       | `CIRCA-R-{Number}`      | `CIRCA-R-1000`   |
 
 ### 14.2 File Extensions
 
-| Extension | Meaning |
-|-----------|---------|
-| `.pdf` | Record (Markdown rendered as paper) |
-| `.eml` | Filed email |
-| `.txt` | Rumor, note, scrap |
-| `.jpg` / `.png` | Evidence photo |
-| `.wav` | Audio evidence |
+| Extension       | Meaning                             |
+| --------------- | ----------------------------------- |
+| `.pdf`          | Record (Markdown rendered as paper) |
+| `.eml`          | Filed email                         |
+| `.txt`          | Rumor, note, scrap                  |
+| `.jpg` / `.png` | Evidence photo                      |
+| `.wav`          | Audio evidence                      |
 
 ### 14.3 Desktop Icon List
 
@@ -870,7 +873,7 @@ This older organization-code scheme is distinct from the newer [Incident classif
 
 ---
 
-*This document is a living specification. All decisions are subject to revision as the project evolves.*
+_This document is a living specification. All decisions are subject to revision as the project evolves._
 
 ### Implemented authentication transport (phases 5–6)
 

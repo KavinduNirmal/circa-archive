@@ -14,11 +14,17 @@ import { fileURLToPath } from "node:url";
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
 export const CORPUS_FILE = resolve(ROOT, "public/Ghost_story.md");
-export const BUNDLE_FILE = resolve(ROOT, "src/components/reader/ghost-story.ts");
+export const BUNDLE_FILE = resolve(
+  ROOT,
+  "src/components/reader/ghost-story.ts",
+);
 
 /** Escapes only what a template literal would otherwise reinterpret. */
 export function escapeTemplate(value: string): string {
-  return value.replaceAll("\\", "\\\\").replaceAll("`", "\\`").replaceAll("${", "\\${");
+  return value
+    .replaceAll("\\", "\\\\")
+    .replaceAll("`", "\\`")
+    .replaceAll("${", "\\${");
 }
 
 /** The whole generated module, header included, for one document. */
@@ -38,13 +44,18 @@ export const GHOST_STORY = \`${escapeTemplate(corpus)}\`;
 `;
 }
 
-if (process.argv[1] !== undefined && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+if (
+  process.argv[1] !== undefined &&
+  resolve(process.argv[1]) === fileURLToPath(import.meta.url)
+) {
   const corpus = readFileSync(CORPUS_FILE, "utf8");
   const bundle = renderBundle(corpus);
   if (readFileSync(BUNDLE_FILE, "utf8") === bundle) {
     console.log("ghost-story.ts is already in sync with public/Ghost_story.md");
   } else {
     writeFileSync(BUNDLE_FILE, bundle);
-    console.log("Wrote src/components/reader/ghost-story.ts from public/Ghost_story.md");
+    console.log(
+      "Wrote src/components/reader/ghost-story.ts from public/Ghost_story.md",
+    );
   }
 }

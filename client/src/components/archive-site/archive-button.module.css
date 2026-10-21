@@ -22,13 +22,14 @@
   min-height: 26px;
   padding: 0 10px;
   border: 1px solid;
-  border-color: var(--circa-bevel-light) var(--circa-bevel-shadow) var(--circa-bevel-shadow) var(--circa-bevel-light);
+  border-color: var(--circa-bevel-light) var(--circa-bevel-shadow)
+    var(--circa-bevel-shadow) var(--circa-bevel-light);
   background: var(--secondary);
   color: #a4c2e6;
   font: inherit;
   font-size: 10px;
   font-weight: 700;
-  letter-spacing: .06em;
+  letter-spacing: 0.06em;
   line-height: 1;
   text-decoration: none;
   text-transform: uppercase;
@@ -36,16 +37,23 @@
   cursor: pointer;
 }
 
-.button[data-tone]:hover { background: #304155; color: #dce9f5; }
+.button[data-tone]:hover {
+  background: #304155;
+  color: #dce9f5;
+}
 
 .button[data-tone]:active,
 .button[data-tone][aria-current="page"] {
-  border-color: var(--circa-bevel-shadow) var(--circa-bevel-light) var(--circa-bevel-light) var(--circa-bevel-shadow);
+  border-color: var(--circa-bevel-shadow) var(--circa-bevel-light)
+    var(--circa-bevel-light) var(--circa-bevel-shadow);
   background: var(--card);
   color: #dce9f5;
 }
 
-.button[data-tone]:focus-visible { outline: 1px dashed #c8d6e5; outline-offset: -3px; }
+.button[data-tone]:focus-visible {
+  outline: 1px dashed #c8d6e5;
+  outline-offset: -3px;
+}
 
 .button[data-tone]:disabled,
 .button[data-tone][aria-disabled="true"] {
@@ -64,7 +72,10 @@
   color: var(--circa-link);
 }
 
-.button[data-tone="paper"]:hover { background: #becbd8; color: var(--circa-ink); }
+.button[data-tone="paper"]:hover {
+  background: #becbd8;
+  color: var(--circa-ink);
+}
 
 .button[data-tone="paper"]:active,
 .button[data-tone="paper"][aria-current="page"] {
@@ -73,12 +84,18 @@
   color: var(--circa-ink);
 }
 
-.button[data-tone="paper"]:focus-visible { outline: 2px dotted var(--circa-ink); outline-offset: 2px; }
+.button[data-tone="paper"]:focus-visible {
+  outline: 2px dotted var(--circa-ink);
+  outline-offset: 2px;
+}
 
 /*
  * On a narrow screen the key has to be a finger's width, on both grounds: the
  * section bar used to grow on its own, and the paper tools were left small.
  */
 @media (max-width: 620px) {
-  .button[data-tone] { min-height: 32px; padding: 0 9px; }
+  .button[data-tone] {
+    min-height: 32px;
+    padding: 0 9px;
+  }
 }

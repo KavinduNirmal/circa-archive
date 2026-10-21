@@ -8,14 +8,14 @@ Other organizations may name those changes differently. The progression is not a
 
 ## Reference stages
 
-| Stage | Name | Reference value | Described signs |
-| --- | --- | --- | --- |
-| **0** | **Baseline** | **5%** | No established signs of supernatural contamination. |
-| **I** | **Residual** | **22%** | Recurring dreams, anomalous familiarity, or sensitivity to supernatural anchors. |
-| **II** | **Displacement** | **43%** | Inconsistent memories, altered personal records, or unexplained knowledge. |
-| **III** | **Assimilation** | **63%** | The explorer begins exhibiting characteristics of previously encountered stories. |
-| **IV** | **Incorporation** | **82%** | Ordinary reality begins treating the explorer as an entity or as part of an existing story. |
-| **V** | **Manifestation** | **100%** | The person behaves as an actor of the Incident that corrupted them and may remain in ordinary reality as an autonomous entity. Establishing an independent Incident additionally requires a new anchor and complete narrative flow. |
+| Stage   | Name              | Reference value | Described signs                                                                                                                                                                                                                     |
+| ------- | ----------------- | --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **0**   | **Baseline**      | **5%**          | No established signs of supernatural contamination.                                                                                                                                                                                 |
+| **I**   | **Residual**      | **22%**         | Recurring dreams, anomalous familiarity, or sensitivity to supernatural anchors.                                                                                                                                                    |
+| **II**  | **Displacement**  | **43%**         | Inconsistent memories, altered personal records, or unexplained knowledge.                                                                                                                                                          |
+| **III** | **Assimilation**  | **63%**         | The explorer begins exhibiting characteristics of previously encountered stories.                                                                                                                                                   |
+| **IV**  | **Incorporation** | **82%**         | Ordinary reality begins treating the explorer as an entity or as part of an existing story.                                                                                                                                         |
+| **V**   | **Manifestation** | **100%**        | The person behaves as an actor of the Incident that corrupted them and may remain in ordinary reality as an autonomous entity. Establishing an independent Incident additionally requires a new anchor and complete narrative flow. |
 
 The percentages are reference values within the illustration. They are not measurements of a person's condition, probabilities of transformation, or thresholds by which an outcome can be predicted.
 

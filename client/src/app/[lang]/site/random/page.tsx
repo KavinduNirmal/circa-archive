@@ -11,7 +11,11 @@ import { randomRecordCode } from "@/components/archive-site/archive-data";
  */
 export const dynamic = "force-dynamic";
 
-export default async function RandomRecordPage({ params }: { params: Promise<{ lang: string }> }) {
+export default async function RandomRecordPage({
+  params,
+}: {
+  params: Promise<{ lang: string }>;
+}) {
   const { lang } = await params;
   redirect(`/${lang}/site/records/${randomRecordCode()}`);
 }

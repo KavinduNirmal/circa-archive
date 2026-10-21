@@ -21,7 +21,9 @@ function isDelimiterRow(line: string): boolean {
   const trimmed = line.trim();
   if (!trimmed.includes("-")) return false;
   const cells = trimmed.replace(/^\|/, "").replace(/\|$/, "").split("|");
-  return cells.length > 0 && cells.every((cell) => /^\s*:?-{1,}:?\s*$/.test(cell));
+  return (
+    cells.length > 0 && cells.every((cell) => /^\s*:?-{1,}:?\s*$/.test(cell))
+  );
 }
 
 /** A row candidate: a line with a pipe that is not itself escaped. */

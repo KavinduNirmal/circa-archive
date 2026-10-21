@@ -49,6 +49,6 @@ Build one deployable ASP.NET Core 10 service with strong internal module boundar
 
 - [`ARCHITECTURE.md`](../../ARCHITECTURE.md) §3.1, §3.4, §3.5 — stack, backend responsibilities, schema.
 - [`backend/README.md`](../../backend/README.md) — module responsibilities and the test-runner requirement.
-- [Milan Jovanović, *How to Build a Modular Monolith in .NET*](https://milanjovanovic.tech/blog/build-modular-monolith-dotnet-step-by-step) — the project layout and Contracts-only references.
+- [Milan Jovanović, _How to Build a Modular Monolith in .NET_](https://milanjovanovic.tech/blog/build-modular-monolith-dotnet-step-by-step) — the project layout and Contracts-only references.
 - [kgrzybek/modular-monolith-with-ddd](https://github.com/kgrzybek/modular-monolith-with-ddd) — isolation rules and module composition.
 - [EF Core: using a separate migrations project](https://learn.microsoft.com/en-us/ef/core/managing-schemas/migrations/projects) and [transactions](https://learn.microsoft.com/en-us/ef/core/saving/transactions).

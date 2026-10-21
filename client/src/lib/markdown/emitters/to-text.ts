@@ -35,7 +35,10 @@ export function renderText(input: RenderInput): RenderResult<string> {
   if (header) blocks.push(header);
   const body = renderBlocks(parsed.output.children as RootContent[], 0);
   if (body) blocks.push(body);
-  return { output: `${blocks.join("\n\n").trim()}\n`, warnings: parsed.warnings };
+  return {
+    output: `${blocks.join("\n\n").trim()}\n`,
+    warnings: parsed.warnings,
+  };
 }
 
 function renderMetadata(metadata: Record<string, unknown>): string {
@@ -43,8 +46,12 @@ function renderMetadata(metadata: Record<string, unknown>): string {
   if (entries.length === 0) return "";
   return entries
     .map(([key, value]) => {
-      const label = `${key.replace(/_/g, " ").toUpperCase()}:`.padEnd(LABEL_WIDTH);
-      const text = Array.isArray(value) ? value.join(", ") : String(value ?? "");
+      const label = `${key.replace(/_/g, " ").toUpperCase()}:`.padEnd(
+        LABEL_WIDTH,
+      );
+      const text = Array.isArray(value)
+        ? value.join(", ")
+        : String(value ?? "");
       return `${label}${text}`;
     })
     .join("\n");
@@ -91,7 +98,9 @@ function renderBlock(node: RootContent, depth: number): string {
     case "yaml":
       return "";
     default:
-      return "children" in node ? renderBlocks(node.children as RootContent[], depth) : "";
+      return "children" in node
+        ? renderBlocks(node.children as RootContent[], depth)
+        : "";
   }
 }
 
@@ -102,7 +111,9 @@ function renderList(node: List, depth: number): string {
       const indent = " ".repeat(marker.length);
       return renderBlocks(item.children as RootContent[], depth + 1)
         .split("\n")
-        .map((line, index) => (index === 0 ? `${marker}${line}` : `${indent}${line}`))
+        .map((line, index) =>
+          index === 0 ? `${marker}${line}` : `${indent}${line}`,
+        )
         .join("\n");
     })
     .join("\n");
@@ -110,15 +121,23 @@ function renderList(node: List, depth: number): string {
 
 function renderTable(node: Table): string {
   const rows = node.children.map((row) =>
-    row.children.map((cell) => inline(cell.children).replace(/\s+/g, " ").trim()),
+    row.children.map((cell) =>
+      inline(cell.children).replace(/\s+/g, " ").trim(),
+    ),
   );
   if (rows.length === 0) return "";
   const columns = Math.max(...rows.map((row) => row.length));
   const widths = Array.from({ length: columns }, (_, column) =>
-    Math.min(CELL_CAP, Math.max(1, ...rows.map((row) => (row[column] ?? "").length))),
+    Math.min(
+      CELL_CAP,
+      Math.max(1, ...rows.map((row) => (row[column] ?? "").length)),
+    ),
   );
   const line = (cells: readonly string[]) =>
-    widths.map((width, column) => pad(cells[column] ?? "", width)).join("  ").trimEnd();
+    widths
+      .map((width, column) => pad(cells[column] ?? "", width))
+      .join("  ")
+      .trimEnd();
   const rule = widths.map((width) => "-".repeat(width)).join("-+-");
   const [header, ...rest] = rows;
   return [line(header), rule, ...rest.map(line)].join("\n");
@@ -154,7 +173,9 @@ function inlineNode(node: PhrasingContent): string {
     case "break":
       return " ";
     default:
-      return "children" in node ? inline((node as { children: PhrasingContent[] }).children) : "";
+      return "children" in node
+        ? inline((node as { children: PhrasingContent[] }).children)
+        : "";
   }
 }
 

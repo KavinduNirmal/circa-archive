@@ -1,0 +1,26 @@
+# Dependencies and generated output in every package
+**/node_modules/**
+**/.next/**
+**/.astro/**
+**/dist/**
+**/out/**
+**/coverage/**
+**/bin/**
+**/obj/**
+**/TestResults/**
+**/playwright-report/**
+**/test-results/**
+.pw-browsers/
+.husky/_/
+# Local-only agent context and credentials
+.agents/
+.codex/
+.aws/
+.env*
+!.env.example
+# Package-manager-owned lockfiles
+**/bun.lock
+# Byte-sensitive fiction fixture: custom redaction/table syntax is not GFM
+client/public/Ghost_story.md
+# Generated directly from that source by client/scripts/sync-corpus.ts
+client/src/components/reader/ghost-story.ts

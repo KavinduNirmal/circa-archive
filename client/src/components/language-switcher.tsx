@@ -35,7 +35,10 @@ export function LanguageSwitcher({
   const t = useTranslations("switcher");
 
   return (
-    <nav className={className ? `circa-language ${className}` : "circa-language"} aria-label={t("label")}>
+    <nav
+      className={className ? `circa-language ${className}` : "circa-language"}
+      aria-label={t("label")}
+    >
       {routing.locales.map((locale) => (
         <Link
           key={locale}

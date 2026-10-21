@@ -19,7 +19,10 @@ import { updatesFor } from "./record-updates";
  * An exploration row hands its code to the reader's own record opener, so an
  * exploration opens as a record and not as a second, special reading surface.
  */
-export function RecordStatusCells({ code, onOpenRecord }: {
+export function RecordStatusCells({
+  code,
+  onOpenRecord,
+}: {
   code: string;
   onOpenRecord: (code: string) => void;
 }) {
@@ -48,7 +51,10 @@ export function RecordStatusCells({ code, onOpenRecord }: {
               <p className="reader-status-panel-title">{t("updatesTitle")}</p>
               <ol className="reader-status-updates">
                 {updates.map((update) => (
-                  <li key={`${update.filed}-${update.text}`} data-tone={update.tone}>
+                  <li
+                    key={`${update.filed}-${update.text}`}
+                    data-tone={update.tone}
+                  >
                     <time dateTime={update.filed}>{update.filed}</time>
                     <span>{update.text}</span>
                   </li>
@@ -60,7 +66,10 @@ export function RecordStatusCells({ code, onOpenRecord }: {
       ) : null}
 
       {explorations.length > 0 ? (
-        <Popover.Root open={explorationsOpen} onOpenChange={setExplorationsOpen}>
+        <Popover.Root
+          open={explorationsOpen}
+          onOpenChange={setExplorationsOpen}
+        >
           <Popover.Trigger className="reader-status-cell reader-status-action">
             {t("explorationsCount", { count: explorations.length })}
           </Popover.Trigger>
@@ -72,7 +81,9 @@ export function RecordStatusCells({ code, onOpenRecord }: {
               sideOffset={6}
               aria-label={t("explorationsTitle")}
             >
-              <p className="reader-status-panel-title">{t("explorationsTitle")}</p>
+              <p className="reader-status-panel-title">
+                {t("explorationsTitle")}
+              </p>
               <ul className="reader-status-explorations">
                 {explorations.map((item) => (
                   <li key={item.code}>
@@ -85,9 +96,15 @@ export function RecordStatusCells({ code, onOpenRecord }: {
                         setExplorationsOpen(false);
                       }}
                     >
-                      <span className="reader-status-record-code circa-mono">{item.code}</span>
-                      <span className="reader-status-record-org">{item.organization}</span>
-                      <span className="reader-status-record-preview">{item.preview}</span>
+                      <span className="reader-status-record-code circa-mono">
+                        {item.code}
+                      </span>
+                      <span className="reader-status-record-org">
+                        {item.organization}
+                      </span>
+                      <span className="reader-status-record-preview">
+                        {item.preview}
+                      </span>
                     </button>
                   </li>
                 ))}

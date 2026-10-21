@@ -24,12 +24,12 @@ A condition can be satisfied unintentionally. Where the rule is fulfilled, the a
 
 Intelligence does not grant unrestricted authority over the rules.
 
-| Layer | Ordinary limit of intelligent alteration |
-| --- | --- |
-| **Participation rules** | May change the conditions governing admission or participation. |
-| **Completion requirements** | May change what must be satisfied to reach the conclusion. |
-| **Underlying story and ending** | Cannot ordinarily be rewritten merely because an actor dislikes the result. |
-| **Actor behavior and limitations** | Continue to constrain what the actor can do. |
+| Layer                              | Ordinary limit of intelligent alteration                                    |
+| ---------------------------------- | --------------------------------------------------------------------------- |
+| **Participation rules**            | May change the conditions governing admission or participation.             |
+| **Completion requirements**        | May change what must be satisfied to reach the conclusion.                  |
+| **Underlying story and ending**    | Cannot ordinarily be rewritten merely because an actor dislikes the result. |
+| **Actor behavior and limitations** | Continue to constrain what the actor can do.                                |
 
 Exceptions occur among higher classifications. The particular exception requires its own account; the label alone does not establish an unlimited ability to rewrite the system.
 

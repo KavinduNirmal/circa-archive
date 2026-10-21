@@ -11,8 +11,12 @@ function openEditor(body = "") {
   renderWithIntl(<WordWindow initialBody={body} onCloseWindow={() => {}} />);
   const root = document.querySelector<HTMLElement>(".word");
   if (!root) throw new Error("the editor did not render");
-  const area = () => within(root).getByLabelText("Record body, in Markdown") as HTMLTextAreaElement;
-  const bar = () => within(root).getByRole("toolbar", { name: "Markdown tools" });
+  const area = () =>
+    within(root).getByLabelText(
+      "Record body, in Markdown",
+    ) as HTMLTextAreaElement;
+  const bar = () =>
+    within(root).getByRole("toolbar", { name: "Markdown tools" });
   const tool = (name: string) => within(bar()).getByRole("button", { name });
   const status = () => within(root).getByRole("status").textContent ?? "";
   const menu = async (title: string) => {
@@ -39,11 +43,17 @@ function openEditor(body = "") {
 describe("record editor", () => {
   it("opens as a word processor: menu bar, format bar, ruler, sheet, and status cells", () => {
     const { root, area, status } = openEditor("# Heading\n\ntwo words");
-    expect(within(root).getByRole("menubar", { name: "CIRCA Word menu" })).toBeVisible();
-    expect(within(root).getByRole("toolbar", { name: "Markdown tools" })).toBeVisible();
+    expect(
+      within(root).getByRole("menubar", { name: "CIRCA Word menu" }),
+    ).toBeVisible();
+    expect(
+      within(root).getByRole("toolbar", { name: "Markdown tools" }),
+    ).toBeVisible();
     // The ruler is decorative and hidden from assistive tech rather than announced.
     expect(root.querySelector(".word-ruler")).not.toBeNull();
-    expect(within(root).getByLabelText("Record body, in Markdown")).toBeVisible();
+    expect(
+      within(root).getByLabelText("Record body, in Markdown"),
+    ).toBeVisible();
     expect(area().value).toBe("# Heading\n\ntwo words");
     // The status bar reports the document and where the caret is.
     expect(status()).toContain("4 words, 3 lines, 20 characters");
@@ -56,9 +66,29 @@ describe("record editor", () => {
 
   it("carries the markdown tools rather than a picture of the result", () => {
     const { tool } = openEditor("");
-    const expected = ["Bold", "Italic", "Strikethrough", "Inline code", "Heading 1", "Heading 2", "Heading 3",
-      "Bulleted list", "Numbered list", "Blockquote", "Code block", "Link", "Image", "Table", "Horizontal rule", "Clear formatting"];
-    for (const name of expected) expect(tool(name), `${name} is missing from the format bar`).toBeVisible();
+    const expected = [
+      "Bold",
+      "Italic",
+      "Strikethrough",
+      "Inline code",
+      "Heading 1",
+      "Heading 2",
+      "Heading 3",
+      "Bulleted list",
+      "Numbered list",
+      "Blockquote",
+      "Code block",
+      "Link",
+      "Image",
+      "Table",
+      "Horizontal rule",
+      "Clear formatting",
+    ];
+    for (const name of expected)
+      expect(
+        tool(name),
+        `${name} is missing from the format bar`,
+      ).toBeVisible();
     // Each button states the markdown it writes, so nothing is a guess.
     expect(tool("Bold")).toHaveAttribute("title", "Bold  **bold**");
     expect(tool("Code block")).toHaveAttribute("title", "Code block  ```");
@@ -97,7 +127,9 @@ describe("record editor", () => {
     const { user, area, select, tool } = openEditor("the brief");
     await select(4, 9);
     await user.click(tool("Link"));
-    const strip = within(area().ownerDocument.body).getByRole("form", { name: "Link address" });
+    const strip = within(area().ownerDocument.body).getByRole("form", {
+      name: "Link address",
+    });
     const field = within(strip).getByLabelText("Link to");
     await user.type(field, "https://archive.local/x");
     await user.click(within(strip).getByRole("button", { name: "Insert" }));
@@ -105,7 +137,11 @@ describe("record editor", () => {
 
     // Cancelling the strip leaves the document alone.
     await user.click(tool("Link"));
-    await user.click(within(await screen.findByRole("form", { name: "Link address" })).getByRole("button", { name: "Cancel" }));
+    await user.click(
+      within(
+        await screen.findByRole("form", { name: "Link address" }),
+      ).getByRole("button", { name: "Cancel" }),
+    );
     expect(area().value).toBe("the [brief](https://archive.local/x)");
   });
 
@@ -121,9 +157,13 @@ describe("record editor", () => {
     await select(0, 5);
     await user.click(tool("Bold"));
     expect(area().value).toBe("**bravo**");
-    await user.click(within(await menu("Edit")).getByRole("menuitem", { name: /Undo/ }));
+    await user.click(
+      within(await menu("Edit")).getByRole("menuitem", { name: /Undo/ }),
+    );
     expect(area().value).toBe("bravo");
-    await user.click(within(await menu("Edit")).getByRole("menuitem", { name: /Redo/ }));
+    await user.click(
+      within(await menu("Edit")).getByRole("menuitem", { name: /Redo/ }),
+    );
     expect(area().value).toBe("**bravo**");
   });
 
@@ -132,7 +172,9 @@ describe("record editor", () => {
     await user.click(area());
     await user.keyboard("freight car");
     expect(area().value).toBe("freight car");
-    await user.click(within(await menu("Edit")).getByRole("menuitem", { name: /Undo/ }));
+    await user.click(
+      within(await menu("Edit")).getByRole("menuitem", { name: /Undo/ }),
+    );
     expect(area().value).toBe("");
   });
 
@@ -166,7 +208,9 @@ describe("record editor", () => {
 
   it("changes the heading level from the style box instead of stacking markers", async () => {
     const { user, area } = openEditor("# Black dog");
-    const style = within(area().ownerDocument.body).getByLabelText("Style") as HTMLSelectElement;
+    const style = within(area().ownerDocument.body).getByLabelText(
+      "Style",
+    ) as HTMLSelectElement;
     expect(style.value).toBe("h1");
     await user.selectOptions(style, "h2");
     expect(area().value).toBe("## Black dog");
@@ -180,10 +224,16 @@ describe("record editor", () => {
     const file = await screen.findByRole("menu");
     // Save is present and refused with its reason on the item itself. Radix marks
     // a disabled item with `aria-disabled` rather than the `disabled` attribute.
-    expect(within(file).getByRole("menuitem", { name: /Save/ })).toHaveAttribute("aria-disabled", "true");
-    await user.click(within(file).getByRole("menuitem", { name: /File to case/ }));
+    expect(
+      within(file).getByRole("menuitem", { name: /Save/ }),
+    ).toHaveAttribute("aria-disabled", "true");
+    await user.click(
+      within(file).getByRole("menuitem", { name: /File to case/ }),
+    );
     const box = await screen.findByRole("alertdialog");
-    expect(within(box).getByText("This draft cannot be filed yet")).toBeVisible();
+    expect(
+      within(box).getByText("This draft cannot be filed yet"),
+    ).toBeVisible();
     expect(box).toHaveTextContent("LN-POLICY-26");
   });
 
@@ -191,8 +241,12 @@ describe("record editor", () => {
     const { user, root, area } = openEditor("one");
     await user.click(within(root).getByRole("menuitem", { name: "View" }));
     const view = await screen.findByRole("menu");
-    await user.click(within(view).getByRole("menuitemradio", { name: "LARGE" }));
-    expect(within(root).getByRole("status")).toHaveTextContent("Text size: LARGE.");
+    await user.click(
+      within(view).getByRole("menuitemradio", { name: "LARGE" }),
+    );
+    expect(within(root).getByRole("status")).toHaveTextContent(
+      "Text size: LARGE.",
+    );
     expect(root).toHaveAttribute("data-size", "large");
     expect(area().ownerDocument.body.textContent).toContain("LARGE");
   });
@@ -201,31 +255,45 @@ describe("record editor", () => {
     const { user, root } = openEditor("one");
     await user.click(within(root).getByRole("menuitem", { name: "View" }));
     const view = await screen.findByRole("menu");
-    await user.click(within(view).getByRole("menuitemcheckbox", { name: "Ruler" }));
+    await user.click(
+      within(view).getByRole("menuitemcheckbox", { name: "Ruler" }),
+    );
     expect(root).toHaveAttribute("data-ruler", "false");
     expect(root.querySelector(".word-ruler")).toBeNull();
   });
 
   it("starts a new document from the File menu and clears the history", async () => {
     const { user, root, area, menu } = openEditor("draft");
-    await user.click(within(await menu("File")).getByRole("menuitem", { name: /New/ }));
+    await user.click(
+      within(await menu("File")).getByRole("menuitem", { name: /New/ }),
+    );
     expect(area().value).toBe("");
     // Nothing to undo, so the Edit menu says so rather than offering a dead item.
     const edit = await menu("Edit");
-    expect(within(edit).getByRole("menuitem", { name: /Undo/ })).toHaveAttribute("aria-disabled", "true");
+    expect(
+      within(edit).getByRole("menuitem", { name: /Undo/ }),
+    ).toHaveAttribute("aria-disabled", "true");
     expect(root).toBeVisible();
   });
 
   it("explains itself in the About and filing policy boxes", async () => {
     const { user, menu } = openEditor("");
-    await user.click(within(await menu("Help")).getByRole("menuitem", { name: /About/ }));
+    await user.click(
+      within(await menu("Help")).getByRole("menuitem", { name: /About/ }),
+    );
     const about = await screen.findByRole("alertdialog");
     expect(within(about).getByText("CIRCA Word 2000")).toBeVisible();
     await user.click(within(about).getByRole("button", { name: "OK" }));
 
-    await user.click(within(await menu("Help")).getByRole("menuitem", { name: "Filing policy" }));
+    await user.click(
+      within(await menu("Help")).getByRole("menuitem", {
+        name: "Filing policy",
+      }),
+    );
     const policy = await screen.findByRole("alertdialog");
-    expect(policy).toHaveTextContent("Records are written in Markdown and filed as .pdf into a case folder");
+    expect(policy).toHaveTextContent(
+      "Records are written in Markdown and filed as .pdf into a case folder",
+    );
   });
 
   it("names its own window title, which the shell reads", () => {

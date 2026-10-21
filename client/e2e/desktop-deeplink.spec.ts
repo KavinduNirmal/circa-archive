@@ -2,7 +2,9 @@ import { readFileSync } from "node:fs";
 import { expect, test, type Page } from "@playwright/test";
 
 /** Read the shipped catalog rather than hard-coding a translation that can drift. */
-const koShell = JSON.parse(readFileSync("messages/ko/shell.json", "utf8")) as { readerTitle: string };
+const koShell = JSON.parse(readFileSync("messages/ko/shell.json", "utf8")) as {
+  readerTitle: string;
+};
 
 /**
  * Deep links and history for the workstation.
@@ -30,23 +32,33 @@ test("a destination deep link opens its window", async ({ page }) => {
   await expect(page.getByRole("dialog", { name: ARCHIVE })).toBeVisible();
   await expect(page).toHaveURL(/\/en\/desktop\/archive$/);
   // The URL was adopted, not navigated to; the page did not grow its history.
-  await expect(page.getByRole("region", { name: "Workstation boot" })).toHaveCount(0);
+  await expect(
+    page.getByRole("region", { name: "Workstation boot" }),
+  ).toHaveCount(0);
 });
 
 test("a record deep link opens the reader on that record", async ({ page }) => {
   await enterWorkstation(page, "/en/desktop/record/INC-00014");
   const reader = page.getByRole("dialog", { name: RECORD });
   await expect(reader).toBeVisible();
-  await expect(reader.getByRole("heading", { level: 1 })).toContainText("Unlogged freight car, northbound");
+  await expect(reader.getByRole("heading", { level: 1 })).toContainText(
+    "Unlogged freight car, northbound",
+  );
   await expect(page).toHaveURL(/\/en\/desktop\/record\/INC-00014$/);
 });
 
-test("a continuity code survives its encoded path segment", async ({ page }) => {
+test("a continuity code survives its encoded path segment", async ({
+  page,
+}) => {
   await enterWorkstation(page, "/en/desktop/record/ORG-C-005102%2FC1");
   const reader = page.getByRole("dialog", { name: RECORD });
   await expect(reader).toBeVisible();
-  await expect(reader.getByRole("heading", { level: 1 })).toContainText("Continuity branch, closed");
-  expect(new URL(page.url()).pathname).toBe("/en/desktop/record/ORG-C-005102%2FC1");
+  await expect(reader.getByRole("heading", { level: 1 })).toContainText(
+    "Continuity branch, closed",
+  );
+  expect(new URL(page.url()).pathname).toBe(
+    "/en/desktop/record/ORG-C-005102%2FC1",
+  );
 });
 
 test("unknown destinations and codes are 404", async ({ page }) => {
@@ -56,7 +68,9 @@ test("unknown destinations and codes are 404", async ({ page }) => {
   expect(record?.status()).toBe(404);
 });
 
-test("opening a destination pushes and Back restores the previous URL", async ({ page }) => {
+test("opening a destination pushes and Back restores the previous URL", async ({
+  page,
+}) => {
   await enterWorkstation(page, "/en/desktop");
   const rail = page.getByRole("navigation", { name: "Desktop folders" });
   await rail.getByRole("button", { name: "Archive", exact: true }).click();
@@ -72,19 +86,32 @@ test("opening a destination pushes and Back restores the previous URL", async ({
   const taskbar = page.locator("footer[aria-label='Taskbar']");
   // Archive is focused again, and Inbox is still open — Back moves focus, it
   // does not unwind the desktop.
-  await expect(taskbar.getByRole("button", { name: ARCHIVE, exact: true })).toHaveAttribute("data-active", "true");
-  await expect(taskbar.getByRole("button", { name: /Titan Mail/, exact: true })).toBeVisible();
+  await expect(
+    taskbar.getByRole("button", { name: ARCHIVE, exact: true }),
+  ).toHaveAttribute("data-active", "true");
+  await expect(
+    taskbar.getByRole("button", { name: /Titan Mail/, exact: true }),
+  ).toBeVisible();
   // An in-workspace navigation keeps the shell mounted: the post never replays.
-  await expect(page.getByRole("region", { name: "Workstation boot" })).toHaveCount(0);
+  await expect(
+    page.getByRole("region", { name: "Workstation boot" }),
+  ).toHaveCount(0);
 
   await page.goForward();
   await expect(page).toHaveURL(/\/en\/desktop\/inbox$/);
-  await expect(taskbar.getByRole("button", { name: /Titan Mail/, exact: true })).toHaveAttribute("data-active", "true");
+  await expect(
+    taskbar.getByRole("button", { name: /Titan Mail/, exact: true }),
+  ).toHaveAttribute("data-active", "true");
 });
 
-test("Back and Forward move the reader cursor without appending to the trail", async ({ page }) => {
+test("Back and Forward move the reader cursor without appending to the trail", async ({
+  page,
+}) => {
   await enterWorkstation(page, "/en/desktop");
-  await page.getByRole("navigation", { name: "Desktop folders" }).getByRole("button", { name: "Search", exact: true }).click();
+  await page
+    .getByRole("navigation", { name: "Desktop folders" })
+    .getByRole("button", { name: "Search", exact: true })
+    .click();
   const browser = page.getByRole("dialog", { name: BROWSER });
   await browser.getByRole("button", { name: "INC-00907", exact: true }).click();
   const reader = page.getByRole("dialog", { name: RECORD });
@@ -92,52 +119,79 @@ test("Back and Forward move the reader cursor without appending to the trail", a
   await expect(page).toHaveURL(/\/en\/desktop\/record\/INC-00907$/);
 
   // A follow-up opens the second record in the same viewer.
-  const inbound = reader.getByRole("region", { name: "Subsequent Records" }).getByRole("list", { name: "Filed against this record" });
+  const inbound = reader
+    .getByRole("region", { name: "Subsequent Records" })
+    .getByRole("list", { name: "Filed against this record" });
   await inbound.getByRole("button", { name: /INC-00027/ }).click();
-  await expect(reader.getByRole("heading", { level: 1 })).toContainText("Signal repeat interval");
+  await expect(reader.getByRole("heading", { level: 1 })).toContainText(
+    "Signal repeat interval",
+  );
   await expect(page).toHaveURL(/\/en\/desktop\/record\/INC-00027$/);
 
   // Back is a cursor move inside the trail, not a new visit: Forward within the
   // viewer still reaches the record that was read after it.
   await page.goBack();
   await expect(page).toHaveURL(/\/en\/desktop\/record\/INC-00907$/);
-  await expect(reader.getByRole("heading", { level: 1 })).toContainText("Tide gauge disagreement, two stations");
+  await expect(reader.getByRole("heading", { level: 1 })).toContainText(
+    "Tide gauge disagreement, two stations",
+  );
   const next = reader.getByRole("button", { name: "Next record", exact: true });
   await expect(next).toBeEnabled();
   await next.click();
-  await expect(reader.getByRole("heading", { level: 1 })).toContainText("Signal repeat interval");
+  await expect(reader.getByRole("heading", { level: 1 })).toContainText(
+    "Signal repeat interval",
+  );
   // The reader's own Forward is a position change, so it replaces the address.
   await expect(page).toHaveURL(/\/en\/desktop\/record\/INC-00027$/);
 });
 
-test("closing and minimizing replace the URL with the surviving window", async ({ page }) => {
+test("closing and minimizing replace the URL with the surviving window", async ({
+  page,
+}) => {
   await enterWorkstation(page, "/en/desktop/archive");
   // Escape closes the focused window; with nothing left, the address is the bare workstation.
   await page.keyboard.press("Escape");
   await expect(page.getByRole("dialog", { name: ARCHIVE })).toHaveCount(0);
   await expect(page).toHaveURL(/\/en\/desktop$/);
 
-  await page.getByRole("navigation", { name: "Desktop folders" }).getByRole("button", { name: "Archive", exact: true }).click();
+  await page
+    .getByRole("navigation", { name: "Desktop folders" })
+    .getByRole("button", { name: "Archive", exact: true })
+    .click();
   await expect(page).toHaveURL(/\/en\/desktop\/archive$/);
-  await page.getByRole("navigation", { name: "Desktop folders" }).getByRole("button", { name: "Inbox", exact: true }).click();
+  await page
+    .getByRole("navigation", { name: "Desktop folders" })
+    .getByRole("button", { name: "Inbox", exact: true })
+    .click();
   await expect(page).toHaveURL(/\/en\/desktop\/inbox$/);
 
-  await page.getByRole("button", { name: /Minimize Titan Mail/, exact: true }).click();
+  await page
+    .getByRole("button", { name: /Minimize Titan Mail/, exact: true })
+    .click();
   await expect(page).toHaveURL(/\/en\/desktop\/archive$/);
 });
 
-test("the workstation addresses are noindex and the Korean route is Korean", async ({ page }) => {
+test("the workstation addresses are noindex and the Korean route is Korean", async ({
+  page,
+}) => {
   await enterWorkstation(page, "/en/desktop/archive");
-  await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", "noindex, nofollow");
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
+    "content",
+    "noindex, nofollow",
+  );
 
   await enterWorkstation(page, "/ko/desktop/record/INC-00014");
   const reader = page.getByRole("dialog", { name: koShell.readerTitle });
   await expect(reader).toBeVisible();
   // Filed content stays as filed; only the chrome follows the reader's language.
-  await expect(reader.getByRole("heading", { level: 1 })).toContainText("Unlogged freight car, northbound");
+  await expect(reader.getByRole("heading", { level: 1 })).toContainText(
+    "Unlogged freight car, northbound",
+  );
 });
 
-test("a refresh restores the workspace and focuses the URL's window", async ({ page }) => {
+test("a refresh restores the workspace and focuses the URL's window", async ({
+  page,
+}) => {
   await enterWorkstation(page, "/en/desktop");
   const rail = page.getByRole("navigation", { name: "Desktop folders" });
   await rail.getByRole("button", { name: "Archive", exact: true }).click();
@@ -153,12 +207,17 @@ test("a refresh restores the workspace and focuses the URL's window", async ({ p
   await expect(page.getByRole("dialog", { name: ARCHIVE })).toBeVisible();
   await expect(page.getByRole("dialog", { name: /Titan Mail/ })).toBeVisible();
   const taskbar = page.locator("footer[aria-label='Taskbar']");
-  await expect(taskbar.getByRole("button", { name: /Titan Mail/, exact: true })).toHaveAttribute("data-active", "true");
+  await expect(
+    taskbar.getByRole("button", { name: /Titan Mail/, exact: true }),
+  ).toHaveAttribute("data-active", "true");
 });
 
 test("a new tab starts with an empty workspace", async ({ page, context }) => {
   await enterWorkstation(page, "/en/desktop");
-  await page.getByRole("navigation", { name: "Desktop folders" }).getByRole("button", { name: "Archive", exact: true }).click();
+  await page
+    .getByRole("navigation", { name: "Desktop folders" })
+    .getByRole("button", { name: "Archive", exact: true })
+    .click();
   await expect(page.getByRole("dialog", { name: ARCHIVE })).toBeVisible();
 
   // sessionStorage is per tab: a second tab is a second workspace, not a copy.

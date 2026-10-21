@@ -18,7 +18,11 @@ import { warningBag } from "./validate";
  * and the corpus carries two of them inside a table cell.
  */
 
-function partsFor(value: string, line: number | undefined, warnings: RenderWarning[]): PhrasingContent[] | null {
+function partsFor(
+  value: string,
+  line: number | undefined,
+  warnings: RenderWarning[],
+): PhrasingContent[] | null {
   if (!value.includes("||")) return null;
   const parts = value.split("||");
   const delimiters = parts.length - 1;
@@ -40,7 +44,10 @@ function partsFor(value: string, line: number | undefined, warnings: RenderWarni
       continue;
     }
     if (index <= paired) {
-      children.push({ type: "redaction", children: text ? [{ type: "text", value: text }] : [] });
+      children.push({
+        type: "redaction",
+        children: text ? [{ type: "text", value: text }] : [],
+      });
       continue;
     }
     children.push({ type: "text", value: `||${text}` });
@@ -53,7 +60,11 @@ export const remarkRedactions: Plugin<[], Root> = () => (tree, file) => {
   visit(tree, (node, index, parent) => {
     if (node.type !== "text" && node.type !== "inlineCode") return;
     if (!parent || index === undefined || !("children" in parent)) return;
-    const replacement = partsFor(node.value, node.position?.start.line, warnings);
+    const replacement = partsFor(
+      node.value,
+      node.position?.start.line,
+      warnings,
+    );
     if (!replacement) return;
     (parent as Parents).children.splice(index, 1, ...(replacement as never[]));
     return [SKIP, index + replacement.length];

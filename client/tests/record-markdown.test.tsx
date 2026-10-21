@@ -6,16 +6,20 @@ import { describe, expect, it } from "vitest";
 import { RecordMarkdown } from "@/components/reader/record-markdown";
 import { renderWithIntl } from "./intl";
 
-const CORPUS = readFileSync(resolve(process.cwd(), "public/Ghost_story.md"), "utf8");
+const CORPUS = readFileSync(
+  resolve(process.cwd(), "public/Ghost_story.md"),
+  "utf8",
+);
 
-const mount = (source: string) => renderWithIntl(<RecordMarkdown source={source} />);
+const mount = (source: string) =>
+  renderWithIntl(<RecordMarkdown source={source} />);
 const sheet = () => document.body;
 
 /** The mark holding one particular withheld phrase, found by its own text. */
 function markFor(text: string): HTMLElement {
-  const found = [...sheet().querySelectorAll<HTMLElement>("mark.reader-redaction-inline")].find(
-    (mark) => mark.textContent === text,
-  );
+  const found = [
+    ...sheet().querySelectorAll<HTMLElement>("mark.reader-redaction-inline"),
+  ].find((mark) => mark.textContent === text);
   if (!found) throw new Error(`No redaction mark holds "${text}".`);
   return found;
 }
@@ -23,9 +27,15 @@ function markFor(text: string): HTMLElement {
 describe("record markdown viewer", () => {
   it("renders the record's headings without printing its YAML header", () => {
     mount(CORPUS);
-    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("The Unwalled Door");
-    expect(screen.getByRole("heading", { level: 2, name: "Brief" })).toBeVisible();
-    expect(screen.getByRole("heading", { level: 3, name: "Filing Metadata" })).toBeVisible();
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
+      "The Unwalled Door",
+    );
+    expect(
+      screen.getByRole("heading", { level: 2, name: "Brief" }),
+    ).toBeVisible();
+    expect(
+      screen.getByRole("heading", { level: 3, name: "Filing Metadata" }),
+    ).toBeVisible();
     expect(sheet()).not.toHaveTextContent("circa_code");
     expect(sheet()).not.toHaveTextContent("CIRCA-S-03007\n---");
   });
@@ -51,10 +61,9 @@ describe("record markdown viewer", () => {
     expect(within(metadata).getByText("CIRCA-S-03007")).toBeVisible();
     expect(within(metadata).getAllByRole("row")).toHaveLength(13);
     expect(within(crossReference).getByText("Related records")).toBeVisible();
-    expect(within(crossReference).getByRole("link", { name: "INC-00907" })).toHaveAttribute(
-      "href",
-      "/site/records/INC-00907",
-    );
+    expect(
+      within(crossReference).getByRole("link", { name: "INC-00907" }),
+    ).toHaveAttribute("href", "/site/records/INC-00907");
     // Nothing is left of the old typed dump and its stray empty fence.
     expect(sheet()).not.toHaveTextContent("CIRCA CODE:");
     expect(sheet().querySelectorAll("pre")).toHaveLength(0);
@@ -63,7 +72,9 @@ describe("record markdown viewer", () => {
   it("floats a figure the way its directive asked, with a caption and no prefix", () => {
     mount(CORPUS);
     const figures = sheet().querySelectorAll("figure[data-align]");
-    expect([...figures].map((figure) => figure.getAttribute("data-align"))).toEqual(["right", "full", "left"]);
+    expect(
+      [...figures].map((figure) => figure.getAttribute("data-align")),
+    ).toEqual(["right", "full", "left"]);
     const caption = figures[0].querySelector("figcaption");
     expect(caption?.textContent).toMatch(/^Figure 1\./);
     expect(sheet()).not.toHaveTextContent("right|Figure");
@@ -87,7 +98,9 @@ describe("record markdown viewer", () => {
     const mark = markFor("not to be approached");
     await user.click(mark);
     expect(mark).toHaveAttribute("data-revealed", "true");
-    expect(within(mark).getByText("not to be approached")).not.toHaveAttribute("aria-hidden");
+    expect(within(mark).getByText("not to be approached")).not.toHaveAttribute(
+      "aria-hidden",
+    );
     await user.click(mark);
     expect(mark).toHaveAttribute("data-revealed", "false");
   });
@@ -100,14 +113,20 @@ describe("record markdown viewer", () => {
   });
 
   it("emits a real list for a bulleted source, so the sheet's markers have something to style", () => {
-    mount("## Both readings\n\n- Station A, upper estuary: high water 04:07\n- Station B, lower estuary: high water 04:18\n");
+    mount(
+      "## Both readings\n\n- Station A, upper estuary: high water 04:07\n- Station B, lower estuary: high water 04:18\n",
+    );
     const list = screen.getByRole("list");
     expect(within(list).getAllByRole("listitem")).toHaveLength(2);
-    expect(within(list).getAllByRole("listitem")[0]).toHaveTextContent("high water 04:07");
+    expect(within(list).getAllByRole("listitem")[0]).toHaveTextContent(
+      "high water 04:07",
+    );
   });
 
   it("treats a record's markup as text: script and javascript: links are inert", () => {
-    mount("# A record\n\n<script>window.__pwned = true;</script>\n\n[click](javascript:alert(1))\n");
+    mount(
+      "# A record\n\n<script>window.__pwned = true;</script>\n\n[click](javascript:alert(1))\n",
+    );
     expect(sheet().querySelector("script")).toBeNull();
     const link = screen.getByText("click").closest("a");
     expect(link?.getAttribute("href") ?? "").not.toMatch(/^javascript:/i);

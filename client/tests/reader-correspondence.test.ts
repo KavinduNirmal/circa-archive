@@ -16,13 +16,19 @@ describe("annotations", () => {
   it("anchors every seeded note to a section the record actually has", () => {
     for (const note of ANNOTATIONS) {
       const sections = recordDocument(note.code)?.sections ?? [];
-      expect(sections.map((section) => section.id), `${note.code} ${note.sectionId}`).toContain(note.sectionId);
+      expect(
+        sections.map((section) => section.id),
+        `${note.code} ${note.sectionId}`,
+      ).toContain(note.sectionId);
     }
   });
 
   it("keeps replies one level deep, the way marginalia works", () => {
     for (const note of ANNOTATIONS) {
-      expect(note.replies.every((reply) => !("replies" in reply)), note.id).toBe(true);
+      expect(
+        note.replies.every((reply) => !("replies" in reply)),
+        note.id,
+      ).toBe(true);
     }
   });
 
@@ -44,14 +50,22 @@ describe("annotations", () => {
   it("drops a note whose section is not in the document in front of it", () => {
     const all = recordDocument("INC-00042")?.sections ?? [];
     const openingOnly = all.slice(0, 1);
-    expect(notesFor(ANNOTATIONS, "INC-00042", openingOnly).length).toBeLessThan(notesFor(ANNOTATIONS, "INC-00042", all).length);
+    expect(notesFor(ANNOTATIONS, "INC-00042", openingOnly).length).toBeLessThan(
+      notesFor(ANNOTATIONS, "INC-00042", all).length,
+    );
     expect(notesFor(ANNOTATIONS, "INC-00042", []).length).toBe(0);
   });
 
   it("files no notes against a record nobody has annotated", () => {
     const sections = recordDocument("INC-00014")?.sections ?? [];
     expect(notesFor(ANNOTATIONS, "INC-00014", sections)).toEqual([]);
-    expect(notesFor(ANNOTATIONS, "INC-00042", recordDocument("INC-00042")?.sections ?? []).length).toBeGreaterThan(0);
+    expect(
+      notesFor(
+        ANNOTATIONS,
+        "INC-00042",
+        recordDocument("INC-00042")?.sections ?? [],
+      ).length,
+    ).toBeGreaterThan(0);
   });
 });
 
@@ -69,20 +83,29 @@ describe("follow-up records", () => {
     expect(inbound.map((card) => card.code)).toContain("INC-00204");
     expect(outbound.map((card) => card.code)).toContain("INC-00014");
     // A citation is one direction only, so no record appears in both lists.
-    const both = inbound.filter((card) => outbound.some((other) => other.code === card.code));
+    const both = inbound.filter((card) =>
+      outbound.some((other) => other.code === card.code),
+    );
     expect(both).toEqual([]);
   });
 
   it("only ever points at a code the archive index can open", () => {
     for (const entry of ARCHIVE_INDEX) {
-      for (const card of [...followUpsFor(entry.code).inbound, ...followUpsFor(entry.code).outbound]) {
-        expect(codes.has(card.code), `${entry.code} -> ${card.code}`).toBe(true);
+      for (const card of [
+        ...followUpsFor(entry.code).inbound,
+        ...followUpsFor(entry.code).outbound,
+      ]) {
+        expect(codes.has(card.code), `${entry.code} -> ${card.code}`).toBe(
+          true,
+        );
       }
     }
   });
 
   it("describes a card from the archive's own index entry, not a second copy", () => {
-    const card = followUpsFor("INC-00907").inbound.find((item) => item.code === "INC-00027");
+    const card = followUpsFor("INC-00907").inbound.find(
+      (item) => item.code === "INC-00027",
+    );
     const entry = ARCHIVE_INDEX.find((item) => item.code === "INC-00027");
     expect(card?.organization).toBe(entry?.organization);
     expect(card?.preview).toBe(entry?.abstract);
@@ -113,7 +136,9 @@ describe("exploration records", () => {
   it("lists the records filed against a record whose filing type is exploration", () => {
     const explorations = explorationsFor("INC-00027");
     expect(explorations.map((item) => item.code)).toContain("INC-00907");
-    expect(explorations.every((item) => item.type === "EXPLORATION")).toBe(true);
+    expect(explorations.every((item) => item.type === "EXPLORATION")).toBe(
+      true,
+    );
   });
 
   it("does not call a record's own citations its explorations", () => {
@@ -125,14 +150,19 @@ describe("exploration records", () => {
     for (const entry of ARCHIVE_INDEX) {
       for (const item of explorationsFor(entry.code)) {
         expect(item.type, `${entry.code} -> ${item.code}`).toBe("EXPLORATION");
-        expect(codes.has(item.code), `${entry.code} -> ${item.code}`).toBe(true);
+        expect(codes.has(item.code), `${entry.code} -> ${item.code}`).toBe(
+          true,
+        );
       }
     }
   });
 
   it("keeps the parent's count and the row's record in agreement", () => {
     const explorations = explorationsFor("ORG-C-005102");
-    expect(explorations.map((item) => item.code)).toEqual(["ORG-C-005102/C1", "ORG-U-000011"]);
+    expect(explorations.map((item) => item.code)).toEqual([
+      "ORG-C-005102/C1",
+      "ORG-U-000011",
+    ]);
   });
 });
 
@@ -140,14 +170,18 @@ describe("correspondent user codes", () => {
   it("issues a six-digit code to every writer the margin can name", () => {
     const writers = [
       ...ANNOTATIONS.map((note) => note.author),
-      ...ANNOTATIONS.flatMap((note) => note.replies.map((reply) => reply.author)),
+      ...ANNOTATIONS.flatMap((note) =>
+        note.replies.map((reply) => reply.author),
+      ),
     ];
     for (const writer of writers) {
       if (writer === "Unattributed") continue;
       expect(userCodeFor(writer), writer).toMatch(/^\d{6}$/);
     }
     // Distinct, so the margin never shows two correspondents with one number.
-    const codes = writers.filter((writer) => writer !== "Unattributed").map((writer) => userCodeFor(writer));
+    const codes = writers
+      .filter((writer) => writer !== "Unattributed")
+      .map((writer) => userCodeFor(writer));
     expect(new Set(codes).size).toBe(codes.length);
   });
 

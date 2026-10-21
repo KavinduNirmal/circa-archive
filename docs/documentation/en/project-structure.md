@@ -36,13 +36,13 @@ A route under app/[lang] composes: it resolves the language, sets the request lo
 
 What is translated and what is not is a product decision, not an accident.
 
-| Kind | Lives in | Translated? |
-| --- | --- | --- |
-| Interface chrome | `messages/<locale>/*.json` | Yes |
-| Filed records | `*-index.ts, *-sources.ts` | No |
-| Project pages | `messages/<locale>/meta.json` | Yes |
-| Documentation articles | `docs/documentation/<locale>/*.md` | Yes |
-| Identifiers | code and data modules | No |
+| Kind                   | Lives in                           | Translated? |
+| ---------------------- | ---------------------------------- | ----------- |
+| Interface chrome       | `messages/<locale>/*.json`         | Yes         |
+| Filed records          | `*-index.ts, *-sources.ts`         | No          |
+| Project pages          | `messages/<locale>/meta.json`      | Yes         |
+| Documentation articles | `docs/documentation/<locale>/*.md` | Yes         |
+| Identifiers            | code and data modules              | No          |
 
 An archive does not translate a document that was filed in English. The catalog test keeps the two languages aligned, and the archive's own guide explains the gap to a reader.
 

@@ -19,10 +19,15 @@ export function SignOutButton({ onSuccess }: { onSuccess?: () => void }) {
     setPending(true);
     setFailed(false);
     try {
-      const response = await authFetch("/api/v1/auth/logout", { method: "POST" });
+      const response = await authFetch("/api/v1/auth/logout", {
+        method: "POST",
+      });
       if (!response.ok) throw new Error("logout_failed");
       if (onSuccess) onSuccess();
-      else window.location.assign(new URL(`/${locale}/site`, window.location.origin).href);
+      else
+        window.location.assign(
+          new URL(`/${locale}/site`, window.location.origin).href,
+        );
     } catch {
       setFailed(true);
     } finally {
@@ -31,8 +36,16 @@ export function SignOutButton({ onSuccess }: { onSuccess?: () => void }) {
     }
   }
 
-  return <div>
-    <ArchiveButton tone="paper" onClick={signOut} disabled={pending}>{t(pending ? "pending" : "signOut")}</ArchiveButton>
-    {failed && <p role="alert" className={styles.notice}>{t("unavailable")}</p>}
-  </div>;
+  return (
+    <div>
+      <ArchiveButton tone="paper" onClick={signOut} disabled={pending}>
+        {t(pending ? "pending" : "signOut")}
+      </ArchiveButton>
+      {failed && (
+        <p role="alert" className={styles.notice}>
+          {t("unavailable")}
+        </p>
+      )}
+    </div>
+  );
 }

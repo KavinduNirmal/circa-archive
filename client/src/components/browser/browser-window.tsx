@@ -17,7 +17,13 @@ import {
   type ArchiveDocument,
   type ArchiveTextSize,
 } from "./archive-page";
-import { BrowserMenu, BrowserStatus, BrowserTabs, BrowserToolbar, type BrowserActions } from "./browser-chrome";
+import {
+  BrowserMenu,
+  BrowserStatus,
+  BrowserTabs,
+  BrowserToolbar,
+  type BrowserActions,
+} from "./browser-chrome";
 import { BrowserNotice, type BrowserNoticeKind } from "./browser-notice";
 import "./browser.css";
 
@@ -56,7 +62,10 @@ function documentMessageKey(document: ArchiveDocument): string {
  * reader, which is the screen built for reading one, and the index stays where
  * it was so Back is still the way to the list you found the code on.
  */
-export function ArchiveBrowser({ onCloseWindow, onOpenRecord }: {
+export function ArchiveBrowser({
+  onCloseWindow,
+  onOpenRecord,
+}: {
   onCloseWindow: () => void;
   onOpenRecord: (code: string) => void;
 }) {
@@ -68,14 +77,20 @@ export function ArchiveBrowser({ onCloseWindow, onOpenRecord }: {
   const [textSize, setTextSize] = useState<ArchiveTextSize>("normal");
   const [notice, setNotice] = useState<BrowserNoticeKind | null>(null);
   const [visited, setVisited] = useState<readonly string[]>([]);
-  const [status, setStatus] = useState<StatusMessage>({ key: "statusReady", values: { count: ARCHIVE_INDEX.length } });
+  const [status, setStatus] = useState<StatusMessage>({
+    key: "statusReady",
+    values: { count: ARCHIVE_INDEX.length },
+  });
   const statusText = t(status.key, status.values);
   // The words the page prints for a class and a status, so a query matches what
   // the reader can see rather than only the index's English vocabulary.
   const vocabulary = archiveVocabulary(t);
 
   const document = history[cursor];
-  const results = document.kind === "results" ? searchArchive(document.query, ARCHIVE_INDEX, vocabulary) : [];
+  const results =
+    document.kind === "results"
+      ? searchArchive(document.query, ARCHIVE_INDEX, vocabulary)
+      : [];
   const canGoBack = cursor > 0;
   const canGoForward = cursor < history.length - 1;
   /** Pushes a document, which is what every deliberate navigation does. */
@@ -99,11 +114,18 @@ export function ArchiveBrowser({ onCloseWindow, onOpenRecord }: {
   function report(query: ArchiveQuery) {
     const matched = searchArchive(query, ARCHIVE_INDEX, vocabulary);
     const scope = [
-      query.text.trim() ? t("scopeTerm", { term: query.text.trim() }) : t("scopeWholeIndex"),
-      query.klass === "all" ? t("scopeAllClasses") : t(CLASS_MESSAGE_KEYS[query.klass]),
+      query.text.trim()
+        ? t("scopeTerm", { term: query.text.trim() })
+        : t("scopeWholeIndex"),
+      query.klass === "all"
+        ? t("scopeAllClasses")
+        : t(CLASS_MESSAGE_KEYS[query.klass]),
       t(PERIOD_MESSAGE_KEYS[query.period]),
     ].join(" · ");
-    setStatus({ key: "statusMatch", values: { count: matched.length, total: ARCHIVE_INDEX.length, scope } });
+    setStatus({
+      key: "statusMatch",
+      values: { count: matched.length, total: ARCHIVE_INDEX.length, scope },
+    });
   }
 
   function runSearch() {
@@ -130,23 +152,36 @@ export function ArchiveBrowser({ onCloseWindow, onOpenRecord }: {
   /** Hands the code to the reader and stays where it is, so the index is not lost. */
   function handOff(code: string) {
     onOpenRecord(code);
-    setVisited((current) => (current.includes(code) ? current : [...current, code]));
+    setVisited((current) =>
+      current.includes(code) ? current : [...current, code],
+    );
     setStatus({ key: "statusOpened", values: { code } });
   }
 
   function openHome() {
     go({ kind: "home" });
-    setStatus({ key: "statusArchiveHome", values: { count: ARCHIVE_INDEX.length } });
+    setStatus({
+      key: "statusArchiveHome",
+      values: { count: ARCHIVE_INDEX.length },
+    });
   }
 
   function clearAll() {
     setDraft(EMPTY_QUERY);
     go({ kind: "home" });
-    setStatus({ key: "statusFiltersCleared", values: { count: ARCHIVE_INDEX.length } });
+    setStatus({
+      key: "statusFiltersCleared",
+      values: { count: ARCHIVE_INDEX.length },
+    });
   }
 
   function refresh() {
-    setStatus({ key: document.kind === "home" ? "statusIndexReloaded" : "statusSearchReloaded" });
+    setStatus({
+      key:
+        document.kind === "home"
+          ? "statusIndexReloaded"
+          : "statusSearchReloaded",
+    });
   }
 
   function attemptNewTab() {
@@ -177,18 +212,48 @@ export function ArchiveBrowser({ onCloseWindow, onOpenRecord }: {
 
   return (
     <div className="browser">
-      <BrowserMenu textSize={textSize} onTextSizeChange={setTextSize}
-        canGoBack={canGoBack} canGoForward={canGoForward} actions={actions} />
-      <BrowserToolbar address={address} onAddressChange={setAddress} onAddressSubmit={submitAddress}
-        canGoBack={canGoBack} canGoForward={canGoForward} actions={actions} />
+      <BrowserMenu
+        textSize={textSize}
+        onTextSizeChange={setTextSize}
+        canGoBack={canGoBack}
+        canGoForward={canGoForward}
+        actions={actions}
+      />
+      <BrowserToolbar
+        address={address}
+        onAddressChange={setAddress}
+        onAddressSubmit={submitAddress}
+        canGoBack={canGoBack}
+        canGoForward={canGoForward}
+        actions={actions}
+      />
       <BrowserTabs onOpenHome={openHome} onNewTab={attemptNewTab} />
-      <div className="browser-page" id="browser-page" role="tabpanel" aria-labelledby="browser-tab-archive">
-        <ArchivePage document={document} draft={draft} results={results} visited={visited} textSize={textSize}
-          onDraftChange={setDraft} onSearch={runSearch} onClear={clearAll} onOpenRecord={handOff}
-          onIndexLink={openIndexLink} onWidenPeriod={widenPeriod} />
+      <div
+        className="browser-page"
+        id="browser-page"
+        role="tabpanel"
+        aria-labelledby="browser-tab-archive"
+      >
+        <ArchivePage
+          document={document}
+          draft={draft}
+          results={results}
+          visited={visited}
+          textSize={textSize}
+          onDraftChange={setDraft}
+          onSearch={runSearch}
+          onClear={clearAll}
+          onOpenRecord={handOff}
+          onIndexLink={openIndexLink}
+          onWidenPeriod={widenPeriod}
+        />
       </div>
       <BrowserStatus status={statusText} />
-      <BrowserNotice kind={notice} attempted={address} onClose={() => setNotice(null)} />
+      <BrowserNotice
+        kind={notice}
+        attempted={address}
+        onClose={() => setNotice(null)}
+      />
     </div>
   );
 }

@@ -35,7 +35,9 @@ export function setMetadata(file: VFile, metadata: RecordMetadata): void {
 
 export function metadataOf(file: VFile): RecordMetadata {
   const existing = (file.data as Record<string, unknown>)[METADATA];
-  return existing && typeof existing === "object" && !Array.isArray(existing) ? (existing as RecordMetadata) : {};
+  return existing && typeof existing === "object" && !Array.isArray(existing)
+    ? (existing as RecordMetadata)
+    : {};
 }
 
 /** The 1-based line an offset sits on, so a warning can point at the source. */
@@ -56,8 +58,14 @@ export function lineOf(source: string, offset: number): number {
  * reconciling it: chrome follows the index entry, prose follows the body, and
  * the disagreement stays visible.
  */
-export function disagreementWarning(markdown: string, metadata: RecordMetadata): RenderWarning | undefined {
-  const declared = typeof metadata.status === "string" ? metadata.status.trim().toUpperCase() : "";
+export function disagreementWarning(
+  markdown: string,
+  metadata: RecordMetadata,
+): RenderWarning | undefined {
+  const declared =
+    typeof metadata.status === "string"
+      ? metadata.status.trim().toUpperCase()
+      : "";
   if (!declared) return undefined;
   const printed = /\bStatus:\s*\*{0,2}([A-Za-z]+)\*{0,2}/.exec(markdown);
   if (!printed) return undefined;

@@ -4,7 +4,10 @@ import type { PersistStorage, StorageValue } from "zustand/middleware";
 import { DesktopShell } from "@/components/desktop-shell";
 import { DesktopUrlSync } from "@/components/desktop-url-sync";
 import type { WorkstationWindowState } from "@/lib/desktop-types";
-import { createPersistedWorkstationStore, type PersistedWorkstationState } from "@/stores/workstation-store";
+import {
+  createPersistedWorkstationStore,
+  type PersistedWorkstationState,
+} from "@/stores/workstation-store";
 import { catalogFor, renderWorkstation } from "./intl";
 
 /**
@@ -32,7 +35,10 @@ const RECORD = shell.readerTitle;
 
 const area = { width: 1200, height: 700 };
 
-const windowState = (id: string, overrides: Partial<WorkstationWindowState> = {}): WorkstationWindowState => ({
+const windowState = (
+  id: string,
+  overrides: Partial<WorkstationWindowState> = {},
+): WorkstationWindowState => ({
   id,
   title: id,
   status: null,
@@ -56,16 +62,23 @@ function seededStorage(seed: StorageValue<PersistedWorkstationState>) {
 /** A storage that withholds the payload until the test releases it. */
 function deferredStorage(seed: StorageValue<PersistedWorkstationState>) {
   let release!: () => void;
-  const gate = new Promise<void>((resolve) => { release = resolve; });
+  const gate = new Promise<void>((resolve) => {
+    release = resolve;
+  });
   const storage: PersistStorage<PersistedWorkstationState> = {
-    getItem: async () => { await gate; return seed; },
+    getItem: async () => {
+      await gate;
+      return seed;
+    },
     setItem: async () => {},
     removeItem: async () => {},
   };
   return { storage, release };
 }
 
-const payload = (state: Partial<PersistedWorkstationState>): StorageValue<PersistedWorkstationState> => ({
+const payload = (
+  state: Partial<PersistedWorkstationState>,
+): StorageValue<PersistedWorkstationState> => ({
   state: {
     windows: [
       windowState("archive", { title: ARCHIVE, z: 1 }),
@@ -96,32 +109,59 @@ describe("restoring a persisted workspace", () => {
       await Promise.resolve();
     });
 
-    await waitFor(() => expect(screen.getByRole("dialog", { name: ARCHIVE })).toBeVisible());
+    await waitFor(() =>
+      expect(screen.getByRole("dialog", { name: ARCHIVE })).toBeVisible(),
+    );
     expect(screen.getByRole("dialog", { name: MAIL })).toBeVisible();
     expect(store.getState().hydrated).toBe(true);
   });
 
   it("restores every window and focuses the record the URL names", async () => {
     nav.pathname = "/desktop/record/INC-00014";
-    const store = createPersistedWorkstationStore({ storage: seededStorage(payload({})) });
-    renderWorkstation(<><DesktopShell /><DesktopUrlSync /></>, { store });
+    const store = createPersistedWorkstationStore({
+      storage: seededStorage(payload({})),
+    });
+    renderWorkstation(
+      <>
+        <DesktopShell />
+        <DesktopUrlSync />
+      </>,
+      { store },
+    );
 
     const reader = await screen.findByRole("dialog", { name: RECORD });
-    expect(within(reader).getByRole("heading", { level: 1 })).toHaveTextContent("Unlogged freight car, northbound");
+    expect(within(reader).getByRole("heading", { level: 1 })).toHaveTextContent(
+      "Unlogged freight car, northbound",
+    );
     // The two persisted windows survive; the URL's resource wins focus.
-    expect(store.getState().windows.map((item) => item.id).sort()).toEqual(["archive", "inbox", "reader"]);
+    expect(
+      store
+        .getState()
+        .windows.map((item) => item.id)
+        .sort(),
+    ).toEqual(["archive", "inbox", "reader"]);
     expect(store.getState().lastFocused).toBe("reader");
   });
 
   it("follows the restored focus when the URL is the bare workstation", async () => {
     nav.pathname = "/desktop";
-    const store = createPersistedWorkstationStore({ storage: seededStorage(payload({ lastFocused: "archive" })) });
-    renderWorkstation(<><DesktopShell /><DesktopUrlSync /></>, { store });
+    const store = createPersistedWorkstationStore({
+      storage: seededStorage(payload({ lastFocused: "archive" })),
+    });
+    renderWorkstation(
+      <>
+        <DesktopShell />
+        <DesktopUrlSync />
+      </>,
+      { store },
+    );
 
     await screen.findByRole("dialog", { name: ARCHIVE });
     // A restored workspace opened at /desktop replaces the address with the
     // focused window, so a refresh lands on what the reader was doing.
-    await waitFor(() => expect(router.replace).toHaveBeenCalledWith("/desktop/archive"));
+    await waitFor(() =>
+      expect(router.replace).toHaveBeenCalledWith("/desktop/archive"),
+    );
     expect(store.getState().lastFocused).toBe("archive");
   });
 });

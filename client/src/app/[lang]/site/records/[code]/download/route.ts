@@ -11,7 +11,10 @@ import { renderText } from "@/lib/markdown/emitters/to-text";
  * copy to give, so the request fails rather than returning a page-shaped
  * substitute.
  */
-export async function GET(request: Request, { params }: { params: Promise<{ lang: string; code: string }> }) {
+export async function GET(
+  request: Request,
+  { params }: { params: Promise<{ lang: string; code: string }> },
+) {
   const { code } = await params;
   const entry = ARCHIVE_INDEX.find((item) => item.code === code);
   const source = recordSource(code);
@@ -22,17 +25,22 @@ export async function GET(request: Request, { params }: { params: Promise<{ lang
     });
   }
 
-  const format = new URL(request.url).searchParams.get("format") === "md" ? "md" : "txt";
+  const format =
+    new URL(request.url).searchParams.get("format") === "md" ? "md" : "txt";
   const header = [
     entry.designation ?? "Designation withheld",
     `${entry.code} · filed ${entry.filed} · ${entry.organization} · ${entry.clearance}`,
     "",
   ].join("\n");
-  const body = format === "md" ? source : renderText({ markdown: source }).output;
+  const body =
+    format === "md" ? source : renderText({ markdown: source }).output;
 
   return new Response(header + body, {
     headers: {
-      "content-type": format === "md" ? "text/markdown; charset=utf-8" : "text/plain; charset=utf-8",
+      "content-type":
+        format === "md"
+          ? "text/markdown; charset=utf-8"
+          : "text/plain; charset=utf-8",
       "content-disposition": `attachment; filename="${entry.code}.${format}"`,
       "cache-control": "public, max-age=3600",
     },

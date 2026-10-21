@@ -36,7 +36,12 @@ function directiveOf(alt: string): Directive | null {
 
 /** Whether a path needs a base to resolve outside the page it was written for. */
 function isRelativeAsset(url: string): boolean {
-  return !/^[a-z][a-z0-9+.-]*:/i.test(url) && !url.startsWith("//") && !url.startsWith("/") && !url.startsWith("#");
+  return (
+    !/^[a-z][a-z0-9+.-]*:/i.test(url) &&
+    !url.startsWith("//") &&
+    !url.startsWith("/") &&
+    !url.startsWith("#")
+  );
 }
 
 /** Hangs a document-relative path on an absolute origin, leaving absolute ones alone. */
@@ -45,38 +50,40 @@ export function resolveAsset(url: string, assetBaseUrl?: string): string {
   return `${assetBaseUrl.replace(/\/+$/, "")}/${url.replace(/^\.\//, "")}`;
 }
 
-export const remarkImageDirective: Plugin<[ImageDirectiveOptions?], Root> = (options = {}) => (tree, file) => {
-  const warnings = warningBag(file);
-  visit(tree, "paragraph", (node, index, parent) => {
-    if (!parent || index === undefined || node.children.length !== 1) return;
-    const image = node.children[0];
-    if (image.type !== "image") return;
-    const directive = directiveOf(image.alt ?? "");
-    if (!directive) return;
-    const line = image.position?.start.line;
-    if (!directive.known) {
-      warnings.push({
-        code: "unknown-image-align",
-        message: `An image asked for alignment "${(image.alt ?? "").split("|")[0]}"; it is laid out full width instead.`,
-        ...(line === undefined ? {} : { line }),
-      });
-    }
-    if (isRelativeAsset(image.url) && !options.assetBaseUrl) {
-      warnings.push({
-        code: "relative-image",
-        message: `The image at ${image.url} stays a relative path, which only resolves against the page it is served from.`,
-        ...(line === undefined ? {} : { line }),
-      });
-    }
-    const figure: Figure = {
-      type: "figure",
-      url: resolveAsset(image.url, options.assetBaseUrl),
-      caption: directive.caption,
-      align: directive.align,
-      title: image.title ?? null,
-      ...(image.position === undefined ? {} : { position: image.position }),
-    };
-    (parent as Parents).children.splice(index, 1, figure as never);
-    return [SKIP, index + 1];
-  });
-};
+export const remarkImageDirective: Plugin<[ImageDirectiveOptions?], Root> =
+  (options = {}) =>
+  (tree, file) => {
+    const warnings = warningBag(file);
+    visit(tree, "paragraph", (node, index, parent) => {
+      if (!parent || index === undefined || node.children.length !== 1) return;
+      const image = node.children[0];
+      if (image.type !== "image") return;
+      const directive = directiveOf(image.alt ?? "");
+      if (!directive) return;
+      const line = image.position?.start.line;
+      if (!directive.known) {
+        warnings.push({
+          code: "unknown-image-align",
+          message: `An image asked for alignment "${(image.alt ?? "").split("|")[0]}"; it is laid out full width instead.`,
+          ...(line === undefined ? {} : { line }),
+        });
+      }
+      if (isRelativeAsset(image.url) && !options.assetBaseUrl) {
+        warnings.push({
+          code: "relative-image",
+          message: `The image at ${image.url} stays a relative path, which only resolves against the page it is served from.`,
+          ...(line === undefined ? {} : { line }),
+        });
+      }
+      const figure: Figure = {
+        type: "figure",
+        url: resolveAsset(image.url, options.assetBaseUrl),
+        caption: directive.caption,
+        align: directive.align,
+        title: image.title ?? null,
+        ...(image.position === undefined ? {} : { position: image.position }),
+      };
+      (parent as Parents).children.splice(index, 1, figure as never);
+      return [SKIP, index + 1];
+    });
+  };

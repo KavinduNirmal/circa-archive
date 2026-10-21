@@ -23,7 +23,10 @@ import type { ArchiveClass, ArchiveStatus } from "../browser/archive-index";
  * and never imports React: the frame hands it a translator whenever it asks for
  * a word, so the frame stays the only thing that knows who is reading.
  */
-export type ReaderTranslate = (key: string, values?: Record<string, string | number>) => string;
+export type ReaderTranslate = (
+  key: string,
+  values?: Record<string, string | number>,
+) => string;
 
 /* ------------------------------------------------------------------------- */
 /* View and scale                                                             */
@@ -32,7 +35,11 @@ export type ReaderTranslate = (key: string, values?: Record<string, string | num
 /** Which of the reader's three page arrangements the sheet is using. */
 export type ReaderView = "single" | "continuous" | "two-up";
 
-export const READER_VIEWS: readonly ReaderView[] = ["single", "continuous", "two-up"];
+export const READER_VIEWS: readonly ReaderView[] = [
+  "single",
+  "continuous",
+  "two-up",
+];
 
 const VIEW_KEYS: Record<ReaderView, string> = {
   single: "viewSingle",
@@ -58,7 +65,10 @@ export const SCALE_DEFAULT = 100;
 export function stepScale(current: number, direction: 1 | -1): number {
   if (current < SCALE_MIN) return SCALE_MIN;
   if (current > SCALE_MAX) return SCALE_MAX;
-  return Math.min(SCALE_MAX, Math.max(SCALE_MIN, current + direction * SCALE_STEP));
+  return Math.min(
+    SCALE_MAX,
+    Math.max(SCALE_MIN, current + direction * SCALE_STEP),
+  );
 }
 
 /** Whether a scale button has nothing left to do, so it can be disabled with a reason. */
@@ -90,7 +100,12 @@ export function clampScale(value: number): number {
  */
 export type ReaderFont = "courier" | "sans" | "serif" | "mono";
 
-export const READER_FONTS: readonly ReaderFont[] = ["courier", "sans", "serif", "mono"];
+export const READER_FONTS: readonly ReaderFont[] = [
+  "courier",
+  "sans",
+  "serif",
+  "mono",
+];
 
 const FONT_KEYS: Record<ReaderFont, string> = {
   courier: "fontCourier",
@@ -108,10 +123,11 @@ export function fontLabel(font: ReaderFont, t: ReaderTranslate): string {
  * family, because the first three name faces this workstation cannot ship.
  */
 export const FONT_STACKS: Record<ReaderFont, string> = {
-  courier: '"Courier New", Courier, "Nimbus Mono PS", "Liberation Mono", ui-monospace, monospace',
+  courier:
+    '"Courier New", Courier, "Nimbus Mono PS", "Liberation Mono", ui-monospace, monospace',
   sans: 'var(--font-sans), "DejaVu Sans", Verdana, sans-serif',
   serif: 'Georgia, "Times New Roman", "Liberation Serif", serif',
-  mono: 'var(--font-mono), ui-monospace, monospace',
+  mono: "var(--font-mono), ui-monospace, monospace",
 };
 
 /**
@@ -176,7 +192,10 @@ export const FOLLOW_UP_PREVIEW_LIMIT = 10;
 
 /** A labelled value the sheet borrows from the catalogue, or a body the archive holds. */
 export type ReaderBlock =
-  | { kind: "fields"; rows: readonly { label: string; value: string; mono?: boolean }[] }
+  | {
+      kind: "fields";
+      rows: readonly { label: string; value: string; mono?: boolean }[];
+    }
   | { kind: "withheld"; label: string; note: string };
 
 /**
@@ -268,7 +287,11 @@ export function matchRanges(text: string, query: string): TextMatch[] {
 }
 
 /** What the toolbar's search readout says, in the reader's own voice and tongue. */
-export function describeMatches(count: number, query: string, t: ReaderTranslate): string {
+export function describeMatches(
+  count: number,
+  query: string,
+  t: ReaderTranslate,
+): string {
   const term = query.trim();
   if (!term) return "";
   if (count === 0) return t("matchesNone", { term });

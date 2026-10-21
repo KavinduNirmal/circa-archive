@@ -6,16 +6,16 @@ A classification summarizes an assessment of those consequences. Read it with th
 
 ## The scale
 
-| Class | Meaning |
-| --- | --- |
-| **E** | Established as non-hostile or harmless under known conditions. Size, reach, and influence do not by themselves exclude an Incident from this class. |
-| **D** | Low risk. Deaths are uncommon and survival procedures are relatively reliable. |
-| **C** | Moderate risk. Lethal consequences are established and potentially manageable. |
-| **B** | High risk. Significant fatalities or unreliable survival procedures. |
-| **A** | Extreme risk. Survival is highly uncertain, with substantial casualty potential. |
-| **S** | Catastrophic. More than 1,000 confirmed deaths, or comparable disaster potential. |
-| **O — Omega** | A credible extinction-level threat. |
-| **U** | Unclassified. Information is insufficient or contradictory. |
+| Class         | Meaning                                                                                                                                             |
+| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **E**         | Established as non-hostile or harmless under known conditions. Size, reach, and influence do not by themselves exclude an Incident from this class. |
+| **D**         | Low risk. Deaths are uncommon and survival procedures are relatively reliable.                                                                      |
+| **C**         | Moderate risk. Lethal consequences are established and potentially manageable.                                                                      |
+| **B**         | High risk. Significant fatalities or unreliable survival procedures.                                                                                |
+| **A**         | Extreme risk. Survival is highly uncertain, with substantial casualty potential.                                                                    |
+| **S**         | Catastrophic. More than 1,000 confirmed deaths, or comparable disaster potential.                                                                   |
+| **O — Omega** | A credible extinction-level threat.                                                                                                                 |
+| **U**         | Unclassified. Information is insufficient or contradictory.                                                                                         |
 
 Death counts are important evidence. They are not the only evidence relevant to an explorer's chances of returning or ending a manifestation.
 

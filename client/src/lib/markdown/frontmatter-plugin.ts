@@ -23,7 +23,8 @@ export const remarkFrontmatterData: Plugin<[], Root> = () => (tree, file) => {
   if (index === -1) {
     warningBag(file).push({
       code: "metadata-field-missing",
-      message: "The record carries no frontmatter block, so its header fields are missing.",
+      message:
+        "The record carries no frontmatter block, so its header fields are missing.",
       line: 1,
     });
     setMetadata(file, {});
@@ -34,10 +35,14 @@ export const remarkFrontmatterData: Plugin<[], Root> = () => (tree, file) => {
   try {
     parsed = parseYaml(node.value);
   } catch (error) {
-    throw new Error(`The record's frontmatter is not valid YAML: ${(error as Error).message}`);
+    throw new Error(
+      `The record's frontmatter is not valid YAML: ${(error as Error).message}`,
+    );
   }
   const metadata: RecordMetadata =
-    parsed && typeof parsed === "object" && !Array.isArray(parsed) ? (parsed as RecordMetadata) : {};
+    parsed && typeof parsed === "object" && !Array.isArray(parsed)
+      ? (parsed as RecordMetadata)
+      : {};
   setMetadata(file, metadata);
   tree.children.splice(index, 1);
 };

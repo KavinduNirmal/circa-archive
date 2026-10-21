@@ -1,9 +1,21 @@
 /** Localized navigation and reading order. Article content and headings live in GitHub Markdown. */
 
 export const DOC_GROUPS = [
-  { id: "start", labelKey: "docsGroupStart", slugs: ["overview", "getting-started", "project-structure"] },
-  { id: "archive", labelKey: "docsGroupArchive", slugs: ["records", "rendering", "routes"] },
-  { id: "project", labelKey: "docsGroupProject", slugs: ["contributing", "testing", "design"] },
+  {
+    id: "start",
+    labelKey: "docsGroupStart",
+    slugs: ["overview", "getting-started", "project-structure"],
+  },
+  {
+    id: "archive",
+    labelKey: "docsGroupArchive",
+    slugs: ["records", "rendering", "routes"],
+  },
+  {
+    id: "project",
+    labelKey: "docsGroupProject",
+    slugs: ["contributing", "testing", "design"],
+  },
   { id: "author", labelKey: "docsGroupAuthor", slugs: ["author-guide"] },
   {
     id: "lore",
@@ -366,10 +378,15 @@ export function docTopic(slug: string): DocTopic | undefined {
 
 /** The overview is the section's front door, so it keeps the short address. */
 export function docHref(slug: string): string {
-  return slug === "overview" ? "/meta/documentation" : `/meta/documentation/${slug}`;
+  return slug === "overview"
+    ? "/meta/documentation"
+    : `/meta/documentation/${slug}`;
 }
 
-export function docNeighbours(slug: string): { previous?: DocTopic; next?: DocTopic } {
+export function docNeighbours(slug: string): {
+  previous?: DocTopic;
+  next?: DocTopic;
+} {
   const index = DOC_TOPICS.findIndex((topic) => topic.slug === slug);
   if (index === -1) return {};
   return { previous: DOC_TOPICS[index - 1], next: DOC_TOPICS[index + 1] };

@@ -14,7 +14,10 @@ class ResizeObserverStub implements ResizeObserver {
 }
 
 if (!("ResizeObserver" in globalThis)) {
-  Object.defineProperty(globalThis, "ResizeObserver", { value: ResizeObserverStub, writable: true });
+  Object.defineProperty(globalThis, "ResizeObserver", {
+    value: ResizeObserverStub,
+    writable: true,
+  });
 }
 
 afterEach(() => {

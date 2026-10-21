@@ -17,9 +17,25 @@ import { routing } from "./routing";
  */
 export default getRequestConfig(async ({ requestLocale }) => {
   const requested = await requestLocale;
-  const locale = hasLocale(routing.locales, requested) ? requested : routing.defaultLocale;
+  const locale = hasLocale(routing.locales, requested)
+    ? requested
+    : routing.defaultLocale;
 
-  const [auth, metadata, switcher, boot, shell, landing, site, meta, files, mail, word, browser, reader] = await Promise.all([
+  const [
+    auth,
+    metadata,
+    switcher,
+    boot,
+    shell,
+    landing,
+    site,
+    meta,
+    files,
+    mail,
+    word,
+    browser,
+    reader,
+  ] = await Promise.all([
     import(`../../messages/${locale}/auth.json`),
     import(`../../messages/${locale}/metadata.json`),
     import(`../../messages/${locale}/switcher.json`),

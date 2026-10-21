@@ -10,7 +10,9 @@ import { allDestinations, isDestinationId } from "@/lib/desktop-destinations";
  * prerender the route, to fail with a 404 for anything that is not a shortcut,
  * and to keep the closed destination list next to the data that defines it.
  */
-type DestinationPageProps = Readonly<{ params: Promise<{ lang: string; destination: string }> }>;
+type DestinationPageProps = Readonly<{
+  params: Promise<{ lang: string; destination: string }>;
+}>;
 
 /** Only the destinations that exist at build time are addressed; anything else is a 404. */
 export const dynamicParams = false;
@@ -19,7 +21,9 @@ export function generateStaticParams() {
   return allDestinations.map((entry) => ({ destination: entry.id }));
 }
 
-export default async function DestinationPage({ params }: DestinationPageProps) {
+export default async function DestinationPage({
+  params,
+}: DestinationPageProps) {
   const { lang, destination } = await params;
   setRequestLocale(lang);
   // `dynamicParams = false` is the build-time guard; this is the runtime one.

@@ -1,9 +1,22 @@
 import { describe, expect, it } from "vitest";
-import { ARCHIVE_INDEX, CLASS_LABELS, STATUS_LABELS } from "@/components/browser/archive-index";
-import { READER_HELD_LABEL, recordDocument } from "@/components/reader/record-filings";
+import {
+  ARCHIVE_INDEX,
+  CLASS_LABELS,
+  STATUS_LABELS,
+} from "@/components/browser/archive-index";
+import {
+  READER_HELD_LABEL,
+  recordDocument,
+} from "@/components/reader/record-filings";
 
 /** The records the preview actually files a body for, rather than an entry alone. */
-const FILED = ["INC-00014", "INC-00042", "INC-00907", "ORG-C-005102", "CIRCA-S-03007"] as const;
+const FILED = [
+  "INC-00014",
+  "INC-00042",
+  "INC-00907",
+  "ORG-C-005102",
+  "CIRCA-S-03007",
+] as const;
 
 describe("record filings", () => {
   it("builds a sectioned document for every entry in the index", () => {
@@ -37,7 +50,9 @@ describe("record filings", () => {
       const ids = sections.map((section) => section.id);
       expect(new Set(ids).size, code).toBe(ids.length);
       sections.forEach((section, position) => {
-        expect(section.index, `${code} ${section.id}`).toBe(String(position + 1).padStart(2, "0"));
+        expect(section.index, `${code} ${section.id}`).toBe(
+          String(position + 1).padStart(2, "0"),
+        );
         expect(section.id, code).toMatch(/^[a-z0-9-]+$/);
       });
     }
@@ -49,9 +64,15 @@ describe("record filings", () => {
       expect(document?.source, code).toBe("filed");
     }
     const sections = recordDocument("INC-00042")?.sections ?? [];
-    expect(sections.map((section) => section.heading)).toContain("Field account");
+    expect(sections.map((section) => section.heading)).toContain(
+      "Field account",
+    );
     // The prose is Markdown the renderer owns, not a block the model re-describes.
-    expect(sections.some((section) => section.source?.includes("Three surveyors climbed"))).toBe(true);
+    expect(
+      sections.some((section) =>
+        section.source?.includes("Three surveyors climbed"),
+      ),
+    ).toBe(true);
   });
 
   it("files the renderer's corpus, so every feature it carries is reachable in the reader", () => {
@@ -68,7 +89,8 @@ describe("record filings", () => {
       expect(section.source?.length ?? 0, section.heading).toBeGreaterThan(20);
     }
     // The table, the redactions, and the alignment directives are in the source.
-    const source = document?.sections.map((section) => section.source).join("\n") ?? "";
+    const source =
+      document?.sections.map((section) => section.source).join("\n") ?? "";
     expect(source).toContain("||not to be approached||");
     expect(source).toContain("![right|Figure 1.");
     expect(source).toContain("| S-01 |");
@@ -78,16 +100,24 @@ describe("record filings", () => {
     const document = recordDocument("INC-00042");
     const opening = document?.sections[0];
     const fields = opening?.blocks.find((block) => block.kind === "fields");
-    expect(fields && fields.kind === "fields" ? fields.rows.map((row) => row.label) : [])
-      .toEqual(["Class", "Filed", "Status", "Filed by", "Clearance"]);
-    expect(fields && fields.kind === "fields" ? fields.rows[0].value : "").toBe(CLASS_LABELS.incident);
-    expect(fields && fields.kind === "fields" ? fields.rows[2].value : "").toBe(STATUS_LABELS.sealed);
+    expect(
+      fields && fields.kind === "fields"
+        ? fields.rows.map((row) => row.label)
+        : [],
+    ).toEqual(["Class", "Filed", "Status", "Filed by", "Clearance"]);
+    expect(fields && fields.kind === "fields" ? fields.rows[0].value : "").toBe(
+      CLASS_LABELS.incident,
+    );
+    expect(fields && fields.kind === "fields" ? fields.rows[2].value : "").toBe(
+      STATUS_LABELS.sealed,
+    );
   });
 
   it("holds the body of a record the archive has not released", () => {
     const document = recordDocument("CIRCA-M-0002");
     expect(document?.source).toBe("held");
-    const withheld = document?.sections.filter((section) => section.withheld) ?? [];
+    const withheld =
+      document?.sections.filter((section) => section.withheld) ?? [];
     expect(withheld.length).toBeGreaterThan(0);
     for (const section of withheld) {
       expect(section.blocks.map((block) => block.kind)).toEqual(["withheld"]);
@@ -113,9 +143,16 @@ describe("record filings", () => {
   });
 
   it("names sections in the voice of the class, not a single house template", () => {
-    const incident = recordDocument("INC-00014")?.sections.map((section) => section.heading) ?? [];
-    const held = recordDocument("INC-00118")?.sections.map((section) => section.heading) ?? [];
-    const organization = recordDocument("ORG-C-005102")?.sections.map((section) => section.heading) ?? [];
+    const incident =
+      recordDocument("INC-00014")?.sections.map((section) => section.heading) ??
+      [];
+    const held =
+      recordDocument("INC-00118")?.sections.map((section) => section.heading) ??
+      [];
+    const organization =
+      recordDocument("ORG-C-005102")?.sections.map(
+        (section) => section.heading,
+      ) ?? [];
     expect(incident).toContain("Brief");
     expect(held[0]).toBe("Brief");
     expect(organization[0]).toBe("Charter");
@@ -124,7 +161,10 @@ describe("record filings", () => {
   it("keeps every section's heading short enough for the rail to print", () => {
     for (const entry of ARCHIVE_INDEX) {
       for (const section of recordDocument(entry.code)?.sections ?? []) {
-        expect(section.heading.length, `${entry.code} ${section.heading}`).toBeLessThanOrEqual(28);
+        expect(
+          section.heading.length,
+          `${entry.code} ${section.heading}`,
+        ).toBeLessThanOrEqual(28);
       }
     }
   });

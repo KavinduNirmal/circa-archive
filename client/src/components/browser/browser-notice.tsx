@@ -41,7 +41,11 @@ const COPY: Record<BrowserNoticeKind, NoticeCopy> = {
   },
 };
 
-export function BrowserNotice({ kind, attempted, onClose }: {
+export function BrowserNotice({
+  kind,
+  attempted,
+  onClose,
+}: {
   kind: BrowserNoticeKind | null;
   /** The address a refused navigation was aimed at, quoted back in the notice. */
   attempted?: string;
@@ -53,7 +57,12 @@ export function BrowserNotice({ kind, attempted, onClose }: {
    * Only the About heading interpolates the product name; the other messages
    * take no arguments, and an argument a message does not use is ignored.
    */
-  const title = kind === "about" ? t("aboutTitle", { name: BROWSER_NAME }) : copy ? BROWSER_NAME : "";
+  const title =
+    kind === "about"
+      ? t("aboutTitle", { name: BROWSER_NAME })
+      : copy
+        ? BROWSER_NAME
+        : "";
   return (
     <MessageBox
       open={kind !== null}
@@ -61,7 +70,7 @@ export function BrowserNotice({ kind, attempted, onClose }: {
       heading={copy ? t(copy.headingKey, { name: BROWSER_NAME }) : ""}
       body={copy ? t(copy.bodyKey) : ""}
       reference={copy?.reference}
-      detail={kind === "navigation" ? attempted ?? null : null}
+      detail={kind === "navigation" ? (attempted ?? null) : null}
       tone={kind === "about" ? "info" : "warning"}
       onClose={onClose}
     />

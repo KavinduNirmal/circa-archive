@@ -3,14 +3,25 @@ import { ARCHIVE_INDEX } from "@/components/browser/archive-index";
 import { FILING_TYPES } from "@/components/reader/reader-correspondence";
 import { RECORD_UPDATES, updatesFor } from "@/components/reader/record-updates";
 
-const filedOn = (code: string) => ARCHIVE_INDEX.find((entry) => entry.code === code)?.filed ?? "";
+const filedOn = (code: string) =>
+  ARCHIVE_INDEX.find((entry) => entry.code === code)?.filed ?? "";
 
 describe("record status updates", () => {
   it("returns a record's updates newest first", () => {
     const updates = updatesFor("CIRCA-S-03007");
-    expect(updates.map((update) => update.filed)).toEqual(["2004-09-14", "2004-09-13", "2004-09-12"]);
-    expect(updates.some((update) => update.text.includes("severity has been changed"))).toBe(true);
-    expect(updates.some((update) => update.text.includes("[Daydream Inc.]"))).toBe(true);
+    expect(updates.map((update) => update.filed)).toEqual([
+      "2004-09-14",
+      "2004-09-13",
+      "2004-09-12",
+    ]);
+    expect(
+      updates.some((update) =>
+        update.text.includes("severity has been changed"),
+      ),
+    ).toBe(true);
+    expect(
+      updates.some((update) => update.text.includes("[Daydream Inc.]")),
+    ).toBe(true);
   });
 
   it("returns nothing for a record with no filed updates", () => {
@@ -45,6 +56,8 @@ describe("record status updates", () => {
   });
 
   it("copies the fixture so a caller cannot reorder it in place", () => {
-    expect(updatesFor("CIRCA-S-03007")).not.toBe(RECORD_UPDATES["CIRCA-S-03007"]);
+    expect(updatesFor("CIRCA-S-03007")).not.toBe(
+      RECORD_UPDATES["CIRCA-S-03007"],
+    );
   });
 });

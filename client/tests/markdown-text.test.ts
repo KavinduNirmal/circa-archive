@@ -3,7 +3,10 @@ import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 import { renderText } from "@/lib/markdown/emitters/to-text";
 
-const CORPUS = readFileSync(resolve(process.cwd(), "public/Ghost_story.md"), "utf8");
+const CORPUS = readFileSync(
+  resolve(process.cwd(), "public/Ghost_story.md"),
+  "utf8",
+);
 const rendered = renderText({ markdown: CORPUS });
 const text = rendered.output;
 const lines = text.split("\n");
@@ -28,7 +31,9 @@ describe("plain-text export", () => {
     expect(text).toMatch(/^CIRCA CODE:\s+CIRCA-S-03007$/m);
     expect(text).toMatch(/^STATUS:\s+FILED$/m);
     expect(text).toMatch(/^RELATED:\s+INC-00907, INC-00204, CIRCA-R-000441$/m);
-    expect(text).toMatch(/^TAGS:\s+door, record-inconsistency, gangwon, daydream-inc, bureau-crossref$/m);
+    expect(text).toMatch(
+      /^TAGS:\s+door, record-inconsistency, gangwon, daydream-inc, bureau-crossref$/m,
+    );
     expect(text).not.toMatch(/^circa_code:/m);
     expect(text).not.toContain("---\ncirca_code");
   });
@@ -48,23 +53,33 @@ describe("plain-text export", () => {
     expect(block[1]).toMatch(/^-+(\+-+)+$/);
     // Cells line up because every column is padded to its own width.
     const rows = block.filter((line) => line.startsWith("S-"));
-    const positions = rows.filter((row) => row.includes("Both")).map((row) => row.indexOf("Both"));
+    const positions = rows
+      .filter((row) => row.includes("Both"))
+      .map((row) => row.indexOf("Both"));
     expect(new Set(positions).size).toBe(1);
     expect(block.some((line) => line.includes("Two birth dates"))).toBe(true);
   });
 
   it("writes a redaction as a redaction, in every target and not only the paper one", () => {
     expect(text).toContain("[REDACTED]");
-    for (const secret of ["not to be approached", "containment breach", "disaster"]) {
+    for (const secret of [
+      "not to be approached",
+      "containment breach",
+      "disaster",
+    ]) {
       expect(text, secret).not.toContain(secret);
     }
     expect(text).not.toContain("||");
   });
 
   it("keeps an image's caption and drops its path and its alignment prefix", () => {
-    expect(text).toContain("Figure 1. The door, photographed from the south approach, 2004.");
+    expect(text).toContain(
+      "Figure 1. The door, photographed from the south approach, 2004.",
+    );
     expect(text).toContain("Figure 3. Registry discrepancy notice, 2004.");
-    for (const url of [...CORPUS.matchAll(/!\[(?:right|full|left)\|Figure[^\]]*\]\(([^)]+)\)/g)].map((match) => match[1])) {
+    for (const url of [
+      ...CORPUS.matchAll(/!\[(?:right|full|left)\|Figure[^\]]*\]\(([^)]+)\)/g),
+    ].map((match) => match[1])) {
       expect(text, url).not.toContain(url);
     }
     expect(text).not.toMatch(/(right|left|full)\|Figure/);
@@ -96,6 +111,8 @@ describe("plain-text export", () => {
   });
 
   it("reports the same content warnings the parse layer found", () => {
-    expect(rendered.warnings.map((warning) => warning.code)).toContain("metadata-disagreement");
+    expect(rendered.warnings.map((warning) => warning.code)).toContain(
+      "metadata-disagreement",
+    );
   });
 });

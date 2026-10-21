@@ -29,7 +29,10 @@ export type DesktopEntry = {
 /** The copy the shell needs to name a destination in a titlebar or status strip. */
 export type DesktopCopy = { label: string; detail: string };
 
-export type Translate = (key: string, values?: Record<string, string>) => string;
+export type Translate = (
+  key: string,
+  values?: Record<string, string>,
+) => string;
 
 /**
  * Desktop shortcuts in reading order: workstation containers first, then the
@@ -42,22 +45,67 @@ export type Translate = (key: string, values?: Record<string, string>) => string
  */
 export const desktopFolders = [
   { id: "my-pc", messageKey: "myPc", ready: true, icon: { glyph: "my-pc" } },
-  { id: "records", messageKey: "records", ready: true, icon: { glyph: "records" } },
-  { id: "my-work", messageKey: "myWork", ready: true, icon: { glyph: "records-work" } },
-  { id: "archive", messageKey: "archive", ready: true, icon: { glyph: "archive", shortcut: true } },
-  { id: "organizations", messageKey: "organizations", ready: true, icon: { glyph: "organizations" } },
+  {
+    id: "records",
+    messageKey: "records",
+    ready: true,
+    icon: { glyph: "records" },
+  },
+  {
+    id: "my-work",
+    messageKey: "myWork",
+    ready: true,
+    icon: { glyph: "records-work" },
+  },
+  {
+    id: "archive",
+    messageKey: "archive",
+    ready: true,
+    icon: { glyph: "archive", shortcut: true },
+  },
+  {
+    id: "organizations",
+    messageKey: "organizations",
+    ready: true,
+    icon: { glyph: "organizations" },
+  },
   { id: "inbox", messageKey: "inbox", ready: true, icon: { glyph: "inbox" } },
-  { id: "write", messageKey: "word", ready: true, icon: { glyph: "circa-word" } },
-  { id: "search", messageKey: "search", ready: true, icon: { glyph: "search" } },
-  { id: "expunged", messageKey: "expunged", ready: true, icon: { glyph: "expunged", shortcut: true } },
-  { id: "recycle", messageKey: "recycle", ready: true, icon: { glyph: "recycle" } },
+  {
+    id: "write",
+    messageKey: "word",
+    ready: true,
+    icon: { glyph: "circa-word" },
+  },
+  {
+    id: "search",
+    messageKey: "search",
+    ready: true,
+    icon: { glyph: "search" },
+  },
+  {
+    id: "expunged",
+    messageKey: "expunged",
+    ready: true,
+    icon: { glyph: "expunged", shortcut: true },
+  },
+  {
+    id: "recycle",
+    messageKey: "recycle",
+    ready: true,
+    icon: { glyph: "recycle" },
+  },
 ] as const satisfies readonly DesktopEntry[];
 
 export type DesktopFolder = (typeof desktopFolders)[number];
 
 /** Locations reachable only from inside My PC. */
 export const myPcContents = [
-  { id: "system", messageKey: "system", ready: true, icon: { glyph: "system" } },
+  {
+    id: "system",
+    messageKey: "system",
+    ready: true,
+    icon: { glyph: "system" },
+  },
 ] as const satisfies readonly DesktopEntry[];
 
 export type MyPcItem = (typeof myPcContents)[number];
@@ -65,7 +113,10 @@ export type MyPcItem = (typeof myPcContents)[number];
 export type DesktopDestination = DesktopFolder | MyPcItem;
 
 /** Every destination the shell can name, the desktop rail and My PC contents alike. */
-export const allDestinations: readonly DesktopEntry[] = [...desktopFolders, ...myPcContents];
+export const allDestinations: readonly DesktopEntry[] = [
+  ...desktopFolders,
+  ...myPcContents,
+];
 
 const destinationIds = new Set(allDestinations.map((entry) => entry.id));
 
@@ -110,7 +161,14 @@ export function desktopHint(t: Translate, entry: DesktopEntry): string {
  * language.
  */
 export const EXPLORER_SCOPES = new Set([
-  "my-pc", "records", "my-work", "archive", "organizations", "expunged", "recycle", "system",
+  "my-pc",
+  "records",
+  "my-work",
+  "archive",
+  "organizations",
+  "expunged",
+  "recycle",
+  "system",
 ]);
 
 /**

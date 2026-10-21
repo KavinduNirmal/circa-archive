@@ -53,7 +53,10 @@ export function MetaAbout() {
             <div className="meta-intro-main">
               <p className="meta-eyebrow">{t("aboutPageKicker")}</p>
 
-              <h1 className="meta-display meta-display-intro" id="meta-about-title">
+              <h1
+                className="meta-display meta-display-intro"
+                id="meta-about-title"
+              >
                 <span>{t("aboutPageTitleA")}</span>{" "}
                 <span className="meta-display-dim">{t("aboutPageTitleB")}</span>
               </h1>
@@ -77,13 +80,18 @@ export function MetaAbout() {
                 </div>
               </dl>
 
-              <nav className="meta-about-index" aria-label={t("aboutIndexLabel")}>
+              <nav
+                className="meta-about-index"
+                aria-label={t("aboutIndexLabel")}
+              >
                 <p className="meta-about-index-title">{t("aboutIndexLabel")}</p>
                 <ol>
                   {ABOUT_SECTIONS.map(([label, id], index) => (
                     <li key={id}>
                       <a href={`#${id}`}>
-                        <span className="meta-about-index-number">{String(index + 1).padStart(2, "0")}</span>
+                        <span className="meta-about-index-number">
+                          {String(index + 1).padStart(2, "0")}
+                        </span>
                         {t(label)}
                       </a>
                     </li>

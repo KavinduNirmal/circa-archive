@@ -4,16 +4,16 @@ CIRCA Archive uses a gitflow model: `develop` integrates ordinary work, and `mai
 
 ## Branches
 
-| Branch | Purpose | Cut from | Merges into |
-| --- | --- | --- | --- |
-| `main` | Released code and release tags | — | — |
-| `develop` | Integration branch and repository default | `main` (initial setup) | — |
-| `feature/<topic>` | New behavior or a substantial enhancement | `develop` | `develop` |
-| `fix/<topic>` | A defect fix | `develop` | `develop` |
-| `docs/<topic>` | Documentation and specifications | `develop` | `develop` |
-| `chore/<topic>` | Tooling, dependencies, and maintenance | `develop` | `develop` |
-| `release/<version>` | Release preparation | `develop` | `main`, then `develop` |
-| `hotfix/<version>` | Urgent fix to a release | `main` | `main`, then `develop` |
+| Branch              | Purpose                                   | Cut from               | Merges into            |
+| ------------------- | ----------------------------------------- | ---------------------- | ---------------------- |
+| `main`              | Released code and release tags            | —                      | —                      |
+| `develop`           | Integration branch and repository default | `main` (initial setup) | —                      |
+| `feature/<topic>`   | New behavior or a substantial enhancement | `develop`              | `develop`              |
+| `fix/<topic>`       | A defect fix                              | `develop`              | `develop`              |
+| `docs/<topic>`      | Documentation and specifications          | `develop`              | `develop`              |
+| `chore/<topic>`     | Tooling, dependencies, and maintenance    | `develop`              | `develop`              |
+| `release/<version>` | Release preparation                       | `develop`              | `main`, then `develop` |
+| `hotfix/<version>`  | Urgent fix to a release                   | `main`                 | `main`, then `develop` |
 
 Use lower-case, hyphenated topic names: `feature/record-search`, `fix/mail-sort`, `docs/api-contracts`, `release/0.2.0`, `hotfix/0.2.1`.
 

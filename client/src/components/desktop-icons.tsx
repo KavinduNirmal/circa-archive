@@ -52,12 +52,27 @@ export type DesktopIconSpec = { glyph: IconGlyph; shortcut?: boolean };
  * Renders one shortcut icon and, when requested, overlays the Windows 98
  * shortcut marker in the lower-left corner like a `.lnk` file.
  */
-export function DesktopIcon({ icon, className, ...props }: { icon: DesktopIconSpec; className?: string } & ComponentProps<"span">) {
+export function DesktopIcon({
+  icon,
+  className,
+  ...props
+}: { icon: DesktopIconSpec; className?: string } & ComponentProps<"span">) {
   const entry = icons[icon.glyph];
   return (
-    <span className={["desktop-icon", className].filter(Boolean).join(" ")} data-icon={icon.glyph} data-shortcut={icon.shortcut ? "true" : undefined} {...props}>
-      <Bitmap src={entry.asset} className="desktop-icon-glyph" size={ICON_SIZE} />
-      {icon.shortcut && <Bitmap src={SHORTCUT_OVERLAY} className="desktop-icon-shortcut" />}
+    <span
+      className={["desktop-icon", className].filter(Boolean).join(" ")}
+      data-icon={icon.glyph}
+      data-shortcut={icon.shortcut ? "true" : undefined}
+      {...props}
+    >
+      <Bitmap
+        src={entry.asset}
+        className="desktop-icon-glyph"
+        size={ICON_SIZE}
+      />
+      {icon.shortcut && (
+        <Bitmap src={SHORTCUT_OVERLAY} className="desktop-icon-shortcut" />
+      )}
     </span>
   );
 }
@@ -67,6 +82,24 @@ export function DesktopIcon({ icon, className, ...props }: { icon: DesktopIconSp
  * but optimisation is off: these assets are already tiny, and re-encoding them
  * would defeat the nearest-neighbour scaling the 1998 pixel grid relies on.
  */
-function Bitmap({ src, className, size = 32 }: { src: string; className: string; size?: number }) {
-  return <Image className={className} src={src} alt="" width={size} height={size} draggable={false} unoptimized />;
+function Bitmap({
+  src,
+  className,
+  size = 32,
+}: {
+  src: string;
+  className: string;
+  size?: number;
+}) {
+  return (
+    <Image
+      className={className}
+      src={src}
+      alt=""
+      width={size}
+      height={size}
+      draggable={false}
+      unoptimized
+    />
+  );
 }

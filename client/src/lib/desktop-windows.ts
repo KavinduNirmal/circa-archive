@@ -1,5 +1,9 @@
 import type { WindowSpec } from "./desktop-types";
-import { destinationById, explorerTitle, type Translate } from "./desktop-destinations";
+import {
+  destinationById,
+  explorerTitle,
+  type Translate,
+} from "./desktop-destinations";
 
 /**
  * Window specs: the one definition of how a destination or a record is titled.
@@ -18,7 +22,10 @@ const APPLICATION_TITLES: Readonly<Record<string, string>> = {
 };
 
 /** A destination as a window, or `null` when the id names nothing the shell can open. */
-export function specForDestination(id: string, t: Translate): WindowSpec | null {
+export function specForDestination(
+  id: string,
+  t: Translate,
+): WindowSpec | null {
   const entry = destinationById(id);
   if (!entry) return null;
   const applicationTitle = APPLICATION_TITLES[id];
@@ -43,5 +50,11 @@ export function specForDestination(id: string, t: Translate): WindowSpec | null 
  * carries no translated copy.
  */
 export function readerWindowSpec(title: string): WindowSpec {
-  return { id: "reader", title, status: null, icon: { glyph: "reader" }, maximized: true };
+  return {
+    id: "reader",
+    title,
+    status: null,
+    icon: { glyph: "reader" },
+    maximized: true,
+  };
 }

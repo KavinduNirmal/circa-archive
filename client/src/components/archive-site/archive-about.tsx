@@ -1,7 +1,11 @@
 import { useTranslations } from "next-intl";
 import { BookOpen, Monitor } from "lucide-react";
 import { Link } from "@/i18n/navigation";
-import { ARCHIVE_CLASSES, ARCHIVE_INDEX, ARCHIVE_STATUSES } from "../browser/archive-index";
+import {
+  ARCHIVE_CLASSES,
+  ARCHIVE_INDEX,
+  ARCHIVE_STATUSES,
+} from "../browser/archive-index";
 import { ArchiveChrome } from "./archive-chrome";
 import { ArchiveButton } from "./archive-button";
 import { CLASS_MESSAGE_KEY, STATUS_MESSAGE_KEY } from "./archive-data";
@@ -47,10 +51,13 @@ export function ArchiveAbout() {
     statusErased: t("aboutStatusErasedBody"),
   };
 
-  const organizations = ARCHIVE_INDEX.filter((entry) => entry.klass === "organization").length;
+  const organizations = ARCHIVE_INDEX.filter(
+    (entry) => entry.klass === "organization",
+  ).length;
 
   /** One released code per class, so the key points at something a reader can open. */
-  const sampleFor = (klass: string) => ARCHIVE_INDEX.find((entry) => entry.klass === klass)?.code;
+  const sampleFor = (klass: string) =>
+    ARCHIVE_INDEX.find((entry) => entry.klass === klass)?.code;
 
   return (
     <ArchiveChrome active="about" trail={[{ label: t("trailAbout") }]}>
@@ -64,9 +71,15 @@ export function ArchiveAbout() {
           </header>
 
           <div className={styles.sheet}>
-            <section className={styles.sheetSection} id="using" aria-labelledby="using-title">
+            <section
+              className={styles.sheetSection}
+              id="using"
+              aria-labelledby="using-title"
+            >
               <h2 className={styles.sheetHeading} id="using-title">
-                <span className={styles.sectionIndex} aria-hidden="true">01</span>
+                <span className={styles.sectionIndex} aria-hidden="true">
+                  01
+                </span>
                 {t("aboutUseTitle")}
               </h2>
               <p className={styles.guideBody}>{t("aboutUseBody")}</p>
@@ -78,9 +91,15 @@ export function ArchiveAbout() {
               links to the index filtered by that class, and the sample code is a
               real entry, so the key can be tested rather than believed.
             */}
-            <section className={styles.sheetSection} id="classes" aria-labelledby="classes-title">
+            <section
+              className={styles.sheetSection}
+              id="classes"
+              aria-labelledby="classes-title"
+            >
               <h2 className={styles.sheetHeading} id="classes-title">
-                <span className={styles.sectionIndex} aria-hidden="true">02</span>
+                <span className={styles.sectionIndex} aria-hidden="true">
+                  02
+                </span>
                 {t("aboutClassesTitle")}
               </h2>
               <table className={styles.keyTable} data-key="classes">
@@ -94,10 +113,15 @@ export function ArchiveAbout() {
                   {ARCHIVE_CLASSES.map((klass) => (
                     <tr key={klass} data-klass={klass}>
                       <th scope="row">
-                        <Link className={styles.keyClass} href={`/site/records?class=${klass}`}>
+                        <Link
+                          className={styles.keyClass}
+                          href={`/site/records?class=${klass}`}
+                        >
                           {t(CLASS_MESSAGE_KEY[klass])}
                         </Link>
-                        <span className={styles.keyCode}>{sampleFor(klass) ?? "—"}</span>
+                        <span className={styles.keyCode}>
+                          {sampleFor(klass) ?? "—"}
+                        </span>
                       </th>
                       <td>{classBody[CLASS_MESSAGE_KEY[klass]]}</td>
                     </tr>
@@ -107,9 +131,15 @@ export function ArchiveAbout() {
               <p className={styles.guideHint}>{t("aboutKeyHint")}</p>
             </section>
 
-            <section className={styles.sheetSection} id="statuses" aria-labelledby="statuses-title">
+            <section
+              className={styles.sheetSection}
+              id="statuses"
+              aria-labelledby="statuses-title"
+            >
               <h2 className={styles.sheetHeading} id="statuses-title">
-                <span className={styles.sectionIndex} aria-hidden="true">03</span>
+                <span className={styles.sectionIndex} aria-hidden="true">
+                  03
+                </span>
                 {t("aboutStatusesTitle")}
               </h2>
               <table className={styles.keyTable} data-key="statuses">
@@ -139,25 +169,45 @@ export function ArchiveAbout() {
               <p className={styles.guideHint}>{t("aboutStatusHint")}</p>
             </section>
 
-            <section className={styles.sheetSection} id="clearance" aria-labelledby="clearance-title">
+            <section
+              className={styles.sheetSection}
+              id="clearance"
+              aria-labelledby="clearance-title"
+            >
               <h2 className={styles.sheetHeading} id="clearance-title">
-                <span className={styles.sectionIndex} aria-hidden="true">04</span>
+                <span className={styles.sectionIndex} aria-hidden="true">
+                  04
+                </span>
                 {t("aboutClearanceTitle")}
               </h2>
               <p className={styles.guideNote}>{t("aboutClearanceBody")}</p>
             </section>
 
-            <section className={styles.sheetSection} id="workstation" aria-labelledby="workstation-title">
+            <section
+              className={styles.sheetSection}
+              id="workstation"
+              aria-labelledby="workstation-title"
+            >
               <h2 className={styles.sheetHeading} id="workstation-title">
-                <span className={styles.sectionIndex} aria-hidden="true">05</span>
+                <span className={styles.sectionIndex} aria-hidden="true">
+                  05
+                </span>
                 {t("aboutWorkstationTitle")}
               </h2>
               <p className={styles.guideBody}>{t("aboutWorkstationBody")}</p>
               <p className={styles.guideActions}>
-                <ArchiveButton tone="paper" href="/desktop" icon={<Monitor aria-hidden size={12} />}>
+                <ArchiveButton
+                  tone="paper"
+                  href="/desktop"
+                  icon={<Monitor aria-hidden size={12} />}
+                >
                   {t("aboutWorkstationLink")}
                 </ArchiveButton>
-                <ArchiveButton tone="paper" href="/" icon={<BookOpen aria-hidden size={12} />}>
+                <ArchiveButton
+                  tone="paper"
+                  href="/"
+                  icon={<BookOpen aria-hidden size={12} />}
+                >
                   {t("aboutPublicLink")}
                 </ArchiveButton>
               </p>
@@ -166,8 +216,13 @@ export function ArchiveAbout() {
         </article>
 
         <aside className={styles.recordAside}>
-          <section className={`${styles.asideBlock} ${styles.guideContents}`} aria-labelledby="guide-contents">
-            <h2 className={styles.asideTitle} id="guide-contents">{t("aboutContentsTitle")}</h2>
+          <section
+            className={`${styles.asideBlock} ${styles.guideContents}`}
+            aria-labelledby="guide-contents"
+          >
+            <h2 className={styles.asideTitle} id="guide-contents">
+              {t("aboutContentsTitle")}
+            </h2>
             <ol className={styles.guideToc}>
               {SECTIONS.map((section, position) => (
                 <li key={section.id}>
@@ -182,13 +237,30 @@ export function ArchiveAbout() {
             </ol>
           </section>
 
-          <section className={styles.asideBlock} aria-labelledby="edition-title">
-            <h2 className={styles.asideTitle} id="edition-title">{t("aboutEditionTitle")}</h2>
+          <section
+            className={styles.asideBlock}
+            aria-labelledby="edition-title"
+          >
+            <h2 className={styles.asideTitle} id="edition-title">
+              {t("aboutEditionTitle")}
+            </h2>
             <dl className={styles.particulars}>
-              <div><dt>{t("aboutEditionEntries")}</dt><dd className="circa-mono">{ARCHIVE_INDEX.length}</dd></div>
-              <div><dt>{t("aboutEditionOrganizations")}</dt><dd className="circa-mono">{organizations}</dd></div>
-              <div><dt>{t("aboutEditionClasses")}</dt><dd className="circa-mono">{ARCHIVE_CLASSES.length}</dd></div>
-              <div><dt>{t("aboutEditionStatuses")}</dt><dd className="circa-mono">{ARCHIVE_STATUSES.length}</dd></div>
+              <div>
+                <dt>{t("aboutEditionEntries")}</dt>
+                <dd className="circa-mono">{ARCHIVE_INDEX.length}</dd>
+              </div>
+              <div>
+                <dt>{t("aboutEditionOrganizations")}</dt>
+                <dd className="circa-mono">{organizations}</dd>
+              </div>
+              <div>
+                <dt>{t("aboutEditionClasses")}</dt>
+                <dd className="circa-mono">{ARCHIVE_CLASSES.length}</dd>
+              </div>
+              <div>
+                <dt>{t("aboutEditionStatuses")}</dt>
+                <dd className="circa-mono">{ARCHIVE_STATUSES.length}</dd>
+              </div>
             </dl>
           </section>
         </aside>
