@@ -405,12 +405,206 @@
   z-index: 40;
   display: grid;
   gap: 9px;
-  width: 330px;
+  width: min(680px, calc(100vw - 24px));
   max-width: calc(100vw - 24px);
   padding: 10px;
   border: 1px solid #526e94;
   background: var(--circa-paper-sunken);
   box-shadow: 4px 4px 0 rgb(8 17 25 / 35%);
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.globalFilterPanel {
+  display: grid;
+  gap: 10px;
+  padding: 10px 0 0;
+  border-top: 1px solid var(--circa-rule);
+}
+
+.globalFilterGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px 14px;
+}
+
+.globalFilterSet {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.globalFilterSet legend,
+.globalTextField > span,
+.globalSelectField > span {
+  margin-bottom: 4px;
+  color: var(--circa-ink-soft);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.globalFilterOptions {
+  display: grid;
+  gap: 3px;
+}
+
+.globalFilterOptions label {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  color: var(--circa-ink);
+  font-size: 10.5px;
+}
+
+.globalFilterOptions input {
+  accent-color: #365b80;
+}
+
+.globalTextField,
+.globalSelectField {
+  display: grid;
+  align-content: start;
+  gap: 4px;
+  min-width: 0;
+}
+
+.globalTextField input,
+.globalSelectField select,
+.globalDateFields input {
+  width: 100%;
+  min-height: 30px;
+  padding: 4px 7px;
+  border: 1px solid #7b8b9c;
+  background: var(--circa-paper-sunken);
+  color: var(--circa-ink);
+  font: inherit;
+  font-size: 11px;
+}
+
+.globalTextField small {
+  color: var(--circa-ink-soft);
+  font-size: 9px;
+}
+
+.globalDateFields {
+  display: flex;
+  grid-column: span 2;
+  gap: 10px;
+}
+
+.globalDateFields label {
+  display: grid;
+  flex: 1;
+  align-content: start;
+  gap: 4px;
+  color: var(--circa-ink-soft);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.globalFilterPanel .applyKey,
+.filterPanel .filterPanelApply {
+  justify-self: start;
+}
+
+.searchExcerpt {
+  max-width: 72ch;
+  margin: 4px 0 0;
+  color: var(--circa-ink-soft);
+  font-family: "Libre Baskerville", Georgia, serif;
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.sealedNotice {
+  margin: 5px 0 0;
+  color: #72531b;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.searchPagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  margin: 14px 0 4px;
+}
+
+.searchPagination a {
+  display: inline-flex;
+  min-width: 32px;
+  min-height: 32px;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 8px;
+  border: 1px solid var(--circa-rule);
+  background: var(--circa-paper-raised);
+  font-family: "Courier New", monospace;
+  text-decoration: none;
+}
+
+.searchPagination a[aria-current="page"] {
+  border-color: #334d68;
+  background: #334d68;
+  color: #fff;
+}
+
+.searchSkeleton {
+  display: grid;
+  gap: 8px;
+  margin: 18px 0;
+}
+
+.searchSkeleton span {
+  display: block;
+  height: 34px;
+  border: 1px solid var(--circa-rule);
+  background: linear-gradient(90deg, #dbe2e8 25%, #edf1f4 50%, #dbe2e8 75%);
+  background-size: 200% 100%;
+  animation: search-skeleton 1.3s linear infinite;
+}
+
+.searchSkeleton span:nth-child(2) {
+  width: 92%;
+}
+.searchSkeleton span:nth-child(3) {
+  width: 84%;
+}
+
+.searchError {
+  display: grid;
+  justify-items: start;
+  gap: 8px;
+  padding: 18px;
+  border: 1px solid var(--circa-rule);
+  border-left: 4px solid var(--circa-stamp);
+  background: var(--circa-paper-raised);
+}
+
+.searchError p {
+  margin: 0;
+}
+
+@keyframes search-skeleton {
+  to {
+    background-position: -200% 0;
+  }
 }
 
 .filterPanelApply {
@@ -3133,6 +3327,9 @@
   .guideLayout {
     grid-template-columns: minmax(0, 1fr);
   }
+  .globalFilterGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
   .heroNotes {
     grid-template-columns: minmax(0, 1fr);
   }
@@ -3177,6 +3374,15 @@
      half-width ones, and the key has to be reachable with a thumb. */
   .filterField {
     flex-basis: 100%;
+  }
+  .globalFilterGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .globalDateFields {
+    grid-column: auto;
+  }
+  .filterPanel {
+    width: calc(100vw - 24px);
   }
   .applyKey {
     width: 100%;
@@ -3274,6 +3480,9 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .searchSkeleton span {
+    animation: none;
+  }
   .shell .step svg {
     transition: none;
   }
@@ -3358,4 +3567,108 @@
   .navToggle[data-tone] {
     min-width: 44px;
   }
+}
+
+/* Search filters use the archive's square, ruled control treatment. */
+.pageFilterMenu {
+  min-width: 0;
+}
+.pageFilterMenu > summary {
+  width: fit-content;
+  cursor: pointer;
+}
+.pageFilterMenu[open] > summary {
+  margin-bottom: 12px;
+}
+.globalFilterPanel {
+  padding: 16px 0;
+}
+.globalFilterGrid {
+  gap: 20px 24px;
+}
+.globalFilterSet legend,
+.globalFilterOptions label,
+.globalTextField > span,
+.globalSelectField > span,
+.globalDateFields label,
+.filterSummary {
+  font-family: var(--font-mono), monospace;
+}
+.globalFilterOptions {
+  gap: 5px;
+}
+.globalFilterOptions label {
+  align-items: center;
+  min-height: 30px;
+  cursor: pointer;
+}
+.globalFilterOptions [data-slot="checkbox"] {
+  width: 16px;
+  height: 16px;
+}
+.tagCycleHint {
+  max-width: 32ch;
+  margin: 0 0 8px;
+  font-size: 10px;
+  color: var(--circa-ink-soft);
+}
+.tagState {
+  order: 2;
+  margin-left: auto;
+  font-size: 9px;
+  color: var(--circa-ink-soft);
+}
+.tagState[data-excluded="true"] {
+  color: #9a302c;
+}
+.globalFilterOptions [data-slot="checkbox"][data-state="unchecked"] {
+  background: var(--circa-paper-sunken);
+  color: var(--circa-ink-soft);
+}
+.globalFilterOptions [data-slot="checkbox"][data-state="checked"] {
+  background: #365b80;
+  color: #fff;
+}
+.globalFilterOptions [data-slot="checkbox"][data-state="indeterminate"] {
+  background: #9a302c;
+  color: #fff;
+}
+.searchField > [data-slot="input"],
+.searchField > [data-slot="button"] {
+  height: auto;
+}
+
+/* Search record classes reuse the archive taxonomy palette. */
+.shell [data-klass="record"],
+.shell [data-klass="exploration"] {
+  --klass-color: var(--klass-continuity);
+}
+.shell [data-klass="evidence"] {
+  --klass-color: var(--klass-organization);
+}
+.shell [data-klass="rumour"] {
+  --klass-color: var(--klass-memo);
+}
+
+.resultTypes {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.warningLabels {
+  text-transform: uppercase;
+  font-size: 9.5px;
+  font-weight: 700;
+  line-height: 1.6;
+}
+.warningLabels[data-tier="red"] {
+  color: #9e1f26;
+}
+.warningLabels[data-tier="yellow"] {
+  color: #805400;
+}
+.warningLabels[data-tier="green"] {
+  color: #2b6140;
 }

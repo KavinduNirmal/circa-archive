@@ -8,6 +8,7 @@
 - `landing.test.tsx`: archive entry, audience procedures, local link integrity, service limitations, diegetic route metadata, the whole portal in Korean with its identifiers intact, the page staying inside the fiction, the altered sentences and their staggered cues, the closed pages, and the no-gradients rule.
 - `meta-pages.test.tsx`: project introduction, corpus statistics, navigation, documentation, and the shared frame without backend status notices in English and Korean.
 - `archive-site.test.tsx`: the public archive as a website — its full-page chrome and search, the front page's featured, recent, popular, and random sections, server-side search, record pages (released, sealed, held), the action bar and downloads, notes, organizations, the guide, the project page, and link integrity in both languages.
+- `search-query.test.ts`, `search-fixture.test.ts`, and `search-result.test.ts`: canonical URL parsing/serialization, fixture visibility/filter/pagination behavior, and public result destinations.
 - `portal-signs.test.tsx`: the portal's four client behaviours on a fake clock — the alteration cycle and its reduced-motion opt-out, the attendance count and its "still present" note, the register refresh withdrawing the notices and dating the page earlier, and the message box behind a page the site does not hold.
 - `setup.ts`: DOM matchers and cleanup.
 - `utils.test.ts`: class composition and Tailwind conflict resolution.
@@ -56,3 +57,5 @@ The `incident-editor-*` suites cover form defaults, prose-only references, tempo
 Archive chrome tests also cover About dropdown hover, keyboard activation, Escape focus return, outside dismissal, and destination links.
 
 `archive-write.test.tsx` verifies author actions, disabled placeholders, saved-draft continuation, empty state, and storage failure without writes.
+
+Search tests cover exclusion precedence, repeated URL parameters, fixture exclusion predicates, and the three-click warning-tag cycle inside a collapsed filter disclosure.

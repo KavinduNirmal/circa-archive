@@ -37,6 +37,14 @@ export type ArchiveEntry = {
   status: ArchiveStatus;
   /** The filing lens: `CIRCA` or the organization code that filed it. */
   organization: string;
+  /** Cosmetic holder code only; distinct from the organization that filed the entry. */
+  holderCode?: string;
+  /** Canonical search metadata where the older reader fixture cannot express it. */
+  searchWarningTier?: "red" | "yellow" | "green";
+  searchDisclosure?: "none" | "no-warnings-apply" | "not-provided";
+  searchClass?: "incident" | "exploration" | "evidence" | "rumour";
+  searchStatus?:
+    "on-file" | "contested" | "sealed" | "restricted" | "erased" | "tombstoned";
   clearance: string;
   abstract: string;
   warnings: readonly ArchiveWarningTag[];

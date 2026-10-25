@@ -42,4 +42,6 @@ The incident editor suite also checks that Form information and Content share a 
 
 `archive-navigation.spec.ts` checks hover continuity, keyboard dismissal and focus, click activation, and dropdown bounds at 1440px, 620px, and 390px. Screenshots are saved under `/tmp/circa-about-dropdown-<width>.png`.
 
+`search.spec.ts` checks the canonical GET query, sealed incident stubs, filter-preserving pagination, and submitting the search form with JavaScript disabled.
+
 `archive-write.spec.ts` checks author landing navigation, editor routing, local draft continuation, and narrow-screen layout.

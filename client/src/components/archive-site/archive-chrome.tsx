@@ -9,6 +9,7 @@ import { ArchiveFooter } from "./archive-footer";
 import { SITE_INDEX } from "./archive-data";
 import { SiteSearch } from "./site-search";
 import styles from "./archive-site.module.css";
+import type { SearchState } from "@/lib/search/contract";
 
 /**
  * The public archive's frame.
@@ -43,11 +44,13 @@ export function ArchiveChrome({
   trail,
   children,
   compact = false,
+  searchValues,
 }: {
   active: ArchiveSection;
   trail: readonly ArchiveCrumb[];
   children: React.ReactNode;
   compact?: boolean;
+  searchValues?: SearchState;
 }) {
   const t = useTranslations("site");
   const editorWriteLabel = t("writeTitle");
@@ -91,7 +94,7 @@ export function ArchiveChrome({
             </span>
           </Link>
 
-          <SiteSearch variant="masthead" />
+          <SiteSearch variant="masthead" values={searchValues} />
 
           <div className={styles.topbarTools}>
             <LanguageSwitcher className={styles.language} />
