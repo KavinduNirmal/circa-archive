@@ -8,6 +8,7 @@
     <ProjectReference Include="..\Modules\Auth\Circa.Auth.Infrastructure\Circa.Auth.Infrastructure.csproj" />
     <ProjectReference Include="..\Modules\Auth\Circa.Auth.Contracts\Circa.Auth.Contracts.csproj" />
     <ProjectReference Include="..\Common\Circa.Common.Infrastructure\Circa.Common.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\Archive\Circa.Archive.Infrastructure\Circa.Archive.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>

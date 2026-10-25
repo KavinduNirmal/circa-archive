@@ -6,11 +6,14 @@ using Circa.Auth.Contracts;
 using Circa.Auth.Infrastructure;
 using Circa.Auth.Infrastructure.Endpoints;
 using Circa.Auth.Infrastructure.Persistence;
+using Circa.Archive.Infrastructure;
+using Circa.Archive.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddAuthModule(builder.Configuration, builder.Environment);
+builder.Services.AddArchiveModule(builder.Configuration);
 builder.Services.AddProblemDetails();
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
@@ -52,6 +55,9 @@ if (app.Configuration.GetValue<bool>("Database:InitializeOnStartup"))
     await using var scope = app.Services.CreateAsyncScope();
     var database = scope.ServiceProvider.GetRequiredService<AuthDbContext>();
     await database.Database.EnsureCreatedAsync();
+
+    var archiveDatabase = scope.ServiceProvider.GetRequiredService<ArchiveDbContext>();
+    await ArchiveSchemaInitializer.EnsureAsync(archiveDatabase);
 }
 
 app.UseMiddleware<Circa.Auth.Infrastructure.Security.SecurityHeadersMiddleware>();

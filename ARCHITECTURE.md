@@ -152,7 +152,7 @@ Users interact with a diegetic desktop environment. Records are authored in Mark
 
 ### 3.5 Database Schema
 
-The schema below has been revised for the entity and reference model in the 2026-10-21 development notes. It is still conceptual: it does not yet model versioned foundational constraints, scoped Continuity Stewards and succession, or separate publication, evidentiary, and per-continuity adoption states. Temporary-entity promotion and reference resolution are specified as transactional behavior, but their exact EF Core mapping remains undecided.
+The schema below has been revised for the entity and reference model in the 2026-10-21 development notes. The core archive entity tables and their search indexes are now scaffolded in `Circa.Archive.Domain` and `Circa.Archive.Infrastructure`; no CRUD or endpoints exist yet. The remaining schema is still conceptual: it does not yet model versioned foundational constraints, scoped Continuity Stewards and succession, or separate publication, evidentiary, and per-continuity adoption states. Temporary-entity promotion and reference resolution are specified as transactional behavior, but their exact EF Core mapping remains undecided.
 
 Naming below is provisional. `Records` means filings against an Incident (`EXP`, `EVI`, `RUM`); the originating Incident remains its own table. `Recoveries` is the archive term for items and appears as `ITM` in display codes.
 

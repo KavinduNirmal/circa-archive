@@ -23,9 +23,11 @@ Frontend rendering and browser logic belong in `client/`. The backend exposes HT
 
 Authentication is implemented and integrated with the Next.js account pages and
 server-rendered session navigation: registration, sign-in, account persistence,
-rotating cookie sessions, JWT validation, and authorization policies. Archive
-records still come from client fixtures; record persistence, publishing, notes,
-moderation, and real-time delivery remain in development.
+rotating cookie sessions, JWT validation, and authorization policies. The archive
+schema now persists incidents, filings, organizations, characters, recoveries,
+and tags, with exact, trigram, full-text, composite, and filtered indexes.
+Archive CRUD, publishing, notes, moderation, and real-time delivery remain in
+development; the client still reads fixtures.
 
 ## Development
 
@@ -51,6 +53,13 @@ Auth audit events record login success/failure, refresh, reuse, logout, and revo
 To rotate the single signing key, deploy a new random key on every instance together, revoke active `auth.sessions` through an operational database procedure, and require sign-in again. Replacing the JWT signing key alone invalidates access JWTs but does not revoke opaque refresh sessions. Persist Data Protection keys across host restarts for refresh grace retries.
 
 The Next.js integration uses `Path=/` for the Strict, HttpOnly refresh cookie so it reaches page navigations. The previous auth-only path cannot support proxy refresh. Clear pre-release local auth cookies and sign in again after this change. See the [client transport guide](../client/src/lib/auth/README.md).
+
+## Archive persistence
+
+The `archive` schema is created by an idempotent SQL script after the Auth schema
+is initialized. It contains models and search indexes only; there are no archive
+endpoints yet. See [Archive module](src/Modules/Archive/README.md) and
+[index rationale](src/Modules/Archive/Circa.Archive.Infrastructure/Persistence/README.md).
 
 ## Account profiles
 
