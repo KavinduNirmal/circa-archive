@@ -7,8 +7,9 @@ Hosts self-contained domain feature modules composing the CIRCA modular monolith
 ## Structure
 
 - `Auth/`: User identity, password verification, session lifecycle, token issuance, and authorization policies.
+- `Archive/`: Persistent incident, filing, organization, character, recovery, and tag models with their `archive` schema and search indexes. CRUD and endpoints are not implemented yet.
 
-Future modules will include `Records/`, `Incidents/`, `Organizations/`, `Votes/`, and `Moderation/`.
+Future modules will include `Votes/` and `Moderation/`.
 
 ## Boundaries
 

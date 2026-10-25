@@ -9,6 +9,7 @@ Hosts unit, integration, and contract tests for the CIRCA backend services.
 - `Circa.Api.IntegrationTests/`: End-to-end HTTP integration tests utilizing `WebApplicationFactory` and `Testcontainers.PostgreSql`.
 - `Circa.BrowserTestHost/`: real Kestrel API and isolated PostgreSQL for the client auth browser suite.
 - `Circa.Modules.Auth.Tests/`: Unit and component tests for Auth domain invariants, handlers, and session lifecycle logic.
+- `Circa.Modules.Archive.Tests/`: PostgreSQL integration tests for archive models, constraints, and search index creation.
 
 ## Boundaries
 
