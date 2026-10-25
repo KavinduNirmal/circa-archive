@@ -4,14 +4,13 @@
 
 The full-page reading edition of the archive: the website a visitor uses instead
 of the interactive workstation. It is server-rendered, needs no client JavaScript
-to read, and carries the same entries as the archive browser. The only client code
-on any of these pages is the annotations composer on a record, and a reader who
-never opens it downloads no Markdown parser and runs no state.
+to read, and carries the same entries as the archive browser. Client islands handle navigation disclosures and record annotations; neither
+requires loading the Markdown editor parser.
 
 - `archive-chrome.tsx`: the full-bleed frame — the classification notice above the
   masthead, the masthead with the search box, the section bar, the announcement
-  bar, breadcrumbs, and the foot. It also carries the one link out of the fiction,
-  "About the site", which goes to `/[lang]/meta` beside "About the archive" in the section bar. The masthead carries the server-verified personal access link.
+  bar, breadcrumbs, and the foot. It also carries the About dropdowns for archive guidance and project resources,
+  preserving the overview links to `/[lang]/site/about` and `/[lang]/meta`. The masthead carries the server-verified personal access link.
 - `site-search.tsx`: the search form and its filters. A plain GET form to the
   index, so a query and a filter set survive a bookmark and work without
   JavaScript. The masthead puts the filters behind a `<details>`; the pages show
@@ -36,6 +35,13 @@ never opens it downloads no Markdown parser and runs no state.
   statuses wear the chips they wear in the index; either name opens the index
   filtered by it. The margin carries the guide's sections and the edition's own
   count; its guide numbering is independent of the record reader.
+- `archive-footer.tsx`: the shared foot of the public shell — registry line,
+  edition mark, directory, and return-to-top key. Both the archive chrome and the
+  access register render it.
+- `archive-write.tsx` and `archive-write.module.css`: the author landing's
+  client island — the guidance bar, the two-column creation cards, and the
+  browser-local incident draft list. Only the incident card is wired; the other
+  creation actions are disabled placeholders.
 - `archive-data.ts`: the questions these pages ask of the index — consultation
   counts, holdings, adjacency, and a random code. No React.
 - `record-prose.tsx`: the server-side Markdown renderer. It runs the same pipeline
@@ -45,7 +51,7 @@ never opens it downloads no Markdown parser and runs no state.
   into the archive are written in the corpus as `/site/…` and prefixed with the
   reader's language here, because a Markdown document cannot know which edition is
   reading it.
-- `record-notes.tsx`: the page's only client island — the annotations list and the
+- `record-notes.tsx`: the annotations client island — the annotations list and the
   correspondence slip. Its words are the workstation viewer's — annotations, a
   note filed by a correspondent, a reply to a correspondent, a cancel — but a note
   written here is a draft held in the browser and stamped `Not filed`, because the
@@ -82,9 +88,12 @@ stay serif and sentence-cased.
 **Colour.** Each class owns one desaturated colour — incident crimson, organization
 steel, continuity teal, memo ochre — carried by the code in an index, the class tag,
 and the class doors on the front page. Status keeps its own boxed chip: neutral,
-crimson for contested, amber for sealed and restricted, struck for erased. Lucide
-icons mark the section headings and the primary keys only; they are decorative and
-always `aria-hidden`.
+crimson for contested, amber for sealed and restricted, struck for erased. The
+warnings column is an 8×8 swatch beside the word Clear or Warning: red for
+warnings present, orange for an author-supplied warning list, and white for no
+warnings. Its title and accessible name also carry the specific warning names, so
+the colour is never the only signal. Lucide icons mark the section headings and the primary keys only;
+they are decorative and always `aria-hidden`.
 
 ## Status history and explorations
 
@@ -104,8 +113,8 @@ of their own, because the parent's count is the account of them.
 ## Boundaries
 
 The archive is fiction; the project page is not. This folder never explains that
-the Commission is invented — `../meta/` owns that — and the "About the site"
-button is the only door between them. The pages read from the index, the record
+the Commission is invented — `../meta/` owns that — and the About navigation
+provides explicit links to guidance and project resources. The pages read from the index, the record
 service, and the correspondence fixtures; they never invent a record, a citation,
 or a note. Downloads are generated from the authored Markdown through the same
 pipeline as the reader, and a held filing has no download at all.
@@ -119,3 +128,24 @@ and a held filing), the status-update accordion and its card tones, the explorat
 the action bar, the annotations list and its composer, downloads and the refused
 download, the organizations and guide, the project page, and link integrity in
 both languages. The routes live in `../../app/[lang]/site/`.
+
+The shared frame supports a compact editor variant that retains the masthead and navigation while omitting the classification notice, announcement ticker, and footer. The navigation includes the locale-aware incident editor entry point. Editing lives in [incident-editor](../incident-editor/README.md).
+
+## About navigation dropdowns
+
+`archive-nav-dropdown.tsx` preserves the About links and adds adjacent disclosure
+buttons. Hover opens the panel; click or Enter toggles it; Tab reaches its links;
+Escape closes it and restores focus. Leaving the group closes it unless focus
+remains inside, and outside clicks or focus departure dismiss it. Menus use the
+existing steel palette and 44px touch targets on narrow or coarse-pointer screens.
+
+The requested archive menu extends the previous fiction-only navigation boundary:
+Rules and Content Warnings link to sections of the existing author guide,
+Guidelines opens that guide, and Filings opens the records index. The site menu
+links to configured sponsorship and GitHub URLs, documentation, lore, and the
+existing licence/terms section (TOS). These are existing destinations, not new
+policy pages. English and Korean labels live in the site catalogs.
+
+`archive-write.tsx` and `archive-write.module.css` provide the author landing: a guidelines bar, five creation cards in two columns (the final odd card spans
+the row), and the existing local incident draft as a list with
+empty/loading/error states. Only incident creation and continuation are wired. Archive navigation opens `/site/write`.

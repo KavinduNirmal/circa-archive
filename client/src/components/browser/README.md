@@ -21,7 +21,7 @@ The fiction drives the interaction model. The local network permits one address 
 
 ## Structure
 
-- `archive-index.ts`: the entry vocabulary, the preview fixture, and the pure query function. No React, no presentation.
+- `archive-index.ts`: the entry vocabulary, the preview fixture, the pure query function, and the content-warning tags each entry may carry. An entry also records whether its warning list was supplied by the author, which the public index reduces to one of three swatch states. No React, no presentation.
 - `archive-page.tsx`: the document the browser displays (index, results, no-match) and nothing else. It renders no record: a code is handed to the reader and the index stays where it was, so Back is still the way to the list the code came from.
 - `browser-chrome.tsx`: the browser's own furniture: menu bar, toolbar and address bar, the permanent tab strip, and the status bar.
 - `browser-window.tsx`: the document stack, the search form state, the action set, and the composition of chrome plus page.

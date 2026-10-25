@@ -2,6 +2,7 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { LanguageSwitcher } from "../language-switcher";
 import { ArchiveButton } from "../archive-site/archive-button";
+import { ArchiveFooter } from "../archive-site/archive-footer";
 import archive from "../archive-site/archive-site.module.css";
 import styles from "./auth.module.css";
 
@@ -91,10 +92,7 @@ export function AccessShell({
           <div className={styles.sheetFoot}>{t("credentialNote")}</div>
         </div>
       </main>
-      <footer className={styles.footer}>
-        <span>{t("registry")}</span>
-        <span>{t("footer")}</span>
-      </footer>
+      <ArchiveFooter />
     </div>
   );
 }

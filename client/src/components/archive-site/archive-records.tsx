@@ -7,11 +7,13 @@ import {
   type ArchivePeriod,
   type ArchiveStatus,
   type ArchiveVocabulary,
+  warningState,
 } from "../browser/archive-index";
 import { ArchiveChrome } from "./archive-chrome";
 import {
   CLASS_MESSAGE_KEY,
   STATUS_MESSAGE_KEY,
+  WARNING_MESSAGE_KEY,
   SITE_INDEX,
 } from "./archive-data";
 import { SiteSearch } from "./site-search";
@@ -36,6 +38,16 @@ export function RecordTable({
   compact?: boolean;
 }) {
   const t = useTranslations("site");
+  const warningLabel = (entry: ArchiveEntry): string => {
+    const state = warningState(entry);
+    if (state === "none") return `${t("warningClear")} — ${t("warningNone")}`;
+    const tags = entry.warnings
+      .map((tag) => t(WARNING_MESSAGE_KEY[tag]))
+      .join(", ");
+    const disclosure =
+      state === "author" ? t("warningAuthor") : t("warningPresent");
+    return `${t("warningWarning")} — ${disclosure}: ${tags}`;
+  };
   return (
     <div
       className={styles.tableWrap}
@@ -52,6 +64,7 @@ export function RecordTable({
             <th scope="col">{t("columnCode")}</th>
             <th scope="col">{t("columnDesignation")}</th>
             {!compact && <th scope="col">{t("columnClass")}</th>}
+            <th scope="col">{t("columnWarnings")}</th>
             <th scope="col">{t("columnFiled")}</th>
             {!compact && <th scope="col">{t("columnStatus")}</th>}
             {!compact && <th scope="col">{t("columnHolder")}</th>}
@@ -87,6 +100,20 @@ export function RecordTable({
                   </span>
                 </td>
               )}
+              <td>
+                <span
+                  className={styles.warningTag}
+                  data-warning={warningState(entry)}
+                  role="img"
+                  aria-label={warningLabel(entry)}
+                  title={warningLabel(entry)}
+                >
+                  <span className={styles.warningSwatch} aria-hidden="true" />
+                  {warningState(entry) === "none"
+                    ? t("warningClear")
+                    : t("warningWarning")}
+                </span>
+              </td>
               <td className="circa-mono">{entry.filed}</td>
               {!compact && (
                 <td>

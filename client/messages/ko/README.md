@@ -22,3 +22,5 @@ Each file is a flat map of camelCase keys to strings; keys never contain dots, b
 ## Usage
 
 `src/i18n/request.ts` imports these files; components never do. Edit every locale in the same change, then run `bun run test` for the parity check.
+
+`editor.json` contains Korean incident editor controls and messages, matching the English catalog keys and placeholders.

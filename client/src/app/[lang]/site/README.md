@@ -17,6 +17,8 @@ sets the request locale, builds route metadata, and renders a component from
   released filing, and a 404 for a held one.
 - `organizations/page.tsx`, `about/page.tsx`: the directories and the guide.
 - `random/page.tsx`: redirects to a randomly chosen record on each request.
+- `write/page.tsx`: the author landing, handing the client island its copy and
+  listing creation actions and the browser-local draft.
 
 ## Boundaries
 
@@ -24,3 +26,7 @@ The archive is reached at `/{lang}/site`; the public portal stays at `/{lang}`
 and the workstation at `/{lang}/desktop`. The project page is `/{lang}/meta`
 and is the only route here that leaves the fiction. Record content is not
 translated — the filings are English documents and stay so in Korean.
+
+- `write/editor/page.tsx`: browser-local incident authoring in a compact archive frame. See the [route README](write/editor/README.md).
+
+The `write/` route is the author landing; `write/editor/` hosts the browser-local incident editor.

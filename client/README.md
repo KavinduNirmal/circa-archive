@@ -112,3 +112,7 @@ Compose now publishes the [ingress gateway](../infra/README.md) on port 3001 and
 keeps the Next port internal. API requests go directly through the gateway to the
 API. For direct host development, the existing Next rewrite still applies and
 proxy-header trust remains disabled by default.
+
+The browser-local incident editor is available at `/en/site/write/editor` and `/ko/site/write/editor`. It restores one draft and image attachments from IndexedDB and saves the editor font in localStorage. The entity registry is illustrative and submission is unavailable. See [editor components](src/components/incident-editor/README.md).
+
+The author landing at `/{lang}/site/write` offers creation cards and the current local draft. Only incident writing is available; the other creation types are placeholders.

@@ -1358,6 +1358,46 @@
   background: var(--klass-color, var(--circa-ink-soft));
 }
 
+/*
+ * A warning status is a swatch and a word, like a class tag. The specific
+ * warnings stay in the title and accessible name until a reader asks for them.
+ */
+.warningTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--circa-ink-soft);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  line-height: 1.6;
+  text-transform: uppercase;
+  white-space: nowrap;
+  cursor: help;
+}
+.warningTag[data-warning="present"] {
+  color: #9e1f26;
+}
+.warningTag[data-warning="author"] {
+  color: #8a4b16;
+}
+.warningSwatch {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  flex: 0 0 auto;
+}
+.warningTag[data-warning="present"] .warningSwatch {
+  background: #9e1f26;
+}
+.warningTag[data-warning="author"] .warningSwatch {
+  background: #b5651d;
+}
+.warningTag[data-warning="none"] .warningSwatch {
+  background: #fff;
+  box-shadow: 0 0 0 1px #7b8b9c;
+}
+
 .withheldDesignation {
   display: inline-flex;
   align-items: center;
@@ -3253,5 +3293,69 @@
   }
   .banner {
     border-color: #7a5c20;
+  }
+}
+
+/* A joined navigation key with a gap-free hover path into its disclosure. */
+.navDropdown {
+  position: relative;
+  display: inline-flex;
+}
+
+.navToggle[data-tone] {
+  min-width: 28px;
+  padding-inline: 6px;
+  margin-left: -1px;
+}
+
+.navToggle[aria-expanded="true"] svg {
+  transform: rotate(180deg);
+}
+
+.navDropdownPanel {
+  position: absolute;
+  z-index: 65;
+  inset-block-start: 100%;
+  inset-inline-start: 0;
+  width: max-content;
+  min-width: 100%;
+  max-width: calc(100vw - 36px);
+  margin: 0;
+  padding: 5px;
+  list-style: none;
+  border: 1px solid var(--circa-bevel-light);
+  background: var(--secondary);
+  box-shadow: 3px 3px 0 var(--circa-bevel-shadow);
+}
+
+.navDropdownPanel a {
+  display: flex;
+  align-items: center;
+  min-height: 36px;
+  padding: 8px 12px;
+  color: #dce9f5;
+  font-size: 12px;
+  text-decoration: none;
+}
+
+.navDropdownPanel a:hover,
+.navDropdownPanel a:focus-visible {
+  color: #fff;
+  background: #304155;
+}
+
+@media (max-width: 620px), (pointer: coarse) {
+  /*
+   * One height for the whole section bar. The direct keys used to keep the
+   * masthead's compact 32px while the disclosure keys grew to a 44px touch
+   * target, so the row stepped. Every key is the same target now.
+   */
+  .navInner > [data-tone],
+  .navInner .navDropdown > [data-tone],
+  .navDropdownPanel a {
+    min-height: 44px;
+  }
+  .navToggle[data-tone] {
+    min-width: 44px;
   }
 }

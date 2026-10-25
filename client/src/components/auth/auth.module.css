@@ -63,8 +63,7 @@
 .kicker,
 .filingLine,
 .sectionLabel,
-.sheetFoot,
-.footer {
+.sheetFoot {
   font-family: var(--font-mono);
   font-size: 11px;
   line-height: 1.6;
@@ -289,16 +288,6 @@
   border-top: 1px dashed var(--circa-rule);
   font-size: 10px;
 }
-.footer {
-  width: min(1104px, calc(100% - 56px));
-  margin: 0 auto;
-  padding: 20px 0 28px;
-  border-top: 3px double var(--circa-rule);
-  display: flex;
-  justify-content: space-between;
-  gap: 16px;
-  font-size: 10px;
-}
 .page :lang(ko) {
   letter-spacing: normal;
 }
@@ -362,10 +351,5 @@
   }
   .title {
     font-size: 27px;
-  }
-  .footer {
-    width: calc(100% - 32px);
-    flex-direction: column;
-    gap: 6px;
   }
 }

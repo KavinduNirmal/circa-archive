@@ -80,6 +80,12 @@ it("prints account particulars without exposing credential data", async () => {
   expect(screen.getByText("my.circa.archive", { exact: true })).toBeVisible();
   expect(screen.getByText("Author", { exact: true })).toBeVisible();
   expect(screen.getByRole("button", { name: "Sign out" })).toBeVisible();
+  const footer = screen.getByRole("contentinfo");
+  expect(footer).toBeVisible();
+  expect(within(footer).getByRole("link", { name: "Records" })).toHaveAttribute(
+    "href",
+    "/en/site/records",
+  );
 });
 
 it("keeps an unavailable account session distinct from logout, with a retry link", async () => {

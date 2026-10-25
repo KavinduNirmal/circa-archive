@@ -2,7 +2,7 @@
 
 ## Responsibility and structure
 
-- `access-shell.tsx` and `auth.module.css`: an archive masthead, language control, and a two-column registry document with a reading-room note and a ruled paper form or account leaf. Mobile keeps a short registry heading above the form. They reuse the archive seal, palette, typography, and `ArchiveButton`; search, classification notices, and the marquee stay in the archive.
+- `access-shell.tsx` and `auth.module.css`: an archive masthead, language control, and a two-column registry document with a reading-room note and a ruled paper form or account leaf. Mobile keeps a short registry heading above the form. They reuse the archive seal, palette, typography, `ArchiveButton`, and shared `ArchiveFooter`; search, classification notices, and the marquee stay in the archive.
 - `access-page.tsx`: server session checks, authenticated/guest redirects, account particulars, and a retryable unavailable state.
 - `account-record.tsx` and `account.module.css`: the authenticated account register, with a left section index and anchored archive identity, account particulars, and session access. It displays the API profile, including the stable account UUID and UTC registration date. Navigation reflows above the details on mobile.
 - `auth-form.tsx`: sign-up and sign-in through the existing cookie API, native localized username/password validation, translated API errors, password visibility, and pending protection. Registration fetches a generated analyst name from `/display-name`, supports rerolls, and submits the selected name with credentials. Preview failures preserve the last selection; without one, registration delegates name assignment to the API.

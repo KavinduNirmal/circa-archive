@@ -54,3 +54,5 @@ A minimized window is hidden rather than unmounted. It costs one hidden element 
 ## Boundaries and verification
 
 The workstation store owns the workspace — windows, focus, the reader trail, and the CRT preference — while each application keeps its own internal state (the browser's document stack, the explorer's folder history, mail selection, the editor's draft), preserved by hidden-not-unmounted windows. The application windows read illustrative archive fixtures, and persistent archive actions remain future work. Account registration, sign-in, and session navigation are integrated separately through the authentication service. Radix supplies accessible dialog/popover behavior. Icons render at 48px on the desktop and 32px in Start; each destination either names a bitmap or a Lucide fallback, so swapping artwork never touches layout code. Run client lint, typecheck, unit tests, and browser tests after interaction changes.
+
+- `incident-editor/`: controlled incident authoring workspace, entity registry, and browser-local site host. See its [README](incident-editor/README.md).
