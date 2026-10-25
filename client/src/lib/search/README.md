@@ -19,3 +19,11 @@ The route owns localized label lookup; archive components own presentation. This
 From `client/`, run `bun run test -- tests/search-query.test.ts tests/search-fixture.test.ts tests/search-result.test.ts` and `bun run typecheck`.
 
 Warning exclusions use repeated `excludeWarnTag` parameters and `excludedWarningTags` state. Exclusion wins over inclusion for conflicting URLs; any excluded tag removes a result, while included tags retain OR semantics. Pagination and removable chips preserve exclusions.
+
+## Backend contract alignment
+
+The stage 2 API can return null warning tier/disclosure for dossier entities and
+full sealed records to explicitly approved readers. `api.ts` accepts those shapes
+while rejecting unredacted sealed incidents and excerpts on redacted rows.
+`tests/search-api.test.ts` covers this boundary. `SEARCH_SOURCE` still defaults to
+fixtures until stage 3 integrates real destination pages.

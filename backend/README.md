@@ -26,6 +26,7 @@ server-rendered session navigation: registration, sign-in, account persistence,
 rotating cookie sessions, JWT validation, and authorization policies. The archive
 schema now persists incidents, filings, organizations, characters, recoveries,
 and tags, with exact, trigram, full-text, composite, and filtered indexes.
+The global search read API is implemented across all five entity types.
 Archive CRUD, publishing, notes, moderation, and real-time delivery remain in
 development; the client still reads fixtures.
 
@@ -57,8 +58,9 @@ The Next.js integration uses `Path=/` for the Strict, HttpOnly refresh cookie so
 ## Archive persistence
 
 The `archive` schema is created by an idempotent SQL script after the Auth schema
-is initialized. It contains models and search indexes only; there are no archive
-endpoints yet. See [Archive module](src/Modules/Archive/README.md) and
+is initialized. It contains models, search indexes, and the supporting tables used by
+`GET /api/v1/search`. The client retains fixture search until destination read
+pages are integrated. See [Archive module](src/Modules/Archive/README.md) and
 [index rationale](src/Modules/Archive/Circa.Archive.Infrastructure/Persistence/README.md).
 
 ## Account profiles

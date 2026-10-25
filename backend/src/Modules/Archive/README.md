@@ -4,23 +4,26 @@
 
 Owns the persistent archive entity model and its PostgreSQL `archive` schema:
 incidents, filings (records), record tags, organizations, characters, and
-recoveries. This scaffold covers models, relationships, constraints, and search
-indexes. It intentionally contains no HTTP endpoints, write workflows, or query
-handlers yet.
+recoveries. It implements models, relationships, search indexes, and the global
+search read endpoint. Archive write workflows and destination read pages remain pending.
 
 ## Structure
 
 - `Circa.Archive.Domain/`: entity classes and vocabulary enums.
+- `Circa.Archive.Application/`: transport-independent global search contracts, validation,
+  code/vocabulary interpretation, and plain-text helpers.
 - `Circa.Archive.Infrastructure/`: EF Core `ArchiveDbContext`, snake_case/archive
-  value mappings, schema initialization, and module registration.
+  value mappings, schema initialization, SQL search reader, HTTP endpoint, and rate limiting.
 
 ## Boundaries
 
 The module exclusively manages the `archive` schema. It stores `author_id`,
 `filed_by_id`, and other account identifiers as UUIDs without cross-module
 foreign keys; account lookup belongs to Auth contracts when CRUD is introduced.
-Other modules must not query archive tables directly. Archive DTOs and public
-contracts will be added with the first consumer, not in this scaffold.
+Other modules must not query archive tables directly. Search request contracts
+live in Application. The public search endpoint supports all five entity types;
+the client enables only types with destinations and retains fixture transport
+until stage 3.
 
 IDs are UUIDs supplied by the application (UUIDv7). Display codes such as
 `INC-007540`, `EXP-288902`, and `ITM-000001` are unique display identifiers, never

@@ -1,5 +1,7 @@
 using Circa.Archive.Infrastructure.Persistence;
+using Circa.Archive.Infrastructure.Search;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -19,6 +21,9 @@ public static class ArchiveModuleExtensions
                 ?? "Host=localhost;Database=circa;Username=circa;Password=circa_password";
             options.UseNpgsql(connectionString);
         });
+
+        services.AddScoped<SearchReader>();
+        services.AddRateLimiter(options => options.AddPolicy<string, SearchRateLimiting>("archive_search"));
 
         return services;
     }

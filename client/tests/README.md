@@ -59,3 +59,6 @@ Archive chrome tests also cover About dropdown hover, keyboard activation, Escap
 `archive-write.test.tsx` verifies author actions, disabled placeholders, saved-draft continuation, empty state, and storage failure without writes.
 
 Search tests cover exclusion precedence, repeated URL parameters, fixture exclusion predicates, and the three-click warning-tag cycle inside a collapsed filter disclosure.
+
+`search-api.test.ts` verifies backend-compatible nullable warnings and approved
+sealed-record response validation while preserving sealed incident redaction.

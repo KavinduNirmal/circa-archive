@@ -615,7 +615,7 @@ function GlobalSearchTable({
                 : item.displayCode;
             const warningLabel =
               item.warning.tags.map((tag) => t(labelKey(tag))).join(", ") ||
-              t(labelKey(item.warning.disclosure));
+              t(labelKey(item.warning.disclosure ?? "not-provided"));
             const klass = item.class ?? item.type;
             const warning = item.warning.tags.length
               ? "present"
@@ -656,7 +656,7 @@ function GlobalSearchTable({
                       {renderHighlights(item.excerpt, item.highlights)}
                     </p>
                   )}
-                  {item.status === "sealed" && (
+                  {item.status === "sealed" && item.redacted && (
                     <p className={styles.sealedNotice}>
                       ▣{" "}
                       {t(

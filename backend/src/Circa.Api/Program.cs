@@ -8,7 +8,9 @@ using Circa.Auth.Infrastructure.Endpoints;
 using Circa.Auth.Infrastructure.Persistence;
 using Circa.Archive.Infrastructure;
 using Circa.Archive.Infrastructure.Persistence;
+using Circa.Archive.Infrastructure.Search;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -79,6 +81,13 @@ var api = app.MapGroup("/api/v{version:apiVersion}")
 
 api.MapGet("/", () => "CIRCA API").HasApiVersion(1, 0).AllowAnonymous();
 api.MapAuthEndpoints();
+api.MapSearchEndpoints(async context =>
+{
+    if (context.User.Identity?.IsAuthenticated != true) return null;
+    var authorization = context.RequestServices.GetRequiredService<IAuthorizationService>();
+    var session = await authorization.AuthorizeAsync(context.User, null, [new LiveSessionRequirement()]);
+    return session.Succeeded && Guid.TryParse(context.User.FindFirst("sub")?.Value, out var userId) ? userId : (Guid?)null;
+}).HasApiVersion(1, 0);
 
 var records = api.MapGroup("/records").HasApiVersion(1, 0);
 records.MapGet("/", () => Results.Ok(Array.Empty<object>())).AllowAnonymous();

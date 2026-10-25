@@ -18,6 +18,7 @@ COPY src/Modules/Auth/Circa.Auth.Application/Circa.Auth.Application.csproj src/M
 COPY src/Modules/Auth/Circa.Auth.Infrastructure/Circa.Auth.Infrastructure.csproj src/Modules/Auth/Circa.Auth.Infrastructure/
 COPY src/Modules/Auth/Circa.Auth.Contracts/Circa.Auth.Contracts.csproj src/Modules/Auth/Circa.Auth.Contracts/
 COPY src/Modules/Archive/Circa.Archive.Domain/Circa.Archive.Domain.csproj src/Modules/Archive/Circa.Archive.Domain/
+COPY src/Modules/Archive/Circa.Archive.Application/Circa.Archive.Application.csproj src/Modules/Archive/Circa.Archive.Application/
 COPY src/Modules/Archive/Circa.Archive.Infrastructure/Circa.Archive.Infrastructure.csproj src/Modules/Archive/Circa.Archive.Infrastructure/
 RUN dotnet restore src/Circa.Api/Circa.Api.csproj
 COPY src/ ./src/

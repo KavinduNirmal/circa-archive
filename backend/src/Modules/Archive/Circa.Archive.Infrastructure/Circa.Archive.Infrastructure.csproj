@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <ProjectReference Include="../Circa.Archive.Application/Circa.Archive.Application.csproj" />
     <ProjectReference Include="..\Circa.Archive.Domain\Circa.Archive.Domain.csproj" />
   </ItemGroup>
 

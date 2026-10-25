@@ -51,3 +51,12 @@ DOTNET_PROCESSOR_COUNT=1 DOTNET_CLI_USE_MSBUILD_SERVER=0 MSBUILDDISABLENODEREUSE
 Reuse `--no-build --no-restore` for subsequent batches only after a successful
 build. Do not run frontend checks or production builds concurrently with these
 batches.
+
+## Global search
+
+`SearchEndpointTests` initializes the archive schema and exercises anonymous and
+stale-cookie search, validation ProblemDetails, repeated facets, language aliases,
+private cache headers, pagination links, rate limits/Retry-After, real database
+timeouts, generic unexpected-error responses, and sealed-record access through live/revoked sessions. Moderators and
+owners receive stubs unless explicitly approved; revocation falls back to public
+results rather than failing the public endpoint.

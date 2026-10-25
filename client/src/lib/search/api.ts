@@ -45,10 +45,12 @@ function isSearchResult(value: unknown): value is SearchResultItem {
     );
   const warningIsValid =
     isObject(warning) &&
-    WARNING_TIERS.includes(warning.tier as (typeof WARNING_TIERS)[number]) &&
-    WARNING_DISCLOSURES.includes(
-      warning.disclosure as (typeof WARNING_DISCLOSURES)[number],
-    ) &&
+    (warning.tier === null ||
+      WARNING_TIERS.includes(warning.tier as (typeof WARNING_TIERS)[number])) &&
+    (warning.disclosure === null ||
+      WARNING_DISCLOSURES.includes(
+        warning.disclosure as (typeof WARNING_DISCLOSURES)[number],
+      )) &&
     Array.isArray(warning.tags) &&
     warning.tags.every((tag) =>
       WARNING_TAGS.includes(tag as (typeof WARNING_TAGS)[number]),
@@ -75,6 +77,7 @@ function isSearchResult(value: unknown): value is SearchResultItem {
     value.lifecycle !== "erased" &&
     value.lifecycle !== "tombstoned" &&
     (value.status !== "sealed" ||
+      (value.type === "record" && value.redacted === false) ||
       (value.excerpt === null && value.redacted === true)) &&
     (value.redacted !== true || value.excerpt === null);
   return (

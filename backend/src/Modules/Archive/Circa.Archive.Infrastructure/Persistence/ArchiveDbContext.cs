@@ -72,6 +72,7 @@ public sealed class ArchiveDbContext(DbContextOptions<ArchiveDbContext> options)
         ConfigureCharacters(builder);
         ConfigureRecoveries(builder);
         ConfigureSupportingEntities(builder);
+        ConfigureSearch(builder);
     }
 
     private static void ConfigureIncidents(ModelBuilder builder)
@@ -525,7 +526,7 @@ public sealed class ArchiveDbContext(DbContextOptions<ArchiveDbContext> options)
             b.Property(x => x.RecordId).HasColumnName("record_id");
             b.Property(x => x.UserId).HasColumnName("user_id");
             b.Property(x => x.Assessment).HasColumnName("assessment").HasMaxLength(20)
-                .HasConversion<string>();
+                .HasConversion(ArchiveValueConverters.SnakeCase<AssessmentValue>());
             b.Property(x => x.CreatedAt).HasColumnName("created_at").HasDefaultValueSql("now()");
             b.HasOne(x => x.Record).WithMany(x => x.Assessments)
                 .HasForeignKey(x => x.RecordId).OnDelete(DeleteBehavior.Cascade);
@@ -541,7 +542,7 @@ public sealed class ArchiveDbContext(DbContextOptions<ArchiveDbContext> options)
             b.Property(x => x.RecordId).HasColumnName("record_id");
             b.Property(x => x.RequesterId).HasColumnName("requester_id");
             b.Property(x => x.Status).HasColumnName("status").HasMaxLength(20)
-                .HasConversion<string>();
+                .HasConversion(ArchiveValueConverters.SnakeCase<AccessRequestStatus>());
             b.Property(x => x.DecidedBy).HasColumnName("decided_by");
             b.Property(x => x.DecidedAt).HasColumnName("decided_at");
             b.Property(x => x.CreatedAt).HasColumnName("created_at").HasDefaultValueSql("now()");
@@ -863,4 +864,60 @@ public sealed class ArchiveDbContext(DbContextOptions<ArchiveDbContext> options)
         });
     }
 
+    private static void ConfigureSearch(ModelBuilder builder)
+    {
+        builder.Entity<Incident>(b =>
+        {
+            b.Property<string>("SearchText").HasColumnName("search_text")
+                .HasComputedColumnSql("coalesce(designation, '') || ' ' || coalesce(markdown, '')", stored: true);
+            b.HasIndex("SearchText").HasDatabaseName("ix_incidents_search_text")
+                .HasMethod("gin").HasOperators("gin_trgm_ops");
+        });
+        builder.Entity<Record>(b =>
+        {
+            b.Property<string>("SearchText").HasColumnName("search_text")
+                .HasComputedColumnSql("coalesce(code, '') || ' ' || coalesce(markdown, '')", stored: true);
+            b.HasIndex("SearchText").HasDatabaseName("ix_records_search_text")
+                .HasMethod("gin").HasOperators("gin_trgm_ops");
+        });
+        builder.Entity<Organization>(b =>
+        {
+            b.Property<string>("SearchText").HasColumnName("search_text")
+                .HasComputedColumnSql("coalesce(name, '') || ' ' || coalesce(markdown, '')", stored: true);
+            b.HasIndex("SearchText").HasDatabaseName("ix_organizations_search_text")
+                .HasMethod("gin").HasOperators("gin_trgm_ops");
+            b.Property<NpgsqlTsVector>("SearchVector").HasColumnName("search_vector")
+                .HasComputedColumnSql("to_tsvector('english', coalesce(name, '') || ' ' || coalesce(markdown, ''))", stored: true);
+            b.HasIndex("SearchVector").HasDatabaseName("ix_organizations_search_vector").HasMethod("gin");
+        });
+        builder.Entity<Character>(b =>
+        {
+            b.Property<string>("SearchText").HasColumnName("search_text")
+                .HasComputedColumnSql("coalesce(name, '') || ' ' || coalesce(markdown, '')", stored: true);
+            b.HasIndex("SearchText").HasDatabaseName("ix_characters_search_text")
+                .HasMethod("gin").HasOperators("gin_trgm_ops");
+            b.Property<NpgsqlTsVector>("SearchVector").HasColumnName("search_vector")
+                .HasComputedColumnSql("to_tsvector('english', coalesce(name, '') || ' ' || coalesce(markdown, ''))", stored: true);
+            b.HasIndex("SearchVector").HasDatabaseName("ix_characters_search_vector").HasMethod("gin");
+        });
+        builder.Entity<Recovery>(b =>
+        {
+            b.Property<string>("SearchText").HasColumnName("search_text")
+                .HasComputedColumnSql("archive.recovery_search_text(name, alternative_names, description)", stored: true);
+            b.HasIndex("SearchText").HasDatabaseName("ix_recoveries_search_text")
+                .HasMethod("gin").HasOperators("gin_trgm_ops");
+            b.Property<NpgsqlTsVector>("SearchVector").HasColumnName("search_vector")
+                .HasComputedColumnSql("to_tsvector('english', archive.recovery_search_text(name, alternative_names, description))", stored: true);
+            b.HasIndex("SearchVector").HasDatabaseName("ix_recoveries_search_vector").HasMethod("gin");
+        });
+        builder.Entity<Organization>().Property(x => x.LegacyCode).HasColumnName("legacy_code").HasMaxLength(40);
+        builder.Entity<Organization>().HasIndex(x => x.LegacyCode).IsUnique()
+            .HasDatabaseName("ux_organizations_legacy_code").HasFilter("legacy_code IS NOT NULL");
+        builder.Entity<RecordAccessRequest>().HasIndex(x => new { x.RequesterId, x.RecordId })
+            .HasDatabaseName("ix_record_access_requests_approved")
+            .HasFilter("status = 'approved' AND decided_at IS NOT NULL");
+        builder.Entity<Tombstone>().HasIndex(x => x.RecordId).HasDatabaseName("ix_tombstones_record");
+        // Expression indexes on lower(holder_code) are owned by the SQL schema;
+        // EF cannot map an expression index without a separate generated property.
+    }
 }

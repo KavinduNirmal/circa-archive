@@ -1162,3 +1162,28 @@ it("keeps search result types and warning indicators distinct from severity labe
     expect(cells[3]).not.toHaveTextContent(/^(Red|Yellow|Green):/);
   }
 });
+
+it("shows an approved sealed record excerpt without an access-request notice", () => {
+  const state = parseSearchState({});
+  const response = searchFixture(state);
+  response.items = [
+    {
+      ...response.items[0],
+      type: "record",
+      class: "exploration",
+      status: "sealed",
+      access: "sealed",
+      redacted: false,
+      excerpt: "Approved filing prose",
+      highlights: [],
+      warning: { tier: null, disclosure: null, tags: [] },
+    },
+  ];
+  renderWithIntl(
+    <ArchiveRecords state={state} outcome={{ status: "success", response }} />,
+  );
+  expect(screen.getByText("Approved filing prose")).toBeVisible();
+  expect(
+    screen.queryByText(new RegExp(site.searchSealedRecord)),
+  ).not.toBeInTheDocument();
+});

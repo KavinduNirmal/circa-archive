@@ -156,3 +156,6 @@ Search filters open from a disclosure in both variants. Controls use the shared 
 `site-search.tsx` supplies the site message namespace to the interactive `search-form.tsx` without adding public archive prose to the global client provider.
 
 Search results show type and class on separate lines, each with a coloured square, the archive warning swatch, and separate uppercase warning labels coloured by red/yellow/green severity without colour-name prefixes. Holder codes remain search filters and are omitted from the results table.
+
+API-approved sealed records render their returned excerpt without the access-request
+notice; redacted incident/record results retain their corresponding sealed notice.

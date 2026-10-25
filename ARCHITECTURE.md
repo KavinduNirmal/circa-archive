@@ -152,7 +152,7 @@ Users interact with a diegetic desktop environment. Records are authored in Mark
 
 ### 3.5 Database Schema
 
-The schema below has been revised for the entity and reference model in the 2026-10-21 development notes. The core archive entity tables and their search indexes are now scaffolded in `Circa.Archive.Domain` and `Circa.Archive.Infrastructure`; no CRUD or endpoints exist yet. The remaining schema is still conceptual: it does not yet model versioned foundational constraints, scoped Continuity Stewards and succession, or separate publication, evidentiary, and per-continuity adoption states. Temporary-entity promotion and reference resolution are specified as transactional behavior, but their exact EF Core mapping remains undecided.
+The schema below has been revised for the entity and reference model in the 2026-10-21 development notes. The core archive entity tables and their search indexes are now scaffolded in `Circa.Archive.Domain` and `Circa.Archive.Infrastructure`; global search is implemented; archive CRUD and destination read endpoints remain pending. The remaining schema is still conceptual: it does not yet model versioned foundational constraints, scoped Continuity Stewards and succession, or separate publication, evidentiary, and per-continuity adoption states. Temporary-entity promotion and reference resolution are specified as transactional behavior, but their exact EF Core mapping remains undecided.
 
 Naming below is provisional. `Records` means filings against an Incident (`EXP`, `EVI`, `RUM`); the originating Incident remains its own table. `Recoveries` is the archive term for items and appears as `ITM` in display codes.
 
@@ -594,6 +594,11 @@ CREATE TABLE Folders (
 - Reserved display ranges: Incidents `0-07539`, Explorations `0-288901`, Evidence `0-35782`, Organizations `0-5428`, Characters `0-18256`
 - Full-text search index on `Incidents.Markdown`, `Records.Markdown`, `Organizations.Markdown`, and `Characters.Markdown`
 - Search over classification and status uses display vocabulary, not internal enum names
+- Stored `search_text` and GIN trigram indexes cover all five entity types; recovery text includes alternative names
+- Stored English `search_vector` and GIN indexes cover all five entity types
+- Case-insensitive holder prefixes use SQL expression indexes on `lower(holder_code) text_pattern_ops`
+- Search DDL includes `record_assessments`, `record_access_requests`, and `tombstones`, with unique assessments and approved-reader/tombstone lookup indexes
+- Organizations preserve an optional unique `legacy_code` display alias; canonical references remain stable
 
 ---
 
@@ -716,6 +721,43 @@ All endpoints are versioned via the URL path segment (`/api/v{version}/...`). Th
 | Method | Endpoint         | Description                                                              |
 | ------ | ---------------- | ------------------------------------------------------------------------ |
 | GET    | `/api/v1/search` | Full-text search across incidents, records, orgs, characters, recoveries |
+
+Implemented in the Archive Application/Infrastructure projects. Inputs are `q`,
+`holder`, repeated `type`, `class`, `status`, `lifecycle`, `access`, `advisory`,
+`warn`, `disclosure`, `warnTag`, `excludeWarnTag`, plus `period`, `from`, `to`,
+`language`, `sort`, `page`, and `limit`. Repeated facet values combine with OR;
+different facets combine with AND. Exclusions override included warning tags.
+`language=en|ko` defaults to English; `lang` is an accepted alias. English uses
+FTS and trigram fallback; Korean uses trigram matching. Holder is a literal
+case-insensitive printed-code prefix, with no relationship lookup.
+
+Responses contain `items`, `page` (number, size, total, totalPages), common-filtered
+`facets`, normalized `applied` filters, and `meta` (codeMatch, holderMatch, language).
+Items distinguish entity `type` from filing `class`, expose lifecycle/access/advisory
+separately from display status, and include plain-text excerpts with UTF-16 highlight
+offsets. Warning tier/disclosure can be null for dossiers. Rumours have null `code`,
+`displayCode=RUM`, a reference number, and an incident parent. Organization codes
+stay canonical while display codes preserve stored legacy aliases.
+
+Public discovery excludes restricted, erased, and tombstoned rows before counts,
+along with records whose incident parent is hidden. Sealed incidents always return
+title-visible metadata stubs. Sealed records return stubs unless the viewer has a
+live session and an approved, dated access request. Ownership and moderation roles
+grant no bypass. Bodies in stubs cannot affect matching, ranking, or excerpts.
+Display status precedence is sealed over contested over on-file within this visible
+set; contested requires at least 10 assessments and at least 70% contest votes.
+
+The endpoint is anonymous and treats invalid/revoked sessions as guests. Every
+response uses `Cache-Control: private, no-store` and `Vary: Cookie`. Pagination
+uses Link headers and pages 1–100 with sizes 10/20/50. Requests are limited to
+4 KiB, 200 query characters, 120 holder characters, and 20 values per facet.
+Invalid input returns 400 `invalid_search_filter`; process-local IP limiting
+(default 60/minute, `Search:PermitLimit`) returns 429 `rate_limit_exceeded` with
+Retry-After. A 3-second SQL timeout returns 503 `search_unavailable`.
+
+See [search implementation and verification](backend/src/Modules/Archive/Circa.Archive.Infrastructure/Search/README.md)
+and the [additive schema upgrade](backend/src/Modules/Archive/Circa.Archive.Infrastructure/Persistence/README.md).
+The client remains fixture-backed until destination pages are integrated.
 
 ### 4.11 Real-time (SignalR)
 
@@ -1174,7 +1216,14 @@ The full public regulations should be published alongside the [Author guide](doc
 ### 10.2 Global Search
 
 - Full-text search across incidents, records, organizations, characters, and recoveries.
-- Filters: organization, classification, date, character, type, author, content warning, custody status.
+- Implemented filters: cosmetic holder code, entity type, filing class, display status,
+  exact lifecycle/access/advisory, warning tier/disclosure/included and excluded tags,
+  filing date bounds/period, language, sorting, and pagination.
+- Deferred: resolved organization/author/tag/character/custody filters, broader mentions,
+  classification UI, cursors, saved searches, and search-as-you-type. Holder does not
+  resolve affiliations, claims, or custody; a future mentions model owns that behavior.
+- The API returns all five entity types. The current UI enables incident, record, and
+  organization and keeps fixture transport until those destinations use real data.
 - Search must match display vocabulary (for example `Corroborate`, `On file`, `Restricted`) rather than internal enum names.
 - Reference lookup accepts typed codes and resolves them through the same visibility rules as record reading.
 

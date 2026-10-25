@@ -22,3 +22,6 @@ workflows. Codes are display identifiers; `Id` is the database key. Markdown and
 JSON payloads are stored as text until editing and validation workflows define
 their typed shapes. Navigation properties describe relationships; `ArchiveDbContext`
 still owns table mapping and relationship configuration.
+
+Organizations may preserve a nullable `LegacyCode` display alias alongside the
+canonical reference number. It is not a holder or relationship identifier.

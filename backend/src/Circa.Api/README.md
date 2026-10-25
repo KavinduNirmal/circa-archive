@@ -37,3 +37,11 @@ rightmost hop before authentication and rate limiting; it never trusts an
 arbitrary caller's IP claim. The Compose ingress replaces inbound forwarding
 headers, and Next forwards its validated edge address for server session calls.
 See the [ingress guide](../../../infra/README.md). No schema changes are needed.
+
+## Global archive search
+
+`GET /api/v1/search` is public, bounded, and uncached. The host resolves a viewer
+through Auth's live-session requirement; revoked, expired, or invalid sessions
+fall back to guest visibility. Archive Infrastructure applies approved sealed
+record access and search predicates. Configure `Search:PermitLimit` (default 60
+requests/minute per connection IP). See [search contract](../Modules/Archive/Circa.Archive.Infrastructure/Search/README.md).

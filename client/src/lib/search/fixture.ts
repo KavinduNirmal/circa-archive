@@ -31,7 +31,11 @@ export type SearchResultItem = {
   access: "public" | "sealed" | "restricted";
   advisory: "contested" | null;
   filedAt: string;
-  warning: { tier: WarningTier; disclosure: WarningDisclosure; tags: string[] };
+  warning: {
+    tier: WarningTier | null;
+    disclosure: WarningDisclosure | null;
+    tags: string[];
+  };
   holder: { holderCode: string } | null;
   parent: { type: "incident"; code: string; title: string } | null;
   referenceNumber: number | null;
@@ -211,9 +215,11 @@ export function searchFixture(
           (item.class !== null && state.classes.includes(item.class))) &&
         (!state.statuses.length || state.statuses.includes(item.status)) &&
         (!state.warnings.length ||
-          state.warnings.includes(item.warning.tier)) &&
+          (item.warning.tier !== null &&
+            state.warnings.includes(item.warning.tier))) &&
         (!state.disclosures.length ||
-          state.disclosures.includes(item.warning.disclosure)) &&
+          (item.warning.disclosure !== null &&
+            state.disclosures.includes(item.warning.disclosure))) &&
         (!state.warningTags.length ||
           state.warningTags.some((tag) => item.warning.tags.includes(tag))) &&
         !state.excludedWarningTags.some((tag) =>
@@ -231,8 +237,12 @@ export function searchFixture(
             item.title ?? "",
             vocabulary.types[item.type],
             vocabulary.statuses[item.status],
-            vocabulary.warningTiers[item.warning.tier],
-            vocabulary.disclosures[item.warning.disclosure],
+            item.warning.tier === null
+              ? ""
+              : vocabulary.warningTiers[item.warning.tier],
+            item.warning.disclosure === null
+              ? ""
+              : vocabulary.disclosures[item.warning.disclosure],
             ...item.warning.tags.map(
               (tag) => vocabulary.warningTags[tag] ?? tag,
             ),

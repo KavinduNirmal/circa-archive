@@ -16,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="../../src/Modules/Archive/Circa.Archive.Application/Circa.Archive.Application.csproj" />
     <ProjectReference Include="..\..\src\Modules\Archive\Circa.Archive.Infrastructure\Circa.Archive.Infrastructure.csproj" />
   </ItemGroup>
 
