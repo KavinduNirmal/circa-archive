@@ -24,6 +24,7 @@ The current design is described in [ARCHITECTURE.md](../../ARCHITECTURE.md). The
 | [004](004-fixture-backed-client.md)               | The client runs on local fixtures until the backend exists              | Accepted                             |
 | [005](005-modular-monolith-backend.md)            | The backend is a .NET modular monolith                                  | Accepted, authentication implemented |
 | [006](006-session-tokens-in-http-only-cookies.md) | Sessions with short-lived JWTs in HttpOnly cookies                      | Accepted, implemented                |
+| [007](007-typed-entity-references.md)             | Typed entity links with transactional promotion of temporary entities   | Proposed                             |
 
 ## Boundaries
 
