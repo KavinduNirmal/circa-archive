@@ -8,13 +8,17 @@ This distinction is necessary. An occurrence may leave several incompatible acco
 
 ## Kinds of account
 
-An **INCIDENT** record preserves the original telling. It may describe a witness’s experience, a recollection, or first contact, and may state or hint at governing conditions. The narrator need not understand them. An explanation supplied later should not be presented as knowledge they possessed then.
+An **INCIDENT** record preserves the original telling. It may describe a witness’s experience, a recollection, or first contact, and may state or hint at governing conditions. The narrator need not understand them. An explanation supplied later should not be presented as knowledge they possessed then. Its archive reference is `INC-`.
 
-A **DISCOVERY** record describes an organization's contact with the Incident: how it came to attention, what was encountered, and what the organization initially understood.
+An **EXPLORATION** record follows the investigation. A character or group deliberately enters the Incident, learns part of its nature, and records the expedition. Interviews, recovery accounts, containment attempts, and later visits may contribute to it. Each supplies evidence from a particular position. Its archive reference is `EXP-`.
 
-An **EXPLORATION** record follows the investigation further. Interviews, recovery accounts, containment attempts, and later visits may contribute to it. Each supplies evidence from a particular position.
+An **EVIDENCE** record preserves testimony, an interview, a document, an image, or another account of the Incident that is not a deliberate expedition. It is often hearsay. It may support an Exploration, contradict one, or establish facts neither noticed. Its archive reference is `EVI-`.
 
-A **RUMOR** preserves an unverified claim. It may contain a truth absent from better-supported accounts. It may also be an invention. Its value cannot be settled by its label alone.
+A **RUMOUR** preserves an unverified claim. It may contain a truth absent from better-supported accounts. It may also be an invention. Its value cannot be settled by its label alone. Rumours have no inherent archive code and are kept in a separate tab.
+
+Organizations, characters, and recoveries are entities rather than record types. A record may refer to them, but they have their own registry pages and references. A reference is navigation, not ownership or proof.
+
+The earlier **DISCOVERY** label is retired. First contact is now filed as Evidence or Exploration depending on who made it and whether an expedition took place.
 
 ## Recorded experience
 

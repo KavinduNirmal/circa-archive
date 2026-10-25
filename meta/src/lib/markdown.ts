@@ -5,9 +5,26 @@ import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
 import rehypeStringify from "rehype-stringify";
 import { visit } from "unist-util-visit";
 import type { Root, Heading } from "mdast";
+import type { Element, Root as HastRoot } from "hast";
 import { documentationPlugins } from "./markdown-plugins";
 import { resolveDocLink } from "./documents";
 import type { Locale } from "./site";
+
+/** Tables keep full width inside a scroll frame so narrow content still fills the column. */
+function rehypeTableScroll() {
+  return (tree: HastRoot) => {
+    visit(tree, "element", (node: Element, index, parent) => {
+      if (node.tagName !== "table" || index === undefined || !parent) return;
+      parent.children[index] = {
+        type: "element",
+        tagName: "div",
+        properties: { className: ["table-scroll"] },
+        children: [node],
+      };
+      return index + 1;
+    });
+  };
+}
 
 function textOf(node: { value?: unknown; children?: unknown[] }): string {
   return typeof node.value === "string"
@@ -48,6 +65,7 @@ export async function renderDocument(
   });
   const renderer = unified()
     .use(remarkRehype)
+    .use(rehypeTableScroll)
     .use(rehypeSanitize, {
       ...defaultSchema,
       clobberPrefix: "",

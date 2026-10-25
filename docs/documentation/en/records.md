@@ -54,6 +54,11 @@ The frontmatter is parsed and kept as metadata. The archive index remains the so
 | `classification` | the access level and the clearance it requires. |
 | `related / tags` | cross-references and labels; both are lists.    |
 
+> [!NOTE]
+> The fixture corpus predates the revised taxonomy
+>
+> The running fixtures use `DISCOVERY` and `CIRCA-` codes. The planned platform model in [ARCHITECTURE.md](../../../ARCHITECTURE.md) replaces `DISCOVERY` with `EVIDENCE` (`EVI-`), keeps `EXPLORATION` (`EXP-`), and gives Incidents, Organizations, Characters, and Recoveries their own `INC-`, `ORG-`, `CHR-`, and `ITM-` references. The renderer still reads Markdown; only the metadata vocabulary changes.
+
 ## Sections and anchors
 
 Use a level-two heading for a section a reader should be able to jump to, and a level-three heading for structure inside it. The reader's page rail is built from level-two headings, and a heading inside a fenced code block is ignored.

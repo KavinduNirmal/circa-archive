@@ -20,6 +20,8 @@
   --ember: #c9762f;
   --line: rgb(242 238 229 / 15%);
   --soft: rgb(242 238 229 / 7%);
+  --pattern-bone: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4' viewBox='0 0 4 4'%3E%3Cpath fill='%23f2eee5' fill-opacity='0.14' d='M1 3h1v1H1V3zm2-2h1v1H3V1z'/%3E%3C/svg%3E");
+  --pattern-ember: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4' viewBox='0 0 4 4'%3E%3Cpath fill='%23c9762f' fill-opacity='0.22' d='M1 3h1v1H1V3zm2-2h1v1H3V1z'/%3E%3C/svg%3E");
   --serif: "Instrument Serif", Georgia, serif;
   --sans:
     "DM Sans", system-ui, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
@@ -1050,7 +1052,7 @@ kbd {
 .prose {
   font-size: 16px;
   line-height: 1.9;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
 }
 .prose > p,
 .prose > ul,
@@ -1087,7 +1089,50 @@ kbd {
 }
 .prose ul,
 .prose ol {
-  padding-left: 22px;
+  padding-left: 0;
+  list-style: none;
+}
+.prose ol {
+  counter-reset: prose-item;
+}
+.prose ol > li {
+  counter-increment: prose-item;
+}
+.prose ul > li,
+.prose ol > li {
+  position: relative;
+  padding-left: 32px;
+}
+.prose ul > li::before,
+.prose ol > li::before {
+  position: absolute;
+  left: 0;
+  background-color: rgb(201 118 47 / 12%);
+  background-image: var(--pattern-ember);
+  background-size: 4px 4px;
+  border: 1px solid rgb(201 118 47 / 45%);
+}
+.prose ol > li::before {
+  content: counter(prose-item);
+  top: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  color: var(--ember);
+  font: 10px/1 var(--mono);
+}
+.prose ul > li::before {
+  content: "";
+  top: 0.68em;
+  width: 8px;
+  height: 8px;
+}
+.prose li > ul,
+.prose li > ol {
+  margin-top: 7px;
+  padding-left: 4px;
 }
 .prose a {
   color: var(--bone);
@@ -1163,28 +1208,58 @@ kbd {
 .prose [data-brand="list"] li:last-child {
   border-bottom: 0;
 }
+.prose [data-brand="list"] li::before {
+  content: none;
+}
+.prose [data-brand="callout"] {
+  background-image: var(--pattern-ember);
+  background-size: 4px 4px;
+}
 .prose mark {
   color: var(--bone);
   background: rgb(201 118 47 / 25%);
   padding: 1px 3px;
 }
-.prose table {
-  display: block;
+.prose .table-scroll {
   overflow-x: auto;
+}
+.prose table {
   border-collapse: collapse;
   width: 100%;
+  border-block: 1px solid var(--line);
+  background: rgb(242 238 229 / 1.5%);
   font-size: 12px;
+  line-height: 1.7;
+  overflow-wrap: normal;
 }
 .prose th,
 .prose td {
-  border: 1px solid var(--line);
+  border: 0;
+  border-bottom: 1px solid var(--soft);
   padding: 12px 14px;
   text-align: left;
   vertical-align: top;
+  overflow-wrap: break-word;
+}
+.prose tbody tr:last-child > th,
+.prose tbody tr:last-child > td {
+  border-bottom: 0;
+}
+.prose tbody tr:nth-child(even) {
+  background: rgb(242 238 229 / 2.5%);
+}
+.prose tbody tr:hover {
+  background: rgb(242 238 229 / 5%);
 }
 .prose th {
-  background: var(--panel);
-  font-weight: 600;
+  background-color: rgb(242 238 229 / 6%);
+  background-image: var(--pattern-bone);
+  background-size: 4px 4px;
+  border-bottom: 1px solid var(--line);
+  color: var(--bone);
+  font: 500 10px/1.6 var(--mono);
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
 }
 .prose img {
   display: block;
@@ -1193,6 +1268,12 @@ kbd {
 .prose .contains-task-list {
   list-style: none;
   padding-left: 0;
+}
+.prose .contains-task-list > li {
+  padding-left: 0;
+}
+.prose .contains-task-list > li::before {
+  content: none;
 }
 .doc-source {
   display: flex;
@@ -1845,6 +1926,34 @@ kbd {
     white-space: pre-wrap;
     background: none;
   }
+  .prose table,
+  .prose th {
+    background: none;
+  }
+  .prose th,
+  .prose td {
+    border-color: #bbb;
+    color: black;
+  }
+  .prose tbody tr {
+    background: none;
+  }
+  .prose [data-brand="callout"] {
+    background-image: none;
+  }
+  .prose ul,
+  .prose ol {
+    list-style: revert;
+    padding-left: 22px;
+  }
+  .prose ul > li,
+  .prose ol > li {
+    padding-left: 0;
+  }
+  .prose ul > li::before,
+  .prose ol > li::before {
+    content: none;
+  }
   .prose a {
     color: black;
   }
@@ -2298,6 +2407,28 @@ button,
   display: inline-flex;
   align-items: center;
   padding: 10px 12px;
+}
+.doc-actions [data-copy-markdown] {
+  gap: 8px;
+}
+.doc-actions [data-copy-markdown] svg {
+  flex-shrink: 0;
+  width: 13px;
+  height: 13px;
+}
+[data-slot="tooltip-content"] {
+  z-index: 50;
+  background: var(--panel);
+  color: var(--bone);
+  border: 1px solid var(--line);
+  padding: 7px 10px;
+  font: 9px/1.6 var(--mono);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  box-shadow: 0 12px 30px rgb(0 0 0 / 35%);
+}
+[data-slot="tooltip-arrow"] {
+  fill: var(--panel);
 }
 .chapter-groups summary {
   min-height: 44px;

@@ -165,11 +165,6 @@ if (article) {
       status.textContent = article!.dataset.failed!;
     }
   }
-  article
-    .querySelector("[data-copy-markdown]")
-    ?.addEventListener("click", () => {
-      void copy();
-    });
   article.querySelector("[data-chat]")?.addEventListener("click", () => {
     void copy(true);
   });
