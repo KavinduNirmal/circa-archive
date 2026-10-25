@@ -34,9 +34,13 @@ Organizations may continue employing corrupted personnel who remain in ordinary 
 
 ## Recognition
 
-An organization is **recognized** when CIRCA has a file on it. Recognition establishes an archival reference. It is not an endorsement of its methods, its account of itself, or its claims about another organization.
+An organization **exists** as soon as it is filed, with a reference beginning `ORG-`. It may remain **unrecognized** while authors adopt it: the archive holds the file without treating the organization as mainstream.
 
-A dossier gathers what has been written about it. A dossier may contain contradictions. Its existence does not grant any single account the last word.
+An organization becomes **recognized** through community assessment. Recognition establishes a place in the directory. It is not an endorsement of its methods, its account of itself, or its claims about another organization.
+
+A dossier gathers what has been written about it. A dossier may contain contradictions. Its existence does not grant any single account the last word. Appointed authors maintain the page; their appointment does not give them platform authority or ownership of adopters' records.
+
+An erased organization leaves the directory, but its reference number remains occupied forever. Erasure does not silently delete every record that mentioned it.
 
 ## Claims
 
@@ -50,6 +54,8 @@ An organization's account of its own conduct should be read beside accounts writ
 
 ## Codes and assessments
 
-An organization's founding-carnage letter is part of its archival designation. It is fixed at promotion. An [Incident classification](Classifications.md) assesses the phenomenon described by a file.
+An organization's archive reference is `ORG-` followed by a minimum six-digit number. Older files may use a founding-carnage letter such as `ORG-A-081323`; new organizations do not receive one. An [Incident classification](Classifications.md) assesses the phenomenon described by a file, not the organization that investigates it.
+
+An organization may give a held Incident its own holder code, built from a prefix, number, suffix, and severity word. The holder code is cosmetic. It points back to the archive reference and never replaces it.
 
 Do not read an organization's code as a current assessment of every Incident it investigates. Cite the relevant Incident account.

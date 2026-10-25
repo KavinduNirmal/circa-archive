@@ -8,6 +8,14 @@ Some objects are produced by an Incident. Others enter as ordinary belongings an
 
 Record what is known of its origin. Do not supply one merely because it has been recovered.
 
+## Registry
+
+A filed recovery receives an archive reference beginning `ITM-`. The page records its commonly used name, alternative names, category, origin Incident, first written account, and the author who registered it. Documentation status distinguishes a **Basic** stub from a **Documented** account.
+
+Custody is often separate from discovery. The page may name who first recovered the object and who currently reports possessing it. Custody status is one of **Unknown**, **Unclaimed**, **Claimed**, **Disputed**, **Lost**, or **Destroyed**. Reproducibility is **Unknown**, **Unique**, or **Repeatable**.
+
+These fields record claims, not proof. A disputed custody entry should remain disputed. Registration does not grant the registrant ownership of the object or of its fiction.
+
 ## Working distinctions
 
 **Residual recoveries** are objects left behind without an observed continuing connection to the manifestation. An absence of observed behavior should be stated with the duration and limits of observation.

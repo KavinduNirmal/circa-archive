@@ -105,10 +105,13 @@ test("Markdown copying reports success and failures without sending a ChatGPT me
     }),
   );
   await page.goto("/en/documentation/records/");
-  await page
-    .getByRole("button", { name: "Copy Markdown", exact: true })
-    .click();
-  await expect(page.locator("[data-copy-status]")).toContainText("Copied");
+  const copyButton = page.getByRole("button", {
+    name: "Copy Markdown",
+    exact: true,
+  });
+  await expect(copyButton.locator("svg")).toBeVisible();
+  await copyButton.click();
+  await expect(page.getByRole("tooltip")).toContainText("Copied");
   const raw = await (await page.request.get("/en/source/records.md")).text();
   expect(
     await page.evaluate(() => (window as unknown as { copied: string }).copied),
@@ -126,12 +129,32 @@ test("Markdown copying reports success and failures without sending a ChatGPT me
       configurable: true,
     }),
   );
-  await page
-    .getByRole("button", { name: "Copy Markdown", exact: true })
-    .click();
-  await expect(page.locator("[data-copy-status]")).toContainText(
-    "Could not copy",
-  );
+  await copyButton.click();
+  await expect(page.getByRole("tooltip")).toContainText("Could not copy");
+});
+
+test("documentation tables wrap at spaces instead of breaking short words", async ({
+  page,
+}) => {
+  await page.goto("/en/documentation/records/");
+  const table = page.locator(".prose table").first();
+  const frame = page.locator(".prose .table-scroll").first();
+  await expect(table).toBeVisible();
+  const styles = await frame.evaluate((element) => {
+    const cell = element.querySelector("td");
+    const table = element.querySelector("table")!;
+    return {
+      tableWrap: getComputedStyle(table).overflowWrap,
+      cellWrap: cell ? getComputedStyle(cell).overflowWrap : null,
+      overflowX: getComputedStyle(element).overflowX,
+      tableWidth: table.getBoundingClientRect().width,
+      frameWidth: element.getBoundingClientRect().width,
+    };
+  });
+  expect(styles.tableWrap).toBe("normal");
+  expect(styles.cellWrap).toBe("break-word");
+  expect(styles.overflowX).toBe("auto");
+  expect(styles.tableWidth).toBeCloseTo(styles.frameWidth, 0);
 });
 
 test("shared lore keeps Korean navigation and local images; old About fragments find the new page", async ({

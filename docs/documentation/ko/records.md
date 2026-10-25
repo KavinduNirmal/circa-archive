@@ -54,6 +54,11 @@ A free-standing door in a pasture in Gangwon Province.
 | `classification` | 접근 등급과 요구되는 열람 허가.                  |
 | `related / tags` | 상호 참조와 레이블. 둘 다 목록입니다.            |
 
+> [!NOTE]
+> 픽스처 코퍼스는 개정된 분류보다 먼저 작성되었습니다
+>
+> 실행 중인 픽스처는 `DISCOVERY`와 `CIRCA-` 코드를 사용합니다. [ARCHITECTURE.md](../../../ARCHITECTURE.md)의 예정된 플랫폼 모델은 `DISCOVERY`를 `EVIDENCE`(`EVI-`)로 바꾸고, `EXPLORATION`(`EXP-`)을 유지하며, 사건·조직·인물·회수품에 각각 `INC-`, `ORG-`, `CHR-`, `ITM-` 참조를 부여합니다. 렌더러는 계속 마크다운을 읽고, 바뀌는 것은 메타데이터 어휘뿐입니다.
+
 ## 섹션과 앵커
 
 독자가 이동할 수 있어야 하는 섹션에는 2단계 제목을, 그 안의 구조에는 3단계 제목을 쓰세요. 리더의 페이지 레일은 2단계 제목으로 만들어지고, 코드 펜스 안의 제목은 무시됩니다.

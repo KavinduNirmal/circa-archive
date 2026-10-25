@@ -1,5 +1,6 @@
 ---
 import { getCollection } from "astro:content";
+import CopyMarkdown from "./CopyMarkdown";
 import Shell from "../layouts/Shell.astro";
 import { DOC_GROUPS, DOC_TOPICS, docHref, docTopic } from "../lib/documents";
 import { renderDocument } from "../lib/markdown";
@@ -135,10 +136,13 @@ const source = projectHref(locale, `source/${slug}.md`).replace(/\/$/, "");
           <p class="doc-lede">{t(locale, topic.ledeKey)}</p>
         )}
         <div class="doc-actions">
-          <button data-copy-markdown>
-            {t(locale, "docsCopyMarkdown")}
-            <span aria-hidden="true">⧉</span>
-          </button>
+          <CopyMarkdown
+            client:load
+            source={source}
+            label={t(locale, "docsCopyMarkdown")}
+            copiedLabel={t(locale, "docsCopied")}
+            failedLabel={t(locale, "docsMarkdownCopyFailed")}
+          />
           <a href={source}>{t(locale, "sourceLabel")} ↗</a>
           <a
             href="https://chatgpt.com/"

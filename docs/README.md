@@ -12,7 +12,7 @@
 - `desktop-cookie-mobile.png`: desktop shortcut rail, taskbar, and cookie notice occupy separate usable space at 390px; the rail scrolls to reach all applications.
 - `portal.webp`: preview of the public archive portal used by the root README.
 - `workstation.webp`: preview of the CIRCA/OS workstation used by the root README.
-- [AUTHOR_GUIDE.md](AUTHOR_GUIDE.md): platform collaboration rules for story authors, protected constraints, character permissions, and continuity adoption; implementation remains pending.
+- [AUTHOR_GUIDE.md](AUTHOR_GUIDE.md): platform collaboration rules for story authors, including the filing taxonomy, typed wikilinks and the entity registry, protected constraints, character permissions, content warnings, revisions, assessment, the public regulations, and CC BY-NC-SA 4.0 licensing; implementation remains pending.
 - [lore/](lore/README.md): original fictional setting, archival voice, and linked reference notes for Incidents and their records.
 
 ## Boundaries and verification

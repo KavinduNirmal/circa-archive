@@ -31,7 +31,7 @@ CIRCA's original fictional setting and shared vocabulary. The reference notes us
 - [The Witness Pen](Witness%20Pen.md): INC-E-08932, used to prepare recording sheets.
 - [The Lasting Bamboo](Lasting%20Bamboo.md): INC-E-10534, the source of indestructible recording paper.
 - [The Recollection Projector](Recollection%20Projector.md): INC-E-10743, playback of recorded vision with sound.
-- [Records](Records.md): kinds of account, references, and the meaning of filing.
+- [Records](Records.md): incident, exploration, evidence, and rumour accounts; references; and the meaning of filing.
 - [Organizations](Organizations.md): institutional language, recognition, and competing claims.
 - [Continuities](Continuities.md): branches of recorded history and institutional persistence.
 
