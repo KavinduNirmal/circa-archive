@@ -35,6 +35,7 @@ export default getRequestConfig(async ({ requestLocale }) => {
     word,
     browser,
     reader,
+    editor,
   ] = await Promise.all([
     import(`../../messages/${locale}/auth.json`),
     import(`../../messages/${locale}/metadata.json`),
@@ -49,6 +50,7 @@ export default getRequestConfig(async ({ requestLocale }) => {
     import(`../../messages/${locale}/word.json`),
     import(`../../messages/${locale}/browser.json`),
     import(`../../messages/${locale}/reader.json`),
+    import(`../../messages/${locale}/editor.json`),
   ]);
 
   return {
@@ -67,6 +69,7 @@ export default getRequestConfig(async ({ requestLocale }) => {
       word: word.default,
       browser: browser.default,
       reader: reader.default,
+      editor: editor.default,
     },
   };
 });

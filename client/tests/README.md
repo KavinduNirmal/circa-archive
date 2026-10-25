@@ -48,3 +48,11 @@ Run `bun run test` or `bun run test:watch` from `client/`. Browser interaction a
 
 The archive section-anchor check also verifies unnumbered record headings and
 contents labels that match the heading at each destination.
+
+The `incident-editor-*` suites cover form defaults, prose-only references, temporary IDs, restricted imports, attachment limits, IndexedDB restoration, tab/preview behavior, browser font preferences, and storage failure handling. IndexedDB tests use `fake-indexeddb` with Node’s cloneable Blob.
+
+`incident-editor-toolbar.test.tsx` exercises the real Markdown input: H1–H6 replacement, selection formatting, code fences, references, redactions, empty-document placeholders, and undo.
+
+Archive chrome tests also cover About dropdown hover, keyboard activation, Escape focus return, outside dismissal, and destination links.
+
+`archive-write.test.tsx` verifies author actions, disabled placeholders, saved-draft continuation, empty state, and storage failure without writes.

@@ -2,7 +2,10 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { LanguageSwitcher } from "../language-switcher";
 import { SessionAccessLink } from "../auth/session-access-link";
+import { ArchiveNavDropdown } from "./archive-nav-dropdown";
+import { PROJECT_LINKS } from "../meta/meta-links";
 import { ArchiveButton } from "./archive-button";
+import { ArchiveFooter } from "./archive-footer";
 import { SITE_INDEX } from "./archive-data";
 import { SiteSearch } from "./site-search";
 import styles from "./archive-site.module.css";
@@ -16,12 +19,12 @@ import styles from "./archive-site.module.css";
  * only its inner measure is constrained, which is what separates a tool from a
  * notice board.
  *
- * The one link that leaves the fiction is "About the site", and it says so: it
- * goes to the project page, where the archive is described as what it is. The
- * rest of the chrome speaks as the Commission.
+ * About dropdowns connect the reading edition to its author guidance and the
+ * project resources. The surrounding chrome speaks as the Commission.
  */
 
-export type ArchiveSection = "archive" | "records" | "organizations" | "about";
+export type ArchiveSection =
+  "archive" | "records" | "organizations" | "about" | "editor";
 
 export type ArchiveCrumb = { label: string; href?: string };
 
@@ -33,19 +36,21 @@ const NAV: readonly { section: ArchiveSection; key: string; href: string }[] = [
     key: "navOrganizations",
     href: "/site/organizations",
   },
-  { section: "about", key: "navAbout", href: "/site/about" },
 ];
 
 export function ArchiveChrome({
   active,
   trail,
   children,
+  compact = false,
 }: {
   active: ArchiveSection;
   trail: readonly ArchiveCrumb[];
   children: React.ReactNode;
+  compact?: boolean;
 }) {
   const t = useTranslations("site");
+  const editorWriteLabel = t("writeTitle");
   // The institution's motto, borrowed from the public portal, and its service line.
   const institution = useTranslations("landing");
 
@@ -61,13 +66,15 @@ export function ArchiveChrome({
         watermark, and the warning in the one crimson the archive reserves for
         a holding. It is a printed notice, not a dialog — nothing to dismiss.
       */}
-      <aside className={styles.classified} aria-label={t("classifiedLabel")}>
-        <div className={styles.classifiedInner}>
-          <p className={styles.classifiedLead}>{t("classifiedLead")}</p>
-          <p className={styles.classifiedMark}>{t("classifiedMark")}</p>
-          <p className={styles.classifiedFoot}>{t("classifiedFoot")}</p>
-        </div>
-      </aside>
+      {!compact && (
+        <aside className={styles.classified} aria-label={t("classifiedLabel")}>
+          <div className={styles.classifiedInner}>
+            <p className={styles.classifiedLead}>{t("classifiedLead")}</p>
+            <p className={styles.classifiedMark}>{t("classifiedMark")}</p>
+            <p className={styles.classifiedFoot}>{t("classifiedFoot")}</p>
+          </div>
+        </aside>
+      )}
 
       <header className={styles.topbar}>
         <div className={styles.topbarInner}>
@@ -104,7 +111,48 @@ export function ArchiveChrome({
               {t(item.key)}
             </ArchiveButton>
           ))}
-          <ArchiveButton href="/meta">{t("aboutSite")}</ArchiveButton>
+          <ArchiveNavDropdown
+            label={t("navAbout")}
+            href="/site/about"
+            current={active === "about"}
+            items={[
+              {
+                label: t("navRules"),
+                href: "/meta/documentation/author-guide#conduct-assessment-and-appeals",
+              },
+              {
+                label: t("navContentWarnings"),
+                href: "/meta/documentation/author-guide#content-warnings-and-access",
+              },
+              {
+                label: t("navGuidelines"),
+                href: "/meta/documentation/author-guide",
+              },
+              { label: t("navFilings"), href: "/site/records" },
+            ]}
+          />
+          <ArchiveNavDropdown
+            label={t("aboutSite")}
+            href="/meta"
+            items={[
+              {
+                label: t("navSponsor"),
+                href: PROJECT_LINKS.sponsor,
+                external: true,
+              },
+              {
+                label: t("navGithub"),
+                href: PROJECT_LINKS.repository,
+                external: true,
+              },
+              { label: t("navDocumentation"), href: "/meta/documentation" },
+              { label: t("navLore"), href: "/meta/documentation/lore" },
+              { label: t("navTos"), href: "/meta/about#licence" },
+            ]}
+          />
+          <ArchiveButton href="/site/write" current={active === "editor"}>
+            {editorWriteLabel}
+          </ArchiveButton>
           <span className={styles.navSpacer} />
           <ArchiveButton href="/site/random">{t("actionRandom")}</ArchiveButton>
           <ArchiveButton href="/desktop">
@@ -116,39 +164,41 @@ export function ArchiveChrome({
       {/*
         The announcement bar. The text is drawn twice on a single track so the
         loop has no seam; the second copy is decoration and is hidden from the
-        accessibility tree. The pause box is a real checkbox because the site
-        ships no JavaScript and an automatic marquee still has to be stoppable —
+        accessibility tree. The pause box is a real checkbox because an automatic
+        marquee still has to be stoppable without JavaScript —
         `:checked ~` is what halts it.
       */}
-      <aside className={styles.banner} aria-label={t("bannerLabel")}>
-        <div className={styles.bannerInner}>
-          <input
-            id="site-announcement-pause"
-            className={styles.bannerPauseInput}
-            type="checkbox"
-            aria-label={t("bannerPause")}
-          />
-          <span className={styles.bannerLabel}>{t("bannerLabel")}</span>
-          <div className={styles.bannerTicker}>
-            <div className={styles.bannerTrack}>
-              <span className={styles.bannerText}>{t("bannerText")}</span>
-              <span className={styles.bannerText} aria-hidden="true">
-                {t("bannerText")}
-              </span>
+      {!compact && (
+        <aside className={styles.banner} aria-label={t("bannerLabel")}>
+          <div className={styles.bannerInner}>
+            <input
+              id="site-announcement-pause"
+              className={styles.bannerPauseInput}
+              type="checkbox"
+              aria-label={t("bannerPause")}
+            />
+            <span className={styles.bannerLabel}>{t("bannerLabel")}</span>
+            <div className={styles.bannerTicker}>
+              <div className={styles.bannerTrack}>
+                <span className={styles.bannerText}>{t("bannerText")}</span>
+                <span className={styles.bannerText} aria-hidden="true">
+                  {t("bannerText")}
+                </span>
+              </div>
+            </div>
+            <div className={styles.bannerTools}>
+              <label
+                className={styles.bannerPause}
+                htmlFor="site-announcement-pause"
+                aria-hidden="true"
+              />
+              <ArchiveButton href="/site/about" className={styles.bannerKey}>
+                {t("bannerLink")}
+              </ArchiveButton>
             </div>
           </div>
-          <div className={styles.bannerTools}>
-            <label
-              className={styles.bannerPause}
-              htmlFor="site-announcement-pause"
-              aria-hidden="true"
-            />
-            <ArchiveButton href="/site/about" className={styles.bannerKey}>
-              {t("bannerLink")}
-            </ArchiveButton>
-          </div>
-        </div>
-      </aside>
+        </aside>
+      )}
 
       <div className={styles.frame}>
         <nav className={styles.crumbs} aria-label={t("crumbsLabel")}>
@@ -171,39 +221,7 @@ export function ArchiveChrome({
         {children}
       </div>
 
-      <footer className={styles.footer}>
-        <div className={styles.footerInner}>
-          <div className={styles.footerRow}>
-            <p>
-              {institution("footerRegistry")} <span aria-hidden="true">·</span>{" "}
-              {institution("footerService")}
-            </p>
-            <p className={styles.footerMeta}>
-              {t("footerEdition")} <span aria-hidden="true">·</span>{" "}
-              {t("circularReissue")}
-            </p>
-          </div>
-
-          <nav
-            className={styles.footerLinks}
-            aria-label={t("footerLinksLabel")}
-          >
-            <Link href="/site">{t("navArchive")}</Link>
-            <Link href="/site/records">{t("navRecords")}</Link>
-            <Link href="/site/organizations">{t("navOrganizations")}</Link>
-            <Link href="/site/about">{t("navAbout")}</Link>
-            <Link href="/site/random">{t("randomTitle")}</Link>
-            <Link href="/desktop">{t("navWorkstation")}</Link>
-            <Link href="/meta">{t("aboutSite")}</Link>
-            <Link href="/">{t("navPublic")}</Link>
-          </nav>
-
-          <p className={styles.footerFine}>
-            <span>{t("footerEnd")}</span>
-            <a href="#top">{institution("footerTop")}</a>
-          </p>
-        </div>
-      </footer>
+      {!compact && <ArchiveFooter />}
     </div>
   );
 }

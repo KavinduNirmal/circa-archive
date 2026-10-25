@@ -1,5 +1,6 @@
 "use client";
 
+import type { PluggableList } from "unified";
 import type { Handlers } from "mdast-util-to-hast";
 import { useMemo } from "react";
 import ReactMarkdown, { type Components } from "react-markdown";
@@ -90,10 +91,15 @@ const COMPONENTS: Components = {
 export function RecordMarkdown({
   source,
   redactionMode = "labelled",
+  additionalPlugins = [],
+  components = {},
 }: {
   source: string;
   /** Policy, not styling: `hidden` leaves a redaction with nothing to reveal. */
   redactionMode?: RedactionMode;
+  /** Host-specific references and local asset presentation; the record syntax stays shared. */
+  additionalPlugins?: PluggableList;
+  components?: Components;
 }) {
   const handlers = useMemo(
     () => recordHandlers(redactionMode),
@@ -104,9 +110,9 @@ export function RecordMarkdown({
   return (
     <div className="reader-markdown">
       <ReactMarkdown
-        remarkPlugins={RECORD_REMARK_PLUGINS}
+        remarkPlugins={[...RECORD_REMARK_PLUGINS, ...additionalPlugins]}
         remarkRehypeOptions={{ handlers }}
-        components={COMPONENTS}
+        components={{ ...COMPONENTS, ...components }}
         skipHtml
       >
         {normalised}

@@ -15,6 +15,7 @@ const index: readonly ArchiveEntry[] = [
     organization: "CIRCA",
     clearance: "LEVEL 4",
     abstract: "One car is absent from every copy of the waybill.",
+    warnings: [],
   },
   {
     code: "INC-00907",
@@ -25,6 +26,7 @@ const index: readonly ArchiveEntry[] = [
     organization: "ORG-C-005102",
     clearance: "LEVEL 3",
     abstract: "Two stations recorded the same tide eleven minutes apart.",
+    warnings: [],
   },
   {
     code: "ORG-C-005102",
@@ -35,6 +37,7 @@ const index: readonly ArchiveEntry[] = [
     organization: "CIRCA",
     clearance: "LEVEL 4",
     abstract: "Filed under seal; the body is listed here for completeness.",
+    warnings: [],
   },
   {
     code: "CIRCA-M-0002",
@@ -45,6 +48,7 @@ const index: readonly ArchiveEntry[] = [
     organization: "CIRCA",
     clearance: "LEVEL 5",
     abstract: "Transcription of a fragment held in cold storage.",
+    warnings: [],
   },
 ];
 

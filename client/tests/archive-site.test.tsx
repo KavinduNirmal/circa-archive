@@ -49,6 +49,46 @@ const entryFor = (code: string) =>
   ARCHIVE_INDEX.find((entry) => entry.code === code)!;
 
 describe("the archive home", () => {
+  it("opens archive and site dropdowns on hover and dismisses with Escape", async () => {
+    const user = userEvent.setup();
+    renderWithIntl(<ArchiveHome />);
+    const nav = screen.getByRole("navigation", { name: site.navLabel });
+    const archive = within(nav).getByRole("button", { name: site.navAbout });
+    expect(archive).toHaveAttribute("aria-expanded", "false");
+    await user.hover(archive);
+    expect(archive).toHaveAttribute("aria-expanded", "true");
+    expect(within(nav).getByRole("link", { name: "Rules" })).toHaveAttribute(
+      "href",
+      "/en/meta/documentation/author-guide#conduct-assessment-and-appeals",
+    );
+    expect(
+      within(nav).getByRole("link", { name: "Content Warnings" }),
+    ).toHaveAttribute(
+      "href",
+      "/en/meta/documentation/author-guide#content-warnings-and-access",
+    );
+    expect(within(nav).getByRole("link", { name: "Guidelines" })).toBeVisible();
+    expect(within(nav).getByRole("link", { name: "Filings" })).toHaveAttribute(
+      "href",
+      "/en/site/records",
+    );
+    await user.unhover(archive);
+    expect(archive).toHaveAttribute("aria-expanded", "false");
+    archive.focus();
+    await user.keyboard("{Enter}{Tab}");
+    expect(within(nav).getByRole("link", { name: "Rules" })).toHaveFocus();
+    await user.keyboard("{Escape}");
+    expect(archive).toHaveFocus();
+    expect(archive).toHaveAttribute("aria-expanded", "false");
+    const project = within(nav).getByRole("button", { name: site.aboutSite });
+    await user.click(project);
+    for (const name of ["Sponsor", "Github", "Documentation", "Lore", "TOS"]) {
+      expect(within(nav).getByRole("link", { name })).toBeVisible();
+    }
+    await user.click(screen.getByRole("heading", { level: 1 }));
+    expect(project).toHaveAttribute("aria-expanded", "false");
+  });
+
   it("offers the index, the organizations, and the workstation as ordinary links", () => {
     renderWithIntl(<ArchiveHome />);
     expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
@@ -71,7 +111,8 @@ describe("the archive home", () => {
       );
     }
     expect(
-      within(nav).getByRole("link", { name: site.navAbout }).nextElementSibling,
+      within(nav).getByRole("link", { name: site.navAbout }).parentElement
+        ?.nextElementSibling,
     ).toHaveTextContent(site.aboutSite);
     expect(screen.getByRole("link", { name: "Sign in" })).toHaveAttribute(
       "href",
@@ -216,6 +257,46 @@ describe("the index of records", () => {
     expect(screen.getAllByText(site.classIncident).length).toBeGreaterThan(0);
     expect(screen.getAllByText(site.statusSealed).length).toBeGreaterThan(0);
     expect(screen.getAllByText(site.statusErased).length).toBeGreaterThan(0);
+  });
+  it("marks warning status with a swatch and label that name the warnings on hover", () => {
+    renderWithIntl(<ArchiveRecords />);
+    expect(
+      screen.getByRole("columnheader", { name: site.columnWarnings }),
+    ).toBeVisible();
+
+    const rowFor = (code: string) =>
+      screen
+        .getAllByRole("link", {
+          name: site.openRecord.replace("{code}", code),
+        })[0]
+        .closest("tr")!;
+
+    const present = within(rowFor("INC-00042")).getByRole("img");
+    expect(present).toHaveAttribute("data-warning", "present");
+    expect(
+      within(rowFor("INC-00042")).getByText(site.warningWarning),
+    ).toBeVisible();
+    expect(present).toHaveAttribute(
+      "title",
+      `${site.warningWarning} — ${site.warningPresent}: ${site.warningTagPsychological}`,
+    );
+
+    const author = within(rowFor("INC-00204")).getByRole("img");
+    expect(author).toHaveAttribute("data-warning", "author");
+    expect(author).toHaveAttribute(
+      "title",
+      `${site.warningWarning} — ${site.warningAuthor}: ${site.warningTagDeath}`,
+    );
+
+    const none = within(rowFor("INC-00014")).getByRole("img");
+    expect(none).toHaveAttribute("data-warning", "none");
+    expect(
+      within(rowFor("INC-00014")).getByText(site.warningClear),
+    ).toBeVisible();
+    expect(none).toHaveAttribute(
+      "title",
+      `${site.warningClear} — ${site.warningNone}`,
+    );
   });
 });
 
@@ -508,7 +589,7 @@ describe("every link on the plain site", () => {
         }
         const url = new URL(href, "https://archive.invalid");
         expect(url.pathname, href).toMatch(
-          /^\/(en|ko)(\/site(\/records(\/[A-Z0-9/-]+)?(\/download)?|\/organizations|\/about|\/random)?|\/meta(\/about)?|\/desktop|\/sign-in|\/account)?$/,
+          /^\/(en|ko)(\/site(\/records(\/[A-Z0-9/-]+)?(\/download)?|\/organizations|\/about|\/random|\/write(\/editor)?)?|\/meta(\/about)?|\/desktop|\/sign-in|\/account)?$/,
         );
         // A query is a filter, and only the index and the directory take one.
         for (const key of url.searchParams.keys()) {
@@ -947,7 +1028,7 @@ describe("the project page", () => {
         continue;
       }
       expect(href, href).toMatch(
-        /^\/(en|ko)(\/(site(\/records(\/[A-Z0-9/-]+)?(\/download)?|\/organizations|\/about|\/random)?|meta(\/(about|documentation(\/[a-z-]+)?))?|desktop))?$/,
+        /^\/(en|ko)(\/(site(\/records(\/[A-Z0-9/-]+)?(\/download)?|\/organizations|\/about|\/random|\/editor)?|meta(\/(about|documentation(\/[a-z-]+)?))?|desktop))?$/,
       );
     }
   });

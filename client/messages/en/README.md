@@ -23,3 +23,5 @@ Each file is a flat map of camelCase keys to strings; keys never contain dots, b
 ## Usage
 
 `src/i18n/request.ts` imports these files; components never do. Edit every locale in the same change, then run `bun run test` for the parity check.
+
+`editor.json` contains incident form questions, source/preview controls, registry actions, restricted-use acknowledgement, and browser save feedback.

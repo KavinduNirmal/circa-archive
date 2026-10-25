@@ -5,6 +5,7 @@ import {
   type ArchiveClass,
   type ArchiveEntry,
   type ArchiveStatus,
+  type ArchiveWarningTag,
 } from "../browser/archive-index";
 
 /**
@@ -32,6 +33,15 @@ export const STATUS_MESSAGE_KEY: Record<ArchiveStatus, string> = {
   sealed: "statusSealed",
   restricted: "statusRestricted",
   erased: "statusErased",
+};
+
+/** The catalog key that names a specific content warning. */
+export const WARNING_MESSAGE_KEY: Record<ArchiveWarningTag, string> = {
+  violence: "warningTagViolence",
+  psychological: "warningTagPsychological",
+  sexual: "warningTagSexual",
+  selfHarm: "warningTagSelfHarm",
+  death: "warningTagDeath",
 };
 
 /** The English words, for the places that need a label without a translator. */

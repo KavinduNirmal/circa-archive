@@ -35,3 +35,11 @@ The auth suite now uses the actual sign-up and sign-in forms in English and Kore
 For a checkout-local browser installation, prefix the auth command with `PLAYWRIGHT_BROWSERS_PATH="$PWD/.pw-browsers"` when running from the repository root.
 
 The auth browser suite also captures and dismisses the English/Korean cookie notice, checks that acknowledgement survives reload, and keeps notice preferences separate from the two HttpOnly authentication cookies.
+
+`incident-editor.spec.ts` covers real Markdown editing, selection and undo across tabs, font-overlay metrics, browser draft/image restoration, restricted imports, temporary entities, and the mobile registry drawer. It captures desktop/mobile screenshots in `/tmp/circa-editor-*.png`. Set `CIRCA_E2E_PORT=3002` to use an alternate frontend port (default 3001).
+
+The incident editor suite also checks that Form information and Content share a horizontal navigation row above the panel at 1440px and 390px, supports switching with the Right Arrow key, and exercises the heading dropdown and new code/reference/redaction quick actions.
+
+`archive-navigation.spec.ts` checks hover continuity, keyboard dismissal and focus, click activation, and dropdown bounds at 1440px, 620px, and 390px. Screenshots are saved under `/tmp/circa-about-dropdown-<width>.png`.
+
+`archive-write.spec.ts` checks author landing navigation, editor routing, local draft continuation, and narrow-screen layout.

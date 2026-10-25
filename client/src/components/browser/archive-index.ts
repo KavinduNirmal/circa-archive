@@ -13,6 +13,15 @@
  */
 
 export type ArchiveClass = "incident" | "organization" | "continuity" | "memo";
+export const ARCHIVE_WARNING_TAGS = [
+  "violence",
+  "psychological",
+  "sexual",
+  "selfHarm",
+  "death",
+] as const;
+export type ArchiveWarningTag = (typeof ARCHIVE_WARNING_TAGS)[number];
+export type ArchiveWarningState = "present" | "author" | "none";
 export type ArchiveStatus =
   "on-file" | "contested" | "sealed" | "restricted" | "erased";
 export type ArchivePeriod = "any" | "current" | "recent" | "historical";
@@ -30,6 +39,9 @@ export type ArchiveEntry = {
   organization: string;
   clearance: string;
   abstract: string;
+  warnings: readonly ArchiveWarningTag[];
+  /** True when the author supplied the warning list rather than the archive. */
+  warningAuthorSupplied?: boolean;
 };
 
 export type ArchiveQuery = {
@@ -122,6 +134,8 @@ const entry = (
   organization: string,
   clearance: string,
   abstract: string,
+  warnings: readonly ArchiveWarningTag[] = [],
+  warningAuthorSupplied = false,
 ): ArchiveEntry => ({
   code,
   designation,
@@ -131,7 +145,15 @@ const entry = (
   organization,
   clearance,
   abstract,
+  warnings,
+  warningAuthorSupplied,
 });
+
+/** The single colour state the index prints for an entry's warnings. */
+export function warningState(entry: ArchiveEntry): ArchiveWarningState {
+  if (entry.warnings.length === 0) return "none";
+  return entry.warningAuthorSupplied ? "author" : "present";
+}
 
 /**
  * Eighteen preview entries spread across four classes and three centuries, so
@@ -173,6 +195,7 @@ export const ARCHIVE_INDEX: readonly ArchiveEntry[] = [
     "CIRCA",
     "LEVEL 4",
     "Three separate climbs in one building returned the same landing number. Measured, then sealed.",
+    ["psychological"],
   ),
   entry(
     "INC-00063",
@@ -193,6 +216,7 @@ export const ARCHIVE_INDEX: readonly ArchiveEntry[] = [
     "CIRCA",
     "LEVEL 5",
     "The designation is withheld at Level 5. The entry remains listed so the code is not reused.",
+    ["sexual", "selfHarm"],
   ),
   entry(
     "INC-00204",
@@ -203,6 +227,8 @@ export const ARCHIVE_INDEX: readonly ArchiveEntry[] = [
     "ORG-A-020748",
     "LEVEL 3",
     "Filed by a reviewer who read it elsewhere. No originating document was ever produced.",
+    ["death"],
+    true,
   ),
   entry(
     "INC-00318",
@@ -233,6 +259,7 @@ export const ARCHIVE_INDEX: readonly ArchiveEntry[] = [
     "Qterw-7-3",
     "LEVEL 3",
     "A free-standing door in a pasture in Gangwon Province, and eleven people whose records disagree with themselves.",
+    ["violence", "death"],
   ),
   entry(
     "ORG-U-000011",
