@@ -1,0 +1,222 @@
+.page {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 24px 32px 64px;
+  font-size: 14px;
+}
+.guidelines {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  background: var(--circa-paper-raised);
+  border: 1px solid var(--circa-ink-soft);
+  color: var(--circa-ink);
+  text-decoration: none;
+  box-shadow: inset 0 1px 0 white;
+}
+.guidelines > span {
+  flex: 1;
+}
+.detail {
+  display: block;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.6;
+  color: var(--circa-ink-soft);
+}
+.heading {
+  padding: 30px 0 24px;
+}
+.kicker {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--circa-ink-soft);
+}
+.heading h1 {
+  margin: 6px 0 8px;
+  font-size: clamp(32px, 5vw, 44px);
+  font-weight: 600;
+  line-height: 1.15;
+}
+.heading > p:last-child {
+  margin: 0;
+  font-size: 16px;
+  color: var(--circa-ink-soft);
+}
+.actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  align-items: stretch;
+}
+.actions > :last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+}
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 14px;
+  min-height: 148px;
+  padding: 16px 18px;
+  border: 1px solid var(--circa-paper);
+  background: var(--circa-paper-sunken);
+  text-decoration: none;
+  text-align: left;
+  color: var(--circa-ink);
+  font: inherit;
+}
+.card:disabled {
+  cursor: not-allowed;
+  opacity: 1;
+}
+.available {
+  background: var(--circa-paper-raised);
+  border-color: var(--circa-ink-soft);
+  border-left: 4px solid var(--klass-incident);
+  padding-left: 15px;
+  box-shadow: inset 0 1px 0 white;
+}
+.cardHead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+.symbol {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  color: var(--circa-ink-soft);
+}
+.symbol span {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+}
+.available .symbol {
+  color: var(--klass-incident);
+}
+.copy {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.copy > strong {
+  display: block;
+  font-size: 17px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.detail {
+  display: block;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.55;
+  color: var(--circa-ink-soft);
+}
+.actionLabel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  color: var(--circa-ink-soft);
+}
+.available .actionLabel {
+  color: var(--circa-link);
+  font-weight: 600;
+}
+.guidelines:hover,
+.available:hover,
+.draftRow:hover {
+  background: var(--circa-paper);
+}
+.page a:focus-visible {
+  outline: 3px solid var(--circa-link);
+  outline-offset: 4px;
+}
+.drafts {
+  margin-top: 36px;
+  border-top: 2px solid var(--circa-ink-soft);
+}
+.draftHeading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 16px;
+}
+.draftHeading h2 {
+  font-size: 22px;
+  font-weight: 600;
+  margin: 0;
+}
+.note {
+  color: var(--circa-ink-soft);
+  margin: 6px 0 16px;
+}
+.empty {
+  padding: 24px;
+  border: 1px dashed var(--circa-paper);
+  background: var(--circa-paper-sunken);
+  color: var(--circa-ink-soft);
+}
+.empty p {
+  margin: 4px 0 0;
+}
+.draftList {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+.draftRow {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 20px;
+  background: var(--circa-paper-raised);
+  border: 1px solid var(--circa-paper);
+  color: var(--circa-ink);
+  text-decoration: none;
+}
+.draftRow .copy > strong {
+  font-size: 16px;
+}
+@media (max-width: 760px) {
+  .actions {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .actions > :last-child:nth-child(odd) {
+    grid-column: auto;
+  }
+}
+@media (max-width: 640px) {
+  .page {
+    padding: 16px 16px 40px;
+  }
+  .guidelines {
+    padding: 14px;
+    gap: 12px;
+  }
+  .guidelines .detail {
+    display: none;
+  }
+  .card {
+    min-height: 0;
+    padding: 14px 16px;
+  }
+  .available {
+    padding-left: 13px;
+  }
+  .draftRow {
+    flex-wrap: wrap;
+  }
+  .draftRow .actionLabel {
+    margin-left: 40px;
+  }
+}

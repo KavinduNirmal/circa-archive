@@ -16,3 +16,5 @@
 Keep shared helpers here; framework-specific authentication is isolated in `auth/`; component presentation belongs in `../components/` and stateful orchestration in `../stores/`. These modules carry no translated copy and no React; they take a translator when they compose a title. `desktop-types.ts` imports `DesktopIconSpec` as a type only, so no component enters the store's module graph.
 
 Add meaningful tests before changing utility or renderer behavior. Run `bun run test` and `bun run typecheck` from the client root; `tests/workstation-store.test.ts` covers the trail operations through the store's public actions, and `tests/desktop-route.test.ts` holds every destination and archive code to a path round-trip.
+
+- `incident-editor/`: [incident draft model and browser storage](incident-editor/README.md), with prose-only entity references and local checks.

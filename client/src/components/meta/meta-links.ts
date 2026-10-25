@@ -1,8 +1,8 @@
 /**
  * Where the project lives outside this site, and what it is licensed under.
  *
- * The project page is the only page allowed to point at the repository, at the
- * funding page, or at a licence deed, so those addresses are declared once here
+ * The project pages and archive About dropdowns share repository and funding
+ * destinations, so those addresses are declared once here
  * instead of being repeated in the markup. Each can be overridden by a deployment
  * without editing a component; the repository and the funding page default to
  * the maintainer's published repository and sponsorship page.

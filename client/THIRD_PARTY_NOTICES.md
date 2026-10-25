@@ -138,3 +138,7 @@ FROM, OUT OF THE USE OR INABILITY TO USE THE FONT SOFTWARE OR FROM
 OTHER DEALINGS IN THE FONT SOFTWARE.
 
 ```
+
+## Incident editor dependencies
+
+The source editor uses [@uiw/react-md-editor](https://github.com/uiwjs/react-md-editor), distributed under the MIT License. Its package metadata and upstream repository identify that license; retain the upstream license notice when redistributing it. Browser-storage tests use [fake-indexeddb](https://github.com/dumbmatter/fakeIndexedDB), under Apache-2.0, with its license retained in the installed distribution. No third-party registry characters or image assets are bundled for the editor.
