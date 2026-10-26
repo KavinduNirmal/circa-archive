@@ -60,6 +60,7 @@ services:
     environment:
       NODE_ENV: development
       API_ORIGIN: http://circa-api:8080
+      SEARCH_SOURCE: ${SEARCH_SOURCE:-fixture}
       TRUST_PROXY_HEADERS: "true"
       NEXT_TELEMETRY_DISABLED: "1"
       CIRCA_LOW_RESOURCE: "1"

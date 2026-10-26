@@ -11,13 +11,16 @@ requires loading the Markdown editor parser.
   masthead, the masthead with the search box, the section bar, the announcement
   bar, breadcrumbs, and the foot. It also carries the About dropdowns for archive guidance and project resources,
   preserving the overview links to `/[lang]/site/about` and `/[lang]/meta`. The masthead carries the server-verified personal access link.
-- `site-search.tsx`: the search form and its filters. A plain GET form to the
-  index, so a query and a filter set survive a bookmark and work without
-  JavaScript. The masthead puts the filters behind a `<details>`; the pages show
-  them in a ruled band.
+- `site-search.tsx`: the global search form. It submits canonical query fields
+  as a plain GET to the index, so searches survive bookmarks and work without
+  JavaScript. The masthead puts the same filters behind a `<details>`; the index
+  shows them in a ruled band. Registry-defined filters include organization,
+  public author display name, record tag, linked character, and recovery custody.
+  Search suggestions are debounced; named saved searches stay in browser storage.
 - `archive-home.tsx`: the front page — search, a featured record, recent filings,
   most consulted, a random door, organizations, and the workstation invitation.
-- `archive-records.tsx`: the index table and the search results page.
+- `archive-records.tsx`: the archive index table and global search results,
+  including active-filter links and pagination.
 - `archive-record.tsx`: one record as a work page. The name and its code share a
   line, the tools that act on the whole record sit in one band, the sheet carries
   unnumbered section headings with matching contents links, and the foot repeats the step through the
@@ -149,3 +152,30 @@ policy pages. English and Korean labels live in the site catalogs.
 `archive-write.tsx` and `archive-write.module.css` provide the author landing: a guidelines bar, five creation cards in two columns (the final odd card spans
 the row), and the existing local incident draft as a list with
 empty/loading/error states. Only incident creation and continuation are wired. Archive navigation opens `/site/write`.
+
+Search filters open from a disclosure in both variants. Controls use the shared shadcn Button, Input, NativeSelect and Radix Checkbox. Warning tags cycle unchecked → included → excluded → unchecked, with explicit labels and an indeterminate minus for exclusions. Without JavaScript, native checkboxes provide separate include/exclude choices.
+
+`site-search.tsx` supplies the site message namespace to the interactive `search-form.tsx` without adding public archive prose to the global client provider.
+
+Search results show type and class on separate lines, each with a coloured square, the archive warning swatch, and separate uppercase warning labels coloured by red/yellow/green severity without colour-name prefixes. Holder codes remain search filters and are omitted from the results table.
+
+API-approved sealed records render their returned excerpt without the access-request
+notice; redacted incident/record results retain their corresponding sealed notice.
+Character and recovery result pages use the shared dossier reader after the API confirms
+an active public destination. Cursor links preserve filters and expose a previous boundary.
+
+## API destination integration
+
+With `SEARCH_SOURCE=api`, `archive-api-record.tsx` renders the actual filing through
+`RecordProse`, a GET acknowledgment for sealed incidents, and stable rumour anchors.
+`record-access-request.tsx` submits authenticated sealed-record requests and handles
+pending, denied, expired, signed-out, and retry states. Roles/ownership never reveal
+a body in the UI; only the server response can supply it. `archive-api-organizations.tsx`
+shows API directory results and the selected organization's Markdown dossier.
+The fixture reader remains the default preview. Component coverage lives in
+`tests/archive-api-record.test.tsx`; real API/browser coverage uses `test:e2e:search`.
+
+The server prose renderer drops raw HTML and applies react-markdown's URL policy
+to every generated link and image, including reference links and custom figures.
+Saved names remain escaped React text; saved URLs are reconstructed through the
+canonical search parser instead of passing browser storage directly to `href`.

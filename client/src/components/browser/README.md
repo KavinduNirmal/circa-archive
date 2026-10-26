@@ -46,6 +46,11 @@ The chrome is workstation furniture: steel palette, hard bevels, uppercase micro
 
 The fixture is illustrative preview content, not canon, and the page says so in its footer. It is deliberately mundane: no organization is named, no incident claims a story, and any body whose designation would name one is withheld as `null` so the page can render the design system's redacted bar. Codes and dates follow `PROJECT_CONTEXT.md` (`INC-00000`, `ORG-A-000000`, `ORG-A-000000/C1`, `CIRCA-R-0000`). A withheld designation is not in the searchable text, which is the point of withholding it.
 
+The shared public search may attach `holderCode`, `searchWarningTier`, and
+`searchDisclosure` fixture metadata to an entry. These are explicit display
+fields and do not reinterpret the browser's filing organization or old warning
+state.
+
 Nothing here reaches the network. There is no request to fail, so no loading or transport-error state exists; the archive is instant because it is local, and the status bar reports exactly what happened rather than simulating a transfer.
 
 ## Boundaries and verification

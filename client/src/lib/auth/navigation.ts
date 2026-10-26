@@ -35,7 +35,10 @@ export async function refreshNavigation(
       headers: {
         ...trustedProxyHeaders(request.headers),
         Cookie: request.headers.get("cookie") ?? "",
-        Origin: request.nextUrl.origin,
+        // This is a server-to-server call, not a browser mutation. nextUrl.origin
+        // reflects the bind address (for example http://0.0.0.0:3001), not the
+        // public origin the API allows, so asserting it here would fail CSRF
+        // origin validation and strand a valid refresh cookie as unavailable.
       },
       cache: "no-store",
       redirect: "manual",

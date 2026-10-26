@@ -42,4 +42,24 @@ The incident editor suite also checks that Form information and Content share a 
 
 `archive-navigation.spec.ts` checks hover continuity, keyboard dismissal and focus, click activation, and dropdown bounds at 1440px, 620px, and 390px. Screenshots are saved under `/tmp/circa-about-dropdown-<width>.png`.
 
+`search.spec.ts` checks the canonical GET query, sealed incident stubs, filter-preserving pagination, and submitting the search form with JavaScript disabled.
+
 `archive-write.spec.ts` checks author landing navigation, editor routing, local draft continuation, and narrow-screen layout.
+
+## API-backed search destinations
+
+`search-api.spec.ts` runs separately with `bun run test:e2e:search` and
+`playwright.search.config.ts`. It uses disposable PostgreSQL, the real API on 5041,
+and Next on 3102 with `SEARCH_SOURCE=api` and `.next/search-e2e`. Run separately from
+the auth suite (which shares the test API port). Covers search-to-destination links,
+incident acknowledgment, organization dossiers, rumour anchors, guest/moderator
+stubs, approved-reader bodies, persistent pending requests, Korean/no-JavaScript
+acknowledgment, and 390px/1440px captures at `/tmp/circa-api-reader-*.png`.
+
+API search browser tests also open character/recovery dossiers and traverse three
+cursor pages forward and backward. Run the browser suites and production builds
+sequentially: the isolated E2E output folders are nested under `.next`, which a
+production build clears.
+
+`search.spec.ts` also preloads hostile saved-search URLs/names and verifies that
+only canonical local links render, with markup remaining inert.

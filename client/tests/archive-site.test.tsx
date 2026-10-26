@@ -7,6 +7,8 @@ import { ArchiveExplorations } from "@/components/archive-site/archive-explorati
 import { ArchiveOrganizations } from "@/components/archive-site/archive-organizations";
 import { ArchiveRecord } from "@/components/archive-site/archive-record";
 import { ArchiveRecords } from "@/components/archive-site/archive-records";
+import { parseSearchState } from "@/lib/search/query";
+import { searchFixture } from "@/lib/search/fixture";
 import { MetaAbout } from "@/components/meta/meta-about";
 import { ISSUES, LICENCES, PROJECT_LINKS } from "@/components/meta/meta-links";
 import { RecordProse } from "@/components/archive-site/record-prose";
@@ -132,31 +134,45 @@ describe("the archive home", () => {
       expect(form).toHaveAttribute("action", "/en/site/records");
       expect(form).toHaveAttribute("method", "get");
       expect(
-        within(form).getByRole("searchbox", { name: site.searchLabel }),
+        within(form).getByRole("combobox", { name: site.searchLabel }),
       ).toHaveAttribute("name", "q");
     }
   });
 
-  it("gives both searches the class, status, and filed filters", () => {
+  it("gives both searches the global facets and filed range", async () => {
     renderWithIntl(<ArchiveHome />);
     const [masthead, page] = screen.getAllByRole("search");
     for (const form of [masthead, page]) {
-      expect(within(form).getByLabelText(site.filterClass)).toHaveAttribute(
-        "name",
-        "class",
-      );
-      expect(within(form).getByLabelText(site.filterStatus)).toHaveAttribute(
-        "name",
-        "status",
-      );
+      expect(
+        within(form).getByRole("group", { name: site.searchClass }),
+      ).toBeInTheDocument();
+      expect(
+        within(form).getByRole("group", { name: site.searchStatus }),
+      ).toBeInTheDocument();
+      expect(
+        within(form).getByRole("group", { name: site.searchType }),
+      ).toBeInTheDocument();
       expect(within(form).getByLabelText(site.filterFiled)).toHaveAttribute(
         "name",
         "period",
       );
+      expect(
+        within(form).getByLabelText(new RegExp(site.searchHolderCode)),
+      ).toHaveAttribute("name", "holder");
+      expect(within(form).getByLabelText(site.searchLanguage)).toHaveAttribute(
+        "name",
+        "language",
+      );
     }
-    expect(
-      within(page).getByRole("button", { name: site.applyFilters }),
-    ).toBeVisible();
+    for (const form of [masthead, page]) {
+      expect(form.querySelector("details")?.open).toBe(false);
+      await userEvent.click(
+        within(form).getByText(site.filtersLabel, { selector: "summary" }),
+      );
+      expect(
+        within(form).getByRole("button", { name: site.applyFilters }),
+      ).toBeVisible();
+    }
     // The masthead's filters live behind a disclosure, so their key is only
     // reachable once the strip is opened — the markup is there, the a11y tree
     // hides it until then.
@@ -167,7 +183,7 @@ describe("the archive home", () => {
       }),
     ).toBeInTheDocument();
     expect(
-      screen.getByText(site.filtersLabel, { selector: "summary" }),
+      within(page).getByText(site.filtersLabel, { selector: "summary" }),
     ).toBeVisible();
   });
 
@@ -621,6 +637,52 @@ describe("the record prose renderer", () => {
 });
 
 describe("search, random, and downloads", () => {
+  it("renders sealed search hits as metadata stubs without body excerpts", () => {
+    const state = parseSearchState({ q: "stairwell", type: "incident" });
+    renderWithIntl(
+      <ArchiveRecords
+        state={state}
+        outcome={{ status: "success", response: searchFixture(state) }}
+      />,
+    );
+    expect(
+      screen.getByRole("link", {
+        name: /Stairwell interval, repeated landing/,
+      }),
+    ).toBeVisible();
+    expect(screen.getByText(/acknowledge to reveal/)).toBeVisible();
+    expect(screen.queryByText(/Three separate climbs/)).toBeNull();
+  });
+
+  it("keeps search filters in pagination links", () => {
+    const state = parseSearchState({ limit: "10", page: "2" });
+    renderWithIntl(
+      <ArchiveRecords
+        state={state}
+        outcome={{ status: "success", response: searchFixture(state) }}
+      />,
+    );
+    expect(
+      screen.getByRole("navigation", { name: site.searchPagination }),
+    ).toBeVisible();
+    expect(
+      screen.getByRole("link", { name: site.searchPrevious }),
+    ).toHaveAttribute("href", "/en/site/records?limit=10");
+  });
+
+  it("shows a distinct rate-limit state and keeps the query on retry", () => {
+    const state = parseSearchState({ q: "door", language: "ko" });
+    renderWithIntl(
+      <ArchiveRecords state={state} outcome={{ status: "rate-limited" }} />,
+    );
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      site.searchRateLimitTitle,
+    );
+    expect(
+      screen.getByRole("link", { name: site.searchErrorRetry }),
+    ).toHaveAttribute("href", "/en/site/records?q=door&language=ko");
+  });
+
   it("filters the index on the server and keeps the query in the address", () => {
     renderWithIntl(<ArchiveRecords query="tide" />);
     expect(
@@ -1042,4 +1104,142 @@ describe("the project page", () => {
     expect(screen.getByText(korean.meta.quote)).toBeVisible();
     expect(screen.getByText(korean.meta.supportPromise)).toBeVisible();
   });
+});
+
+it("cycles warning tags through include, exclude and unchecked inside collapsed filters", async () => {
+  const { SiteSearch } = await import("@/components/archive-site/site-search");
+  const user = userEvent.setup();
+  const view = renderWithIntl(<SiteSearch />);
+  const disclosure = view.container.querySelector("details")!;
+  expect(disclosure.open).toBe(false);
+  await user.click(screen.getByText("Filters", { exact: true }));
+  expect(disclosure.open).toBe(true);
+  const checkbox = screen.getByRole("checkbox", { name: /Graphic violence/ });
+  const form = view.container.querySelector("form")!;
+  await user.click(checkbox);
+  expect(new FormData(form).getAll("warnTag")).toEqual(["graphic-violence"]);
+  await user.click(checkbox);
+  expect(checkbox).toHaveAttribute("aria-checked", "mixed");
+  expect(new FormData(form).getAll("warnTag")).toEqual([]);
+  expect(new FormData(form).getAll("excludeWarnTag")).toEqual([
+    "graphic-violence",
+  ]);
+  await user.click(checkbox);
+  expect(checkbox).toHaveAttribute("aria-checked", "false");
+  expect(new FormData(form).getAll("excludeWarnTag")).toEqual([]);
+});
+
+it("keeps search result types and warning indicators distinct from severity labels", () => {
+  const state = parseSearchState({});
+  const response = searchFixture(state);
+  renderWithIntl(
+    <ArchiveRecords state={state} outcome={{ status: "success", response }} />,
+  );
+  const table = screen.getByRole("table");
+  expect(
+    within(table).queryByRole("columnheader", {
+      name: english.site.columnHolder,
+    }),
+  ).not.toBeInTheDocument();
+  expect(
+    within(table).getByRole("columnheader", {
+      name: english.site.searchWarningTags,
+    }),
+  ).toBeInTheDocument();
+  for (const item of response.items) {
+    const row = within(table).getByText(item.displayCode).closest("tr")!;
+    const cells = within(row).getAllByRole("cell");
+    expect(cells[1]).not.toHaveTextContent("·");
+    const types = cells[1].querySelectorAll("[data-klass]");
+    expect(types).toHaveLength(item.class ? 2 : 1);
+    expect(types[0]).toHaveAttribute("data-klass", item.type);
+    if (item.class) expect(types[1]).toHaveAttribute("data-klass", item.class);
+    expect(cells[2].querySelector("[data-warning]")).toBeInTheDocument();
+    expect(cells[3].querySelector("[data-tier]")).toHaveAttribute(
+      "data-tier",
+      item.warning.tier,
+    );
+    expect(cells[3]).not.toHaveTextContent(/^(Red|Yellow|Green):/);
+  }
+});
+
+it("shows an approved sealed record excerpt without an access-request notice", () => {
+  const state = parseSearchState({});
+  const response = searchFixture(state);
+  response.items = [
+    {
+      ...response.items[0],
+      type: "record",
+      class: "exploration",
+      status: "sealed",
+      access: "sealed",
+      redacted: false,
+      excerpt: "Approved filing prose",
+      highlights: [],
+      warning: { tier: null, disclosure: null, tags: [] },
+    },
+  ];
+  renderWithIntl(
+    <ArchiveRecords state={state} outcome={{ status: "success", response }} />,
+  );
+  expect(screen.getByText("Approved filing prose")).toBeVisible();
+  expect(
+    screen.queryByText(new RegExp(site.searchSealedRecord)),
+  ).not.toBeInTheDocument();
+});
+
+it("resets cursor pagination when removing a repeated filter", () => {
+  const state = parseSearchState({
+    status: "sealed",
+    cursor: "a".repeat(16),
+    page: "3",
+  });
+  renderWithIntl(
+    <ArchiveRecords
+      state={state}
+      outcome={{ status: "success", response: searchFixture(state) }}
+    />,
+  );
+  expect(
+    screen
+      .getByRole("link", {
+        name: siteT("removeFilter", { filter: site.searchStatus }),
+      })
+      .getAttribute("href"),
+  ).not.toContain("cursor=");
+});
+
+it("explains an empty archive without claiming filters caused it", () => {
+  const state = parseSearchState({});
+  renderWithIntl(
+    <ArchiveRecords
+      state={state}
+      outcome={{ status: "success", response: searchFixture(state, []) }}
+    />,
+  );
+  expect(
+    screen.getAllByText("No entries have been filed in this archive yet.")
+      .length,
+  ).toBeGreaterThan(0);
+});
+
+it("rejects executable URLs in authored prose and reference-style links", () => {
+  renderWithIntl(
+    <RecordProse
+      source={
+        "[direct](data:text/html,attack)\n\n[reference][bad]\n\n[bad]: vbscript:attack\n\n[ordinary](https://example.com/path?q=door)"
+      }
+      redactionLabel="Redacted"
+      imageNotHeld="Image unavailable"
+    />,
+  );
+  expect(screen.getByText("direct").closest("a")).toHaveAttribute("href", "");
+  expect(screen.getByText("reference").closest("a")).toHaveAttribute(
+    "href",
+    "",
+  );
+  expect(screen.getByRole("link", { name: "ordinary" })).toHaveAttribute(
+    "href",
+    "https://example.com/path?q=door",
+  );
 });

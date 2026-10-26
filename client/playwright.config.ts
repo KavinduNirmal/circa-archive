@@ -3,7 +3,7 @@ const port = process.env.CIRCA_E2E_PORT ?? "3001";
 
 export default defineConfig({
   testDir: "./e2e",
-  testIgnore: "auth.spec.ts",
+  testIgnore: ["auth.spec.ts", "search-api.spec.ts"],
   fullyParallel: false,
   reporter: [["list"], ["html", { open: "never" }]],
   use: { baseURL: `http://localhost:${port}`, trace: "retain-on-failure" },

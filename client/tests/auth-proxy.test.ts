@@ -49,6 +49,21 @@ describe("navigation session refresh", () => {
     expect(response.headers.get("location")).toBeNull();
   });
 
+  it("does not send a browser Origin on the server-side refresh", async () => {
+    vi.stubEnv("API_ORIGIN", "http://localhost:5040");
+    const fetch = vi.fn().mockResolvedValue(
+      new Response(null, {
+        status: 204,
+        headers: [["set-cookie", "circa_at=fresh; Path=/; HttpOnly"]],
+      }),
+    );
+    vi.stubGlobal("fetch", fetch);
+    await proxy(pageRequest());
+    expect(
+      new Headers(fetch.mock.calls[0][1].headers).get("origin"),
+    ).toBeNull();
+  });
+
   it("refreshes within 120 seconds and keeps the locale redirect", async () => {
     vi.stubGlobal(
       "fetch",

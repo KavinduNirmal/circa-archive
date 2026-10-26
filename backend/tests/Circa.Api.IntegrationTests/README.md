@@ -51,3 +51,23 @@ DOTNET_PROCESSOR_COUNT=1 DOTNET_CLI_USE_MSBUILD_SERVER=0 MSBUILDDISABLENODEREUSE
 Reuse `--no-build --no-restore` for subsequent batches only after a successful
 build. Do not run frontend checks or production builds concurrently with these
 batches.
+
+## Global search
+
+`SearchEndpointTests` initializes the archive schema and exercises anonymous and
+stale-cookie search, validation ProblemDetails, repeated facets, language aliases,
+private cache headers, pagination links, rate limits/Retry-After, real database
+timeouts, generic unexpected-error responses, and sealed-record access through live/revoked sessions. Moderators and
+owners receive stubs unless explicitly approved; revocation falls back to public
+results rather than failing the public endpoint.
+
+`ArchiveDestinationEndpointTests` covers private destination responses, stale-cookie
+guests, explicit incident acknowledgment, real organization bodies, idempotent
+access requests, moderator/owner stubs, approved readers, revoked sessions, and
+hidden-parent 404s. Run with `--filter FullyQualifiedName~ArchiveDestination`.
+
+The shared PostgreSQL fixture uses Testcontainers 4.16 and an explicit image
+constructor. The unused Respawn dependency (and its vulnerable SQL Server/Azure/Image
+transitives) is removed; fixtures already isolate data through disposable PostgreSQL.
+Search validation also checks an encoded NUL returns field-level
+400 ProblemDetails before database execution.

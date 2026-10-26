@@ -4,6 +4,8 @@ import { toHast, type Handlers } from "mdast-util-to-hast";
 import { toJsxRuntime } from "hast-util-to-jsx-runtime";
 import { useLocale } from "next-intl";
 import { useId } from "react";
+import { defaultUrlTransform } from "react-markdown";
+import { visit } from "unist-util-visit";
 import { Fragment, jsx, jsxs } from "react/jsx-runtime";
 import { parseRecord } from "@/lib/markdown/pipeline";
 import { RecordImage } from "../reader/record-image";
@@ -183,6 +185,15 @@ export function RecordProse({
     handlers: proseHandlers(redactionLabel, imageNotHeld, locale, uid),
   });
   if (!tree) return null;
+  // The server renderer bypasses react-markdown, so apply its URL policy to
+  // every generated element, including reference links and custom figures.
+  visit(tree, "element", (node) => {
+    for (const property of ["href", "src"]) {
+      const value = node.properties[property];
+      if (typeof value === "string")
+        node.properties[property] = defaultUrlTransform(value);
+    }
+  });
   return (
     <div className={styles.prose}>
       {toJsxRuntime(tree, {

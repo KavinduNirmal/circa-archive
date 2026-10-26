@@ -2,18 +2,35 @@
 
 ## Responsibility
 
-`page.tsx` renders the index of every released entry and the result of a `?q=`
-search. The query is read from `searchParams` and filtered by
-`searchArchive`, so the page is server-rendered per request and the result is a
-link that can be shared.
+`page.tsx` parses the canonical global-search URL and renders the fixture-backed
+response from `src/lib/search/`. Search state stays in the address, and the
+native GET form works without JavaScript. Search and filter URLs are marked
+`noindex`; the unfiltered index remains indexable. `error.tsx` provides the recovery boundary; `layout.tsx` supplies only its localized recovery messages to the browser.
 
 ## Boundaries
 
-The table, the labels, and the search form belong to
-`../../../../../components/archive-site/`. This file only resolves the language,
-the query, and metadata.
+The result table, translated controls, and chips belong to
+`../../../../../components/archive-site/`. The shared parser, fixture adapter,
+and server-only API adapter live in `../../../../../lib/search/`. Set
+`SEARCH_SOURCE=api` to select the API adapter; the default remains `fixture`
+for the public preview. The route resolves language, query
+state, results, and metadata. The filter registry extends its URL contract with
+organization, public author display name, record tag, character relationship, and
+recovery custody. API-backed results use sort-bound keyset cursors.
 
 ## Usage
 
-`/{lang}/site/records` lists the index; `/{lang}/site/records?q=INC-00014`
-searches it. Covered by `tests/archive-site.test.tsx`.
+`/{lang}/site/records` lists public fixture entries;
+`/{lang}/site/records?q=INC-00014` searches by code. Covered by
+`tests/archive-site.test.tsx`, `tests/search-query.test.ts`, and
+`tests/search-fixture.test.ts`. From `client/`, run `bun run test`,
+`bun run lint`, `bun run typecheck`, and `bun run build`.
+
+## Phase 3 rendering decision
+
+The inherited `loading.tsx` streaming boundary was removed after the real API
+no-JavaScript browser test reproduced a permanent index skeleton on a record
+page. This conflicts with the plan's route-level loading-skeleton suggestion;
+the plan's plain-HTML search/reading requirement takes priority. These routes
+return completed server HTML instead of an automatic streaming fallback. Existing
+loading copy/styles remain available for explicit client-side pending feedback.

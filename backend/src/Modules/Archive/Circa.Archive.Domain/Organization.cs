@@ -9,6 +9,9 @@ public sealed class Organization
     /// <summary>Display number for <c>ORG-000000</c>; 0-5428 is reserved.</summary>
     public long ReferenceNumber { get; set; }
 
+    /// <summary>Optional historical display code; never a holder or relationship key.</summary>
+    public string? LegacyCode { get; set; }
+
     /// <summary>Public organization name.</summary>
     public string Name { get; set; } = string.Empty;
 

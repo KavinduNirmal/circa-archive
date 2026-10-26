@@ -17,7 +17,7 @@ Refresh cookies use `Path=/` so they reach page navigations. They retain `HttpOn
 
 ## Usage and verification
 
-Import `authFetch` only in browser code; import `getSession` or `sessionFetch` only in server code. The [personal access UI](../../components/auth/README.md) uses these helpers for sign-up, sign-in, account details, and the portal/archive access links. Archive/workstation data stays on fixtures.
+Import `authFetch` only in browser code; import `getSession` or `sessionFetch` only in server code. The [personal access UI](../../components/auth/README.md) uses these helpers for sign-up, sign-in, account details, and the portal/archive access links. Workstation data stays on fixtures. Public archive search and its destinations can use the server API with `SEARCH_SOURCE=api`.
 
 Set `API_ORIGIN` to the internal API origin. Development and tests default to `http://localhost:5040`; production requires an explicit value for server auth. Local Next rewrites `/api/*` to that origin in development. Production routing must send `/api` directly to the API through the shared reverse proxy. The local Compose ingress now provides that topology too. Set the API `AllowedOrigins` to the public website origin.
 

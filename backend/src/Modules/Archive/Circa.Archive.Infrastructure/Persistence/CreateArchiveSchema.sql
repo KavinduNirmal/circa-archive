@@ -152,6 +152,26 @@ CREATE TABLE IF NOT EXISTS archive.recoveries (
         REFERENCES archive.organizations (id) ON DELETE SET NULL
 );
 
+-- Resolved organization references extracted from public incidents and records.
+-- Keep this relational so filters can join a stable organization id and code.
+CREATE TABLE IF NOT EXISTS archive.org_mentions (
+    id uuid PRIMARY KEY,
+    org_id uuid NULL REFERENCES archive.organizations(id) ON DELETE SET NULL,
+    record_id uuid NULL REFERENCES archive.records(id) ON DELETE CASCADE,
+    incident_id uuid NULL REFERENCES archive.incidents(id) ON DELETE CASCADE,
+    raw_text varchar(255) NOT NULL,
+    created_at timestamptz NOT NULL DEFAULT now(),
+    CONSTRAINT ck_org_mentions_one_source CHECK ((record_id IS NOT NULL) <> (incident_id IS NOT NULL))
+);
+CREATE INDEX IF NOT EXISTS ix_org_mentions_source
+    ON archive.org_mentions (org_id, record_id, incident_id);
+CREATE INDEX IF NOT EXISTS ix_org_mentions_record
+    ON archive.org_mentions (record_id) WHERE record_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS ix_org_mentions_incident
+    ON archive.org_mentions (incident_id) WHERE incident_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS ix_org_mentions_raw_text_trgm
+    ON archive.org_mentions USING gin (raw_text gin_trgm_ops);
+
 CREATE UNIQUE INDEX IF NOT EXISTS ux_incidents_reference_number
     ON archive.incidents (reference_number);
 CREATE INDEX IF NOT EXISTS ix_incidents_content_hash
@@ -255,3 +275,81 @@ CREATE INDEX IF NOT EXISTS ix_recoveries_first_documented
     WHERE first_documented_record_id IS NOT NULL;
 CREATE INDEX IF NOT EXISTS ix_recoveries_registered_by
     ON archive.recoveries (registered_by_id, created_at DESC, id);
+
+-- PostgreSQL array_to_string is stable for polymorphic arrays. This text-only
+-- wrapper is immutable: text formatting has no locale/session dependency.
+CREATE OR REPLACE FUNCTION archive.recovery_search_text(text, text[], text)
+RETURNS text LANGUAGE sql IMMUTABLE PARALLEL SAFE AS $$
+    SELECT coalesce($1, '') || ' ' || coalesce(pg_catalog.array_to_string($2, ' '), '') || ' ' || coalesce($3, '')
+$$;
+
+-- Additive stage 2 search upgrade. Safe to rerun on the stage 1 schema.
+ALTER TABLE archive.organizations ADD COLUMN IF NOT EXISTS legacy_code varchar(40);
+CREATE UNIQUE INDEX IF NOT EXISTS ux_organizations_legacy_code
+    ON archive.organizations (legacy_code) WHERE legacy_code IS NOT NULL;
+
+CREATE TABLE IF NOT EXISTS archive.record_assessments (
+    id uuid PRIMARY KEY,
+    record_id uuid NOT NULL REFERENCES archive.records(id) ON DELETE CASCADE,
+    user_id uuid NOT NULL,
+    assessment varchar(20) NOT NULL,
+    created_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE UNIQUE INDEX IF NOT EXISTS ux_record_assessments_record_user
+    ON archive.record_assessments (record_id, user_id);
+
+CREATE TABLE IF NOT EXISTS archive.record_access_requests (
+    id uuid PRIMARY KEY,
+    record_id uuid NOT NULL REFERENCES archive.records(id) ON DELETE CASCADE,
+    requester_id uuid NOT NULL,
+    status varchar(20) NOT NULL DEFAULT 'pending',
+    decided_by uuid,
+    decided_at timestamptz,
+    created_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS ix_record_access_requests_record_status
+    ON archive.record_access_requests (record_id, status);
+CREATE INDEX IF NOT EXISTS ix_record_access_requests_approved
+    ON archive.record_access_requests (requester_id, record_id)
+    WHERE status = 'approved' AND decided_at IS NOT NULL;
+
+CREATE TABLE IF NOT EXISTS archive.tombstones (
+    id uuid PRIMARY KEY,
+    record_id uuid NOT NULL REFERENCES archive.records(id) ON DELETE CASCADE,
+    reason text NOT NULL,
+    category varchar(50) NOT NULL,
+    hash varchar(64) NOT NULL,
+    tombstoned_by uuid NOT NULL,
+    tombstoned_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS ix_tombstones_hash ON archive.tombstones (hash);
+CREATE INDEX IF NOT EXISTS ix_tombstones_record ON archive.tombstones (record_id);
+
+ALTER TABLE archive.incidents ADD COLUMN IF NOT EXISTS search_text text GENERATED ALWAYS AS (coalesce(designation, '') || ' ' || coalesce(markdown, '')) STORED;
+CREATE INDEX IF NOT EXISTS ix_incidents_search_text ON archive.incidents USING gin (search_text gin_trgm_ops);
+CREATE INDEX IF NOT EXISTS ix_incidents_holder_prefix ON archive.incidents (lower(holder_code) text_pattern_ops);
+
+ALTER TABLE archive.records ADD COLUMN IF NOT EXISTS search_text text GENERATED ALWAYS AS (coalesce(code, '') || ' ' || coalesce(markdown, '')) STORED;
+CREATE INDEX IF NOT EXISTS ix_records_search_text ON archive.records USING gin (search_text gin_trgm_ops);
+CREATE INDEX IF NOT EXISTS ix_records_holder_prefix ON archive.records (lower(holder_code) text_pattern_ops);
+
+ALTER TABLE archive.organizations ADD COLUMN IF NOT EXISTS search_text text GENERATED ALWAYS AS (coalesce(name, '') || ' ' || coalesce(markdown, '')) STORED;
+ALTER TABLE archive.organizations ADD COLUMN IF NOT EXISTS search_vector tsvector GENERATED ALWAYS AS (to_tsvector('english', coalesce(name, '') || ' ' || coalesce(markdown, ''))) STORED;
+CREATE INDEX IF NOT EXISTS ix_organizations_search_vector ON archive.organizations USING gin (search_vector);
+CREATE INDEX IF NOT EXISTS ix_organizations_search_text ON archive.organizations USING gin (search_text gin_trgm_ops);
+
+ALTER TABLE archive.characters ADD COLUMN IF NOT EXISTS search_text text GENERATED ALWAYS AS (coalesce(name, '') || ' ' || coalesce(markdown, '')) STORED;
+ALTER TABLE archive.characters ADD COLUMN IF NOT EXISTS search_vector tsvector GENERATED ALWAYS AS (to_tsvector('english', coalesce(name, '') || ' ' || coalesce(markdown, ''))) STORED;
+CREATE INDEX IF NOT EXISTS ix_characters_search_vector ON archive.characters USING gin (search_vector);
+CREATE INDEX IF NOT EXISTS ix_characters_search_text ON archive.characters USING gin (search_text gin_trgm_ops);
+
+ALTER TABLE archive.recoveries ADD COLUMN IF NOT EXISTS search_text text GENERATED ALWAYS AS (archive.recovery_search_text(name, alternative_names, description)) STORED;
+ALTER TABLE archive.recoveries ADD COLUMN IF NOT EXISTS search_vector tsvector GENERATED ALWAYS AS (to_tsvector('english', archive.recovery_search_text(name, alternative_names, description))) STORED;
+CREATE INDEX IF NOT EXISTS ix_recoveries_search_vector ON archive.recoveries USING gin (search_vector);
+CREATE INDEX IF NOT EXISTS ix_recoveries_search_text ON archive.recoveries USING gin (search_text gin_trgm_ops);
+
+-- Normalize pre-release databases previously created from the EF scaffold.
+UPDATE archive.record_assessments SET assessment = lower(assessment)
+    WHERE assessment IN ('Corroborate', 'Contest');
+UPDATE archive.record_access_requests SET status = lower(status)
+    WHERE status IN ('Pending', 'Approved', 'Denied', 'Expired');

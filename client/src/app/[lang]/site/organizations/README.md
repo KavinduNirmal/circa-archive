@@ -14,3 +14,8 @@ not invent contacts or members.
 ## Usage
 
 `/{lang}/site/organizations`. Covered by `tests/archive-site.test.tsx`.
+
+In `SEARCH_SOURCE=api` mode this route searches the real organization index and
+reads the selected canonical/legacy code's dossier from `/api/v1/archive/{code}`.
+It renders no fixture fallback on API failure. `test:e2e:search` covers navigation
+from an organization search result into this directory.

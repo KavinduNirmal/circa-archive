@@ -2,9 +2,13 @@
 
 ## Responsibility
 
-Implements archive persistence for the `archive` PostgreSQL schema.
+Implements archive persistence and the global search read API over the `archive`
+PostgreSQL schema.
 
 ## Structure
+
+- `Search/`: parameterized SQL read model, visibility, endpoint, and rate limiting;
+  see its [contract and decisions](Search/README.md).
 
 - `Persistence/ArchiveDbContext.cs`: entity mappings, table/column names,
   constraints, relationships, search indexes, and generated full-text columns.
@@ -18,7 +22,6 @@ Implements archive persistence for the `archive` PostgreSQL schema.
 
 ## Boundaries
 
-No endpoints, handlers, repositories, or seeding are implemented. The module
-registration exists so the schema can be initialized and future consumers can
-resolve the context. Raw SQL is the schema source of truth; the EF model must be
+Global search, scoped destination reads, and sealed-record access requests are implemented. General archive CRUD and production seeding remain pending. Registration supplies the context, reader,
+and search rate-limit policy. Raw SQL is the schema source of truth; the EF model must be
 kept aligned when entities change.

@@ -6,8 +6,7 @@ namespace Circa.Api.IntegrationTests;
 
 public sealed class PostgresFixture : IAsyncLifetime
 {
-    private readonly PostgreSqlContainer _container = new PostgreSqlBuilder()
-        .WithImage("pgvector/pgvector:pg16")
+    private readonly PostgreSqlContainer _container = new PostgreSqlBuilder("pgvector/pgvector:pg16")
         .WithDatabase("circa_test")
         .WithUsername("circa_test")
         .WithPassword("circa_test_password")
