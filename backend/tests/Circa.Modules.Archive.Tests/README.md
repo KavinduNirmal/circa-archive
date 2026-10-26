@@ -42,3 +42,8 @@ cover bounded compressed cursors, Korean titles, and rejected nested history.
 `ArchiveDestinationTests` verifies incident acknowledgment, restricted/erased
 visibility, record approvals (including missing decision dates), tombstones,
 and stable rumour destinations against PostgreSQL.
+
+Security regressions execute destructive-looking SQL payloads as bound search data
+in every text input and reject control characters before the reader runs. The
+PostgreSQL fixture uses Testcontainers 4.16 with the explicit PostgreSQL image
+constructor, avoiding the older vulnerable SSH/Docker transitive dependencies.

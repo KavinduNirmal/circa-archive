@@ -88,6 +88,21 @@ public sealed class SearchRequestTests
         Assert.NotNull(Parse(("cursor", [token]), ("sort", ["title"])).Request);
     }
 
+    [Theory]
+    [InlineData("q")]
+    [InlineData("holder")]
+    [InlineData("mention")]
+    [InlineData("org")]
+    [InlineData("author")]
+    [InlineData("tag")]
+    [InlineData("character")]
+    public void RejectsControlCharactersBeforeDatabaseExecution(string key)
+    {
+        var result = Parse((key, ["safe\0unsafe"]));
+        Assert.Null(result.Request);
+        Assert.Contains(key, result.Errors.Keys);
+    }
+
     private static SearchValidationResult Parse(params (string Key, string[] Values)[] values)
         => SearchRequestValidator.Parse(values.ToDictionary(value => value.Key, value => value.Values));
 }

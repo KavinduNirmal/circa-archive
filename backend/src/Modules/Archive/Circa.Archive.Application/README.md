@@ -30,7 +30,7 @@ uses the boundary. Tokens are base64url-encoded Brotli payloads, capped at 2,048
 characters and 8 KiB after decompression, with one previous-page boundary. Author values are public display names only.
 
 `language` overrides the legacy `lang` alias; English remains the default.
-Scalar duplicates are rejected. Invalid requests return field errors and no
+Scalar duplicates and control characters are rejected before query execution. Invalid requests return field errors and no
 executable request. Visibility, SQL, HTTP binding, total URL length enforcement,
 and ProblemDetails translation belong to infrastructure. Unknown keys are
 ignored for forward compatibility and never become SQL fragments.

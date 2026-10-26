@@ -108,3 +108,43 @@ test("warning tag exclusion persists and filters fit desktop and mobile", async 
     fullPage: true,
   });
 });
+
+test("hostile saved names and destinations remain inert", async ({ page }) => {
+  const payload = '<img src=x onerror="window.__searchXss=1">';
+  await page.addInitScript(
+    ({ payload }) => {
+      Object.assign(window, { __searchXss: 0 });
+      localStorage.setItem(
+        "circa:saved-searches",
+        JSON.stringify([
+          {
+            name: payload,
+            href: `/en/site/records?q=${payload}&unknown=<script>attack</script>`,
+          },
+          { name: "Injected script", href: "javascript:window.__searchXss=1" },
+          {
+            name: "Injected data",
+            href: "data:text/html,<script>attack</script>",
+          },
+        ]),
+      );
+    },
+    { payload },
+  );
+  await page.goto("/en/site/records");
+  const form = page.getByRole("search").nth(1);
+  await form.locator("summary").click();
+  const link = form.getByRole("link", { name: payload });
+  await expect(link).toHaveAttribute(
+    "href",
+    `/en/site/records?${new URLSearchParams({ q: payload })}`,
+  );
+  await expect(link.locator("img")).toHaveCount(0);
+  await expect(form.getByRole("link", { name: "Injected script" })).toHaveCount(
+    0,
+  );
+  await expect(form.getByRole("link", { name: "Injected data" })).toHaveCount(
+    0,
+  );
+  expect(await page.evaluate(() => Reflect.get(window, "__searchXss"))).toBe(0);
+});

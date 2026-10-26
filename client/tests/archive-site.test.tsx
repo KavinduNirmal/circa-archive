@@ -1222,3 +1222,24 @@ it("explains an empty archive without claiming filters caused it", () => {
       .length,
   ).toBeGreaterThan(0);
 });
+
+it("rejects executable URLs in authored prose and reference-style links", () => {
+  renderWithIntl(
+    <RecordProse
+      source={
+        "[direct](data:text/html,attack)\n\n[reference][bad]\n\n[bad]: vbscript:attack\n\n[ordinary](https://example.com/path?q=door)"
+      }
+      redactionLabel="Redacted"
+      imageNotHeld="Image unavailable"
+    />,
+  );
+  expect(screen.getByText("direct").closest("a")).toHaveAttribute("href", "");
+  expect(screen.getByText("reference").closest("a")).toHaveAttribute(
+    "href",
+    "",
+  );
+  expect(screen.getByRole("link", { name: "ordinary" })).toHaveAttribute(
+    "href",
+    "https://example.com/path?q=door",
+  );
+});

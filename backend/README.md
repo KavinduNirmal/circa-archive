@@ -84,3 +84,9 @@ outside Development. Existing schemas require the explicit upgrade above.
 The Dockerfile restores/publishes the API project and its references without
 including test projects. It runs as the image's non-root app user. Separate named
 volumes retain PostgreSQL data and Data Protection keys across restarts.
+
+Testcontainers.PostgreSql is pinned centrally to 4.16.0 to remove vulnerable
+transitive test dependencies. The unused Respawn reference was removed along with
+its vulnerable SQL Server/Azure/Image dependencies. Audit all projects with
+`dotnet list Circa.sln package --vulnerable --include-transitive` from this folder;
+restore before reusing `--no-restore` test commands after dependency changes.

@@ -100,3 +100,29 @@ it("saves the canonical index address even from another archive page", () => {
   );
   window.history.replaceState(null, "", "/");
 });
+
+it("rebuilds stored search destinations from the allowed query contract", () => {
+  const payload = '<img src=x onerror="alert(1)">';
+  localStorage.setItem(
+    "circa:saved-searches",
+    JSON.stringify([
+      {
+        name: payload,
+        href: `/en/site/records?q=${payload}&unknown=<script>alert(1)</script>`,
+      },
+      { name: "Script", href: "javascript:alert(1)" },
+      { name: "Data", href: "data:text/html,<script>alert(1)</script>" },
+      { name: "External", href: "https://attacker.invalid/en/site/records" },
+    ]),
+  );
+  renderWithIntl(<SearchForm />);
+  const link = screen.getByRole("link", { name: payload });
+  expect(link).toHaveAttribute(
+    "href",
+    `/en/site/records?${new URLSearchParams({ q: payload }).toString()}`,
+  );
+  expect(link.querySelector("img")).toBeNull();
+  expect(document.querySelector("script")).toBeNull();
+  for (const name of ["Script", "Data", "External"])
+    expect(screen.queryByRole("link", { name })).toBeNull();
+});

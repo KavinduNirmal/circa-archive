@@ -7,8 +7,7 @@ namespace Circa.Modules.Archive.Tests;
 
 public sealed class ArchivePostgresFixture : IAsyncLifetime
 {
-    private readonly PostgreSqlContainer _container = new PostgreSqlBuilder()
-        .WithImage("pgvector/pgvector:pg16")
+    private readonly PostgreSqlContainer _container = new PostgreSqlBuilder("pgvector/pgvector:pg16")
         .WithDatabase("circa_archive_test")
         .WithUsername("circa_archive_test")
         .WithPassword("circa_archive_test_password")

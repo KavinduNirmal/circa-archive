@@ -65,3 +65,9 @@ results rather than failing the public endpoint.
 guests, explicit incident acknowledgment, real organization bodies, idempotent
 access requests, moderator/owner stubs, approved readers, revoked sessions, and
 hidden-parent 404s. Run with `--filter FullyQualifiedName~ArchiveDestination`.
+
+The shared PostgreSQL fixture uses Testcontainers 4.16 and an explicit image
+constructor. The unused Respawn dependency (and its vulnerable SQL Server/Azure/Image
+transitives) is removed; fixtures already isolate data through disposable PostgreSQL.
+Search validation also checks an encoded NUL returns field-level
+400 ProblemDetails before database execution.

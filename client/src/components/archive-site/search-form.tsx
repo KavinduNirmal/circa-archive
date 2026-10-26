@@ -8,6 +8,7 @@ import { NativeSelect } from "@/components/ui/native-select";
 import { useLocale, useTranslations } from "next-intl";
 import { Search, SlidersHorizontal } from "lucide-react";
 import { toSearchHref } from "@/lib/search/query";
+import { savedSearchHref } from "@/lib/search/saved";
 import {
   DISPLAY_STATUSES,
   RECORD_CLASSES,
@@ -470,15 +471,7 @@ function SavedSearchesContents({ values }: { values: SearchState }) {
               typeof item.href !== "string"
             )
               return false;
-            try {
-              const url = new URL(item.href, window.location.origin);
-              return (
-                url.origin === window.location.origin &&
-                /^\/(en|ko)\/site\/records$/.test(url.pathname)
-              );
-            } catch {
-              return false;
-            }
+            return savedSearchHref(item.href, window.location.origin) !== null;
           })
           .slice(0, 20);
     } catch {
@@ -514,7 +507,14 @@ function SavedSearchesContents({ values }: { values: SearchState }) {
         <ul>
           {saved.map((item) => (
             <li key={`${item.name}:${item.href}`}>
-              <a href={item.href}>{item.name}</a>
+              <a
+                href={
+                  savedSearchHref(item.href, window.location.origin) ??
+                  `/${locale}/site/records`
+                }
+              >
+                {item.name}
+              </a>
               <button
                 type="button"
                 aria-label={t("savedSearchRemove", { name: item.name })}

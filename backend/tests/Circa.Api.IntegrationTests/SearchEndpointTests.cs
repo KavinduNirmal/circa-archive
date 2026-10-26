@@ -52,6 +52,7 @@ public sealed class SearchEndpointTests(PostgresFixture postgres) : IClassFixtur
     [InlineData("from=2026-02-30", "from")]
     [InlineData("type=memo", "type")]
     [InlineData("q=one&q=two", "q")]
+    [InlineData("q=safe%00unsafe", "q")]
     public async Task InvalidQueryReturnsProblemDetails(string query, string key)
     {
         await using var factory = await FactoryAsync();

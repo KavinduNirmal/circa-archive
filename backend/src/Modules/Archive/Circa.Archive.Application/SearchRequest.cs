@@ -39,6 +39,7 @@ public static class SearchRequestValidator
         {
             if (!input.TryGetValue(key, out var values) || values.Length == 0) return fallback;
             if (values.Length > 1) Reject(key, "Supply one value.");
+            if (values[0].Any(char.IsControl)) Reject(key, "Control characters are not allowed.");
             var value = values[0].Trim();
             return value.Length == 0 ? fallback : value;
         }

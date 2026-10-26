@@ -113,3 +113,14 @@ existing stored approved/dated decision grants access. No schema change is neede
 Run focused tests with `DOTNET_PROCESSOR_COUNT=2 dotnet test
 backend/tests/Circa.Modules.Archive.Tests --filter FullyQualifiedName~ArchiveDestination -m:1`
 and the equivalent command for `Circa.Api.IntegrationTests`.
+
+## Input security
+
+All search text, holder/relationship filters, dates, cursor boundaries, and viewer
+IDs are Npgsql parameters. Sort orders and SQL identifiers come from fixed code
+mappings; free text is never concatenated into SQL. LIKE metacharacters are escaped
+for literal matching, separately from parameter binding. The only raw schema SQL
+comes from the repository-owned initialization script, never a request.
+`SearchReaderTests.TreatsSqlInjectionPayloadsAsDataInEveryTextFilter` exercises SQL
+payloads through each text filter against disposable PostgreSQL, checking that
+visibility and stored data remain intact. Validation rejects control characters.

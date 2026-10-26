@@ -174,3 +174,8 @@ a body in the UI; only the server response can supply it. `archive-api-organizat
 shows API directory results and the selected organization's Markdown dossier.
 The fixture reader remains the default preview. Component coverage lives in
 `tests/archive-api-record.test.tsx`; real API/browser coverage uses `test:e2e:search`.
+
+The server prose renderer drops raw HTML and applies react-markdown's URL policy
+to every generated link and image, including reference links and custom figures.
+Saved names remain escaped React text; saved URLs are reconstructed through the
+canonical search parser instead of passing browser storage directly to `href`.

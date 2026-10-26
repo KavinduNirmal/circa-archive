@@ -161,6 +161,25 @@ public sealed class SearchReaderTests(ArchivePostgresFixture fixture, Xunit.Abst
         Assert.Empty((await reader.SearchAsync(Request(("q", "'; DROP TABLE records; --")))).Items);
     }
 
+    [Theory]
+    [InlineData("q")]
+    [InlineData("holder")]
+    [InlineData("mention")]
+    [InlineData("org")]
+    [InlineData("author")]
+    [InlineData("tag")]
+    [InlineData("character")]
+    public async Task TreatsSqlInjectionPayloadsAsDataInEveryTextFilter(string key)
+    {
+        await using var db = await SeedAsync();
+        await db.Database.ExecuteSqlRawAsync("CREATE SCHEMA IF NOT EXISTS auth; CREATE TABLE IF NOT EXISTS auth.users (id uuid PRIMARY KEY, display_name text, username text, email text)");
+        var reader = new SearchReader(db);
+        var response = await reader.SearchAsync(Request((key, "'; DROP TABLE archive.incidents CASCADE; --")));
+        Assert.Empty(response.Items);
+        Assert.Equal(10, (await reader.SearchAsync(Request())).Page.Total);
+        Assert.Equal(5, await db.Incidents.CountAsync());
+    }
+
     [Fact]
     public async Task CombinesFacetsAndPaginatesGloballyWithTotalsOnEmptyPages()
     {

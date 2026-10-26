@@ -7,6 +7,7 @@ This folder owns the shared, URL-driven global search contract, fixture adapter,
 - `contract.ts`: canonical types, the option registry, defaults, and enabled public destination types.
 - `query.ts`: defensive parsing, canonical URL serialization, API parameter construction, and locale-relative links.
 - `fixture.ts`: public-visible fixture filtering and the response shape shared with the API adapter.
+- `saved.ts`: rebuilds untrusted stored destinations as fixed locale index paths and encoded, validated query parameters.
 - `result.ts`: maps entity results to destinations that exist in the public site.
 - `api.ts`: server-only data-source selection, API response validation, error/rate-limit outcomes, and the API adapter. Fixtures remain the default.
 
@@ -45,3 +46,8 @@ filters to the route. Vocabulary matching follows `language`, independently of
 route labels. Fixture relationships use explicit optional public search metadata.
 Saved searches always target the locale's index and remain usable in memory if
 browser storage is blocked; suggestions follow the current language control.
+
+Saved search names render as React text; their destinations are reconstructed at
+the link boundary. External origins, credentials, executable schemes, unexpected
+paths, and unknown query keys never become saved link destinations. Coverage is
+in `search-saved.test.ts`, `search-expansion.test.tsx`, and the browser search suite.

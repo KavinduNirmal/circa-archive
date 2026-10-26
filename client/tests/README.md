@@ -67,3 +67,7 @@ sealed-record response validation while preserving sealed incident redaction.
 navigation, canonical saved addresses, and blocked browser storage. Query tests
 cover discarded-filter notices, Unicode URL budgets, and reversed dates. Archive
 component tests verify that removing a facet clears its pagination cursor.
+
+Security tests cover canonical saved URLs with hostile schemes, origins, credentials,
+markup and unknown parameters; saved names stay literal text. Public record prose
+rejects executable schemes in direct and reference-style Markdown links.

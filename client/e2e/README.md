@@ -60,3 +60,6 @@ API search browser tests also open character/recovery dossiers and traverse thre
 cursor pages forward and backward. Run the browser suites and production builds
 sequentially: the isolated E2E output folders are nested under `.next`, which a
 production build clears.
+
+`search.spec.ts` also preloads hostile saved-search URLs/names and verifies that
+only canonical local links render, with markup remaining inert.
