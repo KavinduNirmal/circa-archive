@@ -12,7 +12,8 @@
  * it as a redacted cell. Codes and dates follow `PROJECT_CONTEXT.md`.
  */
 
-export type ArchiveClass = "incident" | "organization" | "continuity" | "memo";
+export type ArchiveClass =
+  "incident" | "organization" | "exploration" | "evidence";
 export const ARCHIVE_WARNING_TAGS = [
   "violence",
   "psychological",
@@ -27,7 +28,7 @@ export type ArchiveStatus =
 export type ArchivePeriod = "any" | "current" | "recent" | "historical";
 
 export type ArchiveEntry = {
-  /** Archive code in a documented format (`INC-00000`, `ORG-A-000000`, `CIRCA-R-0000`). */
+  /** Archive code in a documented format (`INC-00000`, `EXP-000000`, `EVI-000000`, `ORG-A-000000`). */
   code: string;
   /** Withheld designations are `null` and never match a query. */
   designation: string | null;
@@ -76,8 +77,8 @@ export const ARCHIVE_ADDRESS = "http://archive.circa.local/index.htm";
 export const ARCHIVE_CLASSES: readonly ArchiveClass[] = [
   "incident",
   "organization",
-  "continuity",
-  "memo",
+  "exploration",
+  "evidence",
 ];
 export const ARCHIVE_STATUSES: readonly ArchiveStatus[] = [
   "on-file",
@@ -96,8 +97,8 @@ export const ARCHIVE_PERIODS: readonly ArchivePeriod[] = [
 export const CLASS_LABELS: Record<ArchiveClass, string> = {
   incident: "Incident",
   organization: "Organization",
-  continuity: "Continuity",
-  memo: "Memo",
+  exploration: "Exploration",
+  evidence: "Evidence",
 };
 
 export const STATUS_LABELS: Record<ArchiveStatus, string> = {
@@ -294,7 +295,7 @@ export const ARCHIVE_INDEX: readonly ArchiveEntry[] = [
     "on-file",
     "CIRCA",
     "LEVEL 4",
-    "Holds two continuities. Adopts records freely and has never filed a recognition of its own.",
+    "Holds a single released incident report. Adopts records freely and has never filed a recognition of its own.",
   ),
   entry(
     "ORG-C-005102",
@@ -314,32 +315,32 @@ export const ARCHIVE_INDEX: readonly ArchiveEntry[] = [
     "erased",
     "CIRCA",
     "LEVEL 4",
-    "Rejected at coherence review and erased. Records filed under it remain as rumors.",
+    "Rejected at coherence review and erased. Records filed under it remain as rumours.",
   ),
   entry(
-    "ORG-C-005102/C1",
-    "Continuity branch, closed",
-    "continuity",
+    "EXP-288902",
+    "Second survey, landing nine",
+    "exploration",
     "1992-02-19",
     "on-file",
     "ORG-C-005102",
     "LEVEL 3",
-    "Closed after the last subscribing reader stopped filing. Read-only since 1992.",
+    "A second party climbed the stairwell at INC-00042 and counted nine again. The return was filed as an exploration.",
   ),
   entry(
-    "ORG-C-005102/C2",
-    "Continuity branch, forked",
-    "continuity",
+    "EXP-288903",
+    "Night watch, lower station",
+    "exploration",
     "1996-10-05",
     "contested",
     "ORG-C-005102",
     "LEVEL 3",
-    "Forked from C1 without a cession record. Both branches claim the earlier filings.",
+    "Two observers kept the lower tide station for a week. Their account of the eleven-minute interval does not agree with the gauge trace.",
   ),
   entry(
-    "CIRCA-M-0002",
+    "EVI-035783",
     "Augur ledger, fragment",
-    "memo",
+    "evidence",
     "0100-03-15",
     "sealed",
     "CIRCA",
@@ -347,9 +348,9 @@ export const ARCHIVE_INDEX: readonly ArchiveEntry[] = [
     "Transcription of a fragment held in cold storage. The original hand is not in the archive.",
   ),
   entry(
-    "CIRCA-M-0031",
-    "Recognition memo, unsigned",
-    "memo",
+    "EVI-035784",
+    "Recognition instrument, unsigned",
+    "evidence",
     "1995-04-23",
     "on-file",
     "CIRCA",
@@ -357,9 +358,9 @@ export const ARCHIVE_INDEX: readonly ArchiveEntry[] = [
     "A recognition with no signing body, filed anyway. Retained because the code was already issued.",
   ),
   entry(
-    "CIRCA-M-0077",
+    "EVI-035785",
     "Clearance request, denied",
-    "memo",
+    "evidence",
     "2002-09-17",
     "restricted",
     "CIRCA",

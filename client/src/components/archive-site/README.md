@@ -9,8 +9,12 @@ requires loading the Markdown editor parser.
 
 - `archive-chrome.tsx`: the full-bleed frame — the classification notice above the
   masthead, the masthead with the search box, the section bar, the announcement
-  bar, breadcrumbs, and the foot. It also carries the About dropdowns for archive guidance and project resources,
-  preserving the overview links to `/[lang]/site/about` and `/[lang]/meta`. The masthead carries the server-verified personal access link.
+  bar, breadcrumbs, and the foot. It carries the About dropdowns for archive
+  guidance and project resources, preserving the overview links to
+  `/[lang]/site/about` and `/[lang]/meta`. The section bar also carries the
+  Records dropdown (incidents, explorations, evidence, rumours, playlists) and
+  the Entities dropdown (organizations, characters). The masthead carries the
+  server-verified personal access link.
 - `site-search.tsx`: the global search form. It submits canonical query fields
   as a plain GET to the index, so searches survive bookmarks and work without
   JavaScript. The masthead puts the same filters behind a `<details>`; the index
@@ -22,17 +26,29 @@ requires loading the Markdown editor parser.
 - `archive-records.tsx`: the archive index table and global search results,
   including active-filter links and pagination.
 - `archive-record.tsx`: one record as a work page. The name and its code share a
-  line, the tools that act on the whole record sit in one band, the sheet carries
-  unnumbered section headings with matching contents links, and the foot repeats the step through the
-  register as two large leaves. Its particulars carry the exploration count when
-  records have been filed against it, and the status updates have their own rail
-  section: an accordion of coloured cards.
+  line, the tools that act on the whole record sit in one band, and the sheet
+  carries unnumbered section headings. The section index is folded behind a
+  hamburger key above the sheet and opens as a ruled menu of section rows. Above
+  the annotations, three ruled cards list the record's related lists —
+  explorations, the records filed against it, and the playlists it appears in —
+  rather than stepping to the neighbouring record. Its particulars carry the
+  exploration count when records have been filed against it, and the status
+  updates have their own rail section: an accordion of coloured cards.
 - `archive-explorations.tsx`: the exploration list filed against one record. It
   reuses the ordinary record table and links every row to the ordinary record
   page; it is a filter over the citation web, not a second record template.
 - `archive-organizations.tsx`: the organizations directory — a ledger leaf with the
   totals above, a directory search, and one numbered entry per body carrying its
   holdings as a margin tally.
+- `archive-record-type.tsx`: the class pages named in the Records dropdown.
+  Incidents, explorations, and evidence are the ordinary record table filtered
+  to one class; rumours and playlists delegate to the reserved-page shell,
+  because neither has an index of its own in this edition.
+- `archive-reserved.tsx`: the shared reserved-section page. It names the section,
+  explains why no index is served yet, and returns the reader to the records
+  index instead of a 404.
+- `archive-characters.tsx`: the reserved character directory, composed on the
+  reserved-section shell. It does not invent a roster.
 - `archive-about.tsx`: the reading guide, set as a leaf of the archive's own
   prose. The classes are a colour key with a released code beside each, and the
   statuses wear the chips they wear in the index; either name opens the index
@@ -61,6 +77,10 @@ requires loading the Markdown editor parser.
   reading edition has no writing desk.
 - `archive-site.module.css`: the full-page stylesheet. Full-bleed chrome, a wide
   reading grid, steel panels, and paper sheets. No gradients; depth is a bevel.
+  Its role scale keeps reading prose at 16px and dense labels at 12px or larger;
+  search controls and touch navigation grow to 44px on narrow or coarse-pointer
+  screens. The announcement is static so its full sentence stays available at a
+  glance and does not require a separate pause control.
 - `archive-button.tsx` and `archive-button.module.css`: the site's one control.
   It is the workstation's tool button — a one-pixel bevel, a pressed well for the
   held and current states, tracked uppercase — and it renders the element the job
@@ -73,23 +93,31 @@ requires loading the Markdown editor parser.
 motto. The seal is `public/circa_snake_with_eye.svg` used as a CSS mask, painted by
 the anchor's own colour, so it is exactly as light as the wordmark and brightens
 with it on hover — no recoloured copy of the artwork and no light plate behind it.
-`C.I.R.C.A` is set in Libre Baskerville, the edition's reading face; the line
+`C.I.R.C.A` is set in Instrument Serif, the edition's display face; the line
 under it is the landing catalog's `motto`, not a second string, so both languages
-already carry it. The serif also sets what the archive says at length about
-itself — a record's abstract, a page's lede, the standing note — while chrome,
-headings, labels and keys stay DM Sans through `--font-sans`. A record's own prose
-uses locally bundled Zilla Slab at 16px with 1.75 leading for a printed archive
-feel. Paragraphs, quotations, and the colophon share that face. Markdown table
-values and code retain Courier New; table headers and two-column key labels
-use DM Sans. Regular, italic, bold, and bold italic Latin faces are
-bundled so authored emphasis renders without synthetic styling. This reader
-choice supersedes the earlier Courier-only reading-edition specification;
-the workstation reader retains its own typography.
+already carry it. The display face carries every head — the wordmark, a page's
+title, a record's filing title, a section head — and it has one weight, so
+hierarchy is size and case rather than bold. IBM Plex Sans is the instrument:
+reading prose, ledes, abstracts, the standing notes, controls, and the tracked
+uppercase labels, which is what lets one superfamily cover both the reading and
+the interface roles. Both faces load in `app/[lang]/site/layout.tsx`, so the
+workstation and the project pages do not pay for them. Korean is set by the
+platform: a Myeongjo for display and the platform gothic for reading. No Korean
+webfont is bundled any more — Noto Serif KR cost a single unsubsetted 971 KB
+woff2 on every Korean page, and the trade is recorded in `DESIGN.md`. A record's
+own prose is the instrument face too, at 16px with 1.75 leading and a 44rem
+measure (about 70 characters) that the sheet is sized around, so prose, tables,
+and the ruled register at the foot of a section share one right margin.
+Paragraphs, quotations, and the colophon share that face. Markdown table values
+and code retain the typewriter stack; table headers and two-column key labels
+use the instrument face. Regular,
+italic, and semibold Latin faces are bundled so authored emphasis renders without
+synthetic styling; the display face is roman only and is never asked for bold.
 Record names are set as filing titles: capitals and tracked; their descriptions
-stay serif and sentence-cased.
+are prose and stay sentence-cased.
 
 **Colour.** Each class owns one desaturated colour — incident crimson, organization
-steel, continuity teal, memo ochre — carried by the code in an index, the class tag,
+steel, exploration teal, evidence ochre, rumour plum — carried by the code in an index, the class tag,
 and the class doors on the front page. Status keeps its own boxed chip: neutral,
 crimson for contested, amber for sealed and restricted, struck for erased. The
 warnings column is an 8×8 swatch beside the word Clear or Warning: red for

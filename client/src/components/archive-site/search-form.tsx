@@ -321,14 +321,20 @@ function FilterPanel({
           </NativeSelect>
         </label>
       </div>
-      <Button
-        type="submit"
-        className={compact ? styles.filterPanelApply : styles.applyKey}
-      >
-        {t("applyFilters")}
-      </Button>
       {!compact && <p className={styles.searchHint}>{t("searchHint")}</p>}
+      {/*
+        Naming a search is not the submit. It sits above the pinned foot, so the
+        panel's own scroll can never park the field under the apply key.
+      */}
       <SavedSearches values={values} />
+      <div className={styles.filterPanelFoot}>
+        <Button
+          type="submit"
+          className={compact ? styles.filterPanelApply : styles.applyKey}
+        >
+          {t("applyFilters")}
+        </Button>
+      </div>
     </div>
   );
 }

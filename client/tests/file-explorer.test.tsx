@@ -171,12 +171,12 @@ describe("file browser", () => {
     expect(
       within(grid()).getByRole("columnheader", { name: "Name" }),
     ).toHaveAttribute("aria-sort", "ascending");
-    expect(names()[0]).toBe("CIRCA-M-0002");
+    expect(names()[0]).toBe("CIRCA-O-005102");
     await user.click(within(grid()).getByRole("button", { name: "Name" }));
     expect(
       within(grid()).getByRole("columnheader", { name: "Name" }),
     ).toHaveAttribute("aria-sort", "descending");
-    expect(names()[0]).toBe("CIRCA-S-1283y19");
+    expect(names()[0]).toBe("EVI-035783");
 
     // A new column starts ascending and takes the sort away from the last one.
     await user.click(within(grid()).getByRole("button", { name: "Size" }));

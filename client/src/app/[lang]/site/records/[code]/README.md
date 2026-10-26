@@ -24,7 +24,12 @@ write path, and the page says so where the note appears.
 Status updates have their own sidebar section, folded into one accordion of
 coloured cards, and never enter the sheet: they are the record's history rather
 than its text, and a reader is not asked to step through them. The exploration
-count in the particulars is the only link to the list route.
+count in the particulars links to the list route, and the cards above the
+annotations list the record's related lists — explorations, the records filed
+against it, and the playlists it appears in — instead of stepping to the previous
+or next record. The per-record `filings` and `playlists` lists are not authored
+yet, so those two cards are addresses the archive has reserved rather than pages
+it serves.
 
 ## Usage
 

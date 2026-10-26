@@ -771,7 +771,7 @@ describe("record reader follow-ups", () => {
   });
 
   it("says so plainly when nothing has been filed against a record", () => {
-    const { reader } = mount("CIRCA-M-0077");
+    const { reader } = mount("EVI-035785");
     const strip = within(reader).getByRole("region", {
       name: "Subsequent Records",
     });

@@ -19,7 +19,7 @@
   align-items: center;
   justify-content: center;
   gap: 5px;
-  min-height: 26px;
+  min-height: 36px;
   padding: 0 10px;
   border: 1px solid;
   border-color: var(--circa-bevel-light) var(--circa-bevel-shadow)
@@ -27,7 +27,7 @@
   background: var(--secondary);
   color: #a4c2e6;
   font: inherit;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.06em;
   line-height: 1;
@@ -65,7 +65,7 @@
 
 /* Paper: a sheet's own tools — the record action bar, the index, the doors. */
 .button[data-tone="paper"] {
-  min-height: 28px;
+  min-height: 36px;
   padding: 0 9px;
   border-color: #7b8b9c #46586a #46586a #7b8b9c;
   background: var(--circa-paper-raised);
@@ -95,7 +95,7 @@
  */
 @media (max-width: 620px) {
   .button[data-tone] {
-    min-height: 32px;
+    min-height: 44px;
     padding: 0 9px;
   }
 }

@@ -395,9 +395,15 @@ const NODES: readonly FileNode[] = [
     "1988-07-04 00:00",
     { clearance: "LEVEL 4" },
   ),
-  makeFolder("dir-archive", "case-m0002", "CIRCA-M-0002", "2002-03-15 00:00", {
-    clearance: "LEVEL 5",
-  }),
+  makeFolder(
+    "dir-archive",
+    "case-evi035783",
+    "EVI-035783",
+    "2002-03-15 00:00",
+    {
+      clearance: "LEVEL 5",
+    },
+  ),
   makeFolder("dir-archive", "case-d0004", "CIRCA-S-00004", "2003-01-09 15:20", {
     clearance: "LEVEL 3",
   }),
@@ -590,14 +596,14 @@ const NODES: readonly FileNode[] = [
   makeFile(
     "case-c005102",
     "arc-c005102-cont",
-    "CONTINUITY_NOTES.txt",
+    "HOLDINGS_NOTES.txt",
     "txt",
     6_144,
     "1994-02-19 13:00",
   ),
 
   makeFile(
-    "case-m0002",
+    "case-evi035783",
     "arc-m0002-brief",
     "CASE_BRIEF.pdf",
     "pdf",
@@ -605,7 +611,7 @@ const NODES: readonly FileNode[] = [
     "2002-03-15 00:00",
   ),
   makeFile(
-    "case-m0002",
+    "case-evi035783",
     "arc-m0002-trans",
     "AUGUR_LEDGER_FRAGMENT.pdf",
     "pdf",
@@ -613,7 +619,7 @@ const NODES: readonly FileNode[] = [
     "2002-03-15 00:00",
   ),
   makeFile(
-    "case-m0002",
+    "case-evi035783",
     "arc-m0002-note",
     "COLD_STORAGE_NOTE.txt",
     "txt",
@@ -654,7 +660,7 @@ const NODES: readonly FileNode[] = [
     "2003-01-10 08:30",
   ),
 
-  // Organizations: dossiers, continuities, and superseded revisions.
+  // Organizations: dossiers, explorations, and superseded revisions.
   makeFolder(
     "dir-organizations",
     "org-c005102",
@@ -709,7 +715,7 @@ const NODES: readonly FileNode[] = [
   makeFile(
     "org-c005102",
     "org-c005102-1994",
-    "CONTINUITY_1994.pdf",
+    "EXPLORATION_1994.pdf",
     "pdf",
     88_064,
     "1994-02-19 13:00",
@@ -717,7 +723,7 @@ const NODES: readonly FileNode[] = [
   makeFile(
     "org-c005102",
     "org-c005102-2002",
-    "CONTINUITY_2002.pdf",
+    "EXPLORATION_2002.pdf",
     "pdf",
     91_136,
     "2002-08-30 10:15",
@@ -733,7 +739,7 @@ const NODES: readonly FileNode[] = [
   makeFile(
     "org-a001044",
     "org-a001044-cont",
-    "CONTINUITY_2001.pdf",
+    "EXPLORATION_2001.pdf",
     "pdf",
     76_800,
     "2001-03-14 09:00",
@@ -749,7 +755,7 @@ const NODES: readonly FileNode[] = [
   makeFile(
     "org-b007331",
     "org-b007331-cont",
-    "CONTINUITY_2002.pdf",
+    "EXPLORATION_2002.pdf",
     "pdf",
     68_608,
     "2002-12-04 16:45",

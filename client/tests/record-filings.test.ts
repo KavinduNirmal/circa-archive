@@ -114,7 +114,7 @@ describe("record filings", () => {
   });
 
   it("holds the body of a record the archive has not released", () => {
-    const document = recordDocument("CIRCA-M-0002");
+    const document = recordDocument("EVI-035783");
     expect(document?.source).toBe("held");
     const withheld =
       document?.sections.filter((section) => section.withheld) ?? [];
@@ -126,7 +126,7 @@ describe("record filings", () => {
   });
 
   it("still shows the released entry on a held record, so a code is never a dead end", () => {
-    const document = recordDocument("CIRCA-M-0002");
+    const document = recordDocument("EVI-035783");
     const opening = document?.sections[0];
     expect(opening?.withheld).toBeFalsy();
     // The entry's abstract is the released body, and it renders as Markdown.

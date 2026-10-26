@@ -2,8 +2,9 @@
 
 ## Responsibility
 
-Renders the reading guide: how to use the public archive, the classes, the
-statuses, clearance, and a way to the workstation and the public portal.
+Renders the reading guide: how to use the public archive, the classes
+(incident, organization, exploration, evidence) and the uncoded rumour, the statuses,
+clearance, and a way to the workstation and the public portal.
 
 ## Boundaries
 

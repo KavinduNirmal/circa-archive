@@ -10,10 +10,9 @@ import { isRecordCode } from "@/lib/desktop-route";
  * the URL sync opens the reader. Every released code is prerendered in both
  * languages, and anything else is a 404, matching the public record route.
  *
- * Codes may contain a slash (`ORG-C-005102/C1`), which Next writes as one
- * percent-encoded segment. The static params use the raw code, and the incoming
- * param is decoded defensively so the page does not depend on which form the
- * router hands over.
+ * Codes are written as one percent-encoded segment. The static params use the
+ * raw code, and the incoming param is decoded defensively so the page does not
+ * depend on which form the router hands over.
  */
 type RecordPageProps = Readonly<{
   params: Promise<{ lang: string; code: string }>;

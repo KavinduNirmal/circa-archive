@@ -40,9 +40,9 @@ const index: readonly ArchiveEntry[] = [
     warnings: [],
   },
   {
-    code: "CIRCA-M-0002",
+    code: "EVI-035783",
     designation: "Augur ledger, fragment",
-    klass: "memo",
+    klass: "evidence",
     filed: "0100-03-15",
     status: "sealed",
     organization: "CIRCA",
@@ -87,10 +87,10 @@ describe("archive index search", () => {
       ),
     ).toEqual(["INC-00907", "INC-00014"]);
     expect(
-      searchArchive({ text: "", klass: "memo", period: "any" }, index).map(
+      searchArchive({ text: "", klass: "evidence", period: "any" }, index).map(
         (entry) => entry.code,
       ),
-    ).toEqual(["CIRCA-M-0002"]);
+    ).toEqual(["EVI-035783"]);
   });
 
   it("filters by filed period against the ISO date", () => {
@@ -100,7 +100,7 @@ describe("archive index search", () => {
       );
     expect(inPeriod("current")).toEqual(["INC-00907"]);
     expect(inPeriod("recent")).toEqual(["INC-00014", "ORG-C-005102"]);
-    expect(inPeriod("historical")).toEqual(["CIRCA-M-0002"]);
+    expect(inPeriod("historical")).toEqual(["EVI-035783"]);
   });
 
   it("ranks a code match above a text match, then newest filing first", () => {
@@ -132,9 +132,9 @@ describe("archive index search", () => {
 
   it("ships a fixture whose codes follow the documented archive formats", () => {
     for (const entry of ARCHIVE_INDEX) {
-      // A record code is `CIRCA-{Type}-{Number}`, so the type letter is open.
+      // Filings carry a typed prefix; the holder's own codes stay `CIRCA-`.
       expect(entry.code, entry.code).toMatch(
-        /^(INC-\d{5}|ORG-[USABCD]-\d{6}(\/C\d)?|CIRCA-[A-Z]-\d{4,5}|CIRCA-ID-\d{4})$/,
+        /^(INC-\d{5}|EXP-\d{6}|EVI-\d{6}|ORG-[USABCD]-\d{6}|CIRCA-[A-Z]-\d{4,5}|CIRCA-ID-\d{4})$/,
       );
       expect(entry.filed).toMatch(/^\d{4}-\d{2}-\d{2}$/);
       expect(entry.abstract.length).toBeGreaterThan(20);

@@ -1,4 +1,10 @@
+import { readFileSync } from "node:fs";
 import { expect, test } from "@playwright/test";
+
+/** Read the shipped copy so a rewrite of the tooltip does not fail this spec. */
+const shell = JSON.parse(readFileSync("messages/en/shell.json", "utf8")) as {
+  organizationsDetail: string;
+};
 
 /**
  * Desktop shortcuts in reading order, each paired with the title its window takes.
@@ -150,7 +156,7 @@ test("desktop shortcuts explain themselves with the beveled tooltip", async ({
   await organizations.hover();
   const tooltip = page.getByRole("tooltip");
   await expect(tooltip).toBeVisible();
-  await expect(tooltip).toContainText("Organization dossiers and continuities");
+  await expect(tooltip).toContainText(shell.organizationsDetail);
   await expect(tooltip.locator(".tooltip-arrow")).toHaveCount(1);
   await page.mouse.move(5, 5);
   await expect(tooltip).toBeHidden();

@@ -13,17 +13,17 @@ import {
  *
  * The index module owns what an entry is; this module owns the handful of
  * questions the public pages ask of it that the workstation never needed — how
- * many filings an organization holds, what record comes next in archive order,
- * and which catalog key names a class or a status. It holds no React, so the
- * pages stay views and these rules can be tested from anywhere.
+ * many filings an organization holds and which catalog key names a class or a
+ * status. It holds no React, so the pages stay views and these rules can be
+ * tested from anywhere.
  */
 
 /** The catalog key that names a class to a reader. */
 export const CLASS_MESSAGE_KEY: Record<ArchiveClass, string> = {
   incident: "classIncident",
   organization: "classOrganization",
-  continuity: "classContinuity",
-  memo: "classMemo",
+  exploration: "classExploration",
+  evidence: "classEvidence",
 };
 
 /** The catalog key that names a status to a reader. */
@@ -75,14 +75,14 @@ export const CONSULTATIONS: Readonly<Record<string, number>> = {
   "INC-00907": 588,
   "INC-00204": 431,
   "INC-00318": 398,
-  "CIRCA-M-0002": 312,
+  "EVI-035783": 312,
   "ORG-A-020748": 287,
-  "ORG-C-005102/C2": 231,
-  "ORG-C-005102/C1": 194,
+  "EXP-288903": 231,
+  "EXP-288902": 194,
   "CIRCA-R-0438": 168,
-  "CIRCA-M-0031": 142,
+  "EVI-035784": 142,
   "ORG-U-000011": 97,
-  "CIRCA-M-0077": 88,
+  "EVI-035785": 88,
 };
 
 /** The most consulted entries, newest count first and archive order breaking ties. */
@@ -109,23 +109,4 @@ export function randomRecordCode(random: () => number = Math.random): string {
 /** How many filings an organization holds, counted from the index rather than asserted. */
 export function filingsFor(code: string): number {
   return ARCHIVE_INDEX.filter((entry) => entry.organization === code).length;
-}
-
-/**
- * The records either side of one, in archive order.
- *
- * The index is ordered, so adjacency is a property of the catalogue rather
- * than of the page: a reader walking the site reads it in the same order the
- * archive files it.
- */
-export function neighboursOf(code: string): {
-  previous?: ArchiveEntry;
-  next?: ArchiveEntry;
-} {
-  const at = ARCHIVE_INDEX.findIndex((entry) => entry.code === code);
-  if (at < 0) return {};
-  return {
-    ...(at > 0 ? { previous: ARCHIVE_INDEX[at - 1] } : {}),
-    ...(at < ARCHIVE_INDEX.length - 1 ? { next: ARCHIVE_INDEX[at + 1] } : {}),
-  };
 }

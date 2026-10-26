@@ -67,7 +67,7 @@
   background: #0d131a;
   color: #a4b7ca;
   border-bottom: 1px solid #3a4f6d;
-  font-size: 9px;
+  font-size: 10px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -88,6 +88,15 @@
 .utilityLanguage {
   margin-left: 12px;
   color: #c8d6e5;
+}
+/*
+ * The switcher's own stylesheet is shared with the workstation, so its enlarged
+ * touch area is scoped to the portal's utility strip rather than changed there.
+ */
+.utilityLanguage :global(.circa-language-option) {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
 }
 .utility a {
   color: #c8d6e5;
@@ -137,7 +146,7 @@
 .eyebrow {
   margin: 0 0 3px;
   color: #82a1c7;
-  font-size: 9px;
+  font-size: 10px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
 }
@@ -167,7 +176,7 @@
   border-left: 1px solid #526e94;
   color: #8fa3b6;
   font-family: "Courier New", monospace;
-  font-size: 9px;
+  font-size: 10px;
   line-height: 1.5;
 }
 
@@ -241,7 +250,7 @@
   background: var(--circa-paper-raised);
   border-bottom: 1px solid var(--circa-rule);
   color: var(--circa-ink-soft);
-  font-size: 9px;
+  font-size: 10px;
   letter-spacing: 0.03em;
 }
 
@@ -295,7 +304,7 @@
   background: #3a4f6d;
   color: #e9f0f6;
   border-bottom: 1px solid #24334a;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.08em;
   line-height: 1.4;
@@ -314,6 +323,7 @@
   color: var(--circa-ink-soft);
   font-size: 10px;
   line-height: 1.5;
+  text-wrap: pretty;
 }
 .directoryList {
   margin: 0;
@@ -345,7 +355,7 @@
   flex: 0 0 13px;
   color: var(--circa-ink-soft);
   font-family: "Courier New", monospace;
-  font-size: 9px;
+  font-size: 10px;
   line-height: 1.7;
 }
 
@@ -385,7 +395,7 @@
 .clearance {
   margin: 0 0 5px;
   padding: 5px 8px 0;
-  font-size: 9px;
+  font-size: 10px;
 }
 .clearance div {
   padding: 4px 0;
@@ -454,7 +464,7 @@
   padding: 0 8px;
   color: var(--circa-ink-soft);
   font-family: "Courier New", monospace;
-  font-size: 9px;
+  font-size: 10px;
   line-height: 1.9;
 }
 
@@ -474,7 +484,7 @@
   border-bottom: 1px solid var(--circa-rule);
   color: var(--circa-ink-soft);
   font-family: "Courier New", monospace;
-  font-size: 9px;
+  font-size: 10px;
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
@@ -493,6 +503,7 @@
   margin: 0 0 9px;
   font-size: 12.5px;
   line-height: 1.58;
+  text-wrap: pretty;
 }
 .main .intro {
   font-family: Georgia, "Times New Roman", serif;
@@ -607,7 +618,7 @@
 .entryCode {
   color: var(--circa-ink-soft);
   font-family: "Courier New", monospace;
-  font-size: 8.5px;
+  font-size: 10px;
   line-height: 1.7;
   text-align: right;
   white-space: nowrap;
@@ -656,13 +667,12 @@
   border-top: 1px dotted #b9a777;
   color: #6a5225;
   font-family: "Courier New", monospace;
-  font-size: 9px;
+  font-size: 10px;
 }
 
 .mobileDirectory {
   display: none;
 }
-
 /* Numbered procedures. */
 .procedure {
   margin: 18px 0 0;
@@ -703,7 +713,7 @@
   padding-left: 8px;
   border-left: 2px solid var(--circa-rule);
   color: var(--circa-ink-soft);
-  font-size: 10.5px;
+  font-size: 11px;
   line-height: 1.55;
 }
 
@@ -776,7 +786,9 @@
 }
 
 .textLink {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
   margin-bottom: 6px;
   font-size: 11.5px;
   font-weight: 700;
@@ -803,7 +815,7 @@
   padding: 0 3px;
   background: #8a4a12;
   color: #f8edda;
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.08em;
   line-height: 1.6;
@@ -819,24 +831,30 @@
 .newsDate {
   color: var(--circa-ink-soft);
   font-family: "Courier New", monospace;
-  font-size: 9px;
+  font-size: 10px;
 }
 .newsItem h3 {
   margin: 0 0 3px;
   font-size: 11px;
   line-height: 1.4;
 }
+.newsItem h3 a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+}
 .newsItem p {
   margin: 0;
   font-size: 11px;
   line-height: 1.45;
+  text-wrap: pretty;
 }
 .newsEnd {
   margin: 0;
   padding: 6px 8px;
   color: var(--circa-ink-soft);
   font-family: Georgia, "Times New Roman", serif;
-  font-size: 10px;
+  font-size: 10.5px;
   font-style: italic;
 }
 
@@ -894,13 +912,15 @@
   border-bottom: 0;
 }
 .documentList a {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
 }
 .documentList span {
   display: block;
   margin-top: 1px;
   color: var(--circa-ink-soft);
-  font-size: 9px;
+  font-size: 10px;
 }
 
 .boardList {
@@ -954,18 +974,17 @@
 .held figcaption {
   margin-top: 3px;
   color: var(--circa-ink-soft);
-  font-size: 9px;
+  font-size: 10px;
   line-height: 1.45;
 }
 
 .registerMark {
   margin: auto 8px 0;
-  padding-top: 16px;
   padding-top: 4px;
   border-top: 1px dotted var(--circa-rule);
   color: var(--circa-ink-soft);
   font-family: "Courier New", monospace;
-  font-size: 9px;
+  font-size: 10px;
   line-height: 1.55;
   text-align: right;
 }
@@ -995,20 +1014,25 @@
   width: 100%;
   border-collapse: collapse;
   text-align: left;
-  font-size: 10.5px;
+  font-size: 11px;
 }
 .registers :is(th, td) {
-  padding: 4px 6px;
+  padding: 4px 8px;
   border: 1px solid #96a6b7;
   overflow-wrap: anywhere;
   vertical-align: top;
+}
+.registers a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
 }
 .registers th {
   font-weight: normal;
 }
 .registers thead th {
   background: #bdcad7;
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 700;
 }
 .registers tbody tr:nth-child(even) {
@@ -1017,12 +1041,12 @@
 .registers .registerNote {
   margin: 6px 0 0;
   color: var(--circa-ink-soft);
-  font-size: 9.5px;
+  font-size: 10px;
   line-height: 1.5;
 }
 .registers .registerAction {
   margin: 6px 0 0;
-  font-size: 10.5px;
+  font-size: 11px;
 }
 
 .policies {
@@ -1031,7 +1055,7 @@
   gap: 18px;
   padding: 6px 14px 8px;
   border-top: 1px solid var(--circa-rule);
-  font-size: 10.5px;
+  font-size: 11px;
 }
 
 .policies details {
@@ -1082,7 +1106,7 @@
 .footerRevised {
   color: #a4b7ca;
   font-family: "Courier New", monospace;
-  font-size: 9px;
+  font-size: 10px;
 }
 
 .footerEnd {
@@ -1091,10 +1115,13 @@
   gap: 4px 10px;
   color: #a4b7ca;
   font-family: "Courier New", monospace;
-  font-size: 9px;
+  font-size: 10px;
 }
 .footerTop {
-  font-size: 10px;
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  font-size: 11px;
 }
 
 .skip {
@@ -1245,6 +1272,27 @@
   .crumbs {
     padding: 4px 10px;
   }
+  .mobileDirectory {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px 16px;
+    margin: 0 0 14px;
+    padding: 5px 0;
+    border-block: 1px dotted var(--circa-rule);
+    font-size: 11px;
+  }
+  .mobileDirectory a {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    min-height: 26px;
+    font-weight: 700;
+  }
+  .mobileDirectory a::before {
+    content: "»";
+    font-size: 9px;
+    text-decoration: none;
+  }
   .layout {
     display: flex;
     flex-direction: column;
@@ -1271,26 +1319,6 @@
     margin: 12px auto 8px;
     align-self: start;
   }
-  .rail .received {
-    width: 96px;
-    margin: -6px 10px 12px auto;
-    padding: 3px 5px;
-    border: 2px solid #8a2b2b;
-    color: #8a2b2b;
-    transform: rotate(6deg);
-    text-align: center;
-    font-family: "Courier New", monospace;
-    font-size: 8px;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    line-height: 1.5;
-    opacity: 0.9;
-  }
-
-  .received span {
-    display: block;
-  }
-
   .railFoot {
     grid-column: 1;
     padding-top: 12px;
@@ -1345,7 +1373,7 @@
     display: none;
   }
   .utilityService {
-    font-size: 8.5px;
+    font-size: 10px;
     letter-spacing: 0.05em;
   }
   .utilityLanguage {
@@ -1403,29 +1431,16 @@
   .directory {
     border-color: #45586c;
   }
+  .portal a {
+    color: #102c48;
+  }
   .boxNote,
   .main .small,
-  .received {
-    width: 96px;
-    margin: -6px 10px 12px auto;
-    padding: 3px 5px;
-    border: 2px solid #8a2b2b;
-    color: #8a2b2b;
-    transform: rotate(6deg);
-    text-align: center;
-    font-family: "Courier New", monospace;
-    font-size: 8px;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    line-height: 1.5;
-    opacity: 0.9;
-  }
-
-  .received span {
-    display: block;
-  }
-
-  .railFoot {
+  .railFoot,
+  .closedFoot {
     color: #26313d;
+  }
+  .registers :is(th, td) {
+    border-color: #4a5b6c;
   }
 }

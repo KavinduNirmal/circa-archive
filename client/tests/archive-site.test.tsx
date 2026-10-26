@@ -6,7 +6,9 @@ import { ArchiveAbout } from "@/components/archive-site/archive-about";
 import { ArchiveExplorations } from "@/components/archive-site/archive-explorations";
 import { ArchiveOrganizations } from "@/components/archive-site/archive-organizations";
 import { ArchiveRecord } from "@/components/archive-site/archive-record";
+import { ArchiveRecordType } from "@/components/archive-site/archive-record-type";
 import { ArchiveRecords } from "@/components/archive-site/archive-records";
+import { ArchiveCharacters } from "@/components/archive-site/archive-characters";
 import { parseSearchState } from "@/lib/search/query";
 import { searchFixture } from "@/lib/search/fixture";
 import { MetaAbout } from "@/components/meta/meta-about";
@@ -102,7 +104,7 @@ describe("the archive home", () => {
     for (const [name, href] of [
       [site.navArchive, "/en/site"],
       [site.navRecords, "/en/site/records"],
-      [site.navOrganizations, "/en/site/organizations"],
+      [site.navEntities, "/en/site/organizations"],
       [site.navAbout, "/en/site/about"],
       [site.actionRandom, "/en/site/random"],
       [site.navWorkstation, "/en/desktop"],
@@ -124,6 +126,40 @@ describe("the archive home", () => {
     expect(
       screen.getAllByRole("link", { name: site.aboutSite })[0],
     ).toHaveAttribute("href", "/en/meta");
+  });
+
+  it("opens the record types and the entities from the section bar", async () => {
+    const user = userEvent.setup();
+    renderWithIntl(<ArchiveHome />);
+    const nav = screen.getByRole("navigation", { name: site.navLabel });
+
+    const records = within(nav).getByRole("button", {
+      name: site.navRecords,
+    });
+    await user.click(records);
+    for (const [name, href] of [
+      [site.navRecordIncidents, "/en/site/records/incidents"],
+      [site.navRecordExplorations, "/en/site/records/explorations"],
+      [site.navRecordEvidence, "/en/site/records/evidence"],
+      [site.navRecordRumours, "/en/site/records/rumours"],
+      [site.navRecordPlaylists, "/en/site/records/playlists"],
+    ] as const) {
+      expect(within(nav).getByRole("link", { name })).toHaveAttribute(
+        "href",
+        href,
+      );
+    }
+
+    const entities = within(nav).getByRole("button", {
+      name: site.navEntities,
+    });
+    await user.click(entities);
+    expect(
+      within(nav).getByRole("link", { name: site.navOrganizations }),
+    ).toHaveAttribute("href", "/en/site/organizations");
+    expect(
+      within(nav).getByRole("link", { name: site.navCharacters }),
+    ).toHaveAttribute("href", "/en/site/characters");
   });
 
   it("puts the search in the masthead and again in the page, as a plain form", () => {
@@ -194,16 +230,16 @@ describe("the archive home", () => {
     expect(screen.getByText(site.classifiedFoot)).toBeVisible();
   });
 
-  it("runs the announcement, its pause box, and its key, and offers the featured, popular, and random doors", () => {
+  it("keeps the announcement readable and offers the featured, popular, and random doors", () => {
     renderWithIntl(<ArchiveHome />);
     expect(screen.getByText(site.bannerLabel)).toBeVisible();
-    // The ticker carries two copies of the line so its loop has no seam; the
-    // second is decoration and is hidden from the accessibility tree.
-    const [firstCopy] = screen.getAllByText(site.bannerText);
-    expect(firstCopy).toBeVisible();
-    expect(
-      screen.getByRole("checkbox", { name: site.bannerPause }),
-    ).not.toBeChecked();
+    expect(screen.getByText(site.bannerText)).toBeVisible();
+    // The announcement is static: no ticker, so no pause box inside it. The
+    // search's facet checkboxes are elsewhere on the page and are not the claim.
+    const banner = screen.getByRole("complementary", {
+      name: site.bannerLabel,
+    });
+    expect(within(banner).queryByRole("checkbox")).not.toBeInTheDocument();
     expect(screen.getByRole("link", { name: site.bannerLink })).toHaveAttribute(
       "href",
       "/en/site/about",
@@ -242,6 +278,61 @@ describe("the archive home", () => {
         site.homeCount.replace("{count}", String(ARCHIVE_INDEX.length)),
       ).length,
     ).toBeGreaterThan(0);
+  });
+});
+
+describe("the record type pages", () => {
+  it("lists the entries filed under incidents, explorations, and evidence", () => {
+    for (const [kind, title, present, absent] of [
+      ["incidents", site.classIncident, "INC-00014", "EXP-288902"],
+      ["explorations", site.classExploration, "EXP-288902", "INC-00014"],
+      ["evidence", site.classEvidence, "EVI-035783", "INC-00014"],
+    ] as const) {
+      const { unmount } = renderWithIntl(<ArchiveRecordType kind={kind} />);
+      expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
+        title,
+      );
+      expect(
+        screen.getByRole("link", {
+          name: site.openRecord.replace("{code}", present),
+        }),
+      ).toBeVisible();
+      expect(
+        screen.queryByRole("link", {
+          name: site.openRecord.replace("{code}", absent),
+        }),
+      ).not.toBeInTheDocument();
+      unmount();
+    }
+  });
+
+  it("reserves the rumour and playlist indexes with an explanation", () => {
+    for (const [kind, title, note] of [
+      ["rumours", site.rumoursTitle, site.rumoursNote],
+      ["playlists", site.playlistsTitle, site.playlistsNote],
+    ] as const) {
+      const { unmount } = renderWithIntl(<ArchiveRecordType kind={kind} />);
+      expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
+        title,
+      );
+      expect(screen.getByText(note)).toBeVisible();
+      expect(
+        screen.getByRole("link", { name: site.recordBack }),
+      ).toHaveAttribute("href", "/en/site/records");
+      unmount();
+    }
+  });
+
+  it("reserves the character directory with an explanation", () => {
+    renderWithIntl(<ArchiveCharacters />);
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
+      site.charactersTitle,
+    );
+    expect(screen.getByText(site.charactersNote)).toBeVisible();
+    expect(screen.getByRole("link", { name: site.recordBack })).toHaveAttribute(
+      "href",
+      "/en/site/records",
+    );
   });
 });
 
@@ -342,7 +433,9 @@ describe("a released record", () => {
     ).toBeVisible();
 
     // The two directions of the citation web stay apart.
-    expect(screen.getByText(site.recordInbound)).toBeVisible();
+    expect(
+      screen.getByRole("heading", { name: site.recordInbound }),
+    ).toBeVisible();
     expect(screen.getByText(site.recordOutbound)).toBeVisible();
     expect(screen.getByRole("link", { name: /INC-00042/ })).toHaveAttribute(
       "href",
@@ -390,8 +483,17 @@ describe("a released record", () => {
     ).toHaveAttribute("href", "/en/site/records/INC-00907");
   });
 
-  it("gives every section an anchor and a contents list that reaches it", () => {
+  it("opens the contents menu and reaches every section from it", async () => {
+    const user = userEvent.setup();
     const { container } = renderWithIntl(<ArchiveRecord code="INC-00014" />);
+    const summary = screen.getByText(site.recordContents, {
+      selector: "summary",
+    });
+    expect(summary.closest("details")).not.toHaveAttribute("open");
+
+    await user.click(summary);
+
+    expect(summary.closest("details")).toHaveAttribute("open");
     const contents = screen.getByRole("navigation", {
       name: site.recordContents,
     });
@@ -440,6 +542,31 @@ describe("a released record", () => {
     expect(
       screen.getAllByText("The severity has been changed from A to S."),
     ).toHaveLength(1);
+  });
+
+  it("ends on the record's related lists instead of a step through the register", () => {
+    renderWithIntl(<ArchiveRecord code="INC-00014" />);
+    const related = screen.getByRole("navigation", {
+      name: site.recordRelated,
+    });
+    expect(
+      within(related)
+        .getAllByRole("link")
+        .map((link) => [link.textContent, link.getAttribute("href")]),
+    ).toEqual([
+      [site.recordExplorations, "/en/site/records/INC-00014/explorations"],
+      [site.recordInbound, "/en/site/records/INC-00014/filings"],
+      [site.recordPlaylists, "/en/site/records/INC-00014/playlists"],
+    ]);
+    // The lists sit above the annotations, where the register's step used to be.
+    expect(
+      related.compareDocumentPosition(
+        screen.getByRole("heading", { name: site.notesTitle }),
+      ) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+    // The register's step is gone from both the toolbar and the foot.
+    expect(screen.queryByRole("link", { name: /Previous record/ })).toBeNull();
+    expect(screen.queryByRole("link", { name: /Next record/ })).toBeNull();
   });
 
   it("links a record's exploration count to its exploration list", () => {
@@ -595,6 +722,10 @@ describe("every link on the plain site", () => {
       <ArchiveRecord key="record" code="INC-00014" />,
       <ArchiveOrganizations key="organizations" />,
       <ArchiveAbout key="about" />,
+      <ArchiveRecordType key="incidents" kind="incidents" />,
+      <ArchiveRecordType key="rumours" kind="rumours" />,
+      <ArchiveRecordType key="playlists" kind="playlists" />,
+      <ArchiveCharacters key="characters" />,
     ]) {
       const { container, unmount } = renderWithIntl(page);
       for (const link of screen.getAllByRole("link")) {
@@ -605,7 +736,7 @@ describe("every link on the plain site", () => {
         }
         const url = new URL(href, "https://archive.invalid");
         expect(url.pathname, href).toMatch(
-          /^\/(en|ko)(\/site(\/records(\/[A-Z0-9/-]+)?(\/download)?|\/organizations|\/about|\/random|\/write(\/editor)?)?|\/meta(\/about)?|\/desktop|\/sign-in|\/account)?$/,
+          /^\/(en|ko)(\/site(\/records(\/(incidents|explorations|evidence|rumours|playlists)|\/[A-Z0-9-]+(\/(download|explorations|filings|playlists))?)?|\/characters|\/organizations|\/about|\/random|\/write(\/editor)?)?|\/meta(\/about)?|\/desktop|\/sign-in|\/account)?$/,
         );
         // A query is a filter, and only the index and the directory take one.
         for (const key of url.searchParams.keys()) {
@@ -684,9 +815,9 @@ describe("search, random, and downloads", () => {
   });
 
   it("filters the index on the server and keeps the query in the address", () => {
-    renderWithIntl(<ArchiveRecords query="tide" />);
+    renderWithIntl(<ArchiveRecords query="estuary" />);
     expect(
-      screen.getByText(siteT("searchResults", { count: 1, query: "tide" })),
+      screen.getByText(siteT("searchResults", { count: 1, query: "estuary" })),
     ).toBeVisible();
     expect(
       screen.getByRole("link", {
@@ -722,7 +853,7 @@ describe("search, random, and downloads", () => {
     ).toBeVisible();
     expect(
       screen.queryByRole("link", {
-        name: site.openRecord.replace("{code}", "CIRCA-M-0002"),
+        name: site.openRecord.replace("{code}", "EVI-035783"),
       }),
     ).toBeNull();
     expect(
@@ -752,7 +883,7 @@ describe("search, random, and downloads", () => {
   });
 
   it("keeps the query when a filter is cleared", () => {
-    renderWithIntl(<ArchiveRecords query="record" klass="memo" />);
+    renderWithIntl(<ArchiveRecords query="record" klass="evidence" />);
     const tags = screen.getByRole("list", { name: site.activeFilters });
     expect(
       within(tags).getByRole("link", {
@@ -762,7 +893,7 @@ describe("search, random, and downloads", () => {
   });
 
   it("says so when the filters find nothing", () => {
-    renderWithIntl(<ArchiveRecords klass="memo" status="contested" />);
+    renderWithIntl(<ArchiveRecords klass="evidence" status="contested" />);
     expect(screen.getByText(site.filterNone)).toBeVisible();
   });
 
