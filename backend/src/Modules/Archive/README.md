@@ -5,7 +5,7 @@
 Owns the persistent archive entity model and its PostgreSQL `archive` schema:
 incidents, filings (records), record tags, organizations, characters, and
 recoveries. It implements models, relationships, search indexes, and the global
-search read endpoint. Archive write workflows and destination read pages remain pending.
+search and scoped destination read endpoints. General archive write workflows remain pending; sealed-record access requests are implemented.
 
 ## Structure
 
@@ -23,7 +23,7 @@ foreign keys; account lookup belongs to Auth contracts when CRUD is introduced.
 Other modules must not query archive tables directly. Search request contracts
 live in Application. The public search endpoint supports all five entity types;
 the client enables only types with destinations and retains fixture transport
-until stage 3.
+by default; API-backed destination integration is exercised separately.
 
 IDs are UUIDs supplied by the application (UUIDv7). Display codes such as
 `INC-007540`, `EXP-288902`, and `ITM-000001` are unique display identifiers, never

@@ -22,7 +22,6 @@ PostgreSQL schema.
 
 ## Boundaries
 
-Global search is implemented; archive CRUD, destination read endpoints, and
-production seeding remain pending. Registration supplies the context, reader,
+Global search, scoped destination reads, and sealed-record access requests are implemented. General archive CRUD and production seeding remain pending. Registration supplies the context, reader,
 and search rate-limit policy. Raw SQL is the schema source of truth; the EF model must be
 kept aligned when entities change.

@@ -62,3 +62,8 @@ Search tests cover exclusion precedence, repeated URL parameters, fixture exclus
 
 `search-api.test.ts` verifies backend-compatible nullable warnings and approved
 sealed-record response validation while preserving sealed incident redaction.
+
+`search-expansion.test.tsx` verifies typeahead debounce/language, committed-query
+navigation, canonical saved addresses, and blocked browser storage. Query tests
+cover discarded-filter notices, Unicode URL budgets, and reversed dates. Archive
+component tests verify that removing a facet clears its pagination cursor.

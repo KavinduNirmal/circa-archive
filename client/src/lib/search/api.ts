@@ -122,6 +122,9 @@ function isAppliedSearch(value: unknown): value is SearchApplied {
   return (
     typeof value.q === "string" &&
     (typeof value.holder === "string" || value.holder === null) &&
+    ["mention", "org", "author", "tag", "character", "custody", "cursor"].every(
+      (key) => typeof value[key] === "string" || value[key] === null,
+    ) &&
     arrays.every(
       ([key, allowed]) =>
         Array.isArray(value[key]) &&

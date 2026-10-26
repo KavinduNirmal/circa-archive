@@ -17,7 +17,8 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "sync:corpus": "bun scripts/sync-corpus.ts",
-    "test:e2e:auth": "playwright test --config playwright.auth.config.ts"
+    "test:e2e:auth": "playwright test --config playwright.auth.config.ts",
+    "test:e2e:search": "playwright test --config playwright.search.config.ts"
   },
   "dependencies": {
     "@fontsource/dm-sans": "5.3.0",

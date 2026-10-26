@@ -7,7 +7,12 @@ const nextConfig: NextConfig = {
   ...(process.env.CIRCA_LOW_RESOURCE === "1"
     ? { experimental: { cpus: 1 } }
     : {}),
-  distDir: process.env.CIRCA_AUTH_E2E === "1" ? ".next/auth-e2e" : ".next",
+  distDir:
+    process.env.CIRCA_SEARCH_E2E === "1"
+      ? ".next/search-e2e"
+      : process.env.CIRCA_AUTH_E2E === "1"
+        ? ".next/auth-e2e"
+        : ".next",
   async rewrites() {
     if (process.env.NODE_ENV !== "development") return [];
     const origin = process.env.API_ORIGIN ?? "http://localhost:5040";

@@ -221,6 +221,79 @@ public sealed class SearchReaderTests(ArchivePostgresFixture fixture, Xunit.Abst
     }
 
     [Fact]
+    public async Task RelevanceRanksExactHolderBeforeNewerPrefixMatches()
+    {
+        await using var db = await SeedAsync();
+        var exact = await db.Incidents.SingleAsync(i => i.ReferenceNumber == 8000);
+        var prefix = await db.Incidents.SingleAsync(i => i.ReferenceNumber == 8001);
+        exact.HolderCode = "HOLDER";
+        prefix.HolderCode = "HOLDER-A";
+        prefix.CreatedAt = exact.CreatedAt.AddDays(1);
+        await db.SaveChangesAsync();
+        var result = await new SearchReader(db).SearchAsync(Request(("holder", "HOLDER")));
+        Assert.Equal(exact.Id, result.Items[0].Id);
+    }
+
+    [Theory]
+    [InlineData("newest")]
+    [InlineData("oldest")]
+    [InlineData("title")]
+    [InlineData("relevance")]
+    public async Task CursorTraversesThreePagesWithoutDuplicatesAndCanReturnToPrevious(string sort)
+    {
+        await using var db = await SeedAsync();
+        var template = await db.Incidents.FirstAsync(i => i.ReferenceNumber == 8000);
+        for (var n = 0; n < 25; n++)
+            db.Incidents.Add(new Incident { Id = Guid.NewGuid(), ReferenceNumber = 9000 + n,
+                Designation = $"Cursor document {n:D2}", Markdown = "cursor", AuthorId = Owner,
+                ContentHash = "cursor", CreatedAt = template.CreatedAt.AddMinutes(n), UpdatedAt = template.UpdatedAt });
+        await db.SaveChangesAsync();
+        var reader = new SearchReader(db);
+        var first = await reader.SearchAsync(Request(("sort", sort), ("limit", "10")));
+        Assert.NotNull(first.Page.NextCursor);
+        var second = await reader.SearchAsync(Request(("sort", sort), ("limit", "10"), ("cursor", first.Page.NextCursor)));
+        Assert.NotNull(second.Page.NextCursor);
+        var third = await reader.SearchAsync(Request(("sort", sort), ("limit", "10"), ("cursor", second.Page.NextCursor)));
+        Assert.Equal(3, third.Page.Number);
+        Assert.Equal(30, first.Items.Concat(second.Items).Concat(third.Items).Select(i => i.Id).Distinct().Count());
+        var previous = await reader.SearchAsync(Request(("sort", sort), ("limit", "10"), ("cursor", third.Page.PreviousCursor!)));
+        Assert.Equal(second.Items.Select(i => i.Id), previous.Items.Select(i => i.Id));
+    }
+
+    [Fact]
+    public async Task ExpandedFiltersUseNormalizedRelationshipsAndOnlyPublicAuthorNames()
+    {
+        await using var db = await SeedAsync();
+        await db.Database.ExecuteSqlRawAsync("CREATE SCHEMA IF NOT EXISTS auth; CREATE TABLE IF NOT EXISTS auth.users (id uuid PRIMARY KEY, display_name text, username text, email text)");
+        await db.Database.ExecuteSqlInterpolatedAsync($"INSERT INTO auth.users (id, display_name, username, email) VALUES ({Owner}, 'Public Analyst', 'private_login', 'private@example.invalid') ON CONFLICT (id) DO NOTHING");
+        var incident = await db.Incidents.SingleAsync(i => i.ReferenceNumber == 8000);
+        var record = await db.Records.SingleAsync(r => r.ReferenceNumber == 300000);
+        var organization = await db.Organizations.SingleAsync(o => o.ReferenceNumber == 6000);
+        var character = await db.Characters.SingleAsync();
+        var recovery = await db.Recoveries.SingleAsync();
+        db.OrgMentions.Add(new OrgMention { Id = Guid.NewGuid(), IncidentId = incident.Id, OrgId = organization.Id, RawText = "the office staff", CreatedAt = incident.CreatedAt });
+        db.RecordTags.Add(new RecordTag { RecordId = record.Id, Tag = "field-report" });
+        recovery.FirstRecoveredByCharacterId = character.Id;
+        recovery.OriginIncidentId = incident.Id;
+        recovery.FirstDocumentedRecordId = record.Id;
+        recovery.CustodyStatus = CustodyStatus.Claimed;
+        await db.SaveChangesAsync();
+        var reader = new SearchReader(db);
+        Assert.Equal(incident.Id, Assert.Single((await reader.SearchAsync(Request(("mention", "office staff")))).Items).Id);
+        Assert.Contains((await reader.SearchAsync(Request(("org", "ORG-006000")))).Items, item => item.Id == incident.Id);
+        Assert.Equal(record.Id, Assert.Single((await reader.SearchAsync(Request(("tag", "field-report")))).Items).Id);
+        Assert.Equal(recovery.Id, Assert.Single((await reader.SearchAsync(Request(("custody", "claimed")))).Items).Id);
+        Assert.Equal(4, (await reader.SearchAsync(Request(("character", "Mara Vale")))).Items.Count);
+        character.RecordStatus = RecordStatus.Erased;
+        await db.SaveChangesAsync();
+        Assert.Empty((await reader.SearchAsync(Request(("character", "Mara Vale")))).Items);
+        Assert.NotEmpty((await reader.SearchAsync(Request(("author", "Public Analyst")))).Items);
+        Assert.Empty((await reader.SearchAsync(Request(("author", "private_login")))).Items);
+        Assert.Empty((await reader.SearchAsync(Request(("author", "private@example.invalid")))).Items);
+        Assert.Empty((await reader.SearchAsync(Request(("author", Owner.ToString())))).Items);
+    }
+
+    [Fact]
     public async Task MeasuresRepresentativeQueriesOverTenThousandDocuments()
     {
         await using var db = await SeedAsync();

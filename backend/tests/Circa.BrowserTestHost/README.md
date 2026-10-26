@@ -11,3 +11,9 @@ This executable is test infrastructure, never production startup. Test credentia
 ## Usage and verification
 
 Requires Docker and .NET 10. `dotnet run --project backend/tests/Circa.BrowserTestHost` starts it; `bun run --cwd=client test:e2e:auth` manages it automatically alongside Next.js. Browser assertions live in `client/e2e/auth.spec.ts`.
+
+`CIRCA_SEARCH_E2E=1` adds `SearchDestinationSeed.cs`: dedicated incidents, a sealed
+record, a rumour, an organization, an approved reader, and an unapproved moderator.
+It initializes only the disposable database, permits the search frontend on 3102,
+and raises the search limit for deterministic integration runs. The search config
+waits for the seeded destination before starting tests.

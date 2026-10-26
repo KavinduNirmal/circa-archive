@@ -152,6 +152,26 @@ CREATE TABLE IF NOT EXISTS archive.recoveries (
         REFERENCES archive.organizations (id) ON DELETE SET NULL
 );
 
+-- Resolved organization references extracted from public incidents and records.
+-- Keep this relational so filters can join a stable organization id and code.
+CREATE TABLE IF NOT EXISTS archive.org_mentions (
+    id uuid PRIMARY KEY,
+    org_id uuid NULL REFERENCES archive.organizations(id) ON DELETE SET NULL,
+    record_id uuid NULL REFERENCES archive.records(id) ON DELETE CASCADE,
+    incident_id uuid NULL REFERENCES archive.incidents(id) ON DELETE CASCADE,
+    raw_text varchar(255) NOT NULL,
+    created_at timestamptz NOT NULL DEFAULT now(),
+    CONSTRAINT ck_org_mentions_one_source CHECK ((record_id IS NOT NULL) <> (incident_id IS NOT NULL))
+);
+CREATE INDEX IF NOT EXISTS ix_org_mentions_source
+    ON archive.org_mentions (org_id, record_id, incident_id);
+CREATE INDEX IF NOT EXISTS ix_org_mentions_record
+    ON archive.org_mentions (record_id) WHERE record_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS ix_org_mentions_incident
+    ON archive.org_mentions (incident_id) WHERE incident_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS ix_org_mentions_raw_text_trgm
+    ON archive.org_mentions USING gin (raw_text gin_trgm_ops);
+
 CREATE UNIQUE INDEX IF NOT EXISTS ux_incidents_reference_number
     ON archive.incidents (reference_number);
 CREATE INDEX IF NOT EXISTS ix_incidents_content_hash

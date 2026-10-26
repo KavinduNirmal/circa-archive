@@ -139,3 +139,40 @@ it("excludes any matching warning tag while retaining included tags", () => {
   );
   expect(result.items.map((item) => item.code)).toEqual([entries[0].code]);
 });
+
+it("applies expanded fixture filters through explicit public search metadata", () => {
+  const entry = {
+    ...ARCHIVE_INDEX[0],
+    searchMentions: ["office staff"],
+    searchOrganizations: ["ORG-006000"],
+    searchAuthor: "Public Analyst",
+    searchTags: ["field-report"],
+    searchCharacters: ["CHR-019000"],
+  };
+  for (const [key, value] of Object.entries({
+    mention: "office",
+    org: "ORG-006000",
+    author: "Public Analyst",
+    tag: "field-report",
+    character: "CHR-019000",
+  })) {
+    expect(
+      searchFixture(parseSearchState({ [key]: value }), [entry]).items,
+    ).toHaveLength(1);
+    expect(
+      searchFixture(parseSearchState({ [key]: "absent" }), [entry]).items,
+    ).toHaveLength(0);
+  }
+});
+
+it("distinguishes reserved codes, missing codes, and ordinary hyphenated words", () => {
+  expect(
+    searchFixture(parseSearchState({ q: "INC-001234" }), []).meta.codeMatch,
+  ).toBe("reserved");
+  expect(
+    searchFixture(parseSearchState({ q: "INC-999999" }), []).meta.codeMatch,
+  ).toBe("missing");
+  expect(
+    searchFixture(parseSearchState({ q: "field-report" }), []).meta.codeMatch,
+  ).toBeNull();
+});

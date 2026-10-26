@@ -10,7 +10,7 @@
 - `desktop-windows.ts`: the one composition of a destination's or a record's window title, so the shell, a deep link, and a restored session open identically named frames.
 - `desktop-route.ts`: the pure mapping between a locale-less pathname and the resource it names (`/desktop`, `/desktop/{destination}`, `/desktop/record/{code}`), plus the code and destination validators the server pages guard with.
 - `record-trail.ts`: the reader's trail type and the pure `open`/`step`/`normalise` operations, including the revisit rule that moves the cursor instead of appending a duplicate.
-- `search/`: the public archive's canonical global-search query contract and fixture adapter; see its [README](search/README.md).
+- `search/`: the public archive's canonical global-search contract, fixture/API adapters, and server destination reader; see its [README](search/README.md).
 
 ## Boundaries and verification
 

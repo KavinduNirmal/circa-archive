@@ -14,7 +14,9 @@ requires loading the Markdown editor parser.
 - `site-search.tsx`: the global search form. It submits canonical query fields
   as a plain GET to the index, so searches survive bookmarks and work without
   JavaScript. The masthead puts the same filters behind a `<details>`; the index
-  shows them in a ruled band.
+  shows them in a ruled band. Registry-defined filters include organization,
+  public author display name, record tag, linked character, and recovery custody.
+  Search suggestions are debounced; named saved searches stay in browser storage.
 - `archive-home.tsx`: the front page — search, a featured record, recent filings,
   most consulted, a random door, organizations, and the workstation invitation.
 - `archive-records.tsx`: the archive index table and global search results,
@@ -159,3 +161,16 @@ Search results show type and class on separate lines, each with a coloured squar
 
 API-approved sealed records render their returned excerpt without the access-request
 notice; redacted incident/record results retain their corresponding sealed notice.
+Character and recovery result pages use the shared dossier reader after the API confirms
+an active public destination. Cursor links preserve filters and expose a previous boundary.
+
+## API destination integration
+
+With `SEARCH_SOURCE=api`, `archive-api-record.tsx` renders the actual filing through
+`RecordProse`, a GET acknowledgment for sealed incidents, and stable rumour anchors.
+`record-access-request.tsx` submits authenticated sealed-record requests and handles
+pending, denied, expired, signed-out, and retry states. Roles/ownership never reveal
+a body in the UI; only the server response can supply it. `archive-api-organizations.tsx`
+shows API directory results and the selected organization's Markdown dossier.
+The fixture reader remains the default preview. Component coverage lives in
+`tests/archive-api-record.test.tsx`; real API/browser coverage uses `test:e2e:search`.

@@ -2,6 +2,8 @@ export const SEARCH_ENABLED_TYPES = [
   "incident",
   "record",
   "organization",
+  "character",
+  "recovery",
 ] as const;
 
 export const SEARCH_TYPES = [
@@ -47,6 +49,24 @@ export const SEARCH_PERIODS = [
 export const SEARCH_SORTS = ["relevance", "newest", "oldest", "title"] as const;
 export const SEARCH_LANGUAGES = ["en", "ko"] as const;
 export const SEARCH_LIMITS = [10, 20, 50] as const;
+export const CUSTODY_STATES = [
+  "unknown",
+  "unclaimed",
+  "claimed",
+  "disputed",
+  "lost",
+  "destroyed",
+] as const;
+
+/** Query-backed controls. Added discovery facets register here and in the API validator. */
+export const SEARCH_FILTER_REGISTRY = [
+  { key: "mention", kind: "text", maxLength: 120 },
+  { key: "org", kind: "text", maxLength: 120 },
+  { key: "author", kind: "text", maxLength: 64 },
+  { key: "tag", kind: "text", maxLength: 64 },
+  { key: "character", kind: "text", maxLength: 120 },
+  { key: "custody", kind: "select", values: CUSTODY_STATES },
+] as const;
 
 export type SearchType = (typeof SEARCH_TYPES)[number];
 export type EnabledSearchType = (typeof SEARCH_ENABLED_TYPES)[number];
@@ -63,6 +83,13 @@ export type SearchLimit = (typeof SEARCH_LIMITS)[number];
 export type SearchState = {
   q: string;
   holder: string;
+  mention: string;
+  org: string;
+  author: string;
+  tag: string;
+  character: string;
+  custody: string;
+  cursor: string;
   types: SearchType[];
   classes: RecordClass[];
   statuses: DisplayStatus[];
@@ -82,6 +109,13 @@ export type SearchState = {
 export const DEFAULT_SEARCH_STATE: SearchState = {
   q: "",
   holder: "",
+  mention: "",
+  org: "",
+  author: "",
+  tag: "",
+  character: "",
+  custody: "",
+  cursor: "",
   types: [],
   classes: [],
   statuses: [],

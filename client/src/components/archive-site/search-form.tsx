@@ -1,16 +1,18 @@
 "use client";
 
-import { useSyncExternalStore, useState } from "react";
+import { useEffect, useId, useSyncExternalStore, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { NativeSelect } from "@/components/ui/native-select";
 import { useLocale, useTranslations } from "next-intl";
 import { Search, SlidersHorizontal } from "lucide-react";
+import { toSearchHref } from "@/lib/search/query";
 import {
   DISPLAY_STATUSES,
   RECORD_CLASSES,
   SEARCH_ENABLED_TYPES,
+  SEARCH_FILTER_REGISTRY,
   SEARCH_LANGUAGES,
   SEARCH_LIMITS,
   SEARCH_PERIODS,
@@ -21,22 +23,36 @@ import {
   DEFAULT_SEARCH_STATE,
   type SearchState,
 } from "@/lib/search/contract";
+import { searchFixture } from "@/lib/search/fixture";
 import styles from "./archive-site.module.css";
 
 const optionKey = (value: string) =>
   `searchOption${value.replace(/(^|-)([a-z])/g, (_, _dash, letter: string) => letter.toUpperCase())}`;
 
-export function SearchForm({
+export function SearchForm(props: {
+  values?: SearchState;
+  variant?: "page" | "masthead";
+  source?: "fixture" | "api";
+}) {
+  return <SearchFormContents key={JSON.stringify(props.values)} {...props} />;
+}
+
+function SearchFormContents({
   values = DEFAULT_SEARCH_STATE,
   variant = "page",
+  source = "fixture",
 }: {
   values?: SearchState;
   variant?: "page" | "masthead";
+  source?: "fixture" | "api";
 }) {
   const t = useTranslations("site");
   const locale = useLocale();
   const idPrefix = variant === "masthead" ? "masthead" : "page";
+  const [query, setQuery] = useState(values.q);
+  const [language, setLanguage] = useState(values.language);
   const filterCount =
+    Number(Boolean(values.holder)) +
     values.types.length +
     values.classes.length +
     values.statuses.length +
@@ -44,6 +60,12 @@ export function SearchForm({
     values.disclosures.length +
     values.warningTags.length +
     values.excludedWarningTags.length +
+    Number(Boolean(values.org)) +
+    Number(Boolean(values.mention)) +
+    Number(Boolean(values.author)) +
+    Number(Boolean(values.tag)) +
+    Number(Boolean(values.character)) +
+    Number(Boolean(values.custody)) +
     Number(values.period !== "any") +
     Number(Boolean(values.from || values.to)) +
     Number(values.language !== "en");
@@ -55,6 +77,11 @@ export function SearchForm({
       method="get"
       role="search"
       aria-label={t("searchLabel")}
+      onChange={(event) => {
+        const field = event.target;
+        if (field instanceof HTMLSelectElement && field.name === "language")
+          setLanguage(field.value === "ko" ? "ko" : "en");
+      }}
     >
       <div className={styles.searchField}>
         <label className={styles.srOnly} htmlFor={`${idPrefix}-q`}>
@@ -64,13 +91,21 @@ export function SearchForm({
           id={`${idPrefix}-q`}
           name="q"
           type="search"
-          defaultValue={values.q}
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
           placeholder={t(
             variant === "masthead"
               ? "searchPlaceholderShort"
               : "searchPlaceholder",
           )}
           autoComplete="off"
+          list={`${idPrefix}-suggestions`}
+        />
+        <SearchSuggestions
+          id={`${idPrefix}-suggestions`}
+          query={query}
+          language={language}
+          source={source}
         />
         <Button type="submit">
           <Search size={12} strokeWidth={2} aria-hidden="true" />
@@ -144,6 +179,15 @@ function FilterPanel({
           selected={values.types}
           t={t}
         />
+        {SEARCH_FILTER_REGISTRY.map((filter) => (
+          <RegisteredFilter
+            key={filter.key}
+            id={`${idPrefix}-${filter.key}`}
+            filter={filter}
+            value={values[filter.key]}
+            t={t}
+          />
+        ))}
         <FilterSet
           id={`${idPrefix}-class`}
           name="class"
@@ -283,7 +327,210 @@ function FilterPanel({
         {t("applyFilters")}
       </Button>
       {!compact && <p className={styles.searchHint}>{t("searchHint")}</p>}
+      <SavedSearches values={values} />
     </div>
+  );
+}
+
+function RegisteredFilter({
+  id,
+  filter,
+  value,
+  t,
+}: {
+  id: string;
+  filter: (typeof SEARCH_FILTER_REGISTRY)[number];
+  value: string;
+  t: ReturnType<typeof useTranslations>;
+}) {
+  if (filter.kind === "select")
+    return (
+      <label className={styles.globalSelectField} htmlFor={id}>
+        <span>{t(`searchFilter_${filter.key}`)}</span>
+        <NativeSelect id={id} name={filter.key} defaultValue={value}>
+          <option value="">{t("searchFilterAny")}</option>
+          {filter.values.map((option) => (
+            <option key={option} value={option}>
+              {t(`searchCustody_${option}`)}
+            </option>
+          ))}
+        </NativeSelect>
+      </label>
+    );
+  return (
+    <label className={styles.globalTextField} htmlFor={id}>
+      <span>{t(`searchFilter_${filter.key}`)}</span>
+      <Input
+        id={id}
+        name={filter.key}
+        defaultValue={value}
+        maxLength={filter.maxLength}
+      />
+    </label>
+  );
+}
+
+function SearchSuggestions({
+  id,
+  query,
+  language,
+  source,
+}: {
+  id: string;
+  query: string;
+  language: SearchState["language"];
+  source: "fixture" | "api";
+}) {
+  const [items, setItems] = useState<{ code: string; title: string }[]>([]);
+  useEffect(() => {
+    const term = query.trim();
+    if (term.length < 2) return;
+    const controller = new AbortController();
+    const timer = window.setTimeout(async () => {
+      if (source === "fixture") {
+        const result = searchFixture({
+          ...DEFAULT_SEARCH_STATE,
+          q: term,
+          language,
+          limit: 10,
+        });
+        setItems(
+          result.items.map((item) => ({
+            code: item.displayCode,
+            title: item.title ?? item.displayCode,
+          })),
+        );
+        return;
+      }
+      try {
+        const response = await fetch(
+          `/api/v1/search?q=${encodeURIComponent(term)}&language=${language}&limit=10`,
+          {
+            headers: { Accept: "application/json" },
+            credentials: "same-origin",
+            signal: controller.signal,
+          },
+        );
+        if (!response.ok) return;
+        const payload = (await response.json()) as {
+          items?: { displayCode?: unknown; title?: unknown }[];
+        };
+        setItems(
+          (payload.items ?? []).flatMap((item) =>
+            typeof item.displayCode === "string" &&
+            typeof item.title === "string"
+              ? [{ code: item.displayCode, title: item.title }]
+              : [],
+          ),
+        );
+      } catch (error) {
+        if (!(error instanceof DOMException && error.name === "AbortError"))
+          setItems([]);
+      }
+    }, 320);
+    return () => {
+      window.clearTimeout(timer);
+      controller.abort();
+    };
+  }, [query, language, source]);
+  return (
+    <datalist id={id}>
+      {(query.trim().length < 2 ? [] : items).map((item) => (
+        <option key={item.code} value={item.code} label={item.title} />
+      ))}
+    </datalist>
+  );
+}
+
+function SavedSearches({ values }: { values: SearchState }) {
+  const hydrated = useSyncExternalStore(
+    subscribeHydration,
+    () => true,
+    () => false,
+  );
+  return hydrated ? <SavedSearchesContents values={values} /> : null;
+}
+
+function SavedSearchesContents({ values }: { values: SearchState }) {
+  const locale = useLocale();
+  const t = useTranslations("site");
+  const id = useId();
+  const [name, setName] = useState("");
+  const [saved, setSaved] = useState<{ name: string; href: string }[]>(() => {
+    try {
+      const stored = JSON.parse(
+        localStorage.getItem("circa:saved-searches") ?? "[]",
+      );
+      if (Array.isArray(stored))
+        return stored
+          .filter((item) => {
+            if (
+              !item ||
+              typeof item.name !== "string" ||
+              typeof item.href !== "string"
+            )
+              return false;
+            try {
+              const url = new URL(item.href, window.location.origin);
+              return (
+                url.origin === window.location.origin &&
+                /^\/(en|ko)\/site\/records$/.test(url.pathname)
+              );
+            } catch {
+              return false;
+            }
+          })
+          .slice(0, 20);
+    } catch {
+      /* Storage can be blocked by browser preferences. */
+    }
+    return [];
+  });
+  function save() {
+    const label = name.trim();
+    if (!label) return;
+    const href = `/${locale}${toSearchHref(values)}`;
+    const next = [
+      { name: label, href },
+      ...saved.filter((item) => item.name !== label),
+    ].slice(0, 20);
+    persistSavedSearches(next);
+    setSaved(next);
+    setName("");
+  }
+  return (
+    <section className={styles.savedSearches} aria-label={t("savedSearches")}>
+      <label htmlFor={id}>{t("savedSearchName")}</label>
+      <Input
+        id={id}
+        value={name}
+        maxLength={48}
+        onChange={(event) => setName(event.target.value)}
+      />
+      <Button type="button" variant="outline" size="sm" onClick={save}>
+        {t("savedSearchSave")}
+      </Button>
+      {saved.length > 0 && (
+        <ul>
+          {saved.map((item) => (
+            <li key={`${item.name}:${item.href}`}>
+              <a href={item.href}>{item.name}</a>
+              <button
+                type="button"
+                aria-label={t("savedSearchRemove", { name: item.name })}
+                onClick={() => {
+                  const next = saved.filter((savedItem) => savedItem !== item);
+                  persistSavedSearches(next);
+                  setSaved(next);
+                }}
+              >
+                ×
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
   );
 }
 
@@ -427,4 +674,12 @@ function FilterCheckbox({
 
 function subscribeHydration() {
   return () => {};
+}
+
+function persistSavedSearches(saved: { name: string; href: string }[]) {
+  try {
+    localStorage.setItem("circa:saved-searches", JSON.stringify(saved));
+  } catch {
+    /* Keep this tab usable when persistence is unavailable. */
+  }
 }

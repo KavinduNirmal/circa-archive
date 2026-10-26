@@ -16,7 +16,7 @@ public sealed class SearchClientContractTests
         {
             ["SEARCH_TYPES"] = "type", ["RECORD_CLASSES"] = "class", ["DISPLAY_STATUSES"] = "status",
             ["WARNING_TIERS"] = "warn", ["WARNING_DISCLOSURES"] = "disclosure", ["WARNING_TAGS"] = "warnTag",
-            ["SEARCH_PERIODS"] = "period", ["SEARCH_SORTS"] = "sort", ["SEARCH_LANGUAGES"] = "language"
+            ["CUSTODY_STATES"] = "custody", ["SEARCH_PERIODS"] = "period", ["SEARCH_SORTS"] = "sort", ["SEARCH_LANGUAGES"] = "language"
         };
         foreach (var (constant, key) in keys)
         {

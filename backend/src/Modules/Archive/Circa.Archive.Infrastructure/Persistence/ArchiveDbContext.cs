@@ -651,6 +651,8 @@ public sealed class ArchiveDbContext(DbContextOptions<ArchiveDbContext> options)
                 .HasForeignKey(x => x.IncidentId).OnDelete(DeleteBehavior.Cascade);
             b.HasIndex(x => new { x.OrgId, x.RecordId, x.IncidentId })
                 .HasDatabaseName("ix_org_mentions_source");
+            b.HasIndex(x => x.RawText).HasDatabaseName("ix_org_mentions_raw_text_trgm")
+                .HasMethod("gin").HasOperators("gin_trgm_ops");
         });
 
         builder.Entity<Recognition>(b =>

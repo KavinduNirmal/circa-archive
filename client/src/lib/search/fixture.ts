@@ -44,7 +44,14 @@ export type SearchResultItem = {
 
 export type SearchResponse = {
   items: SearchResultItem[];
-  page: { number: number; size: number; total: number; totalPages: number };
+  page: {
+    number: number;
+    size: number;
+    total: number;
+    totalPages: number;
+    nextCursor?: string | null;
+    previousCursor?: string | null;
+  };
   facets?: Record<string, { value: string; count: number }[]>;
   applied: SearchApplied;
   meta: {
@@ -57,6 +64,13 @@ export type SearchResponse = {
 export type SearchApplied = {
   q: string;
   holder: string | null;
+  mention: string | null;
+  org: string | null;
+  author: string | null;
+  tag: string | null;
+  character: string | null;
+  custody: string | null;
+  cursor: string | null;
   type: SearchType[];
   class: RecordClass[];
   status: DisplayStatus[];
@@ -199,7 +213,30 @@ export function searchFixture(
 ): SearchResponse {
   const query = state.q.trim().toLocaleLowerCase(state.language);
   const holder = state.holder.trim().toLocaleLowerCase();
+  const contains = (values: readonly string[] | undefined, term: string) =>
+    !term ||
+    Boolean(
+      values?.some((value) => value.toLowerCase().includes(term.toLowerCase())),
+    );
   const visible = entries
+    .filter(
+      (entry) =>
+        contains(entry.searchMentions, state.mention) &&
+        contains(
+          entry.searchOrganizations ??
+            (entry.klass === "organization"
+              ? [entry.code, entry.designation ?? ""]
+              : []),
+          state.org,
+        ) &&
+        contains(
+          entry.searchAuthor ? [entry.searchAuthor] : [],
+          state.author,
+        ) &&
+        contains(entry.searchTags, state.tag) &&
+        contains(entry.searchCharacters, state.character) &&
+        (!state.custody || entry.searchCustody === state.custody),
+    )
     .map(mapEntry)
     .filter(
       (item) =>
@@ -308,6 +345,13 @@ export function searchFixture(
     applied: {
       q: state.q,
       holder: state.holder || null,
+      mention: state.mention || null,
+      org: state.org || null,
+      author: state.author || null,
+      tag: state.tag || null,
+      character: state.character || null,
+      custody: state.custody || null,
+      cursor: state.cursor || null,
       type: state.types,
       class: state.classes,
       status: state.statuses,
@@ -324,11 +368,7 @@ export function searchFixture(
       limit: state.limit,
     },
     meta: {
-      codeMatch: exactCode
-        ? "exact"
-        : query && /^[A-Z]+-[A-Z0-9-]+$/i.test(query)
-          ? "missing"
-          : null,
+      codeMatch: exactCode ? "exact" : codeMatchMetadata(query),
       holderMatch: matchingHolder ? "exact" : holderPrefix ? "prefix" : "none",
       language: state.language,
     },
@@ -351,4 +391,21 @@ function highlightRanges(
     cursor = start + lowerQuery.length;
   }
   return ranges;
+}
+
+function codeMatchMetadata(query: string): "reserved" | "missing" | null {
+  if (/^ORG-[A-Z]-[0-9]{1,18}$/i.test(query)) return "missing";
+  const match = /^(INC|EXP|EVI|ORG|CHR|ITM)-([0-9]{1,19})$/i.exec(query);
+  if (!match || BigInt(match[2]) > BigInt("9223372036854775807")) return null;
+  const reserved: Record<string, number> = {
+    INC: 7539,
+    EXP: 288901,
+    EVI: 35782,
+    ORG: 5428,
+    CHR: 18256,
+    ITM: -1,
+  };
+  return BigInt(match[2]) <= BigInt(reserved[match[1].toUpperCase()])
+    ? "reserved"
+    : "missing";
 }

@@ -67,8 +67,8 @@ app.UseMiddleware<Circa.Auth.Infrastructure.Security.OriginValidationMiddleware>
 
 app.UseMiddleware<Circa.Auth.Infrastructure.Security.AuthRateLimitPartitionMiddleware>();
 
-app.UseRateLimiter();
 app.UseAuthentication();
+app.UseRateLimiter();
 app.UseAuthorization();
 
 ApiVersionSet versionSet = app.NewApiVersionSet()
@@ -81,13 +81,15 @@ var api = app.MapGroup("/api/v{version:apiVersion}")
 
 api.MapGet("/", () => "CIRCA API").HasApiVersion(1, 0).AllowAnonymous();
 api.MapAuthEndpoints();
-api.MapSearchEndpoints(async context =>
+async Task<Guid?> ResolveArchiveViewer(HttpContext context)
 {
     if (context.User.Identity?.IsAuthenticated != true) return null;
     var authorization = context.RequestServices.GetRequiredService<IAuthorizationService>();
     var session = await authorization.AuthorizeAsync(context.User, null, [new LiveSessionRequirement()]);
-    return session.Succeeded && Guid.TryParse(context.User.FindFirst("sub")?.Value, out var userId) ? userId : (Guid?)null;
-}).HasApiVersion(1, 0);
+    return session.Succeeded && Guid.TryParse(context.User.FindFirst("sub")?.Value, out var userId) ? userId : null;
+}
+api.MapSearchEndpoints(ResolveArchiveViewer).HasApiVersion(1, 0);
+api.MapArchiveDestinationEndpoints(ResolveArchiveViewer, AuthPolicies.Writes).HasApiVersion(1, 0);
 
 var records = api.MapGroup("/records").HasApiVersion(1, 0);
 records.MapGet("/", () => Results.Ok(Array.Empty<object>())).AllowAnonymous();

@@ -63,24 +63,37 @@ public static class SearchEndpoints
 
     private static IResult Invalid(IReadOnlyDictionary<string, string[]> errors) => Results.Problem(
         statusCode: 400, title: "Invalid search filter",
-        extensions: new Dictionary<string, object?> { ["code"] = "invalid_search_filter", ["errors"] = errors });
+        extensions: new Dictionary<string, object?> { ["code"] = errors.ContainsKey("cursor") ? "invalid_cursor" : "invalid_search_filter", ["errors"] = errors });
 
     private static void SetLinks(HttpContext context, SearchPage page)
     {
         // Preserve all repeated query values, while canonicalizing the language alias.
-        var values = context.Request.Query.Where(x => x.Key is not ("page" or "lang"))
+        var values = context.Request.Query.Where(x => x.Key is not ("page" or "cursor" or "lang"))
             .SelectMany(x => x.Value.Select(value => new KeyValuePair<string, string?>(x.Key, value))).ToList();
         if (!context.Request.Query.ContainsKey("language") && context.Request.Query.TryGetValue("lang", out var alias))
             values.Add(new("language", alias.ToString()));
-        string Link(int number, string relation)
+        string PageLink(int number, string relation)
         {
             var query = QueryString.Create(values.Append(new("page", number.ToString(System.Globalization.CultureInfo.InvariantCulture))));
             return $"<{context.Request.PathBase}{context.Request.Path}{query}>; rel=\"{relation}\"";
         }
+        string CursorLink(string? cursor, string relation)
+        {
+            IEnumerable<KeyValuePair<string, string?>> queryValues = values;
+            if (cursor is null) queryValues = values.Append(new("page", "1"));
+            else if (cursor.Length > 0) queryValues = values.Append(new("cursor", cursor));
+            return $"<{context.Request.PathBase}{context.Request.Path}{QueryString.Create(queryValues)}>; rel=\"{relation}\"";
+        }
         var last = Math.Clamp(page.TotalPages, 1, 100);
-        var links = new List<string> { Link(1, "first"), Link(last, "last") };
-        if (page.Number > 1) links.Add(Link(Math.Min(page.Number - 1, last), "prev"));
-        if (page.Number < last) links.Add(Link(page.Number + 1, "next"));
+        var cursorRequest = context.Request.Query.ContainsKey("cursor");
+        var links = new List<string> { PageLink(1, "first") };
+        if (!cursorRequest && page.Number > 1)
+            links.Add(PageLink(page.Number - 1, "prev"));
+        if (!cursorRequest && page.TotalPages > 1)
+            links.Add(PageLink(last, "last"));
+        if (cursorRequest && page.PreviousCursor is not null)
+            links.Add(page.PreviousCursor.Length == 0 ? PageLink(Math.Max(1, page.Number - 1), "prev") : CursorLink(page.PreviousCursor, "prev"));
+        if (page.NextCursor is not null) links.Add(CursorLink(page.NextCursor, "next"));
         context.Response.Headers.Link = string.Join(", ", links);
     }
 }

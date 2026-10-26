@@ -60,3 +60,8 @@ private cache headers, pagination links, rate limits/Retry-After, real database
 timeouts, generic unexpected-error responses, and sealed-record access through live/revoked sessions. Moderators and
 owners receive stubs unless explicitly approved; revocation falls back to public
 results rather than failing the public endpoint.
+
+`ArchiveDestinationEndpointTests` covers private destination responses, stale-cookie
+guests, explicit incident acknowledgment, real organization bodies, idempotent
+access requests, moderator/owner stubs, approved readers, revoked sessions, and
+hidden-parent 404s. Run with `--filter FullyQualifiedName~ArchiveDestination`.

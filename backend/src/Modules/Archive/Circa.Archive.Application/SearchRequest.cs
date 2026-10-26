@@ -4,7 +4,8 @@ namespace Circa.Archive.Application;
 
 public sealed record SearchRequest(
     string Query, string Holder, IReadOnlyDictionary<string, string[]> Filters,
-    string Period, DateOnly? From, DateOnly? To, string Language, string Sort, int Page, int Limit);
+    string Period, DateOnly? From, DateOnly? To, string Language, string Sort, int Page, int Limit,
+    SearchCursor? Cursor = null, string CursorToken = "");
 
 public sealed record SearchValidationResult(SearchRequest? Request, IReadOnlyDictionary<string, string[]> Errors);
 
@@ -24,7 +25,8 @@ public static class SearchRequestValidator
         ["warn"] = ["red", "yellow", "green"],
         ["disclosure"] = ["none", "no-warnings-apply", "not-provided"],
         ["warnTag"] = WarningTags,
-        ["excludeWarnTag"] = WarningTags
+        ["excludeWarnTag"] = WarningTags,
+        ["custody"] = ["unknown", "unclaimed", "claimed", "disputed", "lost", "destroyed"]
     };
 
     public static SearchValidationResult Parse(IReadOnlyDictionary<string, string[]> input)
@@ -71,6 +73,18 @@ public static class SearchRequestValidator
 
         var query = Scalar("q");
         var holder = Scalar("holder");
+        foreach (var (key, maxLength) in new Dictionary<string, int>
+        {
+            ["mention"] = 120, ["org"] = 120, ["author"] = 64, ["tag"] = 64, ["character"] = 120
+        })
+        {
+            var value = Scalar(key);
+            if (value.Length > maxLength) Reject(key, $"Use at most {maxLength} characters.");
+            filters[key] = value.Length == 0 ? [] : [value];
+        }
+        filters["custody"] = Choice("custody", "", "", "unknown", "unclaimed", "claimed", "disputed", "lost", "destroyed") is { Length: > 0 } custody
+            ? [custody]
+            : [];
         if (query.Length > 200) Reject("q", "Use at most 200 characters.");
         if (holder.Length > 120) Reject("holder", "Use at most 120 characters.");
         var from = Date("from");
@@ -86,8 +100,16 @@ public static class SearchRequestValidator
         if (!int.TryParse(Scalar("limit", "20"), NumberStyles.None, CultureInfo.InvariantCulture, out var limit)
             || limit is not (10 or 20 or 50)) Reject("limit", "Use 10, 20, or 50.");
 
+        var cursorToken = Scalar("cursor");
+        SearchCursor? cursor = null;
+        if (cursorToken.Length > 2048 || (cursorToken.Length > 0 &&
+            (!System.Text.RegularExpressions.Regex.IsMatch(cursorToken, "^[A-Za-z0-9_-]{16,2048}$") ||
+             !SearchCursorCodec.TryDecode(cursorToken, out cursor))))
+            Reject("cursor", "Use a valid continuation cursor.");
+        if (cursor is not null && cursor.Sort != sort) Reject("cursor", "The cursor does not match the selected sort order.");
+
         return new(errors.Count == 0
-            ? new(query, holder, filters, period, from, to, language, sort, page, limit)
+            ? new(query, holder, filters, period, from, to, language, sort, cursor?.Page ?? page, limit, cursor, cursorToken)
             : null, errors);
     }
 }

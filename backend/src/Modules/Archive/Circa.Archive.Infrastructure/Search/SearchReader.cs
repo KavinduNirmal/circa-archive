@@ -25,6 +25,12 @@ public sealed class SearchReader(ArchiveDbContext database)
             var root = document.RootElement;
             var items = root.GetProperty("rows").EnumerateArray().Select(row => Map(row, request.Query)).ToArray();
             var total = root.GetProperty("total").GetInt64();
+            var nextCursor = root.GetProperty("next_cursor").ValueKind == JsonValueKind.Null
+                ? null
+                : SearchCursorCodec.Encode(ReadCursor(root.GetProperty("next_cursor"), request.Cursor));
+            var previousCursor = request.Cursor?.Previous is { } previous
+                ? SearchCursorCodec.Encode(previous with { Previous = previous.Previous })
+                : request.Cursor is not null || request.Page > 1 ? "" : null;
             var facets = new Dictionary<string, SearchFacet[]>();
             foreach (var key in new[] { "type", "class", "status", "warn", "disclosure", "warnTag", "period" })
                 facets[key] = root.GetProperty("facets").TryGetProperty(key, out var values)
@@ -43,13 +49,29 @@ public sealed class SearchReader(ArchiveDbContext database)
             applied["sort"] = request.Sort;
             applied["page"] = request.Page;
             applied["limit"] = request.Limit;
-            return new(items, new(request.Page, request.Limit, total, (int)Math.Ceiling((double)total / request.Limit)),
+            foreach (var key in new[] { "mention", "org", "author", "tag", "character", "custody" })
+                applied[key] = request.Filters.GetValueOrDefault(key)?.FirstOrDefault();
+            applied["cursor"] = request.CursorToken.Length == 0 ? null : request.CursorToken;
+            var pageNumber = request.Cursor?.Page ?? request.Page;
+            return new(items, new(pageNumber, request.Limit, total, (int)Math.Ceiling((double)total / request.Limit), nextCursor, previousCursor),
                 facets, applied, new(codeMatch, holderMatch, request.Language));
         }
         finally
         {
             await database.Database.CloseConnectionAsync();
         }
+    }
+
+    private static SearchCursor ReadCursor(JsonElement value, SearchCursor? current)
+    {
+        var boundary = new SearchCursor(
+            value.GetProperty("sort").GetString()!,
+            value.GetProperty("filedAt").GetDateTimeOffset(),
+            value.GetProperty("id").GetGuid(),
+            value.GetProperty("score").GetDouble(),
+            value.GetProperty("title").GetString()!,
+            value.GetProperty("page").GetInt32());
+        return boundary with { Previous = current is null ? null : current with { Previous = null } };
     }
 
     private static SearchItem Map(JsonElement row, string query)

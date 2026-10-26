@@ -134,7 +134,7 @@ describe("the archive home", () => {
       expect(form).toHaveAttribute("action", "/en/site/records");
       expect(form).toHaveAttribute("method", "get");
       expect(
-        within(form).getByRole("searchbox", { name: site.searchLabel }),
+        within(form).getByRole("combobox", { name: site.searchLabel }),
       ).toHaveAttribute("name", "q");
     }
   });
@@ -1186,4 +1186,39 @@ it("shows an approved sealed record excerpt without an access-request notice", (
   expect(
     screen.queryByText(new RegExp(site.searchSealedRecord)),
   ).not.toBeInTheDocument();
+});
+
+it("resets cursor pagination when removing a repeated filter", () => {
+  const state = parseSearchState({
+    status: "sealed",
+    cursor: "a".repeat(16),
+    page: "3",
+  });
+  renderWithIntl(
+    <ArchiveRecords
+      state={state}
+      outcome={{ status: "success", response: searchFixture(state) }}
+    />,
+  );
+  expect(
+    screen
+      .getByRole("link", {
+        name: siteT("removeFilter", { filter: site.searchStatus }),
+      })
+      .getAttribute("href"),
+  ).not.toContain("cursor=");
+});
+
+it("explains an empty archive without claiming filters caused it", () => {
+  const state = parseSearchState({});
+  renderWithIntl(
+    <ArchiveRecords
+      state={state}
+      outcome={{ status: "success", response: searchFixture(state, []) }}
+    />,
+  );
+  expect(
+    screen.getAllByText("No entries have been filed in this archive yet.")
+      .length,
+  ).toBeGreaterThan(0);
 });

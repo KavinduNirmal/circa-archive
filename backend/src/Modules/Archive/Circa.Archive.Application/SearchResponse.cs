@@ -15,6 +15,7 @@ public sealed record SearchHighlight(int Start, int End);
 public sealed record SearchWarning(string? Tier, string? Disclosure, string[] Tags);
 public sealed record SearchHolder(string HolderCode);
 public sealed record SearchParent(string Type, string Code, string Title);
-public sealed record SearchPage(int Number, int Size, long Total, int TotalPages);
+public sealed record SearchPage(int Number, int Size, long Total, int TotalPages,
+    string? NextCursor = null, string? PreviousCursor = null);
 public sealed record SearchFacet(string Value, long Count);
 public sealed record SearchMeta(string? CodeMatch, string HolderMatch, string Language);

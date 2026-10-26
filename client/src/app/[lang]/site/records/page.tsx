@@ -7,6 +7,7 @@ import type { SearchVocabulary } from "@/lib/search/fixture";
 import { getSearchResults } from "@/lib/search/api";
 import {
   parseSearchState,
+  searchQueryNotices,
   toSearchHref,
   type SearchParamsInput,
 } from "@/lib/search/query";
@@ -26,6 +27,13 @@ export async function generateMetadata({
   const filtered = Boolean(
     state.q ||
     state.holder ||
+    state.mention ||
+    state.org ||
+    state.author ||
+    state.tag ||
+    state.character ||
+    state.custody ||
+    state.cursor ||
     state.types.length ||
     state.classes.length ||
     state.statuses.length ||
@@ -62,13 +70,15 @@ export default async function RecordsPage({
   const state = parseSearchState(input);
   if (Object.values(input).some((value) => value === ""))
     redirect(`/${lang}${toSearchHref(state)}`);
-  // Character and recovery links remain API-capable but have no public destination yet.
   state.types = state.types.filter((type) =>
     SEARCH_ENABLED_TYPES.includes(
       type as (typeof SEARCH_ENABLED_TYPES)[number],
     ),
   );
-  const t = await getTranslations({ locale: lang, namespace: "site" });
+  const t = await getTranslations({
+    locale: state.language,
+    namespace: "site",
+  });
   const vocabulary: SearchVocabulary = {
     types: {
       incident: t("searchOptionIncident"),
@@ -110,5 +120,11 @@ export default async function RecordsPage({
     },
   };
   const outcome = await getSearchResults(state, vocabulary);
-  return <ArchiveRecords state={state} outcome={outcome} />;
+  return (
+    <ArchiveRecords
+      state={state}
+      outcome={outcome}
+      notices={searchQueryNotices(input)}
+    />
+  );
 }

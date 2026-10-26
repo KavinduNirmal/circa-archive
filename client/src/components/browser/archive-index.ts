@@ -45,6 +45,13 @@ export type ArchiveEntry = {
   searchClass?: "incident" | "exploration" | "evidence" | "rumour";
   searchStatus?:
     "on-file" | "contested" | "sealed" | "restricted" | "erased" | "tombstoned";
+  /** Public discovery relationships used by the fixture search adapter. */
+  searchMentions?: readonly string[];
+  searchOrganizations?: readonly string[];
+  searchAuthor?: string;
+  searchTags?: readonly string[];
+  searchCharacters?: readonly string[];
+  searchCustody?: string;
   clearance: string;
   abstract: string;
   warnings: readonly ArchiveWarningTag[];

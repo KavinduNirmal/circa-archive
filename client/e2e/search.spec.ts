@@ -6,7 +6,9 @@ test("search filters use the canonical address and sealed incidents stay stubs",
   await page.goto("/en/site/records");
   const form = page.getByRole("search").nth(1);
   await form.locator("summary").click();
-  await form.getByRole("searchbox").fill("INC-00042");
+  await form
+    .getByRole("combobox", { name: "Search the archive" })
+    .fill("INC-00042");
   await form
     .locator("fieldset")
     .filter({ hasText: "Result type" })
@@ -46,7 +48,9 @@ test("the global search form submits without JavaScript", async ({
     await page.goto("/en/site/records");
     const form = page.getByRole("search").nth(1);
     await form.locator("summary").click();
-    await form.getByRole("searchbox").fill("INC-00042");
+    await form
+      .getByRole("combobox", { name: "Search the archive" })
+      .fill("INC-00042");
     await form
       .locator("fieldset")
       .filter({ hasText: "Result type" })

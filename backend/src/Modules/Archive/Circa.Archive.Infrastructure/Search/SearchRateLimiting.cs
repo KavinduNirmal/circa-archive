@@ -8,13 +8,18 @@ namespace Circa.Archive.Infrastructure.Search;
 
 internal sealed class SearchRateLimiting(IConfiguration configuration) : IRateLimiterPolicy<string>
 {
-    public RateLimitPartition<string> GetPartition(HttpContext context) => RateLimitPartition.GetFixedWindowLimiter(
-        context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+    public RateLimitPartition<string> GetPartition(HttpContext context)
+    {
+        var authenticated = context.User.Identity?.IsAuthenticated == true &&
+            Guid.TryParse(context.User.FindFirst("sub")?.Value, out _);
+        var key = authenticated ? $"user:{context.User.FindFirst("sub")!.Value}" : $"ip:{context.Connection.RemoteIpAddress?.ToString() ?? "unknown"}";
+        return RateLimitPartition.GetFixedWindowLimiter(key,
         _ => new FixedWindowRateLimiterOptions
         {
-            PermitLimit = Math.Clamp(configuration.GetValue("Search:PermitLimit", 60), 1, 10000),
+            PermitLimit = Math.Clamp(authenticated ? configuration.GetValue("Search:AuthenticatedPermitLimit", 120) : configuration.GetValue("Search:PermitLimit", 60), 1, 10000),
             Window = TimeSpan.FromMinutes(1), QueueLimit = 0, AutoReplenishment = true
         });
+    }
 
     public Func<OnRejectedContext, CancellationToken, ValueTask>? OnRejected => async (context, token) =>
     {

@@ -67,6 +67,27 @@ public sealed class SearchRequestTests
         Assert.Equal(["self-harm"], request.Filters["excludeWarnTag"]);
     }
 
+    [Fact]
+    public void AcceptsCursorWithOnePreviousBoundaryAndRejectsNestedHistory()
+    {
+        var previous = new SearchCursor("newest", DateTimeOffset.UtcNow, Guid.NewGuid(), 0, "First boundary", 2);
+        var current = previous with { Id = Guid.NewGuid(), Page = 3, Previous = previous };
+        var token = SearchCursorCodec.Encode(current);
+        var request = Assert.IsType<SearchRequest>(Parse(("cursor", [token])).Request);
+        Assert.Equal(3, request.Page);
+        Assert.Equal(previous, request.Cursor!.Previous);
+        Assert.Null(Parse(("cursor", [SearchCursorCodec.Encode(current with { Previous = current })])).Request);
+    }
+
+    [Fact]
+    public void CursorWithFullLengthKoreanTitlesFitsTheTransportLimit()
+    {
+        var previous = new SearchCursor("title", DateTimeOffset.UtcNow, Guid.NewGuid(), 0, new string('한', 120), 2);
+        var token = SearchCursorCodec.Encode(previous with { Page = 3, Previous = previous });
+        Assert.True(token.Length <= 2048, $"Cursor length: {token.Length}");
+        Assert.NotNull(Parse(("cursor", [token]), ("sort", ["title"])).Request);
+    }
+
     private static SearchValidationResult Parse(params (string Key, string[] Values)[] values)
         => SearchRequestValidator.Parse(values.ToDictionary(value => value.Key, value => value.Values));
 }

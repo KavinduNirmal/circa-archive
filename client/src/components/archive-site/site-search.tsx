@@ -10,7 +10,10 @@ export function SiteSearch(props: {
   const locale = useLocale();
   return (
     <NextIntlClientProvider locale={locale} messages={{ site: messages.site }}>
-      <SearchForm {...props} />
+      <SearchForm
+        {...props}
+        source={process.env.SEARCH_SOURCE === "api" ? "api" : "fixture"}
+      />
     </NextIntlClientProvider>
   );
 }

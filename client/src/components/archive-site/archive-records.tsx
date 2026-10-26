@@ -322,7 +322,11 @@ function LegacyArchiveRecords({
 const labelKey = (value: string) =>
   `searchOption${value.replace(/(^|-)([a-z])/g, (_, _dash, letter: string) => letter.toUpperCase())}`;
 
-type GlobalSearchProps = { state: SearchState; outcome: SearchOutcome };
+type GlobalSearchProps = {
+  state: SearchState;
+  outcome: SearchOutcome;
+  notices?: ("legacy" | "invalid")[];
+};
 type LegacySearchProps = {
   query?: string;
   klass?: ArchiveClass | "all";
@@ -332,10 +336,14 @@ type LegacySearchProps = {
 
 export function ArchiveRecords(props: GlobalSearchProps | LegacySearchProps) {
   if (!("state" in props)) return <LegacyArchiveRecords {...props} />;
-  return <GlobalSearchRecords state={props.state} outcome={props.outcome} />;
+  return <GlobalSearchRecords {...props} />;
 }
 
-function GlobalSearchRecords({ state, outcome }: GlobalSearchProps) {
+function GlobalSearchRecords({
+  state,
+  outcome,
+  notices = [],
+}: GlobalSearchProps) {
   const t = useTranslations("site");
   const locale = useLocale();
   if (outcome.status !== "success") {
@@ -370,6 +378,12 @@ function GlobalSearchRecords({ state, outcome }: GlobalSearchProps) {
   const pages = response.page.totalPages;
   const hasFilters = Boolean(
     state.holder ||
+    state.mention ||
+    state.org ||
+    state.author ||
+    state.tag ||
+    state.character ||
+    state.custody ||
     state.types.length ||
     state.classes.length ||
     state.statuses.length ||
@@ -386,7 +400,9 @@ function GlobalSearchRecords({ state, outcome }: GlobalSearchProps) {
     response.page.total === 0
       ? state.q
         ? t("searchNone", { query: state.q })
-        : t("filterNone")
+        : hasFilters
+          ? t("filterNone")
+          : t("searchEmptyArchive")
       : state.q
         ? t("searchResults", { count: response.page.total, query: state.q })
         : hasFilters
@@ -407,6 +423,15 @@ function GlobalSearchRecords({ state, outcome }: GlobalSearchProps) {
           <SiteSearch values={state} />
           <p className={styles.note}>{t("indexNote")}</p>
         </header>
+        {notices.map((notice) => (
+          <p key={notice} className={styles.note}>
+            {t(
+              notice === "legacy"
+                ? "searchLegacyFilters"
+                : "searchInvalidFilters",
+            )}
+          </p>
+        ))}
         <SearchActive state={state} />
         <p className={styles.count} role="status" aria-live="polite">
           {summary}
@@ -423,7 +448,9 @@ function GlobalSearchRecords({ state, outcome }: GlobalSearchProps) {
                   ? t("searchCodeMissing", { code: state.q })
                   : state.q
                     ? t("searchNoMatchesHelp")
-                    : t("searchFilterNoMatchesHelp")}
+                    : hasFilters
+                      ? t("searchFilterNoMatchesHelp")
+                      : t("searchEmptyArchive")}
             </p>
             <a href={`/${locale}/site/records`}>{t("clearFilters")}</a>
           </div>
@@ -460,6 +487,7 @@ function SearchActive({ state }: { state: SearchState }) {
         ...state,
         [field]: values.filter((item) => item !== value),
         page: 1,
+        cursor: "",
       } as SearchState;
       chips.push({
         label,
@@ -496,6 +524,29 @@ function SearchActive({ state }: { state: SearchState }) {
       href: `/${locale}${toSearchHref(state, { holder: "", page: 1 })}`,
       key: "holder",
     });
+  for (const [key, label] of [
+    ["mention", t("searchFilter_mention")],
+    ["org", t("searchFilter_org")],
+    ["author", t("searchFilter_author")],
+    ["tag", t("searchFilter_tag")],
+    ["character", t("searchFilter_character")],
+  ] as const) {
+    const value = state[key];
+    if (value)
+      chips.push({
+        label,
+        value,
+        href: `/${locale}${toSearchHref(state, { [key]: "", page: 1 })}`,
+        key,
+      });
+  }
+  if (state.custody)
+    chips.push({
+      label: t("searchFilter_custody"),
+      value: t(`searchCustody_${state.custody}`),
+      href: `/${locale}${toSearchHref(state, { custody: "", page: 1 })}`,
+      key: "custody",
+    });
   if (state.language !== "en")
     chips.push({
       label: t("searchLanguage"),
@@ -522,6 +573,13 @@ function SearchActive({ state }: { state: SearchState }) {
     ...state,
     q: "",
     holder: "",
+    mention: "",
+    org: "",
+    author: "",
+    tag: "",
+    character: "",
+    custody: "",
+    cursor: "",
     types: [],
     classes: [],
     statuses: [],
@@ -761,6 +819,39 @@ function SearchPagination({
   const t = useTranslations("site");
   const locale = useLocale();
   const pages = response.page.totalPages;
+  if (
+    state.cursor ||
+    response.page.nextCursor !== undefined ||
+    response.page.previousCursor !== undefined
+  ) {
+    if (!response.page.nextCursor && response.page.previousCursor === null)
+      return null;
+    return (
+      <nav
+        className={styles.searchPagination}
+        aria-label={t("searchPagination")}
+      >
+        {response.page.previousCursor !== null &&
+          response.page.previousCursor !== undefined && (
+            <a
+              href={`/${locale}${toSearchHref(state, { cursor: response.page.previousCursor, page: response.page.number - 1 })}`}
+            >
+              {t("searchPrevious")}
+            </a>
+          )}
+        <span aria-current="page">
+          {t("searchPageCount", { page: response.page.number, pages })}
+        </span>
+        {response.page.nextCursor && (
+          <a
+            href={`/${locale}${toSearchHref(state, { cursor: response.page.nextCursor, page: response.page.number + 1 })}`}
+          >
+            {t("searchNext")}
+          </a>
+        )}
+      </nav>
+    );
+  }
   if (pages < 2) return null;
   return (
     <nav className={styles.searchPagination} aria-label={t("searchPagination")}>

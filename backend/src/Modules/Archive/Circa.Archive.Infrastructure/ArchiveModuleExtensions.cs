@@ -23,6 +23,7 @@ public static class ArchiveModuleExtensions
         });
 
         services.AddScoped<SearchReader>();
+        services.AddScoped<ArchiveDestinationReader>();
         services.AddRateLimiter(options => options.AddPolicy<string, SearchRateLimiting>("archive_search"));
 
         return services;

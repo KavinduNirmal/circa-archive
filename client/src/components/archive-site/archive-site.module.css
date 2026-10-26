@@ -517,6 +517,62 @@
   text-transform: uppercase;
 }
 
+.savedSearches {
+  display: grid;
+  grid-template-columns: minmax(120px, 1fr) auto auto;
+  align-items: end;
+  gap: 6px;
+  padding-top: 8px;
+  border-top: 1px solid var(--circa-rule);
+}
+
+.savedSearches > label {
+  grid-column: 1 / -1;
+  color: var(--circa-ink-soft);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.savedSearches input {
+  min-height: 30px;
+  font-size: 11px;
+}
+
+.savedSearches ul {
+  display: flex;
+  grid-column: 1 / -1;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+  margin: 0;
+  padding: 6px 0 0;
+  border-top: 1px solid var(--circa-rule);
+  list-style: none;
+  font-size: 10px;
+}
+
+.savedSearches a {
+  color: var(--circa-link);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.savedSearches li {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.savedSearches li button {
+  min-width: 22px;
+  min-height: 22px;
+  border: 1px solid var(--circa-rule);
+  background: var(--circa-paper-sunken);
+  color: var(--circa-ink-soft);
+  cursor: pointer;
+}
+
 .globalFilterPanel .applyKey,
 .filterPanel .filterPanelApply {
   justify-self: start;
@@ -557,6 +613,13 @@
   background: var(--circa-paper-raised);
   font-family: "Courier New", monospace;
   text-decoration: none;
+}
+
+.searchPagination > span {
+  padding: 4px 8px;
+  color: var(--circa-ink-soft);
+  font-family: "Courier New", monospace;
+  font-size: 10px;
 }
 
 .searchPagination a[aria-current="page"] {

@@ -27,6 +27,11 @@ Defines the `archive` schema and the indexes that support its planned read paths
 - **Array and tag filters**: GIN indexes cover `warning_tags`, recovery
   `alternative_names`, and the normalized `record_tags.tag` lookup. The tag index
   is B-tree because tags are an exact controlled vocabulary.
+- **Relationship search**: `org_mentions` keeps authored mention text and its
+  optional resolved organization link attached to an incident or record. Its
+  source and target indexes plus a trigram index on `raw_text` support `mention`
+  and resolved `org` filters without copying relationship text into each searchable
+  document.
 
 The scaffold creates new empty tables, so the initial index build is
 non-concurrent. Future index changes on populated tables should use

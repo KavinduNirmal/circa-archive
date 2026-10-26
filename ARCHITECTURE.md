@@ -152,7 +152,7 @@ Users interact with a diegetic desktop environment. Records are authored in Mark
 
 ### 3.5 Database Schema
 
-The schema below has been revised for the entity and reference model in the 2026-10-21 development notes. The core archive entity tables and their search indexes are now scaffolded in `Circa.Archive.Domain` and `Circa.Archive.Infrastructure`; global search is implemented; archive CRUD and destination read endpoints remain pending. The remaining schema is still conceptual: it does not yet model versioned foundational constraints, scoped Continuity Stewards and succession, or separate publication, evidentiary, and per-continuity adoption states. Temporary-entity promotion and reference resolution are specified as transactional behavior, but their exact EF Core mapping remains undecided.
+The schema below has been revised for the entity and reference model in the 2026-10-21 development notes. The core archive entity tables and their search indexes are now scaffolded in `Circa.Archive.Domain` and `Circa.Archive.Infrastructure`; global search is implemented; scoped destination reads and sealed-record access requests are implemented; general archive CRUD remains pending. The remaining schema is still conceptual: it does not yet model versioned foundational constraints, scoped Continuity Stewards and succession, or separate publication, evidentiary, and per-continuity adoption states. Temporary-entity promotion and reference resolution are specified as transactional behavior, but their exact EF Core mapping remains undecided.
 
 Naming below is provisional. `Records` means filings against an Incident (`EXP`, `EVI`, `RUM`); the originating Incident remains its own table. `Recoveries` is the archive term for items and appears as `ITM` in display codes.
 
@@ -384,7 +384,8 @@ CREATE TABLE OrgMentions (
     RecordId UUID NULL REFERENCES Records(Id),
     IncidentId UUID NULL REFERENCES Incidents(Id),
     RawText VARCHAR(255) NOT NULL,
-    CreatedAt TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    CreatedAt TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    CHECK ((RecordId IS NOT NULL) <> (IncidentId IS NOT NULL))
 );
 
 CREATE TABLE Recognitions (
@@ -757,7 +758,18 @@ Retry-After. A 3-second SQL timeout returns 503 `search_unavailable`.
 
 See [search implementation and verification](backend/src/Modules/Archive/Circa.Archive.Infrastructure/Search/README.md)
 and the [additive schema upgrade](backend/src/Modules/Archive/Circa.Archive.Infrastructure/Persistence/README.md).
-The client remains fixture-backed until destination pages are integrated.
+The client defaults to fixtures. `SEARCH_SOURCE=api` selects the API for search,
+incident/record pages, and the organization directory. `GET /api/v1/archive/{code}`
+returns safe destination metadata and nullable Markdown; `acknowledge=true` reveals
+sealed incident prose only at the destination. Records require a dated approval for
+the live viewer, including owners/moderators. Visible rumours are nested under their
+incident with `rumour-{referenceNumber}` anchors. Organization canonical/legacy code
+reads populate the filtered directory entry. Hidden entries and hidden-parent filings
+return 404. `POST /api/v1/archive/{code}/access-requests` requires the live write policy
+and creates one pending request per viewer/filing under an advisory transaction lock.
+Existing decisions remain unchanged; approval administration is outside this phase.
+These routes use private/no-store responses and the existing search limiter.
+`bun run --cwd=client test:e2e:search` exercises this path against disposable PostgreSQL.
 
 ### 4.11 Real-time (SignalR)
 
@@ -1218,12 +1230,26 @@ The full public regulations should be published alongside the [Author guide](doc
 - Full-text search across incidents, records, organizations, characters, and recoveries.
 - Implemented filters: cosmetic holder code, entity type, filing class, display status,
   exact lifecycle/access/advisory, warning tier/disclosure/included and excluded tags,
-  filing date bounds/period, language, sorting, and pagination.
-- Deferred: resolved organization/author/tag/character/custody filters, broader mentions,
-  classification UI, cursors, saved searches, and search-as-you-type. Holder does not
-  resolve affiliations, claims, or custody; a future mentions model owns that behavior.
-- The API returns all five entity types. The current UI enables incident, record, and
-  organization and keeps fixture transport until those destinations use real data.
+  filing date bounds/period, language, organization/author/tag/character/custody, sorting,
+  cursor pagination, and common-filtered facets. A filter registry keeps query parsing,
+  form controls, active chips, and serialization aligned.
+- `mention` matches authored display text in normalized `archive.org_mentions`; `org`
+  resolves those links to organization codes/names and does not infer relationships from
+  arbitrary body text. `character` matches public
+  character codes/names and recovery relationships. `custody` applies to recovery registry
+  states. `tag` matches record tags.
+- `author` matches only public `auth.users.display_name` attribution. It never accepts
+  usernames, email addresses, or account IDs. Sealed entries keep title-only matching;
+  no filter changes the body's visibility rules.
+- Search-as-you-type waits 320 ms, requests at most ten visible results, and leaves the
+  committed query in the URL until submission. Saved searches are named links held in
+  the current browser's local storage; they are not synced across devices or accounts.
+- Cursor tokens bind continuation to the selected sort order and last result tuple.
+  They support next/previous navigation without offsets; ordinary `page` remains accepted
+  for compatibility and bounded links. Relevance prioritizes exact codes, code prefixes,
+  exact/prefix titles, title similarity, English FTS, then general trigram similarity.
+- The API and UI expose all five result types. Character and recovery destinations read
+  active public dossier content through `/api/v1/archive/{code}`.
 - Search must match display vocabulary (for example `Corroborate`, `On file`, `Restricted`) rather than internal enum names.
 - Reference lookup accepts typed codes and resolves them through the same visibility rules as record reading.
 

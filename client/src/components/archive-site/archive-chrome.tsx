@@ -218,7 +218,9 @@ export function ArchiveChrome({
               </span>
             ))}
           </span>
-          <span>{t("indexCount", { count: SITE_INDEX.length })}</span>
+          {process.env.SEARCH_SOURCE !== "api" && (
+            <span>{t("indexCount", { count: SITE_INDEX.length })}</span>
+          )}
         </nav>
 
         {children}

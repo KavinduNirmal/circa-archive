@@ -95,7 +95,7 @@ Use plain build progress to see dependency-layer reuse:
 The website serves port 3001. Compose sets server-only
 `API_ORIGIN=http://circa-api:8080`; the ingress gateway forwards browser `/api/*` calls directly to the API.
 Global archive search uses fixtures by default. `SEARCH_SOURCE=api` selects the
-server-only `/api/v1/search` adapter for integration environments.
+server-only search adapter, incident/record readers, and organization directory for integration environments. Run `bun run test:e2e:search` for the isolated real-API browser suite.
 Host-run Next development still uses its API rewrites. Direct `bun run dev` defaults to `http://localhost:5040`,
 matching the Compose API's published port. Browser code never uses a Docker
 service hostname. The client health check requests `/api/v1/` through Next to

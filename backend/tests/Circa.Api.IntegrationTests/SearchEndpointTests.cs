@@ -65,6 +65,17 @@ public sealed class SearchEndpointTests(PostgresFixture postgres) : IClassFixtur
     }
 
     [Fact]
+    public async Task InvalidCursorReturnsItsDocumentedProblemCode()
+    {
+        await using var factory = await FactoryAsync();
+        using var client = factory.CreateClient();
+        var response = await client.GetAsync("/api/v1/search?cursor=invalid");
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        var body = await response.Content.ReadFromJsonAsync<JsonElement>();
+        Assert.Equal("invalid_cursor", body.GetProperty("code").GetString());
+    }
+
+    [Fact]
     public async Task OversizedUrlIsRejected()
     {
         await using var factory = await FactoryAsync();
@@ -90,6 +101,24 @@ public sealed class SearchEndpointTests(PostgresFixture postgres) : IClassFixtur
         var body = await response.Content.ReadFromJsonAsync<JsonElement>();
         Assert.Equal("rate_limit_exceeded", body.GetProperty("code").GetString());
     }
+    [Fact]
+    public async Task AuthenticatedSearchUsesASeparateUserBudget()
+    {
+        await using var factory = await FactoryAsync();
+        await using var limited = new ApiFactory { PostgresFixture = postgres };
+        limited.Overrides["Search:PermitLimit"] = "1";
+        limited.Overrides["Search:AuthenticatedPermitLimit"] = "2";
+        using var client = limited.CreateClient();
+        Assert.Equal(HttpStatusCode.OK, (await client.GetAsync("/api/v1/search")).StatusCode);
+        Assert.Equal(HttpStatusCode.TooManyRequests, (await client.GetAsync("/api/v1/search")).StatusCode);
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TestTokenFactory.CreateToken(Guid.NewGuid(), "reader"));
+        Assert.Equal(HttpStatusCode.OK, (await client.GetAsync("/api/v1/search")).StatusCode);
+        Assert.Equal(HttpStatusCode.OK, (await client.GetAsync("/api/v1/search")).StatusCode);
+        Assert.Equal(HttpStatusCode.TooManyRequests, (await client.GetAsync("/api/v1/search")).StatusCode);
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TestTokenFactory.CreateToken(Guid.NewGuid(), "other_reader"));
+        Assert.Equal(HttpStatusCode.OK, (await client.GetAsync("/api/v1/search")).StatusCode);
+    }
+
     [Fact]
     public async Task OnlyALiveApprovedReaderCanSearchSealedRecordBodies()
     {

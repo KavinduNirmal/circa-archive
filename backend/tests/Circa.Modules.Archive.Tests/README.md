@@ -29,8 +29,16 @@ code ranges, plain-text/UTF-16 helpers, exact translated vocabulary, and every
 canonical value exported by the client contract. `SearchReaderTests` seeds five
 entity types plus lifecycle/access/advisory cases and verifies filters, sealed
 body isolation, explicit approvals, ranking, facets, sorting, and empty-page totals.
-Its 10,000-document benchmark records seven query timings with a 750 ms p95 ceiling.
+Its 10,000-document benchmark records seven query scenarios with a 750 ms p95 ceiling.
 
 ```sh
 dotnet test backend/tests/Circa.Modules.Archive.Tests --logger 'console;verbosity=detailed'
 ```
+
+`SearchReaderTests` also covers phase 4 relationship filters, author identity privacy,
+exact-holder ranking, and three-page keyset traversal for every sort. Request tests
+cover bounded compressed cursors, Korean titles, and rejected nested history.
+
+`ArchiveDestinationTests` verifies incident acknowledgment, restricted/erased
+visibility, record approvals (including missing decision dates), tombstones,
+and stable rumour destinations against PostgreSQL.

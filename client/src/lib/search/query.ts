@@ -1,5 +1,6 @@
 import {
   DEFAULT_SEARCH_STATE,
+  CUSTODY_STATES,
   DISPLAY_STATUSES,
   RECORD_CLASSES,
   SEARCH_LANGUAGES,
@@ -77,10 +78,26 @@ export function parseSearchState(input: SearchParamsInput): SearchState {
     scalar(input, "q").trim() || scalar(input, "holder").trim()
       ? "relevance"
       : "newest";
-  return {
+  const from = isDate(scalar(input, "from")) ? scalar(input, "from") : "";
+  const to = isDate(scalar(input, "to")) ? scalar(input, "to") : "";
+  const reversedDates = Boolean(from && to && from > to);
+  const state: SearchState = {
     ...DEFAULT_SEARCH_STATE,
     q: scalar(input, "q").slice(0, 200),
     holder: scalar(input, "holder").slice(0, 120),
+    mention: scalar(input, "mention").slice(0, 120),
+    org: scalar(input, "org").slice(0, 120),
+    author: scalar(input, "author").slice(0, 64),
+    tag: scalar(input, "tag").slice(0, 64),
+    character: scalar(input, "character").slice(0, 120),
+    custody: CUSTODY_STATES.includes(
+      scalar(input, "custody") as (typeof CUSTODY_STATES)[number],
+    )
+      ? scalar(input, "custody")
+      : "",
+    cursor: /^[A-Za-z0-9_-]{16,2048}$/.test(scalar(input, "cursor"))
+      ? scalar(input, "cursor")
+      : "",
     types,
     classes,
     statuses: orderedValues(input, "status", DISPLAY_STATUSES),
@@ -93,8 +110,8 @@ export function parseSearchState(input: SearchParamsInput): SearchState {
     period: SEARCH_PERIODS.includes(rawPeriod as SearchState["period"])
       ? (rawPeriod as SearchState["period"])
       : "any",
-    from: isDate(scalar(input, "from")) ? scalar(input, "from") : "",
-    to: isDate(scalar(input, "to")) ? scalar(input, "to") : "",
+    from: reversedDates ? "" : from,
+    to: reversedDates ? "" : to,
     language: SEARCH_LANGUAGES.includes(rawLanguage as SearchLanguage)
       ? (rawLanguage as SearchLanguage)
       : "en",
@@ -106,6 +123,21 @@ export function parseSearchState(input: SearchParamsInput): SearchState {
       ? (rawLimit as SearchState["limit"])
       : 20,
   };
+  // Leave room for the API path, explicit language, and default enabled types.
+  for (const key of [
+    "cursor",
+    "character",
+    "tag",
+    "author",
+    "org",
+    "mention",
+    "holder",
+    "q",
+  ] as const) {
+    if (toSearchParams(state).toString().length <= 3800) break;
+    state[key] = "";
+  }
+  return state;
 }
 
 function appendFacet<T extends string>(
@@ -128,6 +160,12 @@ function serializeSearchParams(
   const params = new URLSearchParams();
   if (state.q.trim()) params.set("q", state.q.trim());
   if (state.holder.trim()) params.set("holder", state.holder.trim());
+  if (state.mention.trim()) params.set("mention", state.mention.trim());
+  if (state.org.trim()) params.set("org", state.org.trim());
+  if (state.author.trim()) params.set("author", state.author.trim());
+  if (state.tag.trim()) params.set("tag", state.tag.trim());
+  if (state.character.trim()) params.set("character", state.character.trim());
+  if (state.custody) params.set("custody", state.custody);
   appendFacet(
     params,
     "type",
@@ -155,7 +193,8 @@ function serializeSearchParams(
   const defaultSort =
     state.q.trim() || state.holder.trim() ? "relevance" : "newest";
   if (state.sort !== defaultSort) params.set("sort", state.sort);
-  if (state.page > 1) params.set("page", String(state.page));
+  if (!state.cursor && state.page > 1) params.set("page", String(state.page));
+  if (state.cursor) params.set("cursor", state.cursor);
   if (state.limit !== 20) params.set("limit", String(state.limit));
   return params;
 }
@@ -179,7 +218,12 @@ export function toSearchHref(
   state: SearchState,
   override: Partial<SearchState> = {},
 ): string {
-  const params = toSearchParams({ ...state, ...override });
+  const nextState = {
+    ...state,
+    ...override,
+    cursor: override.page === 1 ? "" : (override.cursor ?? state.cursor),
+  };
+  const params = toSearchParams(nextState);
   const query = params.toString();
   return query ? `/site/records?${query}` : "/site/records";
 }
@@ -190,3 +234,50 @@ export function formAction(locale: string): string {
 
 /** Retain a narrow registry export for form and chip components. */
 export const SEARCH_FACET_ORDER = FACET_ORDER;
+
+/** Explain normalization of recognized filters; unknown future keys stay silent. */
+export function searchQueryNotices(
+  input: SearchParamsInput,
+): ("legacy" | "invalid")[] {
+  const state = parseSearchState(input);
+  const legacyClasses = ["organization", "continuity", "memo"];
+  const legacy =
+    values(input, "class").some((value) => legacyClasses.includes(value)) ||
+    Boolean(scalar(input, "lang"));
+  let invalid = Object.entries(FACET_ORDER).some(([key, options]) =>
+    values(input, key).some(
+      (value) =>
+        !["all", "any"].includes(value) &&
+        !(options as readonly string[]).includes(value) &&
+        !(key === "class" && legacyClasses.includes(value)),
+    ),
+  );
+  const scalarKeys = [
+    "q",
+    "holder",
+    "mention",
+    "org",
+    "author",
+    "tag",
+    "character",
+    "custody",
+    "cursor",
+    "from",
+    "to",
+    "language",
+    "sort",
+    "period",
+    "page",
+    "limit",
+  ] as const;
+  invalid ||= scalarKeys.some(
+    (key) => scalar(input, key) && String(state[key]) !== scalar(input, key),
+  );
+  invalid ||= values(input, "excludeWarnTag").some(
+    (tag) => !(WARNING_TAGS as readonly string[]).includes(tag),
+  );
+  return [
+    ...(legacy ? ["legacy" as const] : []),
+    ...(invalid ? ["invalid" as const] : []),
+  ];
+}
