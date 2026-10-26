@@ -23,4 +23,4 @@ mapping between a code and this address is owned by
 
 The public `/{lang}/site/records/[code]` page remains the canonical address for a
 record. Run `bun run build` to see every code prerendered here, and the browser
-suite for the encoded continuity code and the unknown-code 404.
+suite for a record code and the unknown-code 404.

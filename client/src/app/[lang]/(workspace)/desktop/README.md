@@ -37,7 +37,7 @@ The workstation is addressable without giving up the desktop as the thing that a
 /{lang}/desktop/record/{code}       the reader on an archive code
 ```
 
-A continuity code contains a slash, so its address is one percent-encoded segment: `/desktop/record/ORG-C-005102%2FC1`. `src/lib/desktop-route.ts` owns both directions of the mapping, and `tests/desktop-route.test.ts` round-trips every destination and every released code.
+A record code is one percent-encoded path segment, and every shipped code fits in one. `src/lib/desktop-route.ts` owns both directions of the mapping, and `tests/desktop-route.test.ts` round-trips every destination and every released code.
 
 The history policy has one writer. `DesktopUrlSync` ([notes](../../../../components/README.md)) reads the pathname, adopts it into the store, and writes the store's focus back:
 

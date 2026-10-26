@@ -3731,6 +3731,29 @@
   background: #304155;
 }
 
+/*
+ * Below the wrap point the bar stacks onto several rows, and a panel hanging off
+ * its own key landed on top of the keys in the rows underneath — a tap aimed at
+ * About the site opened Rules instead. The panel is a sheet under the whole bar
+ * there, so it covers page content and never a sibling key. It stays a DOM child
+ * of the disclosure, which is what keeps the hover path from the key unbroken.
+ */
+@media (max-width: 760px) {
+  .nav {
+    position: relative;
+  }
+  .navDropdown {
+    position: static;
+  }
+  .navDropdownPanel {
+    inset-block-start: 100%;
+    inset-inline: 12px;
+    width: auto;
+    min-width: 0;
+    max-width: none;
+  }
+}
+
 @media (max-width: 620px), (pointer: coarse) {
   /*
    * One height for the whole section bar. The direct keys used to keep the

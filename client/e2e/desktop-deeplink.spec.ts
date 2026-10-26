@@ -47,18 +47,16 @@ test("a record deep link opens the reader on that record", async ({ page }) => {
   await expect(page).toHaveURL(/\/en\/desktop\/record\/INC-00014$/);
 });
 
-test("a continuity code survives its encoded path segment", async ({
+test("an exploration code opens the reader at its own address", async ({
   page,
 }) => {
-  await enterWorkstation(page, "/en/desktop/record/ORG-C-005102%2FC1");
+  await enterWorkstation(page, "/en/desktop/record/EXP-288902");
   const reader = page.getByRole("dialog", { name: RECORD });
   await expect(reader).toBeVisible();
   await expect(reader.getByRole("heading", { level: 1 })).toContainText(
-    "Continuity branch, closed",
+    "Second survey, landing nine",
   );
-  expect(new URL(page.url()).pathname).toBe(
-    "/en/desktop/record/ORG-C-005102%2FC1",
-  );
+  expect(new URL(page.url()).pathname).toBe("/en/desktop/record/EXP-288902");
 });
 
 test("unknown destinations and codes are 404", async ({ page }) => {
