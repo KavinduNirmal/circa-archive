@@ -51,7 +51,11 @@ export function ArchiveHome() {
       <main id="site-content" tabIndex={-1} className={styles.page}>
         <section className={styles.hero}>
           <div className={styles.heroHead}>
-            <p className={styles.kicker}>{t("crumbRegistry")}</p>
+            {/*
+              No eyebrow here: the breadcrumb directly above already reads
+              "Registry / Public archive", and the h1 does not need to be told
+              three times before it is read.
+            */}
             <h1 className={styles.title}>{t("homeTitle")}</h1>
             <p className={styles.lede}>{t("homeLede")}</p>
           </div>

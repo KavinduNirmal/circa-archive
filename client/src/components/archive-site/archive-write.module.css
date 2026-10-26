@@ -37,9 +37,11 @@
 }
 .heading h1 {
   margin: 6px 0 8px;
-  font-size: clamp(32px, 5vw, 44px);
-  font-weight: 600;
-  line-height: 1.15;
+  font-family: var(--archive-display);
+  font-size: clamp(32px, 4.4vw, 42px);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  line-height: 1.04;
 }
 .heading > p:last-child {
   margin: 0;
@@ -152,8 +154,9 @@
   padding-top: 16px;
 }
 .draftHeading h2 {
-  font-size: 22px;
-  font-weight: 600;
+  font-family: var(--archive-display);
+  font-size: 23px;
+  font-weight: 400;
   margin: 0;
 }
 .note {
@@ -187,6 +190,20 @@
 .draftRow .copy > strong {
   font-size: 16px;
 }
+/*
+ * Five actions on a two-column desk: the last tile spans, and a card built to be
+ * a 148px square leaves half of that span empty. A spanning tile is a wide row,
+ * not a tall one, and its description keeps a readable measure.
+ */
+@media (min-width: 761px) {
+  .actions > :last-child:nth-child(odd) {
+    min-height: 0;
+  }
+  .actions > :last-child:nth-child(odd) .copy {
+    max-width: 62ch;
+  }
+}
+
 @media (max-width: 760px) {
   .actions {
     grid-template-columns: minmax(0, 1fr);

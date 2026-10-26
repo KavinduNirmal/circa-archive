@@ -43,8 +43,8 @@ export type ArchiveTextSize = "small" | "normal" | "large";
 export const CLASS_MESSAGE_KEYS: Record<ArchiveClass, string> = {
   incident: "classIncident",
   organization: "classOrganization",
-  continuity: "classContinuity",
-  memo: "classMemo",
+  exploration: "classExploration",
+  evidence: "classEvidence",
 };
 
 export const STATUS_MESSAGE_KEYS: Record<ArchiveStatus, string> = {

@@ -1,10 +1,9 @@
 import { notFound } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import {
-  ChevronLeft,
-  ChevronRight,
   Download,
   List,
+  Menu,
   MessageSquare,
   Monitor,
   Shuffle,
@@ -27,7 +26,6 @@ import {
   CLASS_MESSAGE_KEY,
   CONSULTATIONS,
   STATUS_MESSAGE_KEY,
-  neighboursOf,
 } from "./archive-data";
 import { RecordNotes } from "./record-notes";
 import { RecordProse } from "./record-prose";
@@ -64,7 +62,6 @@ export function ArchiveRecord({ code }: { code: string }) {
   if (!document || !entry) notFound();
 
   const { inbound, outbound } = followUpsFor(code);
-  const { previous, next } = neighboursOf(code);
   const notes = notesFor(ANNOTATIONS, code, document.sections);
   const updates = updatesFor(code);
   const explorations = explorationsFor(code);
@@ -130,10 +127,9 @@ export function ArchiveRecord({ code }: { code: string }) {
 
           {/*
             One toolbar for the whole record. The three tools that act on the
-            record sit together on the left, the step through the register sits
-            with them as a pager, and the two ways out of the page sit on the
-            right. The foot of the page repeats the step at a size worth reaching
-            for once the filing has been read.
+            record sit together on the left, and the two ways out of the page sit
+            on the right. The record's related lists are at the foot of the page,
+            where a reader who has finished the filing can find them.
           */}
           <nav className={styles.actions} aria-label={t("recordActions")}>
             <div className={styles.actionGroup}>
@@ -198,33 +194,6 @@ export function ArchiveRecord({ code }: { code: string }) {
 
             <span className={styles.actionSpacer} />
 
-            {(previous || next) && (
-              <div className={styles.stepper}>
-                {previous ? (
-                  <Link
-                    className={styles.step}
-                    data-dir="prev"
-                    href={`/site/records/${previous.code}`}
-                    aria-label={`${t("recordPrev")}: ${previous.code}`}
-                  >
-                    <ChevronLeft aria-hidden size={13} />
-                    <span className={styles.stepCode}>{previous.code}</span>
-                  </Link>
-                ) : null}
-                {next ? (
-                  <Link
-                    className={styles.step}
-                    data-dir="next"
-                    href={`/site/records/${next.code}`}
-                    aria-label={`${t("recordNext")}: ${next.code}`}
-                  >
-                    <span className={styles.stepCode}>{next.code}</span>
-                    <ChevronRight aria-hidden size={13} />
-                  </Link>
-                ) : null}
-              </div>
-            )}
-
             <div className={styles.actionGroup}>
               <ArchiveButton
                 tone="paper"
@@ -249,18 +218,32 @@ export function ArchiveRecord({ code }: { code: string }) {
             </p>
           )}
 
-          <nav className={styles.contents} aria-label={t("recordContents")}>
-            <h2 className={styles.contentsTitle}>{t("recordContents")}</h2>
-            <ol>
-              {document.sections.map((section) => (
-                <li key={section.id}>
-                  <a href={`#${sectionAnchor(section.id)}`}>
-                    {section.heading}
-                  </a>
-                </li>
-              ))}
-            </ol>
-          </nav>
+          {/*
+            The section index, folded behind a hamburger key. The band of
+            section titles used to sit open above the sheet, where it competed
+            with the filing for the first line; a menu opens the same list as a
+            ruled block of rows when the reader asks for it instead.
+          */}
+          <details className={styles.contents}>
+            <summary className={styles.contentsToggle}>
+              <Menu aria-hidden size={14} />
+              {t("recordContents")}
+            </summary>
+            <nav
+              className={styles.contentsMenu}
+              aria-label={t("recordContents")}
+            >
+              <ol>
+                {document.sections.map((section) => (
+                  <li key={section.id}>
+                    <a href={`#${sectionAnchor(section.id)}`}>
+                      {section.heading}
+                    </a>
+                  </li>
+                ))}
+              </ol>
+            </nav>
+          </details>
 
           {/* Headings and contents share the filing's titles and stable anchors. */}
           <div className={styles.sheet}>
@@ -284,6 +267,38 @@ export function ArchiveRecord({ code }: { code: string }) {
               </section>
             ))}
           </div>
+
+          {/*
+            The lists that hang off the record, after the sheet and before the
+            annotations: what was filed against it, the explorations, and the
+            playlists it appears in. A reader leaving the sheet meets the other
+            lists before the correspondence. Reading order is the reader's, not
+            the register's.
+          */}
+          <nav className={styles.recordRelated} aria-label={t("recordRelated")}>
+            <Link
+              className={styles.relatedCard}
+              href={`/site/records/${document.code}/explorations`}
+            >
+              <span className={styles.relatedLabel}>
+                {t("recordExplorations")}
+              </span>
+            </Link>
+            <Link
+              className={styles.relatedCard}
+              href={`/site/records/${document.code}/filings`}
+            >
+              <span className={styles.relatedLabel}>{t("recordInbound")}</span>
+            </Link>
+            <Link
+              className={styles.relatedCard}
+              href={`/site/records/${document.code}/playlists`}
+            >
+              <span className={styles.relatedLabel}>
+                {t("recordPlaylists")}
+              </span>
+            </Link>
+          </nav>
 
           <RecordNotes
             notes={notes.map((note) => ({
@@ -321,46 +336,6 @@ export function ArchiveRecord({ code }: { code: string }) {
               held: t("noteHeld"),
             }}
           />
-
-          {/*
-            The step at the foot. Big enough to hit without aiming, because a
-            reader who has reached the end of a long filing is already deciding
-            where to go next.
-          */}
-          <nav className={styles.recordNav} aria-label={t("recordOrder")}>
-            {previous ? (
-              <Link
-                className={styles.leaf}
-                data-dir="prev"
-                href={`/site/records/${previous.code}`}
-              >
-                <span className={styles.leafDir}>
-                  <ChevronLeft aria-hidden size={13} />
-                  {t("recordPrev")}
-                </span>
-                <strong className={styles.leafTitle}>
-                  {previous.designation ?? previous.code}
-                </strong>
-                <span className={styles.leafCode}>{previous.code}</span>
-              </Link>
-            ) : null}
-            {next ? (
-              <Link
-                className={styles.leaf}
-                data-dir="next"
-                href={`/site/records/${next.code}`}
-              >
-                <span className={styles.leafDir}>
-                  {t("recordNext")}
-                  <ChevronRight aria-hidden size={13} />
-                </span>
-                <strong className={styles.leafTitle}>
-                  {next.designation ?? next.code}
-                </strong>
-                <span className={styles.leafCode}>{next.code}</span>
-              </Link>
-            ) : null}
-          </nav>
 
           <p className={styles.back}>
             <Link href="/site/records">{t("recordBack")} «</Link>

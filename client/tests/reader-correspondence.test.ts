@@ -118,11 +118,11 @@ describe("follow-up records", () => {
       return inbound.length + outbound.length;
     };
     expect(reached("INC-00042")).toBeGreaterThan(0);
-    expect(reached("CIRCA-M-0077")).toBe(0);
+    expect(reached("EVI-035785")).toBe(0);
   });
 
   it("files nothing against a record nobody has followed up", () => {
-    const { inbound, outbound } = followUpsFor("CIRCA-M-0077");
+    const { inbound, outbound } = followUpsFor("EVI-035785");
     expect(inbound).toEqual([]);
     expect(outbound).toEqual([]);
   });
@@ -160,7 +160,7 @@ describe("exploration records", () => {
   it("keeps the parent's count and the row's record in agreement", () => {
     const explorations = explorationsFor("ORG-C-005102");
     expect(explorations.map((item) => item.code)).toEqual([
-      "ORG-C-005102/C1",
+      "EXP-288902",
       "ORG-U-000011",
     ]);
   });

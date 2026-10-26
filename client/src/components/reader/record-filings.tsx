@@ -42,14 +42,14 @@ const HELD_NOTE =
   "The filing itself is not released. Only the index entry is on the screen.";
 
 /**
- * Section names by class, used for every record whose body is held. A memo is
- * not shaped like an incident, and the archive does not pretend otherwise.
+ * Section names by class, used for every record whose body is held. Evidence is
+ * not shaped like an exploration, and the archive does not pretend otherwise.
  */
 const SECTION_NAMES: Record<ArchiveEntry["klass"], readonly string[]> = {
   incident: ["Brief", "Field account", "Measurement", "Disposition"],
-  organization: ["Charter", "Continuities", "Holdings", "Standing"],
-  continuity: ["Scope", "Subscribers", "Closure"],
-  memo: ["Subject", "Body", "Retention"],
+  organization: ["Charter", "Holdings", "Standing"],
+  exploration: ["Objective", "Entry", "Findings", "Return"],
+  evidence: ["Object", "Provenance", "Account", "Retention"],
 };
 
 /**

@@ -330,6 +330,8 @@ describe("the shipped tree and its scopes", () => {
     const filed = childrenOf("dir-archive", FILE_TREE);
     expect(filed.length).toBeGreaterThan(0);
     expect(filed.every(isFolder)).toBe(true);
-    expect(filed.every((node) => /^CIRCA-/.test(node.name))).toBe(true);
+    expect(
+      filed.every((node) => /^(CIRCA-|INC-|EXP-|EVI-)/.test(node.name)),
+    ).toBe(true);
   });
 });

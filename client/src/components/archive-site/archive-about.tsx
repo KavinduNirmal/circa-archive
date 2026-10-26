@@ -39,8 +39,8 @@ export function ArchiveAbout() {
   const classBody: Record<string, string> = {
     classIncident: t("aboutClassIncidentBody"),
     classOrganization: t("aboutClassOrganizationBody"),
-    classContinuity: t("aboutClassContinuityBody"),
-    classMemo: t("aboutClassMemoBody"),
+    classExploration: t("aboutClassExplorationBody"),
+    classEvidence: t("aboutClassEvidenceBody"),
   };
 
   const statusBody: Record<string, string> = {
@@ -129,6 +129,7 @@ export function ArchiveAbout() {
                 </tbody>
               </table>
               <p className={styles.guideHint}>{t("aboutKeyHint")}</p>
+              <p className={styles.guideHint}>{t("aboutRumourHint")}</p>
             </section>
 
             <section

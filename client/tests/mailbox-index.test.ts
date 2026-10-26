@@ -66,7 +66,7 @@ const mailbox: readonly MailMessage[] = [
     "MSG-0005",
     "dead",
     "Postmaster",
-    "Undeliverable: no such continuity",
+    "Undeliverable: unknown recipient",
     "2003-01-24 04:10",
     { returned: "No office claims it." },
   ),
@@ -131,7 +131,7 @@ describe("mailbox index", () => {
     expect(
       sortMessages(mailbox, { column: "subject", direction: "desc" })[0]
         .subject,
-    ).toBe("Undeliverable: no such continuity");
+    ).toBe("Undeliverable: unknown recipient");
   });
 
   it("finds a message by subject, sender, or body", () => {

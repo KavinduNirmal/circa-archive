@@ -21,11 +21,11 @@ import { GHOST_STORY } from "./ghost-story";
  * ordinary filings by comparison.
  */
 
-function heldUnder(code: string): { total: number; continuities: number } {
+function heldUnder(code: string): { total: number; explorations: number } {
   const held = ARCHIVE_INDEX.filter((entry) => entry.organization === code);
   return {
     total: held.length,
-    continuities: held.filter((entry) => entry.klass === "continuity").length,
+    explorations: held.filter((entry) => entry.klass === "exploration").length,
   };
 }
 
@@ -101,19 +101,15 @@ Filed as contested. Neither reading has been withdrawn, and the estuary's tide t
 
 The body was filed in 1988 under a code issued before its designation was settled. The designation has been withheld at the holder's request since the same year.
 
-## Continuities
-
-Two continuities are filed under this code. Both claim the filings made before 1992, and neither holds a cession record for the other.
-
-The archive files ${organisationHoldings.continuities} of its ${organisationHoldings.total} records as continuities, which is a higher proportion than any other lens in the index.
-
 ## Holdings
 
 Records filed under this lens carry a Level 3 clearance rather than the Level 4 of the index entry. The holder has asked for that difference to be read as a filing preference and not as a correction.
 
+The archive files ${organisationHoldings.explorations} of its ${organisationHoldings.total} records under this code as explorations. Neither was adopted, and neither has been withdrawn.
+
 ## Standing
 
-Read-only since 1992, and open to new filings only through a continuity. The code stays resolvable inside the archive, which is the holder's stated reason for keeping it: a body that cannot be named can still be cited.
+Read-only since 1992, and open to new filings only by a body already entered in the directory. The code stays resolvable inside the archive, which is the holder's stated reason for keeping it: a body that cannot be named can still be cited.
 `,
 
   "CIRCA-S-03007": GHOST_STORY,

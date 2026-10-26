@@ -12,16 +12,16 @@
  * Depth is a one-pixel bevel. What changed from the portal is the composition:
  * a wiki is a tool, and a tool fills the window.
  *
- * Two voices, not one. The instrument face is DM Sans, through the global
- * `--font-sans` token, so the site inherits the Korean fallbacks declared for
- * `:lang(ko)`: chrome, headings, labels and controls. The reading face is Libre
- * Baskerville, for anything the archive is *saying at length* about itself — a
- * page's lede, a record's abstract, the standing note on the index. A record's
- * own prose uses Zilla Slab, a quieter printed-document voice. Courier New
- * keeps codes, dates, and counters distinct from the reading text.
+ * Three voices, not one. Instrument Serif is the institution speaking: the
+ * wordmark, the page's own title, a record's filing title, every section head.
+ * It carries a single weight, so hierarchy is size and case, never bold. IBM
+ * Plex Sans is the instrument — reading prose, ledes, abstracts, controls, and
+ * the tracked uppercase labels; sharing a superfamily with the mono is what
+ * keeps the sans from reading as another shop's UI. Courier New, with IBM Plex
+ * Mono behind it, keeps codes, dates, and counters distinct.
  *
  * Record names are filing titles, so they are set in capitals and tracked out;
- * the description under them stays serif and sentence-cased.
+ * the description under them is prose and stays sentence-cased.
  *
  * Controls are not styled here. Every key on the site is `ArchiveButton`, and its
  * bevel lives in `archive-button.module.css`; this sheet styles the surfaces those
@@ -38,8 +38,23 @@
   /* One colour per class, so a code or a tag is identifiable before it is read. */
   --klass-incident: #7f2626;
   --klass-organization: #2a5480;
-  --klass-continuity: #36605f;
-  --klass-memo: #7a5d1a;
+  --klass-exploration: #36605f;
+  --klass-evidence: #7a5d1a;
+  --klass-rumour: #5f4a73;
+  /*
+   * Korean falls back to the platform Myeongjo for display and to the platform
+   * gothic for reading, rather than shipping an unsubsetted Noto Serif KR on
+   * every Korean page. The trade is named in DESIGN.md.
+   */
+  --archive-display:
+    "Instrument Serif", "AppleMyungjo", "Batang", "Noto Serif CJK KR", Georgia,
+    serif;
+  --archive-instrument:
+    "IBM Plex Sans", "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR",
+    Arial, sans-serif;
+  --archive-typewriter:
+    "Courier New", "IBM Plex Mono", "Nanum Gothic Coding", "Malgun Gothic",
+    monospace;
   min-height: 100dvh;
   background:
     repeating-linear-gradient(
@@ -49,8 +64,8 @@
     ),
     var(--circa-paper-sunken);
   color: var(--circa-ink);
-  font-family: var(--font-sans);
-  font-size: 12px;
+  font-family: var(--archive-instrument);
+  font-size: 16px;
   line-height: 1.5;
   color-scheme: light;
 }
@@ -61,11 +76,14 @@
 .shell [data-klass="organization"] {
   --klass-color: var(--klass-organization);
 }
-.shell [data-klass="continuity"] {
-  --klass-color: var(--klass-continuity);
+.shell [data-klass="exploration"] {
+  --klass-color: var(--klass-exploration);
 }
-.shell [data-klass="memo"] {
-  --klass-color: var(--klass-memo);
+.shell [data-klass="evidence"] {
+  --klass-color: var(--klass-evidence);
+}
+.shell [data-klass="rumour"] {
+  --klass-color: var(--klass-rumour);
 }
 
 .shell::after {
@@ -178,7 +196,7 @@
 
 .classifiedLead {
   margin: 0;
-  font-size: 10.5px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.2em;
   line-height: 1.5;
@@ -196,17 +214,15 @@
   text-transform: uppercase;
   text-shadow:
     -1px 0 0 rgb(28 84 150 / 14%),
-    1px 0 0 rgb(158 31 38 / 18%),
-    0 0 18px rgb(158 31 38 / 24%);
+    1px 0 0 rgb(158 31 38 / 18%);
 }
 
 .classifiedFoot {
   margin: 0;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 700;
-  letter-spacing: 0.16em;
-  line-height: 1.5;
-  text-transform: uppercase;
+  letter-spacing: 0.035em;
+  line-height: 1.6;
 }
 
 /*
@@ -309,8 +325,8 @@
 /* The wordmark: the reading face at its one most ceremonial size. */
 .brandText strong {
   color: inherit;
-  font-family: "Libre Baskerville", Georgia, serif;
-  font-size: 20px;
+  font-family: var(--archive-display);
+  font-size: 21px;
   font-weight: 400;
   letter-spacing: 0.09em;
   line-height: 1.05;
@@ -320,7 +336,7 @@
 /* The motto, not a label: sentence case, so it reads as a sentence. */
 .brandText small {
   color: #8fa3b6;
-  font-size: 10px;
+  font-size: 12px;
   letter-spacing: 0.01em;
   line-height: 1.3;
 }
@@ -345,7 +361,7 @@
   flex: 1 1 auto;
   align-items: stretch;
   gap: 2px;
-  height: 32px;
+  min-height: 44px;
   padding: 2px;
   border: 1px solid;
   border-color: #0d131a #526e94 #526e94 #0d131a;
@@ -355,12 +371,13 @@
 .searchField input {
   flex: 1;
   min-width: 0;
+  min-height: 42px;
   padding: 0 7px;
   border: 0;
   background: none;
   color: #dce9f5;
   font: inherit;
-  font-size: 11px;
+  font-size: 12px;
   outline: none;
 }
 
@@ -388,7 +405,7 @@
 }
 .shell .filterSummary::after {
   content: " ▾";
-  font-size: 8px;
+  font-size: 12px;
 }
 .filterSummary:hover {
   color: #ffffff;
@@ -405,12 +422,82 @@
   z-index: 40;
   display: grid;
   gap: 9px;
-  width: min(680px, calc(100vw - 24px));
+  width: min(760px, calc(100vw - 24px));
   max-width: calc(100vw - 24px);
-  padding: 10px;
+  /*
+   * Eighteen controls do not fit a viewport, and an absolutely positioned panel
+   * that outgrows the window takes its own apply key out of reach. The panel
+   * scrolls instead, and the key stays at its foot.
+   */
+  max-height: min(78vh, 720px);
+  /* No bottom padding: the pinned foot owns that edge, so nothing can scroll
+     into a strip beneath it. */
+  padding: 10px 10px 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
   border: 1px solid #526e94;
   background: var(--circa-paper-sunken);
   box-shadow: 4px 4px 0 rgb(8 17 25 / 35%);
+}
+
+/*
+ * The panels are paper, but their controls are the shared primitives, and those
+ * consume the chrome's surface tokens: a `circa-sunken` field painted the navy
+ * card, a checkbox well painted the page background. Remapping the surface
+ * tokens on the panel — never on `.shell`, where the steel keys live — is what
+ * makes a primitive land on paper instead of punching a hole in it.
+ */
+.filterPanel,
+.globalFilterPanel {
+  /*
+   * The dropdown hangs inside the masthead, which paints its children the light
+   * chrome colour; without this a field on the paper panel would be typed in
+   * near-white. The colour and the token remap below have to land together.
+   */
+  color: var(--circa-ink);
+  --background: var(--circa-paper-sunken);
+  --foreground: var(--circa-ink);
+  --card: var(--circa-paper-sunken);
+  --card-foreground: var(--circa-ink);
+  --popover: var(--circa-paper-raised);
+  --popover-foreground: var(--circa-ink);
+  --border: #7b8b9c;
+  --input: #7b8b9c;
+  --ring: var(--circa-link);
+  --muted: var(--circa-paper-raised);
+  --muted-foreground: var(--circa-ink-soft);
+  --accent: #becbd8;
+  --accent-foreground: var(--circa-ink);
+}
+
+/* A checkbox on paper: a dark rule around a clean well, and a filled mark. */
+.filterPanel [data-slot="checkbox"],
+.globalFilterPanel [data-slot="checkbox"] {
+  width: 17px;
+  height: 17px;
+  border: 1px solid #46586a;
+  background: var(--circa-paper-sunken);
+  color: var(--circa-ink);
+}
+.filterPanel [data-slot="checkbox"]:hover,
+.globalFilterPanel [data-slot="checkbox"]:hover {
+  border-color: var(--circa-ink);
+  background: #ffffff;
+}
+.filterPanel [data-slot="checkbox"][data-state="checked"],
+.filterPanel [data-slot="checkbox"][data-state="indeterminate"],
+.globalFilterPanel [data-slot="checkbox"][data-state="checked"],
+.globalFilterPanel [data-slot="checkbox"][data-state="indeterminate"] {
+  border-color: #1b3f66;
+  background: var(--circa-link);
+  color: #f2f6fa;
+}
+.filterPanel [data-slot="checkbox"][data-state="indeterminate"],
+.globalFilterPanel [data-slot="checkbox"][data-state="indeterminate"] {
+  border-color: #6d1f1f;
+  background: #8a2b2b;
+  color: #f6ecec;
 }
 
 .srOnly {
@@ -450,23 +537,25 @@
 .globalSelectField > span {
   margin-bottom: 4px;
   color: var(--circa-ink-soft);
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
 }
 
 .globalFilterOptions {
-  display: grid;
-  gap: 3px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 16px;
 }
 
 .globalFilterOptions label {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 6px;
   color: var(--circa-ink);
-  font-size: 10.5px;
+  font-size: 12px;
+  white-space: nowrap;
 }
 
 .globalFilterOptions input {
@@ -491,12 +580,12 @@
   background: var(--circa-paper-sunken);
   color: var(--circa-ink);
   font: inherit;
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .globalTextField small {
   color: var(--circa-ink-soft);
-  font-size: 9px;
+  font-size: 12px;
 }
 
 .globalDateFields {
@@ -511,7 +600,7 @@
   align-content: start;
   gap: 4px;
   color: var(--circa-ink-soft);
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -522,14 +611,19 @@
   grid-template-columns: minmax(120px, 1fr) auto auto;
   align-items: end;
   gap: 6px;
-  padding-top: 8px;
+  padding-top: 10px;
   border-top: 1px solid var(--circa-rule);
+}
+
+/* In the dropdown the row sits against the pinned foot, not another field. */
+.filterPanel .savedSearches {
+  padding-bottom: 2px;
 }
 
 .savedSearches > label {
   grid-column: 1 / -1;
   color: var(--circa-ink-soft);
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -537,7 +631,7 @@
 
 .savedSearches input {
   min-height: 30px;
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .savedSearches ul {
@@ -549,7 +643,7 @@
   padding: 6px 0 0;
   border-top: 1px solid var(--circa-rule);
   list-style: none;
-  font-size: 10px;
+  font-size: 12px;
 }
 
 .savedSearches a {
@@ -573,24 +667,61 @@
   cursor: pointer;
 }
 
-.globalFilterPanel .applyKey,
-.filterPanel .filterPanelApply {
+/*
+ * The dropdown has the measure for two columns, and every option group in it
+ * runs the full width so its choices can sit on one line. The page-level band
+ * keeps three columns and simply lets its own groups flow.
+ */
+@media (min-width: 621px) {
+  .filterPanel .globalFilterGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .filterPanel .globalFilterSet {
+    grid-column: 1 / -1;
+  }
+}
+
+.globalFilterPanel .applyKey {
   justify-self: start;
+}
+
+/*
+ * The band variant flows: its apply key is just the next row. In the dropdown the
+ * foot bleeds to the panel's edges and pins, so a reader scrolling eighteen
+ * controls never loses the key — and a rule separates it from what scrolls under.
+ */
+.filterPanelFoot {
+  display: contents;
+}
+
+.filterPanel .filterPanelFoot {
+  position: sticky;
+  bottom: 0;
+  z-index: 1;
+  display: block;
+  margin: 2px -10px 0;
+  padding: 8px 10px 10px;
+  border-top: 1px solid var(--circa-rule);
+  background: var(--circa-paper-sunken);
+}
+
+.filterPanel .filterPanelApply {
+  width: 100%;
 }
 
 .searchExcerpt {
   max-width: 72ch;
   margin: 4px 0 0;
   color: var(--circa-ink-soft);
-  font-family: "Libre Baskerville", Georgia, serif;
-  font-size: 11px;
+  font-family: var(--archive-instrument);
+  font-size: 12px;
   line-height: 1.6;
 }
 
 .sealedNotice {
   margin: 5px 0 0;
   color: #72531b;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 700;
 }
 
@@ -605,21 +736,21 @@
 .searchPagination a {
   display: inline-flex;
   min-width: 32px;
-  min-height: 32px;
+  min-height: 40px;
   align-items: center;
   justify-content: center;
   padding: 4px 8px;
   border: 1px solid var(--circa-rule);
   background: var(--circa-paper-raised);
-  font-family: "Courier New", monospace;
+  font-family: var(--archive-typewriter);
   text-decoration: none;
 }
 
 .searchPagination > span {
   padding: 4px 8px;
   color: var(--circa-ink-soft);
-  font-family: "Courier New", monospace;
-  font-size: 10px;
+  font-family: var(--archive-typewriter);
+  font-size: 12px;
 }
 
 .searchPagination a[aria-current="page"] {
@@ -712,16 +843,21 @@
 .navSpacer {
   flex: 1;
 }
-
 /*
- * The announcement bar, in the one warm surface the archive owns.
- *
- * It is a wire-service strip: a stamp, a hairline, the line running right to
- * left in a window that fades at both edges, a pause box, and the key that opens
- * the announcement. The track carries two copies of the line with a diamond
- * between them, because that is what makes a marquee loop without a seam; the
- * repeat is drawn as a separator rather than left to look like a glitch.
+ * On a phone the bar wraps and the spacer is what leaves a hole in every row:
+ * the primary keys pack from the left and RANDOM / WORKSTATION close up behind
+ * them.
  */
+@media (max-width: 760px) {
+  .navSpacer {
+    display: none;
+  }
+  .navInner {
+    gap: 5px;
+  }
+}
+
+/* The announcement: a paper strip with an amber stamp and a static notice. */
 .banner {
   background: #e9dcb6;
   border-bottom: 1px solid #b9a777;
@@ -744,96 +880,40 @@
   padding: 3px 7px;
   background: var(--circa-stamp);
   color: #f6ecd8;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.14em;
   line-height: 1.3;
   text-transform: uppercase;
 }
 
-/* The window the ticker moves through. */
 .bannerTicker {
   flex: 1 1 auto;
   min-width: 0;
-  overflow: hidden;
-  -webkit-mask-image: linear-gradient(
-    90deg,
-    transparent,
-    #000 40px,
-    #000 calc(100% - 40px),
-    transparent
-  );
-  mask-image: linear-gradient(
-    90deg,
-    transparent,
-    #000 40px,
-    #000 calc(100% - 40px),
-    transparent
-  );
+  border-left: 1px solid #c9b47c;
+  padding-left: 12px;
 }
 
 .bannerTrack {
-  display: flex;
-  width: max-content;
-  animation: banner-scroll 42s linear infinite;
+  min-width: 0;
 }
 
-/*
- * Two identical spans: at -50% the second is exactly where the first began. The
- * diamond and its wide margin are what separate one pass from the next.
- */
 .bannerText {
-  flex: 0 0 auto;
-  font-size: 12px;
-  line-height: 1.4;
-  letter-spacing: 0.005em;
-  white-space: nowrap;
+  display: block;
+  font-size: 14px;
+  line-height: 1.5;
+  text-wrap: pretty;
 }
 
-.bannerText::after {
+.bannerText::before {
   content: "◆";
   display: inline-block;
-  margin: 0 120px;
+  margin-inline-end: 8px;
   color: #b9a777;
-  font-size: 9px;
-  vertical-align: 2px;
+  font-size: 12px;
+  vertical-align: 1px;
 }
 
-@keyframes banner-scroll {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(-50%);
-  }
-}
-
-/* Reading it, or tabbing through it, should stop it. */
-.banner:hover .bannerTrack,
-.banner:focus-within .bannerTrack {
-  animation-play-state: paused;
-}
-
-/*
- * The pause box is a checkbox so the marquee can be stopped without JavaScript:
- * checking it stops the track, and the label is the visible key. The input sits
- * before the ticker so `:checked ~` can reach it, and is clipped rather than
- * removed, because it still has to take focus.
- */
-.bannerPauseInput {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
-}
-
-.bannerPauseInput:checked ~ .bannerTicker .bannerTrack {
-  animation-play-state: paused;
-}
-
-/* The controls sit behind a hairline, so the strip reads label | line | tools. */
 .bannerTools {
   display: flex;
   flex: 0 0 auto;
@@ -841,63 +921,6 @@
   gap: 10px;
   padding-left: 12px;
   border-left: 1px solid #c9b47c;
-}
-
-.bannerPause {
-  display: grid;
-  flex: 0 0 auto;
-  place-items: center;
-  width: 24px;
-  height: 24px;
-  border: 1px solid #b9a777;
-  background: #f2e8cd;
-  color: #5a4316;
-  cursor: pointer;
-  font-size: 7px;
-  line-height: 1;
-}
-
-.bannerPause::before {
-  content: "❚❚";
-}
-.bannerPauseInput:checked ~ .bannerTools .bannerPause::before {
-  content: "▶";
-}
-.bannerPause:hover {
-  border-color: #7a3f0a;
-  background: #f7efd9;
-  color: #3b2e12;
-}
-.bannerPauseInput:focus-visible ~ .bannerTools .bannerPause {
-  outline: 2px dotted #3b2e12;
-  outline-offset: 1px;
-}
-
-/* A hairline between the stamp and the line, so the label does not float. */
-.bannerLabel + .bannerTicker {
-  border-left: 1px solid #c9b47c;
-  padding-left: 12px;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .bannerTrack {
-    animation: none;
-    width: auto;
-  }
-  .bannerTicker {
-    overflow: visible;
-    mask-image: none;
-    -webkit-mask-image: none;
-  }
-  .bannerText {
-    white-space: normal;
-  }
-  .bannerText::after {
-    display: none;
-  }
-  .bannerText[aria-hidden="true"] {
-    display: none;
-  }
 }
 
 /* ------------------------------------------------------------------------- */
@@ -918,8 +941,8 @@
   padding: 7px 0;
   border-bottom: 1px solid var(--circa-rule);
   color: var(--circa-ink-soft);
-  font-family: "Courier New", monospace;
-  font-size: 9px;
+  font-family: var(--archive-typewriter);
+  font-size: 12px;
   letter-spacing: 0.03em;
 }
 
@@ -942,8 +965,8 @@
 .kicker {
   margin: 0 0 4px;
   color: var(--circa-ink-soft);
-  font-family: "Courier New", monospace;
-  font-size: 9px;
+  font-family: var(--archive-typewriter);
+  font-size: 12px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -951,37 +974,40 @@
 .title {
   margin: 0 0 8px;
   color: #101d2b;
-  font-family: var(--font-sans);
-  font-size: 30px;
-  font-weight: normal;
-  line-height: 1.08;
-  letter-spacing: -0.015em;
+  font-family: var(--archive-display);
+  font-size: 34px;
+  font-weight: 400;
+  line-height: 1.06;
+  letter-spacing: -0.005em;
+  text-wrap: balance;
 }
 
 .lede {
   margin: 0 0 8px;
-  max-width: 74ch;
-  font-family: "Libre Baskerville", Georgia, serif;
-  font-size: 14px;
+  max-width: 64ch;
+  font-family: var(--archive-instrument);
+  font-size: 16px;
   letter-spacing: -0.005em;
   line-height: 1.65;
+  text-wrap: pretty;
 }
 .body {
   margin: 0 0 9px;
-  max-width: 82ch;
-  font-size: 12.5px;
-  line-height: 1.6;
+  max-width: 64ch;
+  font-size: 16px;
+  line-height: 1.7;
+  text-wrap: pretty;
 }
 .note {
   margin: 0 0 8px;
   color: var(--circa-ink-soft);
-  font-size: 10px;
+  font-size: 12px;
   line-height: 1.5;
 }
 .count {
   color: var(--circa-ink-soft);
-  font-family: "Courier New", monospace;
-  font-size: 9.5px;
+  font-family: var(--archive-typewriter);
+  font-size: 12px;
 }
 
 /*
@@ -1017,7 +1043,7 @@
 .searchHint {
   margin: 0;
   color: var(--circa-ink-soft);
-  font-size: 10px;
+  font-size: 12px;
   line-height: 1.5;
 }
 
@@ -1036,7 +1062,7 @@
   gap: 10px;
   margin: 0;
   color: var(--circa-ink-soft);
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.14em;
   line-height: 1;
@@ -1061,7 +1087,7 @@
 .filterLabel {
   padding-left: 1px;
   color: var(--circa-ink-soft);
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.1em;
   line-height: 1;
@@ -1086,7 +1112,7 @@
   background-position: right 10px center;
   color: var(--circa-ink);
   font: inherit;
-  font-size: 11px;
+  font-size: 12px;
   cursor: pointer;
 }
 
@@ -1144,7 +1170,7 @@
 
 .filterTagLabel {
   color: var(--circa-ink-soft);
-  font-size: 8.5px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -1152,7 +1178,7 @@
 
 .filterTagValue {
   color: var(--circa-ink);
-  font-size: 10.5px;
+  font-size: 12px;
   font-weight: 700;
 }
 
@@ -1175,12 +1201,12 @@
 }
 
 .shell .filterTagClear a {
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 700;
 }
 
 .shell .more {
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 700;
 }
 
@@ -1218,9 +1244,10 @@
 .heroIntro {
   margin: 0;
   max-width: 66ch;
-  font-family: "Libre Baskerville", Georgia, serif;
-  font-size: 12.5px;
+  font-family: var(--archive-instrument);
+  font-size: 16px;
   line-height: 1.75;
+  text-wrap: pretty;
 }
 
 .heroNote {
@@ -1228,7 +1255,7 @@
   padding-left: 12px;
   border-left: 2px solid #b3c1cf;
   color: var(--circa-ink-soft);
-  font-size: 10.5px;
+  font-size: 12px;
   line-height: 1.6;
 }
 
@@ -1264,8 +1291,8 @@
   gap: 8px;
   margin: 0;
   color: #101d2b;
-  font-family: var(--font-sans);
-  font-size: 19px;
+  font-family: var(--archive-display);
+  font-size: 21px;
   font-weight: 400;
   line-height: 1.2;
 }
@@ -1279,7 +1306,7 @@
 .blockNote {
   margin: 3px 0 0;
   color: var(--circa-ink-soft);
-  font-size: 10.5px;
+  font-size: 12px;
   line-height: 1.5;
 }
 .blockFoot {
@@ -1310,8 +1337,8 @@
 .featuredCode {
   margin: 0 0 6px;
   color: var(--klass-color, var(--circa-ink-soft));
-  font-family: "Courier New", monospace;
-  font-size: 10px;
+  font-family: var(--archive-typewriter);
+  font-size: 12px;
   letter-spacing: 0.08em;
 }
 
@@ -1338,8 +1365,8 @@
 .featuredAbstract {
   margin: 0 0 16px;
   max-width: 58ch;
-  font-family: "Libre Baskerville", Georgia, serif;
-  font-size: 12.5px;
+  font-family: var(--archive-instrument);
+  font-size: 16px;
   line-height: 1.75;
 }
 .featuredAction {
@@ -1351,7 +1378,7 @@
 }
 .featuredNote {
   color: var(--circa-ink-soft);
-  font-size: 10px;
+  font-size: 12px;
   line-height: 1.5;
 }
 
@@ -1368,7 +1395,7 @@
 
 .featuredFacts dt {
   color: var(--circa-ink-soft);
-  font-size: 8.5px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.1em;
   line-height: 1.4;
@@ -1377,7 +1404,7 @@
 
 .featuredFacts dd {
   margin: 2px 0 0;
-  font-size: 11.5px;
+  font-size: 12px;
   line-height: 1.45;
 }
 
@@ -1417,8 +1444,8 @@
 
 .classCount {
   color: var(--circa-ink-soft);
-  font-family: "Courier New", monospace;
-  font-size: 9.5px;
+  font-family: var(--archive-typewriter);
+  font-size: 12px;
   letter-spacing: 0.04em;
 }
 
@@ -1431,8 +1458,8 @@
   padding-bottom: 7px;
   border-bottom: 2px solid #3a4f6d;
   color: #101d2b;
-  font-family: var(--font-sans);
-  font-size: 19px;
+  font-family: var(--archive-display);
+  font-size: 20px;
   font-weight: 400;
   line-height: 1.2;
 }
@@ -1462,8 +1489,9 @@
 .railNote {
   margin: 0 0 8px;
   color: var(--circa-ink-soft);
-  font-size: 10px;
+  font-size: 12px;
   line-height: 1.5;
+  text-wrap: pretty;
 }
 
 .railList {
@@ -1480,7 +1508,7 @@
   align-items: baseline;
   padding: 6px 0;
   border-bottom: 1px dotted var(--circa-rule);
-  font-size: 11.5px;
+  font-size: 12px;
 }
 
 .railItem:last-child {
@@ -1492,8 +1520,8 @@
 }
 .railMeta {
   color: var(--circa-ink-soft);
-  font-family: "Courier New", monospace;
-  font-size: 9px;
+  font-family: var(--archive-typewriter);
+  font-size: 12px;
   white-space: nowrap;
 }
 
@@ -1505,8 +1533,8 @@
   counter-increment: rail;
   content: counter(rail);
   color: var(--circa-ink-soft);
-  font-family: "Courier New", monospace;
-  font-size: 9px;
+  font-family: var(--archive-typewriter);
+  font-size: 12px;
   line-height: 1.6;
 }
 
@@ -1537,7 +1565,7 @@
   width: 100%;
   border-collapse: collapse;
   text-align: left;
-  font-size: 11px;
+  font-size: 12px;
 }
 .table :is(th, td) {
   padding: 6px 8px;
@@ -1557,7 +1585,7 @@
 .table thead th {
   background: #bdcad7;
   border-bottom: 1px solid #7b8b9c;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -1577,7 +1605,7 @@
   background: #dde5ec;
   border-bottom: 1px solid #96a6b7;
   color: var(--circa-ink-soft);
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-align: left;
@@ -1586,8 +1614,8 @@
 
 .codeCell {
   white-space: nowrap;
-  font-family: "Courier New", monospace;
-  font-size: 10px;
+  font-family: var(--archive-typewriter);
+  font-size: 12px;
   font-weight: normal;
 }
 .shell .codeCell a {
@@ -1600,7 +1628,7 @@
   align-items: center;
   gap: 5px;
   color: var(--klass-color, var(--circa-ink));
-  font-size: 9.5px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.07em;
   line-height: 1.6;
@@ -1624,7 +1652,7 @@
   align-items: center;
   gap: 6px;
   color: var(--circa-ink-soft);
-  font-size: 9.5px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.07em;
   line-height: 1.6;
@@ -1674,8 +1702,8 @@
   border: 1px solid #96a6b7;
   background: #cbd5df;
   color: var(--circa-ink-soft);
-  font-family: "Courier New", monospace;
-  font-size: 9px;
+  font-family: var(--archive-typewriter);
+  font-size: 12px;
   letter-spacing: 0.03em;
   line-height: 1.6;
   white-space: nowrap;
@@ -1706,7 +1734,17 @@
   gap: 18px 24px;
   padding: 14px 0 24px;
 }
+/*
+ * The measure of a filing. It is declared here so the head, the sheet, the ruled
+ * register, and the notes all inherit one value; the prose, tables, and register
+ * then end on one right margin inside the leaf, which is what the sheet's border
+ * encloses. `rem` and not `ch`: a `ch` cap resolves in the
+ * element's own font, so one `64ch` was 640px of Plex Sans for a paragraph and
+ * 499px of Plex Mono for the table beneath it, and the table was crushed into a
+ * column narrower than the text it sat under.
+ */
 .record {
+  --filing-measure: 40rem;
   min-width: 0;
 }
 
@@ -1733,12 +1771,13 @@
   flex: 1 1 320px;
   margin: 0;
   color: #101d2b;
-  font-family: var(--font-sans);
-  font-size: 27px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
+  font-family: var(--archive-display);
+  font-size: 26px;
+  font-weight: 400;
+  letter-spacing: 0.055em;
   line-height: 1.18;
   text-transform: uppercase;
+  text-wrap: balance;
 }
 
 .recordCode {
@@ -1752,7 +1791,7 @@
   border-left: 3px solid var(--klass-color, var(--circa-link));
   background: var(--circa-paper-raised);
   color: var(--klass-color, inherit);
-  font-family: "Courier New", monospace;
+  font-family: var(--archive-typewriter);
   font-size: 12.5px;
   font-weight: 700;
   letter-spacing: 0.05em;
@@ -1770,7 +1809,7 @@
   align-items: center;
   gap: 6px;
   color: var(--circa-ink-soft);
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -1818,21 +1857,20 @@
 }
 .recordFacts dt {
   color: var(--circa-ink-soft);
-  font-size: 8.5px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
 }
 .recordFacts dd {
   margin: 0;
-  font-size: 11px;
+  font-size: 12px;
 }
 
 /*
  * The toolbar. The record's own tools stay on the left where a reader arriving
- * at the top of the page looks first; the step through the register sits beside
- * them as a quiet pager; the two ways out sit at the far right. It is one band,
- * not three, and the only rule on it is the pair above and below.
+ * at the top of the page looks first; the two ways out sit at the far right. It
+ * is one band, not three, and the only rule on it is the pair above and below.
  */
 .actions {
   display: flex;
@@ -1853,52 +1891,6 @@
   flex: 1 1 0;
 }
 
-/*
- * The pager. Two neighbouring addresses in the record's own face, set apart from
- * the tools by a hairline rather than boxed alongside them: stepping to the next
- * leaf is navigation, not an operation, and it should not add two more keys to a
- * bar that already holds five.
- */
-.stepper {
-  display: flex;
-  align-items: center;
-  padding-left: 10px;
-  border-left: 1px solid #a7b5c3;
-}
-.shell .step {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  min-height: 24px;
-  padding: 0 6px;
-  color: var(--circa-link);
-  font-family: "Courier New", monospace;
-  font-size: 10px;
-  letter-spacing: 0.02em;
-  text-decoration: none;
-}
-.shell .step:hover {
-  background: #becbd8;
-  color: var(--circa-ink);
-}
-.shell .step + .step {
-  margin-left: 3px;
-  padding-left: 9px;
-  border-left: 1px solid #a7b5c3;
-}
-.shell .step svg {
-  transition: transform 120ms ease;
-}
-.shell .step[data-dir="prev"]:hover svg {
-  transform: translateX(-2px);
-}
-.shell .step[data-dir="next"]:hover svg {
-  transform: translateX(2px);
-}
-.stepCode {
-  line-height: 1;
-}
-
 .download {
   position: relative;
 }
@@ -1912,7 +1904,7 @@
 .shell .downloadSummary::after {
   content: " ▾";
   color: var(--circa-ink-soft);
-  font-size: 8px;
+  font-size: 12px;
 }
 .downloadList {
   position: absolute;
@@ -1932,7 +1924,7 @@
   display: block;
   padding: 6px 8px;
   color: #dce9f5;
-  font-size: 10px;
+  font-size: 12px;
   text-decoration: none;
 }
 .shell .downloadList a:hover {
@@ -1949,8 +1941,8 @@
   padding: 0;
   list-style: none;
   color: var(--circa-ink-soft);
-  font-family: "Courier New", monospace;
-  font-size: 10px;
+  font-family: var(--archive-typewriter);
+  font-size: 12px;
 }
 .readership li {
   padding: 4px 0;
@@ -1967,41 +1959,80 @@
   border-left: 4px solid var(--circa-stamp);
   background: #e9dcb6;
   color: #3b2e12;
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.55;
 }
 
-/* Contents is a single band of section titles. */
+/*
+ * Contents, folded behind a hamburger key. The list itself is the same section
+ * index, opened as a ruled block of rows in a panel under the key rather than a
+ * band across the page: a reader who wants to jump somewhere asks for the list,
+ * and a reader who came to read meets the filing first.
+ */
 .contents {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 4px 14px;
+  position: relative;
   margin: 0 0 14px;
-  padding: 0 0 2px;
 }
-.contentsTitle {
-  margin: 0;
+.shell .contentsToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 9px;
+  border: 1px solid #96a6b7;
+  background: var(--circa-paper-raised);
   color: var(--circa-ink-soft);
-  font-size: 8.5px;
+  font-family: var(--archive-instrument);
+  font-size: 12px;
+  font-weight: 700;
   letter-spacing: 0.12em;
   line-height: 1.4;
   text-transform: uppercase;
+  cursor: pointer;
+  list-style: none;
 }
-.contents ol {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 3px 16px;
+.contentsToggle::-webkit-details-marker {
+  display: none;
+}
+.shell .contentsToggle:hover,
+.contents[open] > .contentsToggle {
+  background: #dde5ec;
+  color: var(--circa-ink);
+}
+.shell .contentsMenu {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 4px);
+  left: 0;
+  width: max-content;
+  min-width: 240px;
+  max-width: min(78vw, 320px);
+  max-height: min(60vh, 420px);
+  overflow-y: auto;
+  padding: 4px 0;
+  border: 1px solid #96a6b7;
+  border-top: 3px solid #526e94;
+  background: var(--circa-paper-raised);
+  box-shadow:
+    0 2px 3px rgb(13 19 26 / 14%),
+    0 14px 28px -14px rgb(13 19 26 / 45%);
+}
+.contentsMenu ol {
   margin: 0;
   padding: 0;
   list-style: none;
-  font-size: 11px;
 }
-.contents a {
+.contentsMenu li + li {
+  border-top: 1px dotted var(--circa-rule);
+}
+.shell .contentsMenu a {
+  display: block;
+  padding: 7px 12px;
+  font-size: 13px;
+  line-height: 1.4;
   text-decoration: none;
 }
-.contents a:hover {
-  text-decoration: underline;
+.shell .contentsMenu a:hover {
+  background: #dde5ec;
 }
 /* The printed sheet keeps balanced margins around its unnumbered sections. */
 .sheet {
@@ -2027,21 +2058,29 @@
 }
 .sheetHeading {
   position: relative;
+  /*
+   * The section rule ends where the section's text ends. No fallback, on
+   * purpose: the guide pages share this heading and declare no filing measure,
+   * so their rules keep spanning the leaf.
+   */
+  max-width: var(--filing-measure);
   margin: 0 0 10px;
   padding-bottom: 5px;
   border-bottom: 1px solid var(--circa-rule);
-  font-family: var(--font-sans);
-  font-size: 19px;
-  font-weight: normal;
+  font-family: var(--archive-display);
+  font-size: 20px;
+  font-weight: 400;
   line-height: 1.25;
 }
 
 .fields {
+  /* The register at the foot of a section ends where the prose ends. */
+  max-width: var(--filing-measure);
   margin: 0 0 10px;
   padding: 7px 10px;
   border: 1px solid var(--circa-rule);
   background: var(--circa-paper-raised);
-  font-size: 10.5px;
+  font-size: 12px;
 }
 .fields > div {
   display: grid;
@@ -2055,8 +2094,8 @@
 }
 .fields dt {
   color: var(--circa-ink-soft);
-  font-family: "Courier New", monospace;
-  font-size: 9px;
+  font-family: var(--archive-typewriter);
+  font-size: 12px;
   letter-spacing: 0.03em;
   text-transform: uppercase;
 }
@@ -2078,8 +2117,8 @@
   padding: 1px 6px;
   border: 1px solid var(--circa-stamp);
   color: var(--circa-stamp);
-  font-family: "Courier New", monospace;
-  font-size: 9px;
+  font-family: var(--archive-typewriter);
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -2098,7 +2137,7 @@
   flex-basis: 100%;
   margin: 0;
   color: var(--circa-ink-soft);
-  font-size: 10px;
+  font-size: 12px;
   line-height: 1.5;
 }
 
@@ -2130,7 +2169,7 @@
   gap: 7px;
   margin: 0 0 8px;
   color: #101d2b;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.1em;
   line-height: 1.3;
@@ -2146,12 +2185,14 @@
 
 .particulars {
   margin: 0;
-  font-size: 10.5px;
+  font-size: 12px;
 }
 .particulars > div {
   display: grid;
-  grid-template-columns: 84px minmax(0, 1fr);
-  gap: 6px;
+  /* Wide enough for "ORGANIZATIONS" in the typewriter face at 12px; narrower
+     runs the label into the value it labels. */
+  grid-template-columns: minmax(0, 108px) minmax(0, 1fr);
+  gap: 8px;
   padding: 5px 0;
   border-top: 1px dotted var(--circa-rule);
 }
@@ -2160,8 +2201,8 @@
 }
 .particulars dt {
   color: var(--circa-ink-soft);
-  font-family: "Courier New", monospace;
-  font-size: 9px;
+  font-family: var(--archive-typewriter);
+  font-size: 12px;
   letter-spacing: 0.03em;
   text-transform: uppercase;
 }
@@ -2207,12 +2248,12 @@
 .recordUpdateCard time {
   display: block;
   color: var(--circa-ink-soft);
-  font-family: "Courier New", monospace;
-  font-size: 9px;
+  font-family: var(--archive-typewriter);
+  font-size: 12px;
 }
 .recordUpdateCard p {
   margin: 3px 0 0;
-  font-size: 10.5px;
+  font-size: 12px;
   line-height: 1.5;
   overflow-wrap: anywhere;
 }
@@ -2220,25 +2261,25 @@
 .asideNote {
   margin: 0;
   color: var(--circa-ink-soft);
-  font-size: 10.5px;
+  font-size: 12px;
   line-height: 1.5;
 }
 .asideBody {
   margin: 0 0 9px;
-  font-size: 10.5px;
+  font-size: 12px;
   line-height: 1.55;
 }
 .asideFoot {
   margin: 0;
   padding-top: 8px;
   border-top: 1px dotted var(--circa-rule);
-  font-size: 10px;
+  font-size: 12px;
 }
 
 .referenceHeading {
   margin: 0 0 3px;
   color: var(--circa-ink-soft);
-  font-size: 8.5px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.1em;
   line-height: 1.4;
@@ -2251,7 +2292,7 @@
   margin: 0;
   padding: 0;
   list-style: none;
-  font-size: 10.5px;
+  font-size: 12px;
 }
 .referenceList li {
   padding: 6px 0;
@@ -2264,73 +2305,46 @@
   display: block;
   margin-top: 2px;
   color: var(--circa-ink-soft);
-  font-size: 9.5px;
+  font-size: 12px;
   line-height: 1.5;
 }
 
 /*
- * The step at the foot. Two leaves on the table rather than two lines of text:
- * each one is a filed card with the direction stamped on it, the record's name,
- * and its address. When only one neighbour exists the card keeps its own side.
+ * The record's related lists, styled as the files they are: three cards on the
+ * table, each a ruled leaf with its own heading, above the annotations because
+ * the other lists are part of the record's address rather than its discussion.
  */
-.recordNav {
+.recordRelated {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
   margin-top: 18px;
-  padding-top: 12px;
-  border-top: 1px solid var(--circa-rule);
 }
-.recordNav > [data-dir="next"]:only-child {
-  grid-column: 2;
-}
-.shell .leaf {
+.shell .relatedCard {
   display: grid;
-  gap: 2px;
+  align-content: center;
+  min-height: 54px;
   padding: 9px 11px 10px;
   border: 1px solid #96a6b7;
   border-top: 3px solid #526e94;
   background: var(--circa-paper-raised);
   text-decoration: none;
 }
-.shell .leaf[data-dir="next"] {
-  border-top-color: var(--circa-stamp);
-  text-align: right;
-}
-.shell .leaf:hover {
+.shell .relatedCard:hover {
   background: #dde5ec;
 }
-.leafDir {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  color: var(--circa-ink-soft);
-  font-size: 8.5px;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  line-height: 1.4;
-  text-transform: uppercase;
-}
-.shell .leaf[data-dir="next"] .leafDir {
-  justify-content: flex-end;
-}
-.leafTitle {
+.relatedLabel {
   color: var(--circa-ink);
+  font-family: var(--archive-typewriter);
   font-size: 12px;
-  font-weight: 400;
+  font-weight: 700;
   letter-spacing: 0.05em;
   line-height: 1.35;
   text-transform: uppercase;
 }
-.leafCode {
-  color: var(--circa-ink-soft);
-  font-family: "Courier New", monospace;
-  font-size: 9px;
-  letter-spacing: 0.04em;
-}
 .back {
   margin: 12px 0 0;
-  font-size: 10.5px;
+  font-size: 12px;
 }
 
 /* Notes at the foot, the way a work page carries its correspondence. */
@@ -2347,9 +2361,9 @@
 }
 .notesTitle {
   margin: 0;
-  font-family: var(--font-sans);
-  font-size: 18px;
-  font-weight: normal;
+  font-family: var(--archive-display);
+  font-size: 19px;
+  font-weight: 400;
   line-height: 1.2;
 }
 .notesCount {
@@ -2357,14 +2371,14 @@
   border: 1px solid #96a6b7;
   background: var(--circa-paper-raised);
   color: var(--circa-ink-soft);
-  font-family: "Courier New", monospace;
-  font-size: 9.5px;
+  font-family: var(--archive-typewriter);
+  font-size: 12px;
   line-height: 1.7;
 }
 .notesLead {
   margin: 0 0 10px;
   color: var(--circa-ink-soft);
-  font-size: 10.5px;
+  font-size: 12px;
 }
 .noteList {
   display: grid;
@@ -2375,7 +2389,7 @@
   padding: 10px 12px;
   border: 1px dashed var(--circa-rule);
   color: var(--circa-ink-soft);
-  font-size: 10.5px;
+  font-size: 12px;
 }
 .noteCard {
   margin: 0;
@@ -2395,8 +2409,8 @@
   gap: 2px 10px;
   margin: 0 0 4px;
   color: var(--circa-ink-soft);
-  font-family: "Courier New", monospace;
-  font-size: 9px;
+  font-family: var(--archive-typewriter);
+  font-size: 12px;
 }
 .noteAuthor {
   color: var(--circa-ink);
@@ -2411,7 +2425,7 @@
   padding: 0 4px;
   border: 1px solid var(--circa-stamp);
   color: var(--circa-stamp);
-  font-size: 8px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.1em;
   line-height: 1.5;
@@ -2419,7 +2433,7 @@
 }
 .noteBody {
   margin: 0;
-  font-family: var(--font-sans);
+  font-family: var(--archive-instrument);
   font-size: 12.5px;
   line-height: 1.6;
 }
@@ -2453,7 +2467,7 @@
   background: none;
   color: var(--circa-link);
   font: inherit;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -2484,7 +2498,7 @@
   gap: 6px;
   margin: 0 0 9px;
   color: var(--circa-ink);
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.12em;
   line-height: 1.4;
@@ -2503,7 +2517,7 @@
 }
 .fieldLabel {
   color: var(--circa-ink-soft);
-  font-size: 8.5px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -2520,18 +2534,18 @@
 .fieldInput {
   min-height: 30px;
   padding: 0 8px;
-  font-size: 11.5px;
+  font-size: 12px;
 }
 .fieldArea {
   padding: 7px 8px;
-  font-family: var(--font-sans);
+  font-family: var(--archive-instrument);
   font-size: 12px;
   line-height: 1.55;
   resize: vertical;
 }
 .fieldInput::placeholder,
 .fieldArea::placeholder {
-  color: #6b7c8d;
+  color: #5a6a7a;
   opacity: 1;
 }
 .composerFoot {
@@ -2547,13 +2561,13 @@
   flex: 1 1 220px;
   margin: 0;
   color: var(--circa-ink-soft);
-  font-size: 9.5px;
+  font-size: 12px;
   line-height: 1.5;
 }
 .composerCount {
   color: var(--circa-ink-soft);
-  font-family: "Courier New", monospace;
-  font-size: 9px;
+  font-family: var(--archive-typewriter);
+  font-size: 12px;
   letter-spacing: 0.02em;
 }
 
@@ -2577,16 +2591,44 @@
  * Zilla Slab gives long filings the weight of printed archive stock. The
  * sheet's prose, tables, figures, and ruled headings share one right margin;
  * tables and codes retain the archive's register typography.
+ *
+ * The container itself stops at the filing measure rather than only capping the
+ * paragraphs inside it: a floated figure anchors to its containing block, so a
+ * full-width `.prose` on a wider sheet pushed a right-hand print past the text's
+ * right margin and left it hanging over the sheet's spare stock. Capped here, the
+ * print sits on the content edge and the text wraps beside it.
  */
 .prose {
-  --prose-font: "Zilla Slab", Georgia, serif;
+  --prose-font: var(--archive-instrument);
+  max-width: var(--filing-measure);
   color: var(--circa-ink);
   font-family: var(--prose-font);
   font-size: 16px;
   line-height: 1.75;
+  text-wrap: pretty;
 }
 .prose p {
-  margin: 0 0 11px;
+  /* A gap nearer half a line than a third: at 16px/1.75 an 11px step read as the
+     same block continuing rather than as the next paragraph of a report. */
+  margin: 0 0 14px;
+}
+/*
+ * A filing is read, not scanned. The measure is the leaf's measure (see
+ * `.record`), so prose, ruled headings, tables, and the register at the foot all
+ * end on the same right margin. It is declared in `rem` rather than `ch`: a `ch`
+ * cap is resolved in the element's own font, so the same `64ch` was 640px of
+ * Plex Sans for a paragraph and 499px of Plex Mono for a table, and the table
+ * was crushed into a column narrower than the text it sat under.
+ */
+.prose > p,
+.prose > ul,
+.prose > ol,
+.prose > blockquote,
+.prose > h3,
+.prose > h4,
+.prose > pre,
+.prose > table {
+  max-width: var(--filing-measure);
 }
 /*
  * Tailwind's preflight sets every list to `none`, and the sheet's lists are
@@ -2595,12 +2637,12 @@
  * stamp, so a list reads as typed rather than as interface.
  */
 .prose ul {
-  margin: 0 0 11px;
+  margin: 0 0 14px;
   padding-left: 20px;
   list-style: disc outside;
 }
 .prose ol {
-  margin: 0 0 11px;
+  margin: 0 0 14px;
   padding-left: 22px;
   list-style: decimal outside;
 }
@@ -2624,7 +2666,7 @@
   padding-top: 8px;
   border-top: 1px solid var(--circa-rule);
   font-family: var(--prose-font);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.16em;
   line-height: 1.4;
@@ -2632,7 +2674,7 @@
 }
 .prose h4 {
   margin-top: 16px;
-  font-size: 10px;
+  font-size: 12px;
   letter-spacing: 0.12em;
 }
 
@@ -2663,13 +2705,22 @@
   margin: 10px 0 14px;
   border: 1px solid var(--circa-rule);
   border-collapse: collapse;
-  font-family: "Courier New", monospace;
+  font-family: var(--archive-typewriter);
   font-size: 13px;
   line-height: 1.55;
 }
 .prose :is(th, td) {
   padding: 5px 9px;
-  overflow-wrap: anywhere;
+  /*
+   * `break-word`, not `anywhere`. `anywhere` also feeds the min-content size of
+   * the cell, so the browser was free to give a column one character of width
+   * and break the header to fit: "SUBJE / CT", "AG / E", "VERIFI / ED?". With
+   * `break-word` a word only breaks when it cannot fit at all, so the columns
+   * keep their words and a long token still wraps instead of overflowing.
+   */
+  overflow-wrap: break-word;
+  word-break: normal;
+  hyphens: none;
   text-align: left;
   vertical-align: top;
 }
@@ -2677,8 +2728,8 @@
   border-bottom: 1px solid var(--circa-rule);
   background: #dfe7ee;
   color: var(--circa-ink-soft);
-  font-family: var(--font-sans);
-  font-size: 8.5px;
+  font-family: var(--archive-instrument);
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -2692,10 +2743,22 @@
 .prose table:has(thead th:nth-child(2):last-child) tbody td:first-child {
   width: 168px;
   color: var(--circa-ink-soft);
-  font-family: var(--font-sans);
-  font-size: 9.5px;
+  font-family: var(--archive-instrument);
+  font-size: 12px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+}
+/*
+ * A register's first column is its key: a code, a range like `S-06–S-11`, a
+ * label. Those are short and they carry meaning as one token, so they are not
+ * allowed to wrap where there is room for them — the en dash is a break
+ * opportunity, and a key that breaks there reads as two keys. Held back on a
+ * phone, where the four columns genuinely compete for the sheet.
+ */
+@media (min-width: 621px) {
+  .prose tbody td:first-child {
+    white-space: nowrap;
+  }
 }
 
 /* Inline code is a punched tag, and the tags in a cross-reference block are the case in point. */
@@ -2704,8 +2767,8 @@
   border: 1px solid #b9c6d3;
   background: #e3eaf1;
   color: #22303d;
-  font-family: "Courier New", monospace;
-  font-size: 10.5px;
+  font-family: var(--archive-typewriter);
+  font-size: 12px;
   letter-spacing: 0.02em;
   white-space: nowrap;
 }
@@ -2721,8 +2784,8 @@
   padding: 0;
   border: 0;
   background: none;
-  font-family: "Courier New", monospace;
-  font-size: 11px;
+  font-family: var(--archive-typewriter);
+  font-size: 12px;
   white-space: pre;
 }
 
@@ -2735,7 +2798,7 @@
 .prose hr + p {
   margin: 0;
   color: var(--circa-ink-soft);
-  font-size: 10.5px;
+  font-size: 12px;
   line-height: 1.7;
 }
 .prose hr + p em {
@@ -2787,8 +2850,8 @@
   padding: 0 4px;
   background: #e9dcb6;
   color: #3b2e12;
-  font-family: "Courier New", monospace;
-  font-size: 9.5px;
+  font-family: var(--archive-typewriter);
+  font-size: 12px;
   line-height: 1.5;
   text-indent: 0;
 }
@@ -2802,48 +2865,78 @@
   display: inline;
 }
 
+/*
+ * A figure on the reading edition is the same instant print as on the
+ * workstation's sheet: brighter, faintly warm stock with the caption band that
+ * makes it a print rather than another ruled panel, and a cast shadow that lifts
+ * it off the filing.
+ *
+ * The print is given the measure a photograph gets on a desk rather than the
+ * sheet's full width, and the plate is capped in height, so a portrait figure
+ * cannot open a page of white space between one paragraph and the next. Floats
+ * are narrower still, so the prose wraps the print instead of waiting for it.
+ */
 .figure {
-  margin: 8px 0 12px;
-  padding: 5px;
-  border: 1px solid var(--circa-rule);
-  background: var(--circa-paper-raised);
+  --print: #fbfbf6;
+  --print-edge: rgb(22 32 43 / 14%);
+  --print-well: #dbe3ea;
+  --print-ink: #3c4954;
+  max-width: 100%;
+  margin: 10px 0 16px;
+  padding: 8px 8px 0;
+  border: 1px solid var(--print-edge);
+  background: var(--print);
+  box-shadow:
+    0 1px 2px rgb(13 19 26 / 12%),
+    0 8px 18px -10px rgb(13 19 26 / 40%);
+  break-inside: avoid;
 }
 .figureFull {
-  width: 100%;
+  width: min(100%, 470px);
+  margin-inline: auto;
   clear: both;
 }
 .figureLeft {
   float: left;
-  width: 44%;
-  margin: 2px 12px 8px 0;
+  width: min(44%, 260px);
+  margin: 4px 22px 18px 0;
 }
 .figureRight {
   float: right;
-  width: 44%;
-  margin: 2px 0 8px 12px;
+  width: min(44%, 260px);
+  margin: 4px 0 18px 22px;
 }
 .figure img {
   display: block;
   width: 100%;
   height: auto;
+  max-height: 340px;
+  object-fit: cover;
+  background: var(--print-well);
+  border: 1px solid var(--print-edge);
 }
 .figureHeld {
   display: grid;
   place-items: center;
-  height: 96px;
-  border: 1px dashed var(--circa-rule);
+  width: min(320px, 100%);
+  height: 140px;
+  margin-inline: auto;
+  border: 1px dashed var(--print-edge);
   color: #8a2b2b;
-  font-family: var(--font-sans);
+  font-family: var(--archive-instrument);
   font-size: 18px;
   line-height: 1;
 }
+/* The band under the photo is the print's own label: typed, centred, and part
+   of the object rather than a note set beneath it. */
 .figureCaption {
-  margin-top: 4px;
-  color: var(--circa-ink-soft);
-  font-family: var(--font-sans);
-  font-size: 10px;
-  font-style: italic;
-  line-height: 1.45;
+  margin: 0;
+  padding: 9px 4px 13px;
+  color: var(--print-ink);
+  font-family: var(--archive-instrument);
+  font-size: 12px;
+  line-height: 1.4;
+  text-align: center;
 }
 
 /* ------------------------------------------------------------------------- */
@@ -2880,7 +2973,7 @@
 
 .orgLedger dt {
   color: var(--circa-ink-soft);
-  font-size: 8.5px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.1em;
   line-height: 1.4;
@@ -2890,7 +2983,7 @@
 .orgLedger dd {
   margin: 3px 0 0;
   color: #101d2b;
-  font-family: "Courier New", monospace;
+  font-family: var(--archive-typewriter);
   font-size: 15px;
   line-height: 1.2;
 }
@@ -2926,8 +3019,8 @@
   border: 1px solid #96a6b7;
   background: var(--circa-paper-raised);
   color: var(--klass-organization);
-  font-family: "Courier New", monospace;
-  font-size: 10.5px;
+  font-family: var(--archive-typewriter);
+  font-size: 12px;
   font-weight: 700;
   line-height: 1;
 }
@@ -2945,15 +3038,15 @@
 }
 .orgCode {
   color: var(--klass-color, var(--circa-ink-soft));
-  font-family: "Courier New", monospace;
+  font-family: var(--archive-typewriter);
   font-size: 12.5px;
   font-weight: 700;
   letter-spacing: 0.02em;
 }
 .orgFiled {
   color: var(--circa-ink-soft);
-  font-family: "Courier New", monospace;
-  font-size: 9.5px;
+  font-family: var(--archive-typewriter);
+  font-size: 12px;
 }
 
 /* An organization's name is a filing title, like a record's. */
@@ -2979,8 +3072,8 @@
 .orgAbstract {
   margin: 0;
   max-width: 64ch;
-  font-family: "Libre Baskerville", Georgia, serif;
-  font-size: 12.5px;
+  font-family: var(--archive-instrument);
+  font-size: 16px;
   line-height: 1.75;
 }
 
@@ -2996,14 +3089,14 @@
 
 .orgTallyValue {
   color: #101d2b;
-  font-family: "Courier New", monospace;
+  font-family: var(--archive-typewriter);
   font-size: 25px;
   line-height: 1;
 }
 
 .orgTallyLabel {
   color: var(--circa-ink-soft);
-  font-size: 8.5px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -3024,7 +3117,7 @@
   border-left: 3px solid var(--klass-organization);
   background: var(--circa-paper-sunken);
   color: var(--circa-link);
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.09em;
   line-height: 1;
@@ -3078,7 +3171,7 @@
 }
 .emptyTitle {
   margin: 0;
-  font-family: "Libre Baskerville", Georgia, serif;
+  font-family: var(--archive-instrument);
   font-size: 13px;
   line-height: 1.6;
 }
@@ -3110,30 +3203,42 @@
 .guideTitle {
   margin: 0 0 10px;
   color: #101d2b;
-  font-family: var(--font-sans);
-  font-size: 27px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
+  font-family: var(--archive-display);
+  font-size: 30px;
+  font-weight: 400;
+  letter-spacing: 0.055em;
   line-height: 1.18;
   text-transform: uppercase;
+  text-wrap: balance;
 }
 .guideLede {
   max-width: 60ch;
   margin: 0 0 9px;
   color: #22303d;
-  font-family: "Libre Baskerville", Georgia, serif;
-  font-size: 14px;
+  font-family: var(--archive-instrument);
+  font-size: 16px;
   line-height: 1.7;
+  text-wrap: pretty;
 }
 .guideIntro {
   margin: 0;
-  max-width: 84ch;
-  font-size: 12.5px;
+  max-width: 64ch;
+  font-size: 16px;
   line-height: 1.65;
 }
+.sectionIndex {
+  margin-right: 10px;
+  color: var(--circa-ink-soft);
+  font-family: var(--archive-typewriter);
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  vertical-align: 0.12em;
+}
 .guideBody {
+  max-width: 64ch;
   margin: 0 0 9px;
-  font-size: 12.5px;
+  font-size: 16px;
   line-height: 1.7;
 }
 .guideBody:last-child {
@@ -3168,7 +3273,7 @@
   border: 1px solid var(--circa-rule);
   border-collapse: collapse;
   background: var(--circa-paper-raised);
-  font-size: 11.5px;
+  font-size: 12px;
   line-height: 1.55;
 }
 .keyTable :is(th, td) {
@@ -3182,7 +3287,7 @@
   border-bottom: 1px solid var(--circa-rule);
   background: #dfe7ee;
   color: var(--circa-ink-soft);
-  font-size: 8.5px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -3205,7 +3310,7 @@
 .shell .keyClass {
   display: block;
   color: var(--klass-color);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.05em;
   text-underline-offset: 3px;
@@ -3218,8 +3323,8 @@
   display: block;
   margin-top: 3px;
   color: var(--circa-ink-soft);
-  font-family: "Courier New", monospace;
-  font-size: 10px;
+  font-family: var(--archive-typewriter);
+  font-size: 12px;
   letter-spacing: 0.02em;
   white-space: nowrap;
 }
@@ -3228,7 +3333,7 @@
 .guideHint {
   margin: 6px 0 0;
   color: var(--circa-ink-soft);
-  font-size: 9.5px;
+  font-size: 12px;
   line-height: 1.5;
 }
 .guideHint::before {
@@ -3251,7 +3356,7 @@
   margin: 0;
   padding: 0;
   list-style: none;
-  font-size: 11.5px;
+  font-size: 12px;
 }
 .guideToc li {
   border-top: 1px dotted var(--circa-rule);
@@ -3272,8 +3377,8 @@
 }
 .tocIndex {
   color: var(--circa-ink-soft);
-  font-family: "Courier New", monospace;
-  font-size: 9px;
+  font-family: var(--archive-typewriter);
+  font-size: 12px;
 }
 
 /* ------------------------------------------------------------------------- */
@@ -3301,8 +3406,8 @@
 }
 .footerMeta {
   color: #a4b7ca;
-  font-family: "Courier New", monospace;
-  font-size: 9px;
+  font-family: var(--archive-typewriter);
+  font-size: 12px;
 }
 .footerLinks {
   display: flex;
@@ -3311,7 +3416,7 @@
   margin: 8px 0 0;
   padding-top: 8px;
   border-top: 1px solid #3a4f6d;
-  font-size: 10px;
+  font-size: 12px;
 }
 .footerLinks a {
   color: #c8d6e5;
@@ -3327,8 +3432,8 @@
   gap: 4px 12px;
   margin: 8px 0 0;
   color: #a4b7ca;
-  font-family: "Courier New", monospace;
-  font-size: 9px;
+  font-family: var(--archive-typewriter);
+  font-size: 12px;
 }
 .footerFine a {
   color: #c8d6e5;
@@ -3421,17 +3526,33 @@
   .guideContents {
     display: none;
   }
+  /* A floated print becomes a centred one, still narrower than the sheet. */
   .figureLeft,
   .figureRight {
     float: none;
-    width: 100%;
-    margin: 8px 0 12px;
+    width: min(100%, 470px);
+    margin: 8px auto 12px;
   }
 }
 
 @media (max-width: 620px) {
   .brandText strong {
     font-size: 16px;
+  }
+  /*
+   * The masthead is brand, account, then the search. The motto is a tagline and
+   * gives up its line first, so the trough gets the full measure instead of
+   * three keys sharing it.
+   */
+  .brandText small {
+    display: none;
+  }
+  .topbarTools {
+    order: 2;
+  }
+  .search {
+    flex-basis: 100%;
+    order: 3;
   }
   /* On a phone the filters stack: a full-width field is easier to hit than two
      half-width ones, and the key has to be reachable with a thumb. */
@@ -3477,10 +3598,13 @@
     margin-top: 0;
   }
   .title {
-    font-size: 25px;
+    font-size: 27px;
+  }
+  .heroIntro {
+    text-wrap: balance;
   }
   .recordTitle {
-    font-size: 24px;
+    font-size: 22px;
   }
   .sheet {
     padding: 14px 14px 8px;
@@ -3488,25 +3612,8 @@
   .recordFacts > div + div::before {
     margin: 0 8px;
   }
-  .recordNav {
+  .recordRelated {
     grid-template-columns: minmax(0, 1fr);
-  }
-  .shell .leaf[data-dir="next"] {
-    text-align: left;
-  }
-  .shell .leaf[data-dir="next"] .leafDir {
-    justify-content: flex-start;
-  }
-  .recordNav > [data-dir="next"]:only-child {
-    grid-column: 1;
-  }
-  /* The pager wraps to its own line here, so its leading divider would be a stub. */
-  .stepper {
-    padding-left: 0;
-    border-left: 0;
-  }
-  .shell .step + .step {
-    border-left: 1px dotted #a7b5c3;
   }
   .composerField:first-child {
     max-width: none;
@@ -3515,7 +3622,7 @@
     flex-basis: 100%;
   }
   .guideTitle {
-    font-size: 24px;
+    font-size: 22px;
   }
   /* The key lets its definition keep the width; the chips only need their own name. */
   .keyTable tbody th {
@@ -3532,10 +3639,24 @@
     grid-template-columns: minmax(0, 1fr);
   }
   .table {
-    font-size: 10px;
+    font-size: 12px;
   }
   .table :is(th, td) {
     padding: 5px 6px;
+  }
+  /*
+   * A four-column register cannot hold tracked capitals in a 336px sheet. The
+   * tracking goes first, because it is the decoration and not the information,
+   * then the padding, then the size.
+   */
+  .prose table {
+    font-size: 12px;
+  }
+  .prose :is(th, td) {
+    padding: 4px 6px;
+  }
+  .prose thead th {
+    letter-spacing: 0.05em;
   }
   .footerInner {
     padding: 11px 12px 13px;
@@ -3545,12 +3666,6 @@
 @media (prefers-reduced-motion: reduce) {
   .searchSkeleton span {
     animation: none;
-  }
-  .shell .step svg {
-    transition: none;
-  }
-  .shell .step:hover svg {
-    transform: none;
   }
 }
 
@@ -3637,8 +3752,21 @@
   min-width: 0;
 }
 .pageFilterMenu > summary {
-  width: fit-content;
+  /*
+   * On a page the key is the caption of the filter band, not a chip beside it:
+   * a lone 95px key under a full-measure trough reads as an orphan at both
+   * widths, so the caption runs the width of the form and opens the band from it.
+   */
+  justify-content: flex-start;
+  width: 100%;
   cursor: pointer;
+  border-color: #7b8b9c #46586a #46586a #7b8b9c;
+  background: var(--circa-paper-raised);
+  color: var(--circa-link);
+}
+.pageFilterMenu > summary:hover {
+  background: #becbd8;
+  color: var(--circa-ink);
 }
 .pageFilterMenu[open] > summary {
   margin-bottom: 12px;
@@ -3658,11 +3786,11 @@
   font-family: var(--font-mono), monospace;
 }
 .globalFilterOptions {
-  gap: 5px;
+  gap: 4px 18px;
 }
 .globalFilterOptions label {
   align-items: center;
-  min-height: 30px;
+  min-height: 40px;
   cursor: pointer;
 }
 .globalFilterOptions [data-slot="checkbox"] {
@@ -3672,13 +3800,13 @@
 .tagCycleHint {
   max-width: 32ch;
   margin: 0 0 8px;
-  font-size: 10px;
+  font-size: 12px;
   color: var(--circa-ink-soft);
 }
 .tagState {
   order: 2;
   margin-left: auto;
-  font-size: 9px;
+  font-size: 12px;
   color: var(--circa-ink-soft);
 }
 .tagState[data-excluded="true"] {
@@ -3701,16 +3829,36 @@
   height: auto;
 }
 
-/* Search record classes reuse the archive taxonomy palette. */
-.shell [data-klass="record"],
-.shell [data-klass="exploration"] {
-  --klass-color: var(--klass-continuity);
+.searchField > [data-slot="button"] {
+  min-height: 42px;
+  font-size: 12px;
 }
-.shell [data-klass="evidence"] {
+
+.filterSummary {
+  min-height: 40px;
+  font-size: 12px;
+}
+
+.shell :global(.circa-language-option) {
+  min-height: 36px;
+  padding: 8px 6px;
+  font-size: 12px;
+}
+
+@media (max-width: 620px), (pointer: coarse) {
+  .searchField > [data-slot="button"],
+  .select,
+  .globalFilterOptions label,
+  .filterSummary,
+  .shell :global(.circa-language-option) {
+    min-height: 44px;
+  }
+}
+
+/* A generic record result borrows the organization steel; its class chip
+   carries the class colour. */
+.shell [data-klass="record"] {
   --klass-color: var(--klass-organization);
-}
-.shell [data-klass="rumour"] {
-  --klass-color: var(--klass-memo);
 }
 
 .resultTypes {
@@ -3722,7 +3870,7 @@
 
 .warningLabels {
   text-transform: uppercase;
-  font-size: 9.5px;
+  font-size: 12px;
   font-weight: 700;
   line-height: 1.6;
 }
@@ -3730,7 +3878,7 @@
   color: #9e1f26;
 }
 .warningLabels[data-tier="yellow"] {
-  color: #805400;
+  color: #754c00;
 }
 .warningLabels[data-tier="green"] {
   color: #2b6140;

@@ -32,8 +32,9 @@
 .site-attendance-note {
   margin: 0;
   color: var(--circa-ink-soft);
-  font-size: 10px;
+  font-size: 10.5px;
   line-height: 1.5;
+  text-wrap: pretty;
 }
 
 /* The second line is the page noticing it is still being read. */
@@ -46,7 +47,7 @@
   padding: 6px 8px 5px;
   border-bottom: 1px dotted var(--circa-rule);
   color: var(--circa-ink-soft);
-  font-size: 10px;
+  font-size: 10.5px;
 }
 
 .site-register-refreshed {
@@ -66,6 +67,9 @@
 }
 
 .site-refresh {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
   padding: 0;
   border: 0;
   background: none;
@@ -83,7 +87,7 @@
   color: var(--circa-ink);
 }
 .site-refresh:focus-visible {
-  outline: 1px dotted var(--circa-link);
+  outline: 2px dotted var(--circa-link);
   outline-offset: 2px;
 }
 
@@ -97,6 +101,9 @@
  * own markup cannot tell the difference, and turns into a notice when chosen.
  */
 .site-dead-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
   padding: 0;
   border: 0;
   background: none;
@@ -114,6 +121,6 @@
   color: var(--circa-ink);
 }
 .site-dead-link:focus-visible {
-  outline: 1px dotted var(--circa-link);
+  outline: 2px dotted var(--circa-link);
   outline-offset: 2px;
 }

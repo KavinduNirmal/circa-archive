@@ -36,6 +36,34 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
+## Instrument Serif
+
+The public archive's display face is Instrument Serif, bundled from
+`@fontsource/instrument-serif` under the SIL Open Font License 1.1. The
+unmodified package license text follows.
+
+```text
+Copyright 2022 The Instrument Serif Project Authors (https://github.com/Instrument/instrument-serif)
+InstrumentSerif-Italic.ttf: Copyright 2022 The Instrument Serif Project Authors (https://github.com/Instrument/instrument-serif)
+```
+
+The full license terms are the SIL Open Font License 1.1 reproduced under
+[Zilla Slab](#zilla-slab) below, and are retained with the installed package.
+
+## IBM Plex Sans
+
+The public archive's reading and instrument face is IBM Plex Sans, bundled from
+`@fontsource/ibm-plex-sans` under the SIL Open Font License 1.1. The unmodified
+package license text follows.
+
+```text
+Copyright 2019 IBM Corp. All rights reserved.
+IBMPlexSans-Italic[wdth,wght].ttf: Copyright 2019 IBM Corp. All rights reserved.
+```
+
+The full license terms are the SIL Open Font License 1.1 reproduced under
+[Zilla Slab](#zilla-slab) below, and are retained with the installed package.
+
 ## Zilla Slab
 
 The public record reader bundles Zilla Slab from `@fontsource/zilla-slab` under

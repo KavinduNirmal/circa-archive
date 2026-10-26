@@ -6,7 +6,6 @@ import { ArchiveNavDropdown } from "./archive-nav-dropdown";
 import { PROJECT_LINKS } from "../meta/meta-links";
 import { ArchiveButton } from "./archive-button";
 import { ArchiveFooter } from "./archive-footer";
-import { SITE_INDEX } from "./archive-data";
 import { SiteSearch } from "./site-search";
 import styles from "./archive-site.module.css";
 import type { SearchState } from "@/lib/search/contract";
@@ -25,18 +24,12 @@ import type { SearchState } from "@/lib/search/contract";
  */
 
 export type ArchiveSection =
-  "archive" | "records" | "organizations" | "about" | "editor";
+  "archive" | "records" | "organizations" | "characters" | "about" | "editor";
 
 export type ArchiveCrumb = { label: string; href?: string };
 
 const NAV: readonly { section: ArchiveSection; key: string; href: string }[] = [
   { section: "archive", key: "navArchive", href: "/site" },
-  { section: "records", key: "navRecords", href: "/site/records" },
-  {
-    section: "organizations",
-    key: "navOrganizations",
-    href: "/site/organizations",
-  },
 ];
 
 export function ArchiveChrome({
@@ -115,6 +108,48 @@ export function ArchiveChrome({
             </ArchiveButton>
           ))}
           <ArchiveNavDropdown
+            label={t("navRecords")}
+            href="/site/records"
+            current={active === "records"}
+            items={[
+              {
+                label: t("navRecordIncidents"),
+                href: "/site/records/incidents",
+              },
+              {
+                label: t("navRecordExplorations"),
+                href: "/site/records/explorations",
+              },
+              {
+                label: t("navRecordEvidence"),
+                href: "/site/records/evidence",
+              },
+              {
+                label: t("navRecordRumours"),
+                href: "/site/records/rumours",
+              },
+              {
+                label: t("navRecordPlaylists"),
+                href: "/site/records/playlists",
+              },
+            ]}
+          />
+          <ArchiveNavDropdown
+            label={t("navEntities")}
+            href="/site/organizations"
+            current={active === "organizations" || active === "characters"}
+            items={[
+              {
+                label: t("navOrganizations"),
+                href: "/site/organizations",
+              },
+              {
+                label: t("navCharacters"),
+                href: "/site/characters",
+              },
+            ]}
+          />
+          <ArchiveNavDropdown
             label={t("navAbout")}
             href="/site/about"
             current={active === "about"}
@@ -164,37 +199,17 @@ export function ArchiveChrome({
         </div>
       </nav>
 
-      {/*
-        The announcement bar. The text is drawn twice on a single track so the
-        loop has no seam; the second copy is decoration and is hidden from the
-        accessibility tree. The pause box is a real checkbox because an automatic
-        marquee still has to be stoppable without JavaScript —
-        `:checked ~` is what halts it.
-      */}
+      {/* The announcement remains a static, readable notice in both languages. */}
       {!compact && (
         <aside className={styles.banner} aria-label={t("bannerLabel")}>
           <div className={styles.bannerInner}>
-            <input
-              id="site-announcement-pause"
-              className={styles.bannerPauseInput}
-              type="checkbox"
-              aria-label={t("bannerPause")}
-            />
             <span className={styles.bannerLabel}>{t("bannerLabel")}</span>
             <div className={styles.bannerTicker}>
               <div className={styles.bannerTrack}>
                 <span className={styles.bannerText}>{t("bannerText")}</span>
-                <span className={styles.bannerText} aria-hidden="true">
-                  {t("bannerText")}
-                </span>
               </div>
             </div>
             <div className={styles.bannerTools}>
-              <label
-                className={styles.bannerPause}
-                htmlFor="site-announcement-pause"
-                aria-hidden="true"
-              />
               <ArchiveButton href="/site/about" className={styles.bannerKey}>
                 {t("bannerLink")}
               </ArchiveButton>
@@ -218,9 +233,12 @@ export function ArchiveChrome({
               </span>
             ))}
           </span>
-          {process.env.SEARCH_SOURCE !== "api" && (
-            <span>{t("indexCount", { count: SITE_INDEX.length })}</span>
-          )}
+          {/*
+            No count here. Every route used to print the index total in this
+            slot, so the writing desk and the reading guide appeared to have
+            eighteen entries, and the records index printed it beside its own
+            result count. The pages that hold a total already state it.
+          */}
         </nav>
 
         {children}

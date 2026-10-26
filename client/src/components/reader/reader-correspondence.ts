@@ -156,36 +156,36 @@ export const FILING_TYPES: Record<string, FollowUpType> = {
   "ORG-A-020748": "DISCOVERY",
   "ORG-C-005102": "EXPLORATION",
   "CIRCA-R-0438": "RUMOR",
-  "ORG-C-005102/C1": "EXPLORATION",
-  "ORG-C-005102/C2": "DISCOVERY",
-  "CIRCA-M-0002": "DISCOVERY",
-  "CIRCA-M-0031": "EXPLORATION",
-  "CIRCA-M-0077": "RUMOR",
+  "EXP-288902": "EXPLORATION",
+  "EXP-288903": "DISCOVERY",
+  "EVI-035783": "DISCOVERY",
+  "EVI-035784": "EXPLORATION",
+  "EVI-035785": "RUMOR",
 };
 
 /** One citation as filed: the citing record, and the record it names. */
 type Citation = { from: string; to: string };
 
 /**
- * The citation web the preview ships. `CIRCA-M-0077` is in no edge, so the
+ * The citation web the preview ships. `EVI-035785` is in no edge, so the
  * empty state of the strip is reachable without emptying the index.
  */
 const CITATIONS: readonly Citation[] = [
   { from: "INC-00204", to: "INC-00042" },
   { from: "INC-00318", to: "INC-00063" },
-  { from: "CIRCA-M-0031", to: "ORG-A-020748" },
-  { from: "ORG-C-005102/C2", to: "ORG-C-005102/C1" },
-  { from: "ORG-C-005102/C1", to: "ORG-C-005102" },
+  { from: "EVI-035784", to: "ORG-A-020748" },
+  { from: "EXP-288903", to: "EXP-288902" },
+  { from: "EXP-288902", to: "ORG-C-005102" },
   { from: "INC-00907", to: "INC-00027" },
   { from: "INC-00027", to: "INC-00907" },
-  { from: "INC-00063", to: "CIRCA-M-0002" },
+  { from: "INC-00063", to: "EVI-035783" },
   { from: "ORG-A-020748", to: "INC-00204" },
-  { from: "CIRCA-R-0438", to: "CIRCA-M-0031" },
+  { from: "CIRCA-R-0438", to: "EVI-035784" },
   { from: "INC-00014", to: "INC-00063" },
   { from: "ORG-U-000011", to: "ORG-C-005102" },
-  { from: "CIRCA-M-0002", to: "ORG-U-000011" },
-  { from: "INC-00042", to: "ORG-C-005102/C1" },
-  { from: "ORG-C-005102", to: "ORG-C-005102/C2" },
+  { from: "EVI-035783", to: "ORG-U-000011" },
+  { from: "INC-00042", to: "EXP-288902" },
+  { from: "ORG-C-005102", to: "EXP-288903" },
   { from: "INC-00042", to: "INC-00014" },
 ];
 

@@ -148,7 +148,7 @@ function mapEntry(entry: ArchiveEntry): SearchResultItem {
       ? "on-file"
       : entry.status);
   const recordClass =
-    entry.searchClass ?? (entry.klass === "incident" ? "incident" : null);
+    entry.searchClass ?? (entry.klass === "organization" ? null : entry.klass);
   const warningTags = entry.warnings.map(
     (tag) =>
       ({

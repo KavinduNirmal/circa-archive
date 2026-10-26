@@ -184,8 +184,8 @@ function LegacyArchiveRecords({
     classes: {
       incident: t("classIncident"),
       organization: t("classOrganization"),
-      continuity: t("classContinuity"),
-      memo: t("classMemo"),
+      exploration: t("classExploration"),
+      evidence: t("classEvidence"),
     },
     statuses: {
       "on-file": t("statusOnFile"),

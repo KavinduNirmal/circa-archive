@@ -39,7 +39,7 @@ describe("desktop navigation", () => {
     expect(screen.queryByRole("tooltip")).not.toBeInTheDocument();
     await user.hover(organizations);
     const tooltip = await screen.findByRole("tooltip");
-    expect(tooltip).toHaveTextContent("Organization dossiers and continuities");
+    expect(tooltip).toHaveTextContent("Organization dossiers and explorations");
     expect(tooltip).toHaveClass("tooltip-content");
     expect(tooltip.querySelector(".tooltip-arrow")).not.toBeNull();
     // Pointer-leave tracking needs real pointer events, so dismissal is exercised with Escape.

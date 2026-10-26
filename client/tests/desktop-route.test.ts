@@ -55,24 +55,12 @@ describe("desktop route mapping", () => {
     }
   });
 
-  it("round-trips every archive code, including the ones a path escapes", () => {
+  it("round-trips every archive code", () => {
     for (const entry of ARCHIVE_INDEX) {
       const path = pathForResource(record(entry.code));
       expect(path).toBe(`/desktop/record/${encodeURIComponent(entry.code)}`);
       expect(resourceOf(path)).toEqual(record(entry.code));
     }
-    // The continuity codes contain a slash; they are one segment, encoded.
-    expect(pathForResource(record("ORG-C-005102/C1"))).toBe(
-      "/desktop/record/ORG-C-005102%2FC1",
-    );
-  });
-
-  it("reads a pathname that was already decoded back into segments", () => {
-    // Next's pathname hook is allowed to hand over a decoded path; the same
-    // record must resolve either way rather than depending on the encoding.
-    expect(resourceOf("/desktop/record/ORG-C-005102/C1")).toEqual(
-      record("ORG-C-005102/C1"),
-    );
   });
 
   it("rejects destinations and codes it does not know, without guessing", () => {

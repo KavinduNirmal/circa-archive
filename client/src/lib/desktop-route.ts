@@ -57,10 +57,9 @@ function decode(segment: string): string {
  * `usePathname` from `@/i18n/navigation` already removed the locale prefix, so a
  * leading `desktop` segment is required: any other path is not the workstation.
  *
- * Record codes may contain a slash (`ORG-C-005102/C1`), which cannot be written
- * as one path segment without encoding. Both forms resolve: `pathForResource`
- * writes the encoded one, and a pathname that arrives already decoded is joined
- * back together.
+ * A record code is written as one percent-encoded path segment. A pathname that
+ * arrives already decoded is joined back together rather than treated as extra
+ * segments.
  */
 export function resourceFromPath(pathname: string): RouteMatch {
   const segments = pathname.split("/").filter(Boolean).map(decode);
