@@ -2,10 +2,11 @@
 import "@fontsource/instrument-serif/400.css";
 import "@fontsource/instrument-serif/400-italic.css";
 import "@fontsource/noto-serif-kr/400.css";
-import "@fontsource/dm-sans/400.css";
-import "@fontsource/dm-sans/600.css";
+import "@fontsource/ibm-plex-sans/latin-400.css";
+import "@fontsource/ibm-plex-sans/latin-600.css";
 import "@fontsource/ibm-plex-mono/400.css";
 import "../styles/site.css";
+import BrandIcon from "../components/BrandIcon.astro";
 import {
   t,
   projectHref,
@@ -34,6 +35,9 @@ const path = Astro.url.pathname;
 const localePath = (lang: Locale) =>
   path.replace(/^\/(en|ko)(?=\/|$)/, `/${lang}`);
 const canonical = new URL(path, PROJECT_ORIGIN).href;
+const homeHref = projectHref(locale);
+const documentTitle =
+  title === t(locale, "brand") ? title : `${title} | CIRCA Archive`;
 ---
 
 <!doctype html>
@@ -41,7 +45,7 @@ const canonical = new URL(path, PROJECT_ORIGIN).href;
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{title} | CIRCA Archive</title>
+    <title>{documentTitle}</title>
     <meta name="description" content={description} />
     <link rel="icon" href="/seal.svg" type="image/svg+xml" />
     <link rel="canonical" href={canonical} />
@@ -63,149 +67,151 @@ const canonical = new URL(path, PROJECT_ORIGIN).href;
     <a class="skip-link" href="#main">
       {t(locale, "skip")}
     </a>
-    <div class="masthead-note">
-      <span>CIRCA ARCHIVE</span>
-      <span>{t(locale, "pageLabel")}</span>
-      <a href={REPOSITORY} target="_blank" rel="noreferrer">
-        {t(locale, "heroSource")} ↗
-      </a>
-    </div>
     <header class="site-header">
-      <a class="brand" href={projectHref(locale)} aria-label="CIRCA Archive">
-        <img src="/seal.svg" width="32" height="34" alt="" />
-        <span>
-          CIRCA<span class="brand-small"> ARCHIVE</span>
-        </span>
-      </a>
-      <details class="mobile-menu" data-mobile-menu>
-        <summary>
-          {t(locale, "navMenu")} <span aria-hidden="true">☰</span>
-        </summary>
-      </details>
-      <nav class="main-nav" aria-label={t(locale, "navMenuLabel")}>
-        <a
-          href={projectHref(locale)}
-          aria-current={path === projectHref(locale) ? "page" : undefined}
-        >
-          {t(locale, "navHome")}
+      <div class="header-inner">
+        <a class="brand" href={homeHref} aria-label="CIRCA Archive">
+          <span class="brand-seal" aria-hidden="true"></span>
+          <span>circa archive</span>
         </a>
-        <details class="nav-disclosure">
-          <summary class:list={[{ current: path.includes("/documentation/") }]}>
-            {t(locale, "navDocs")} <span aria-hidden="true">⌄</span>
-          </summary>
-          <div class="nav-panel">
-            {chapterLinks(locale).map((link) => (
-              <a
-                href={link.href}
-                aria-current={path === link.href ? "page" : undefined}
-              >
-                {link.label}
-                <span aria-hidden="true">↗</span>
-              </a>
-            ))}
-          </div>
-        </details>
-        <details class="nav-disclosure">
-          <summary class:list={[{ current: path.includes("/about/") }]}>
-            {t(locale, "navAbout")} <span aria-hidden="true">⌄</span>
-          </summary>
-          <div class="nav-panel">
-            {aboutLinks(locale).map((link) => (
-              <a
-                href={link.href}
-                aria-current={path === link.href ? "page" : undefined}
-              >
-                {link.label}
-                <span aria-hidden="true">↗</span>
-              </a>
-            ))}
-          </div>
-        </details>
-        <a
-          href={projectHref(locale, "sponsor")}
-          aria-current={path.endsWith("/sponsor/") ? "page" : undefined}
-        >
-          {t(locale, "navSponsor")}
-        </a>
-        <details class="nav-disclosure archive-menu">
+        <details class="mobile-menu" data-mobile-menu>
           <summary>
-            {t(locale, "navEnter")} <span aria-hidden="true">↗</span>
+            {t(locale, "navMenu")}
+            <span class="menu-glyph" aria-hidden="true">
+              <i></i>
+              <i></i>
+            </span>
           </summary>
-          <div class="nav-panel">
-            <a href={archiveHref(locale)}>{t(locale, "footerArchive")} ↗</a>
-            <a href={archiveHref(locale, "/desktop")}>
-              {t(locale, "footerWorkstation")} ↗
-            </a>
-          </div>
         </details>
-      </nav>
-      <div class="header-tools">
-        <a
-          class="search-key"
-          href={`${projectHref(locale, "documentation")}#documentation-search`}
-          aria-label={t(locale, "docsSearchLabel")}
-          title={t(locale, "docsSearchLabel")}
-        >
-          ⌕ <kbd>⌘ K</kbd>
-        </a>
-        <nav class="languages" aria-label="Language">
-          {(["en", "ko"] as const).map((lang) => (
-            <a
-              href={localePath(lang)}
-              lang={lang}
-              aria-current={locale === lang ? "true" : undefined}
+        <nav class="main-nav" aria-label={t(locale, "navMenuLabel")}>
+          <a
+            href={homeHref}
+            aria-current={path === homeHref ? "page" : undefined}
+          >
+            {t(locale, "navHome")}
+          </a>
+          <details class="nav-disclosure">
+            <summary
+              class:list={[{ current: path.includes("/documentation/") }]}
             >
-              {lang.toUpperCase()}
-            </a>
-          ))}
+              {t(locale, "navDocs")}
+              <span class="toggle-mark" aria-hidden="true"></span>
+            </summary>
+            <div class="nav-panel">
+              {chapterLinks(locale).map((link) => (
+                <a
+                  href={link.href}
+                  aria-current={path === link.href ? "page" : undefined}
+                >
+                  {link.label}
+                </a>
+              ))}
+            </div>
+          </details>
+          <details class="nav-disclosure">
+            <summary class:list={[{ current: path.includes("/about/") }]}>
+              {t(locale, "navAbout")}
+              <span class="toggle-mark" aria-hidden="true"></span>
+            </summary>
+            <div class="nav-panel">
+              {aboutLinks(locale).map((link) => (
+                <a
+                  href={link.href}
+                  aria-current={path === link.href ? "page" : undefined}
+                >
+                  {link.label}
+                </a>
+              ))}
+            </div>
+          </details>
+          <a
+            href={projectHref(locale, "sponsor")}
+            aria-current={path.endsWith("/sponsor/") ? "page" : undefined}
+          >
+            {t(locale, "navSponsor")}
+          </a>
+          <details class="nav-disclosure archive-menu">
+            <summary>
+              {t(locale, "navEnter")}
+              <span aria-hidden="true">↗</span>
+            </summary>
+            <div class="nav-panel">
+              <a href={archiveHref(locale)}>{t(locale, "footerArchive")} ↗</a>
+              <a href={archiveHref(locale, "/desktop")}>
+                {t(locale, "footerWorkstation")} ↗
+              </a>
+            </div>
+          </details>
         </nav>
+        <div class="header-tools">
+          <nav class="languages" aria-label="Language">
+            {(["en", "ko"] as const).map((lang) => (
+              <a
+                href={localePath(lang)}
+                lang={lang}
+                aria-current={locale === lang ? "true" : undefined}
+              >
+                {lang.toUpperCase()}
+              </a>
+            ))}
+          </nav>
+        </div>
       </div>
     </header>
     <main id="main" tabindex="-1" class:list={["site-main", { wide }]}>
       <slot />
     </main>
     <footer class="site-footer">
-      <div class="footer-top">
-        <div class="footer-intro">
-          <a class="footer-wordmark" href={projectHref(locale)}>
-            CIRCA<span>ARCHIVE</span>
-          </a>
-          <p>{t(locale, "footerTagline")}</p>
+      <div class="footer-inner">
+        <div class="footer-top">
+          <div class="footer-intro">
+            <a
+              class="footer-wordmark"
+              href={homeHref}
+              aria-label="CIRCA Archive"
+            >
+              <span class="footer-seal" aria-hidden="true"></span>
+              <span>circa archive</span>
+            </a>
+            <p>{t(locale, "footerTagline")}</p>
+            <a class="footer-archive-link" href={archiveHref(locale)}>
+              {t(locale, "footerArchive")} ↗
+            </a>
+          </div>
+          <nav aria-label={t(locale, "footerNav")}>
+            <div>
+              <span class="eyebrow">{t(locale, "footerProjectTitle")}</span>
+              {aboutLinks(locale).map((link) => (
+                <a href={link.href}>{link.label}</a>
+              ))}
+              <a href={projectHref(locale, "sponsor")}>
+                {t(locale, "navSponsor")}
+              </a>
+            </div>
+            <div>
+              <span class="eyebrow">{t(locale, "navDocs")}</span>
+              {chapterLinks(locale).map((link) => (
+                <a href={link.href}>{link.label}</a>
+              ))}
+            </div>
+            <div>
+              <span class="eyebrow">{t(locale, "footerArchiveTitle")}</span>
+              <a href={archiveHref(locale)}>{t(locale, "footerArchive")} ↗</a>
+              <a href={archiveHref(locale, "/desktop")}>
+                {t(locale, "footerWorkstation")} ↗
+              </a>
+              <a href={REPOSITORY} target="_blank" rel="noreferrer">
+                <BrandIcon name="github" /> {t(locale, "footerSource")} ↗
+              </a>
+            </div>
+          </nav>
         </div>
-        <nav aria-label={t(locale, "footerNav")}>
-          <div>
-            <span class="eyebrow">{t(locale, "footerProjectTitle")}</span>
-            {aboutLinks(locale).map((link) => (
-              <a href={link.href}>{link.label}</a>
-            ))}
-            <a href={projectHref(locale, "sponsor")}>
-              {t(locale, "navSponsor")}
-            </a>
-          </div>
-          <div>
-            <span class="eyebrow">{t(locale, "navDocs")}</span>
-            {chapterLinks(locale).map((link) => (
-              <a href={link.href}>{link.label}</a>
-            ))}
-          </div>
-          <div>
-            <span class="eyebrow">{t(locale, "footerArchiveTitle")}</span>
-            <a href={archiveHref(locale)}>{t(locale, "footerArchive")} ↗</a>
-            <a href={archiveHref(locale, "/desktop")}>
-              {t(locale, "footerWorkstation")} ↗
-            </a>
-            <a href={REPOSITORY} target="_blank" rel="noreferrer">
-              {t(locale, "footerSource")} ↗
-            </a>
-          </div>
-        </nav>
-      </div>
-      <div class="footer-bottom">
-        <p>{t(locale, "footerFiction")}</p>
-        <span>{t(locale, "footerCopyright")}</span>
-        <a href="#top" data-top>
-          {t(locale, "top")} ↑
-        </a>
+        <div class="footer-bottom">
+          <p>{t(locale, "footerFiction")}</p>
+          <span>{t(locale, "footerCopyright")}</span>
+          <a href="#top" data-top>
+            {t(locale, "top")} ↑
+          </a>
+        </div>
       </div>
     </footer>
     <script>

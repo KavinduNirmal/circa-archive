@@ -5,8 +5,11 @@
 Record the architectural decisions that shape CIRCA Archive: what was decided, what forced it, and what it costs. One decision per file, written when the decision is made. An ADR is a historical record — its Decision section is not rewritten after the fact; a later ADR supersedes it instead.
 
 Dated implementation notes distinguish current capabilities from the original
-context without rewriting accepted decisions. ADR 004 still governs archive
-fixtures; account routes now use the authentication service.
+context without rewriting accepted decisions. ADR 004 still governs workstation
+fixtures, but [ADR 008](008-v1-public-site-scope.md) supersedes it for the public
+site; account routes now use the authentication service. The v1 content model,
+including the D1–D15 answers, lives in ADR 008, and the migration strategy that
+applies it lives in ADR 009.
 
 The current design is described in [ARCHITECTURE.md](../../ARCHITECTURE.md). The ADRs explain how the repository arrived there and which alternatives were rejected.
 
@@ -16,15 +19,17 @@ The current design is described in [ARCHITECTURE.md](../../ARCHITECTURE.md). The
 - `NNN-slug.md`: one decision per file. Numbering starts at `001`, is sequential, and is never reused. The slug is lower-case and hyphenated.
 - Decisions recorded so far:
 
-| ADR                                               | Decision                                                                | Status                               |
-| ------------------------------------------------- | ----------------------------------------------------------------------- | ------------------------------------ |
-| [001](001-locale-prefixed-routing.md)             | Every page carries its language in the path                             | Accepted                             |
-| [002](002-two-reading-surfaces.md)                | A server-rendered archive and a client-side workstation over one corpus | Accepted                             |
-| [003](003-markdown-records-no-pdf.md)             | Records are Markdown rendered as paper; no PDF generation               | Accepted                             |
-| [004](004-fixture-backed-client.md)               | The client runs on local fixtures until the backend exists              | Accepted                             |
-| [005](005-modular-monolith-backend.md)            | The backend is a .NET modular monolith                                  | Accepted, authentication implemented |
-| [006](006-session-tokens-in-http-only-cookies.md) | Sessions with short-lived JWTs in HttpOnly cookies                      | Accepted, implemented                |
-| [007](007-typed-entity-references.md)             | Typed entity links with transactional promotion of temporary entities   | Proposed                             |
+| ADR                                               | Decision                                                                  | Status                                                    |
+| ------------------------------------------------- | ------------------------------------------------------------------------- | --------------------------------------------------------- |
+| [001](001-locale-prefixed-routing.md)             | Every page carries its language in the path                               | Accepted                                                  |
+| [002](002-two-reading-surfaces.md)                | A server-rendered archive and a client-side workstation over one corpus   | Accepted                                                  |
+| [003](003-markdown-records-no-pdf.md)             | Records are Markdown rendered as paper; no PDF generation                 | Accepted                                                  |
+| [004](004-fixture-backed-client.md)               | The client runs on local fixtures until the backend exists                | Accepted, superseded for `/site` by 008                   |
+| [005](005-modular-monolith-backend.md)            | The backend is a .NET modular monolith                                    | Accepted, authentication implemented                      |
+| [006](006-session-tokens-in-http-only-cookies.md) | Sessions with short-lived JWTs in HttpOnly cookies                        | Accepted, implemented; comments framing superseded by 008 |
+| [007](007-typed-entity-references.md)             | Typed entity links with transactional promotion of temporary entities     | Proposed                                                  |
+| [008](008-v1-public-site-scope.md)                | V1 public-site scope: filings, comments, assessments, playlists, entities | Accepted — implementation pending                         |
+| [009](009-versioned-archive-schema-migrations.md) | Versioned, forward-only SQL migrations for the archive schema             | Accepted — implementation pending                         |
 
 ## Boundaries
 

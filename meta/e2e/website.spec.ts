@@ -49,6 +49,21 @@ test("the navigation exposes the requested chapters, About pages and archive ent
   ).toHaveAttribute("href", "https://github.com/sponsors/KavinduNirmal");
 });
 
+test("search exists only inside documentation", async ({ page }) => {
+  await page.goto("/en/");
+  await expect(page.getByRole("searchbox")).toHaveCount(0);
+  await page.keyboard.press("Control+k");
+  await expect(page).toHaveURL(/\/en\/$/);
+  await page.goto("/en/about/project/");
+  await expect(page.getByRole("searchbox")).toHaveCount(0);
+  await page.goto("/en/documentation/");
+  await expect(page.getByRole("searchbox")).toBeVisible();
+  await expect(page.getByRole("searchbox")).toHaveAttribute(
+    "placeholder",
+    "Search docs",
+  );
+});
+
 test("documentation chapters collapse, survive navigation and restore after search", async ({
   page,
 }) => {
@@ -188,7 +203,7 @@ test("core navigation and documents work without JavaScript", async ({
     viewport: { width: 375, height: 812 },
   });
   const page = await context.newPage();
-  await page.goto("http://127.0.0.1:4321/en/documentation/records/");
+  await page.goto("/en/documentation/records/");
   await expect(page.locator(".prose h2").first()).toBeVisible();
   await page.locator(".chapter-disclosure>summary").click();
   await page.locator('[data-chapter="lore"]>summary').click();

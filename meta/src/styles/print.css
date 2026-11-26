@@ -1,0 +1,79 @@
+/* Print: the essay and the record, without the website around them. */
+@media print {
+  :root {
+    --paper: #fff;
+    --paper-raised: #fff;
+    --paper-fill: #f2f0ea;
+    --ink: #111;
+    --ink-body: #222;
+    --muted: #555;
+    --rule: #bbb;
+    --rule-soft: #ddd;
+  }
+
+  body::before,
+  .site-header,
+  .site-footer,
+  .docs-sidebar,
+  .doc-toc,
+  .mobile-toc,
+  .doc-actions,
+  .doc-pager,
+  .skip-link,
+  .copy-code {
+    display: none !important;
+  }
+
+  body {
+    background: #fff;
+    color: #111;
+    font-size: 11pt;
+  }
+
+  .site-main,
+  .essay,
+  .essay-body,
+  .doc-article,
+  .doc-article > .prose,
+  .terms-body {
+    max-width: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .opening {
+    padding-block: 0 24pt;
+  }
+
+  .opening h1 {
+    font-size: 32pt;
+  }
+
+  .opening h1 span {
+    color: #111;
+  }
+
+  .margin-note {
+    position: static;
+    width: auto;
+    margin-bottom: 20pt;
+    border: 0;
+  }
+
+  .quote,
+  .specimen {
+    break-inside: avoid;
+  }
+
+  .quote {
+    color: #111;
+  }
+
+  .doc-header {
+    padding-bottom: 16pt;
+  }
+
+  a {
+    text-decoration: none;
+  }
+}

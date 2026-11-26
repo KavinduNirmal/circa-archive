@@ -6,6 +6,10 @@
 - **Supersedes:** —
 - **Superseded by:** —
 
+## Implementation update — 2026-10-26
+
+Two details below are superseded by [ADR 008](008-v1-public-site-scope.md). Owner notification on submission is deferred (D8): importing still records the per-draft request and the restricted-character acknowledgement, but v1 promises no notification or delivery. Sealed-access decision authority is also settled (D12): sealed records use a cosmetic overlay, so the resolver no longer needs a decider for an approval queue. The atomic promotion and reference-resolution decisions are unchanged.
+
 ## Context
 
 The archive is gaining more than records. Organizations, characters, and recoveries are entities with their own registry pages, and authors need to link them from Markdown without pasting URLs or trusting free text. The draft model also lets an author invent a barebones organization, character, recovery, or evidence image while writing.

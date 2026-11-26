@@ -4,9 +4,11 @@ if (docs) {
     ".chapter-disclosure",
   )!;
   const desktop = matchMedia("(min-width: 900px)");
+  let shellOpenedForSearch = false;
+  let shellWasOpen = false;
   disclosure.open = desktop.matches;
   desktop.addEventListener("change", (event) => {
-    disclosure.open = event.matches;
+    if (!shellOpenedForSearch) disclosure.open = event.matches;
   });
   const input = docs.querySelector<HTMLInputElement>("#documentation-search")!;
   const status = docs.querySelector<HTMLElement>("[data-search-status]")!;
@@ -86,6 +88,18 @@ if (docs) {
   }
   function applySearch() {
     const query = input.value.trim().toLocaleLowerCase();
+    // The search field sits above the chapter disclosure. A query must reveal
+    // the matching chapter list rather than leaving it closed.
+    if (query) {
+      if (!shellOpenedForSearch) {
+        shellWasOpen = disclosure.open;
+        shellOpenedForSearch = true;
+      }
+      disclosure.open = true;
+    } else if (shellOpenedForSearch) {
+      disclosure.open = shellWasOpen;
+      shellOpenedForSearch = false;
+    }
     if (query && !index) {
       void loadIndex();
       return;

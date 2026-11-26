@@ -4,7 +4,7 @@ The archive grows through writing, code, corrections, and careful review. Start 
 
 ## Write within the setting
 
-Read the [Author guide](../../AUTHOR_GUIDE.md) for authorship, permissions, evidence, and continuity decisions. Consult the [Lore overview](../../lore/README.md) for the public setting. These documents describe policy and fiction; they do not imply that publication and moderation workflows are implemented.
+Read the [Author guide](../../AUTHOR_GUIDE.md) for authorship, permissions, evidence, assessment, and the v1 scope. Consult the [Lore overview](../../lore/README.md) for the public setting. These documents describe policy and fiction; they do not imply that publication and moderation workflows are implemented.
 
 ## Prepare a record
 

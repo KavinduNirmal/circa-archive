@@ -1,5 +1,6 @@
 ---
 import TeamAvatars from "./TeamAvatars";
+import BrandIcon from "./BrandIcon.astro";
 import BitmapSeal from "./BitmapSeal.astro";
 import Shell from "../layouts/Shell.astro";
 import Editions from "./Editions.astro";
@@ -26,18 +27,21 @@ const labels = {
   terms: "navTerms",
   sponsor: "navSponsor",
 };
-const titles = {
-  project: "aboutPageTitleA",
-  team: "contributorsTitle",
-  terms: "navTerms",
-  sponsor: "supportTitle",
-};
 const ledes = {
-  project: "homeLede",
+  project: "aboutPageLede",
   team: "teamLede",
   terms: "termsLede",
   sponsor: "supportLede",
 };
+const facts = ["Website", "Archive", "Source"];
+const contacts = [
+  ["channelBugTitle", `${REPOSITORY}/issues/new?template=bug_report.yml`],
+  [
+    "channelFeatureTitle",
+    `${REPOSITORY}/issues/new?template=feature_request.yml`,
+  ],
+  ["channelContactTitle", CONTACT],
+] as const;
 ---
 
 <Shell
@@ -45,302 +49,273 @@ const ledes = {
   title={t(locale, labels[page])}
   description={t(locale, ledes[page])}
 >
-  <header class:list={["page-intro", { "project-intro": page === "project" }]}>
-    <div class="page-intro-copy">
-      <p class="eyebrow">CIRCA ARCHIVE / {t(locale, labels[page])}</p>
-      <h1>
-        {t(locale, titles[page])}
-        {page === "project" && <em>{t(locale, "aboutPageTitleB")}</em>}
-      </h1>
-      <p class="lede">{t(locale, ledes[page])}</p>
-    </div>
-    {page === "project" && (
-      <figure class="project-seal">
-        <div class="seal-field">
-          <BitmapSeal />
-        </div>
-        <figcaption>
-          <span class="eyebrow">{t(locale, "identityLabel")}</span>
-          <p>{t(locale, "agencyMotto")}</p>
-        </figcaption>
-      </figure>
-    )}
-  </header>
   {page === "project" && (
-    <>
-      <section class="section about-premise project-premise" id="premise">
-        <>
-          <div class="section-heading">
-            <div>
-              <>
-                <p class="eyebrow">01 / {t(locale, "premiseKicker")}</p>
-                <h2>{t(locale, "premiseTitle")}</h2>
-              </>
-            </div>
+    <article class="essay">
+      <header class="opening page-opening">
+        <h1>
+          {t(locale, "aboutPageTitleA")}
+          <span>{t(locale, "aboutPageTitleB")}</span>
+        </h1>
+        <p class="opening-lead">{t(locale, "aboutPageLede")}</p>
+      </header>
+      <div class="essay-body">
+        <aside class="margin-note">
+          <div class="bitmap-plate margin-seal">
+            <BitmapSeal />
           </div>
-          <div class="two-column-prose">
-            <>
-              <p>{t(locale, "premiseBody")}</p>
-              <p>{t(locale, "premiseBodyTwo")}</p>
-            </>
-          </div>
-          <blockquote class="thesis project-principle">
+          <span class="note-code">{t(locale, "institutionLabelShort")}</span>
+          <p>
+            <strong>{t(locale, "agencyName")}</strong>
+          </p>
+          <p>{t(locale, "agencyMotto")}</p>
+        </aside>
+        <div class="essay-flow">
+          <section class="passage" id="premise" aria-labelledby="premise-title">
+            <h2 id="premise-title">{t(locale, "premiseTitle")}</h2>
+            <p>{t(locale, "premiseBody")}</p>
+            <p>{t(locale, "premiseBodyTwo")}</p>
+          </section>
+
+          <blockquote class="quote">
             {t(locale, "quote")}
             <cite>{t(locale, "quoteAttribution")}</cite>
           </blockquote>
-        </>
-      </section>
-      <section
-        class="section project-facts technical-accent"
-        id="project-facts"
-      >
-        <header class="section-heading">
-          <>
-            <div>
-              <>
-                <p class="eyebrow">02 / {t(locale, "builtKicker")}</p>
-                <h2>{t(locale, "builtTitle")}</h2>
-              </>
-            </div>
+
+          <section
+            class="passage"
+            id="project-facts"
+            aria-labelledby="facts-title"
+          >
+            <h2 id="facts-title">{t(locale, "builtTitle")}</h2>
             <p>{t(locale, "constructionLede")}</p>
-          </>
-        </header>
-        <dl class="fact-register">
-          {["Website", "Archive", "Source"].map((key) => (
-            <div>
-              <dt>{t(locale, `fact${key}`)}</dt>
-              <dd>{t(locale, `fact${key}Body`)}</dd>
+            <dl class="fact-list">
+              {facts.map((key) => (
+                <div>
+                  <dt>{t(locale, `fact${key}`)}</dt>
+                  <dd>{t(locale, `fact${key}Body`)}</dd>
+                </div>
+              ))}
+            </dl>
+          </section>
+
+          <section
+            class="passage"
+            id="editions"
+            aria-labelledby="editions-title"
+          >
+            <h2 id="editions-title">{t(locale, "homeEditions")}</h2>
+            <p>{t(locale, "homeEditionsLede")}</p>
+            <Editions locale={locale} />
+          </section>
+
+          <section class="passage" id="questions" aria-labelledby="faq-title">
+            <h2 id="faq-title">{t(locale, "faqTitle")}</h2>
+            <Faq locale={locale} />
+          </section>
+
+          <section class="passage" id="contact" aria-labelledby="contact-title">
+            <h2 id="contact-title">{t(locale, "contactTitle")}</h2>
+            <p>{t(locale, "contactLede")}</p>
+            <div class="contact-rows">
+              {contacts.map(([label, href]) => (
+                <a href={href} target="_blank" rel="noreferrer">
+                  {t(locale, label)} <span aria-hidden="true">↗</span>
+                </a>
+              ))}
             </div>
-          ))}
-        </dl>
-      </section>
-      <section class="section" id="editions">
-        <>
-          <header class="section-heading">
-            <div>
-              <>
-                <p class="eyebrow">03 / {t(locale, "editionsKicker")}</p>
-                <h2>{t(locale, "homeEditions")}</h2>
-              </>
-            </div>
-          </header>
-          <Editions locale={locale} />
-        </>
-      </section>
-      <section class="section" id="questions">
-        <>
-          <header class="section-heading">
-            <div>
-              <>
-                <p class="eyebrow">04 / {t(locale, "faqKicker")}</p>
-                <h2>{t(locale, "faqTitle")}</h2>
-              </>
-            </div>
-          </header>
-          <Faq locale={locale} />
-        </>
-      </section>
-      <section class="section" id="contact">
-        <>
-          <header class="section-heading">
-            <>
-              <div>
-                <>
-                  <p class="eyebrow">05 / {t(locale, "contactKicker")}</p>
-                  <h2>{t(locale, "contactTitle")}</h2>
-                </>
-              </div>
-              <p>{t(locale, "contactLede")}</p>
-            </>
-          </header>
-          <div class="contact-rows">
+          </section>
+
+          <nav
+            class="legacy-links"
+            aria-label={t(locale, "legacyLabel")}
+            hidden
+          >
             {[
-              [
-                "channelBugTitle",
-                `${REPOSITORY}/issues/new?template=bug_report.yml`,
-              ],
-              [
-                "channelFeatureTitle",
-                `${REPOSITORY}/issues/new?template=feature_request.yml`,
-              ],
-              ["channelContactTitle", CONTACT],
-            ].map(([label, href]) => (
-              <a href={href} target="_blank" rel="noreferrer">
-                {t(locale, label)} <span aria-hidden="true">↗</span>
+              ["contributors", "about/team"],
+              ["support", "sponsor"],
+              ["terms", "about/terms"],
+              ["licence", "about/terms"],
+              ["contribute", "documentation/contribution"],
+              ["built", "documentation/building"],
+            ].map(([id, href]) => (
+              <a id={id} href={projectHref(locale, href)} data-legacy-target>
+                {t(
+                  locale,
+                  id === "contributors"
+                    ? "navTeam"
+                    : id === "terms" || id === "licence"
+                      ? "navTerms"
+                      : id === "support"
+                        ? "navSponsor"
+                        : id === "built"
+                          ? "chapterBuilding"
+                          : "chapterContribution",
+                )}{" "}
+                ↗
               </a>
             ))}
-          </div>
-        </>
-      </section>
-      <nav class="legacy-links" aria-label={t(locale, "legacyLabel")}>
-        {[
-          ["contributors", "about/team"],
-          ["support", "sponsor"],
-          ["terms", "about/terms"],
-          ["licence", "about/terms"],
-          ["contribute", "documentation/contribution"],
-          ["built", "documentation/building"],
-        ].map(([id, href]) => (
-          <a id={id} href={projectHref(locale, href)} data-legacy-target>
-            {t(
-              locale,
-              id === "contributors"
-                ? "navTeam"
-                : id === "terms" || id === "licence"
-                  ? "navTerms"
-                  : id === "support"
-                    ? "navSponsor"
-                    : id === "built"
-                      ? "chapterBuilding"
-                      : "chapterContribution",
-            )}{" "}
-            ↗
-          </a>
-        ))}
-      </nav>
-    </>
+          </nav>
+        </div>
+      </div>
+    </article>
   )}
+
   {page === "team" && (
-    <section class="section team-register" id="contributors">
-      <>
-        <div class="team-people">
-          <TeamAvatars
-            members={TEAM}
-            label={t(locale, "teamGroup")}
-            client:load
-          />
-          <noscript>
-            <img
-              class="team-static-portrait"
-              src={TEAM[0].portrait}
-              width="72"
-              height="72"
-              alt={TEAM[0].name}
-            />
-          </noscript>
-          {TEAM.map((member) => (
-            <div class="team-person">
-              <p class="eyebrow">01 / {t(locale, member.roleKey)}</p>
-              <h2>{member.name}</h2>
-              <p class="team-handle">@{member.handle}</p>
-              <p>{t(locale, member.workKey)}</p>
+    <article class="essay">
+      <header class="opening page-opening">
+        <h1>{t(locale, "contributorsTitle")}</h1>
+        <p class="opening-lead">{t(locale, "contributorsLede")}</p>
+      </header>
+      <div class="essay-body">
+        <aside class="margin-note">
+          <span class="note-code">{t(locale, "teamGroup")}</span>
+          <p>
+            <strong>{t(locale, "contributorsOpenName")}</strong>
+          </p>
+          <p>{t(locale, "contributorsOpenRole")}</p>
+          <p>{t(locale, "contributorsOpenWork")}</p>
+        </aside>
+        <div class="essay-flow">
+          <div class="team-register">
+            <div class="team-people">
+              <TeamAvatars
+                members={TEAM}
+                label={t(locale, "teamGroup")}
+                client:load
+              />
+              <noscript>
+                <img
+                  class="team-static-portrait"
+                  src={TEAM[0].portrait}
+                  width="68"
+                  height="68"
+                  alt={TEAM[0].name}
+                />
+              </noscript>
+              {TEAM.map((member) => (
+                <div class="team-person" id="contributors">
+                  <h2>{member.name}</h2>
+                  <p class="team-handle">@{member.handle}</p>
+                  <p class="team-role">{t(locale, member.roleKey)}</p>
+                  <p>{t(locale, member.workKey)}</p>
+                  <a
+                    class="text-link"
+                    href={member.profile}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    <BrandIcon name="github" />{" "}
+                    {t(locale, "contributorsProfile")} ↗
+                  </a>
+                </div>
+              ))}
+            </div>
+            <aside>
+              <h2>{t(locale, "teamInvite")}</h2>
+              <p>{t(locale, "teamInviteBody")}</p>
               <a
                 class="text-link"
-                href={member.profile}
+                href={projectHref(locale, "documentation/contribution")}
+              >
+                {t(locale, "contributorsLink")} ↗
+              </a>
+            </aside>
+            <p class="register-note">{t(locale, "contributorsNote")}</p>
+          </div>
+        </div>
+      </div>
+    </article>
+  )}
+
+  {page === "terms" && (
+    <article class="essay">
+      <header class="opening page-opening">
+        <h1>{t(locale, "navTerms")}</h1>
+        <p class="opening-lead">{t(locale, "termsLede")}</p>
+      </header>
+      <div class="terms-body" id="terms">
+        <section id="licence" aria-labelledby="licence-title">
+          <h2 id="licence-title">{t(locale, "licenceTitle")}</h2>
+          <p>{t(locale, "licenceLede")}</p>
+          <div class="licence-grid">
+            <div>
+              <h3>
+                <a href={LICENCES.code} target="_blank" rel="noreferrer">
+                  MIT ↗
+                </a>
+              </h3>
+              <p>{t(locale, "licenceCodeBody")}</p>
+            </div>
+            <div>
+              <h3>
+                <a href={LICENCES.content} target="_blank" rel="noreferrer">
+                  CC BY-NC-SA 4.0 ↗
+                </a>
+              </h3>
+              <p>{t(locale, "licenceContentBody")}</p>
+            </div>
+          </div>
+        </section>
+        <section aria-labelledby="fiction-title">
+          <h2 id="fiction-title">{t(locale, "faqRealQ")}</h2>
+          <p>{t(locale, "licenceFiction")}</p>
+        </section>
+        <section aria-labelledby="archive-terms-title">
+          <h2 id="archive-terms-title">{t(locale, "termsArchive")}</h2>
+          <p>{t(locale, "termsArchiveBody")}</p>
+        </section>
+        <section aria-labelledby="use-title">
+          <h2 id="use-title">{t(locale, "licenceTermsLabel")}</h2>
+          <p>{t(locale, "termsCookies")}</p>
+          <p>{t(locale, "licenceWarranty")}</p>
+          <a href={CONTACT} target="_blank" rel="noreferrer">
+            {t(locale, "licenceFootnote")} ↗
+          </a>
+        </section>
+      </div>
+    </article>
+  )}
+
+  {page === "sponsor" && (
+    <article class="essay">
+      <header class="opening page-opening">
+        <h1>{t(locale, "supportTitle")}</h1>
+        <p class="opening-lead">{t(locale, "supportLede")}</p>
+      </header>
+      <div class="essay-body">
+        <aside class="margin-note">
+          <span class="note-code">CIRCA / {t(locale, "supportKicker")}</span>
+          <p>{t(locale, "supportPromise")}</p>
+        </aside>
+        <div class="essay-flow">
+          <section class="passage support-statement" id="support">
+            <h2>{t(locale, "supportSponsorTitle")}</h2>
+            <p>{t(locale, "supportBody")}</p>
+            <p>{t(locale, "supportSponsorBody")}</p>
+            <div class="support-actions">
+              <a
+                class="button primary"
+                href={SPONSOR}
                 target="_blank"
                 rel="noreferrer"
               >
-                {t(locale, "contributorsProfile")} ↗
+                <span class="button-label">
+                  <BrandIcon name="github" />
+                  {t(locale, "supportSponsorLink")}
+                </span>
+                <span aria-hidden="true">↗</span>
+              </a>
+              <a class="button" href={COFFEE} target="_blank" rel="noreferrer">
+                <span class="button-label">
+                  <BrandIcon name="coffee" />
+                  {t(locale, "coffeeLink")}
+                </span>
+                <span aria-hidden="true">↗</span>
               </a>
             </div>
-          ))}
-        </div>
-        <aside>
-          <>
-            <p class="eyebrow">02 / {t(locale, "contributorsOpenRole")}</p>
-            <h2>{t(locale, "teamInvite")}</h2>
-            <p>{t(locale, "teamInviteBody")}</p>
-            <a
-              class="text-link"
-              href={projectHref(locale, "documentation/contribution")}
-            >
-              {t(locale, "contributorsLink")} ↗
-            </a>
-          </>
-        </aside>
-        <p class="register-note">{t(locale, "contributorsNote")}</p>
-      </>
-    </section>
-  )}
-  {page === "terms" && (
-    <div class="terms-body prose" id="terms">
-      <>
-        <section id="licence">
-          <>
-            <p class="eyebrow">01 / {t(locale, "licenceKicker")}</p>
-            <h2>{t(locale, "licenceTitle")}</h2>
-            <div class="licence-grid">
-              <>
-                <div>
-                  <>
-                    <h3>
-                      <a href={LICENCES.code} target="_blank" rel="noreferrer">
-                        MIT ↗
-                      </a>
-                    </h3>
-                    <p>{t(locale, "licenceCodeBody")}</p>
-                  </>
-                </div>
-                <div>
-                  <>
-                    <h3>
-                      <a
-                        href={LICENCES.content}
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        CC BY-NC-SA 4.0 ↗
-                      </a>
-                    </h3>
-                    <p>{t(locale, "licenceContentBody")}</p>
-                  </>
-                </div>
-              </>
-            </div>
-          </>
-        </section>
-        <section>
-          <>
-            <h2>{t(locale, "faqRealQ")}</h2>
-            <p>{t(locale, "licenceFiction")}</p>
-          </>
-        </section>
-        <section>
-          <>
-            <h2>{t(locale, "termsArchive")}</h2>
-            <p>{t(locale, "termsArchiveBody")}</p>
-          </>
-        </section>
-        <section>
-          <>
-            <h2>{t(locale, "licenceTermsLabel")}</h2>
-            <p>{t(locale, "termsCookies")}</p>
-            <p>{t(locale, "licenceWarranty")}</p>
-            <a href={CONTACT} target="_blank" rel="noreferrer">
-              {t(locale, "licenceFootnote")} ↗
-            </a>
-          </>
-        </section>
-      </>
-    </div>
-  )}
-  {page === "sponsor" && (
-    <section class="section support-layout" id="support">
-      <>
-        <div class="support-statement">
-          <>
-            <p class="eyebrow">01 / {t(locale, "supportKicker")}</p>
-            <h2>{t(locale, "supportSponsorTitle")}</h2>
-            <p class="lede">{t(locale, "supportBody")}</p>
-            <p>{t(locale, "supportSponsorBody")}</p>
-            <a
-              class="button primary"
-              href={SPONSOR}
-              target="_blank"
-              rel="noreferrer"
-            >
-              {t(locale, "supportSponsorLink")} ↗
-            </a>
-            <p>{t(locale, "coffeeBody")}</p>
-            <a class="button" href={COFFEE} target="_blank" rel="noreferrer">
-              {t(locale, "coffeeLink")} ↗
-            </a>
-            <p class="fineprint">{t(locale, "supportPromise")}</p>
-          </>
-        </div>
-        <aside>
-          <>
-            <span class="eyebrow">02 / {t(locale, "contributeKicker")}</span>
+            <p class="support-promise">{t(locale, "coffeeBody")}</p>
+          </section>
+          <aside class="support-aside">
             <h2>{t(locale, "supportAlternative")}</h2>
             <p>{t(locale, "teamInviteBody")}</p>
             <a
@@ -349,9 +324,9 @@ const ledes = {
             >
               {t(locale, "supportContribute")} ↗
             </a>
-          </>
-        </aside>
-      </>
-    </section>
+          </aside>
+        </div>
+      </div>
+    </article>
   )}
 </Shell>

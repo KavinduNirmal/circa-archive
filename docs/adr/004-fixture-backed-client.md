@@ -4,7 +4,11 @@
 - **Date:** 2026-10-18
 - **Deciders:** Maintainers
 - **Supersedes:** —
-- **Superseded by:** —
+- **Superseded by:** [008](008-v1-public-site-scope.md) for the public site; workstation fixtures remain
+
+## Implementation update — 2026-10-26
+
+The public site is not permanently fixture-backed. [ADR 008](008-v1-public-site-scope.md) makes the API the only runtime source for every route under `/{lang}/site`; fixtures become test and reference data, and the launch seed is hand-authored rather than imported from the fixture corpus. The workstation remains fixture-backed in v1. This supersession is a scope decision, not an implementation report: the site still reads fixtures until read parity lands.
 
 ## Implementation update — 2026-10-20
 

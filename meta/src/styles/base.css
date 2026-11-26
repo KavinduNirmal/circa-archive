@@ -1,0 +1,342 @@
+/*
+ * Base: reset, element defaults, browser surfaces, accessibility helpers.
+ * Nothing here knows about a page composition.
+ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-padding-top: calc(var(--bar-height) + 24px);
+  scrollbar-color: var(--muted) var(--paper);
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100svh;
+  background: var(--paper);
+  color: var(--ink-body);
+  font-family: var(--sans);
+  font-size: 17px;
+  line-height: 1.7;
+  font-synthesis: none;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  isolation: isolate;
+}
+
+/* The printed field: burnt-orange halftone held to the outer margins. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: radial-gradient(
+    circle,
+    var(--field-mark) var(--field-size),
+    transparent calc(var(--field-size) + 0.18px)
+  );
+  background-size: var(--field-gap) var(--field-gap);
+  opacity: var(--field-opacity);
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    #000 0%,
+    transparent 30%,
+    transparent 76%,
+    #000 100%
+  );
+  mask-image: linear-gradient(
+    90deg,
+    #000 0%,
+    transparent 30%,
+    transparent 76%,
+    #000 100%
+  );
+}
+
+h1,
+h2,
+h3,
+h4,
+p,
+figure,
+blockquote,
+dl,
+dd,
+dt,
+ul,
+ol {
+  margin: 0;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-weight: 400;
+  color: var(--ink);
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+h1 {
+  line-height: 1.04;
+  letter-spacing: -0.012em;
+}
+
+h2 {
+  line-height: 1.16;
+  letter-spacing: -0.008em;
+}
+
+h3 {
+  line-height: 1.24;
+}
+
+ul,
+ol {
+  padding: 0;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+img {
+  height: auto;
+}
+
+a {
+  color: inherit;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+  text-decoration-color: color-mix(in srgb, currentColor 55%, transparent);
+  transition:
+    color 140ms ease,
+    text-decoration-thickness 140ms ease;
+}
+
+a:hover {
+  text-decoration-thickness: 2px;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: wait;
+}
+
+summary {
+  cursor: pointer;
+  list-style: none;
+}
+
+summary::-webkit-details-marker {
+  display: none;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+::selection {
+  background: var(--selection);
+  color: var(--ink);
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 4px;
+  border-radius: 0;
+}
+
+a:focus-visible,
+button:focus-visible,
+summary:focus-visible,
+input:focus-visible {
+  outline-offset: 4px;
+}
+
+input {
+  caret-color: var(--accent);
+}
+
+/* Text selection, carets and scrollbars are part of the paper, not the OS. */
+* {
+  scrollbar-width: thin;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--paper);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--rule);
+  border: 3px solid var(--paper);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--muted);
+}
+
+:lang(ko) {
+  word-break: keep-all;
+}
+
+:lang(ko) h1,
+:lang(ko) h2,
+:lang(ko) h3 {
+  line-height: 1.28;
+  letter-spacing: 0;
+}
+
+.skip-link {
+  position: fixed;
+  top: -100px;
+  left: 16px;
+  z-index: 100;
+  padding: 12px 16px;
+  background: var(--paper-raised);
+  border: 1px solid var(--rule);
+  font: 12px/1.4 var(--mono);
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.skip-link:focus {
+  top: 10px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+
+/* Shared small type roles. */
+.mono {
+  font-family: var(--mono);
+  font-size: 12px;
+  line-height: 1.6;
+  font-variant-numeric: tabular-nums;
+}
+
+.eyebrow,
+.folio,
+.fineprint,
+.breadcrumbs {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.eyebrow {
+  font-size: 11px;
+  line-height: 1.5;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+.folio {
+  color: var(--accent);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+}
+
+.fineprint {
+  font-size: 11px;
+  line-height: 1.7;
+  color: var(--muted);
+}
+
+.lede {
+  font-family: var(--serif);
+  font-size: clamp(20px, 2vw, 24px);
+  line-height: 1.6;
+  color: var(--muted);
+  max-width: 48ch;
+}
+
+/* Drawn disclosure mark: plus when closed, minus when open. */
+.toggle-mark {
+  position: relative;
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  flex: none;
+}
+
+.toggle-mark::before,
+.toggle-mark::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: currentColor;
+  transform: translateY(-50%);
+}
+
+.toggle-mark::after {
+  transform: translateY(-50%) rotate(90deg);
+  transition: opacity 140ms ease;
+}
+
+[open] > summary .toggle-mark::after {
+  opacity: 0;
+}
+
+.brand-icon {
+  width: 14px;
+  height: 14px;
+  flex: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  a,
+  button,
+  summary {
+    transition: none;
+  }
+}

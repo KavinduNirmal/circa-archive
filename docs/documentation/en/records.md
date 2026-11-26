@@ -54,6 +54,8 @@ The frontmatter is parsed and kept as metadata. The archive index remains the so
 | `classification` | the access level and the clearance it requires. |
 | `related / tags` | cross-references and labels; both are lists.    |
 
+Reserved code ranges are part of the archive's address space. A code inside a reserved range answers `200` with **Missing Record**; a `404` means the identifier exists but the archive does not hold it. This is fixed by [ADR 008](../../adr/008-v1-public-site-scope.md) (D5) and applies to incidents, explorations, evidence, and recoveries.
+
 > [!NOTE]
 > The fixture corpus predates the revised taxonomy
 >
@@ -92,6 +94,6 @@ Bodies live in components/reader/record-sources.ts; index entries live in compon
 CIRCA-S-03007 is the renderer's test corpus and is filed in the index on purpose. It exercises the header, a table with redactions, all three figure alignments, quotes, and a code fence.
 
 > [!NOTE]
-> There is no CMS yet
+> The public site is moving to the API
 >
-> Adding a record today means editing those two TypeScript modules. When archive content is served by the API, the renderer should keep taking Markdown and not learn where it came from.
+> Adding a record today means editing the fixture modules. The v1 target ([ADR 008](../../adr/008-v1-public-site-scope.md)) makes the API the only runtime source for `/site`: a signed-in author creates a server draft, publishes it, and edits it with revision history. The renderer still takes Markdown and does not learn where it came from.

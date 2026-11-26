@@ -7,14 +7,13 @@ const { locale } = Astro.props;
 ---
 
 <figure class="specimen">
-  <div class="specimen-register">
-    <span>CIRCA / INCIDENT REVIEW</span>
-    <img src="/seal.svg" alt="" width="42" height="44" />
+  <div class="specimen-head">
+    <span class="specimen-code">{t(locale, "specimenCode")}</span>
+    <span>{t(locale, "specimenMeta")}</span>
+    <span class="specimen-seal" aria-hidden="true"></span>
   </div>
-  <p class="specimen-code">{t(locale, "specimenCode")}</p>
-  <h2>{t(locale, "specimenTitle")}</h2>
-  <p class="specimen-meta">{t(locale, "specimenMeta")}</p>
-  <blockquote>{t(locale, "specimenText")}</blockquote>
+  <p class="specimen-title">{t(locale, "specimenTitle")}</p>
+  <p class="specimen-text">{t(locale, "specimenText")}</p>
   <a href={archiveHref(locale, `/site/records/${t(locale, "specimenCode")}`)}>
     {t(locale, "specimenLink")} <span aria-hidden="true">↗</span>
   </a>

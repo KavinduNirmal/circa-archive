@@ -1,0 +1,62 @@
+/*
+ * CIRCA project website — design tokens.
+ * Warm archival paper, burnt-orange ink, printed bitmap field.
+ * One accent only. Never introduce a second hue.
+ */
+:root {
+  color-scheme: light;
+
+  /* Paper — near-white, warm enough to stay archival */
+  --paper: #faf9f4;
+  --paper-raised: #fffefb;
+  --paper-fill: #f1efe8;
+  --paper-deep: #e7e4da;
+
+  /* Ink */
+  --ink: #2d2922;
+  --ink-body: #3b352b;
+  --muted: #6d6252;
+  --muted-soft: #756957;
+
+  /* Accent — burnt orange, not ember on charcoal */
+  --accent: #a2471c;
+  --accent-deep: #863815;
+  --accent-bright: #c0682b;
+  --selection: #f3d8c0;
+
+  /* Rules */
+  --rule: #d6d0c4;
+  --rule-soft: #e8e3d8;
+
+  /* Focus */
+  --focus: #8b3a14;
+
+  /* Type */
+  --serif: "Instrument Serif", "Noto Serif KR", Georgia, serif;
+  --sans:
+    "IBM Plex Sans", "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR",
+    system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", monospace;
+
+  /* Space and measure */
+  --frame: 1280px;
+  --gutter: clamp(20px, 4.5vw, 56px);
+  --measure: 620px;
+  --prose-measure: 68ch;
+  --essay-indent: 22%;
+  --note-width: 190px;
+  --note-gap: 52px;
+  --opening-top: clamp(72px, 8.5vw, 124px);
+  --opening-bottom: clamp(64px, 7.5vw, 108px);
+  --section-gap: clamp(80px, 9vw, 136px);
+
+  /* Header */
+  --bar-height: 60px;
+  --radius: 0px;
+
+  /* Printed field */
+  --field-mark: #a2471c;
+  --field-size: 0.8px;
+  --field-gap: 6px;
+  --field-opacity: 0.13;
+}

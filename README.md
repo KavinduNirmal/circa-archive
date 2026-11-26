@@ -8,7 +8,7 @@
 
 CIRCA Archive is a collaborative horror-fiction project where readers become analysts and writers expand a shared universe through incident reports, exploration records, and organization dossiers. You enter the archive of the Commission for Incident Review and Corrective Action (C.I.R.C.A.), a bureaucracy that files the impossible. CIRCA does not decide truth. It decides what is on file.
 
-An incident begins with someone's encounter with the unexplained. Follow-up records uncover patterns, invent rules, and sometimes contradict each other. Different organizations give the same horror different names; continuities let those accounts branch without erasing the original.
+An incident begins with someone's encounter with the unexplained. Follow-up records uncover patterns, invent rules, and sometimes contradict each other. Different organizations give the same horror different names, and every account remains filed beside the others without erasing the original.
 
 The project has two public faces. The **archive** is a server-rendered reading edition: search-first, readable without JavaScript, with record pages, an organizations directory, a guide, notes, and downloadable copies. The **workstation** is a period desktop for the same world: draggable and resizable windows, a Start menu, a taskbar, an emblem wallpaper, and a switchable CRT overlay. Its browser, mail client, file browser, record editor, and record reader all work over illustrative fixtures.
 
@@ -21,7 +21,7 @@ The project has two public faces. The **archive** is a server-rendered reading e
 
 The current development milestone is **0.2.0**, recorded in the [changelog](CHANGELOG.md). It has not been tagged or published as a supported release.
 
-CIRCA Archive is in pre-release development. The public archive and CIRCA/OS workstation let you explore illustrative records today. The .NET 10/PostgreSQL backend implements account registration, sign-in, cookie sessions, and authorization policies, with personal access integrated into the Next.js client. Archive content still comes from local fixtures; persistent records, notes, publishing, and moderation remain in development. The full platform design in [ARCHITECTURE.md](ARCHITECTURE.md) remains a draft, and no release is currently supported.
+CIRCA Archive is in pre-release development. The public archive and CIRCA/OS workstation let you explore illustrative records today. The .NET 10/PostgreSQL backend implements account registration, sign-in, cookie sessions, and authorization policies, with personal access integrated into the Next.js client. Archive content still comes from local fixtures; persistent records, comments, assessments, playlists, publishing, and revisions remain in development. The v1 content model is recorded in [ADR 008](docs/adr/008-v1-public-site-scope.md), the schema strategy in [ADR 009](docs/adr/009-versioned-archive-schema-migrations.md), and the platform design in [ARCHITECTURE.md](ARCHITECTURE.md) remains a draft. No release is currently supported.
 
 ## What is in the repository
 
@@ -167,13 +167,15 @@ The full branch model, protection rules, release checklist, and hotfix procedure
 
 Read [CONTRIBUTING.md](CONTRIBUTING.md) and the [Code of Conduct](CODE_OF_CONDUCT.md) before opening a pull request. Use the issue forms for bugs, proposals, and documentation gaps. Report vulnerabilities privately through [SECURITY.md](SECURITY.md), never in a public issue.
 
-Story authors can read the [Author guide](docs/AUTHOR_GUIDE.md) for the pre-release collaboration framework, including Core Rules, character consent, independent filings, and adoption.
+Story authors can read the [Author guide](docs/AUTHOR_GUIDE.md) for the pre-release collaboration framework, including Core Rules, character consent, comments, assessments, playlists, and the v1 scope.
 
 Good early contributions include refining archive domain contracts, connecting fixture-backed features to persistent services, improving accessibility, and expanding the original record corpus.
 
 ## License and third-party assets
 
 Original source code and documentation are available under the [MIT License](LICENSE). Contributions must be original or compatible with that license.
+
+Published original creative content — the archive's records, dossiers, and other in-world writing — is offered under [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)](https://creativecommons.org/licenses/by-nc-sa/4.0/); authors retain copyright in their contributions. The two licences cover different parts of the repository: code and documentation are MIT, published fiction is CC BY-NC-SA. The [Author guide](docs/AUTHOR_GUIDE.md) states the content terms.
 
 Some visual assets are not MIT-licensed:
 
