@@ -6,7 +6,7 @@ How the archive is built, how a record is written, and how to change either with
 
 CIRCA Archive is two things at once. In fiction it is the public face of the Commission for Incident Review and Corrective Action: a continuity that files reports on incidents that should not have happened. In code it is a Next.js application that renders that invented archive in English and Korean, with a server-rendered reading edition and an interactive workstation preview.
 
-The records are invented. The interface, the renderer, the tests, and this documentation are real work. Account registration, sign-in, and personal access use the .NET backend and its PostgreSQL database. Archive records remain local fixtures; notes, replies, and editor drafts stay in the browser tab.
+The records are invented. The interface, the renderer, the tests, and this documentation are real work. Account registration, sign-in, and personal access use the .NET backend and its PostgreSQL database. The running archive still reads local fixtures for most content, and notes, replies, and editor drafts stay in the browser tab; the v1 target replaces both with API-backed persistence. The v1 scope is recorded in [ADR 008](../../adr/008-v1-public-site-scope.md), and the migration strategy in [ADR 009](../../adr/009-versioned-archive-schema-migrations.md).
 
 ```brand-callout
 This is code documentation
@@ -51,6 +51,6 @@ Every page ends with the previous and next topic, and every section has an ancho
 
 If a page disagrees with the tree, the tree is right and the page is a bug. [Report it in the repository](contributing.md)
 
-Search covers the titles and Markdown of all nine documents in your language. Press Ctrl+K or Cmd+K from any project page to focus it. Use Edit documentation to propose a GitHub change, or Copy Markdown to copy the exact source. The live source is `develop`, refreshed every five minutes; unavailable documents show a retry and source link.
+Search covers the titles and Markdown of every document in your language. Press Ctrl+K or Cmd+K from any documentation page to focus it. Use Edit documentation to propose a GitHub change, or Copy Markdown to copy the exact source. The live source is `develop`, refreshed every five minutes; unavailable documents show a retry and source link.
 
 Open in ChatGPT copies the source and its URL as context, then opens ChatGPT. Paste the context and add your question; no message is sent automatically. The article footer links to the GitHub editor and shows the last verified file commit date when available.

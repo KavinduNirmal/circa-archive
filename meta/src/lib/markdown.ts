@@ -10,15 +10,39 @@ import { documentationPlugins } from "./markdown-plugins";
 import { resolveDocLink } from "./documents";
 import type { Locale } from "./site";
 
+function firstRowCells(node: Element): number {
+  if (node.tagName === "tr")
+    return node.children.filter(
+      (child) =>
+        child.type === "element" &&
+        (child.tagName === "td" || child.tagName === "th"),
+    ).length;
+  for (const child of node.children) {
+    if (child.type !== "element") continue;
+    const count = firstRowCells(child);
+    if (count) return count;
+  }
+  return 0;
+}
+
 /** Tables keep full width inside a scroll frame so narrow content still fills the column. */
 function rehypeTableScroll() {
   return (tree: HastRoot) => {
     visit(tree, "element", (node: Element, index, parent) => {
       if (node.tagName !== "table" || index === undefined || !parent) return;
+      // Two-column field tables stack into labelled rows on narrow screens;
+      // wider tables keep their own horizontal scroll frame.
+      const paired = firstRowCells(node) === 2;
+      if (paired)
+        node.properties = { ...node.properties, className: ["table-pairs"] };
       parent.children[index] = {
         type: "element",
         tagName: "div",
-        properties: { className: ["table-scroll"] },
+        properties: {
+          className: paired
+            ? ["table-scroll", "table-pairs"]
+            : ["table-scroll"],
+        },
         children: [node],
       };
       return index + 1;

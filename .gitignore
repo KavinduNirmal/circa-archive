@@ -44,3 +44,9 @@ test-results/
 
 # Astro generated types and content cache
 .astro/
+
+# Impeccable local workflow state and review captures
+.impeccable/
+
+# Local screenshot checks
+.shots/

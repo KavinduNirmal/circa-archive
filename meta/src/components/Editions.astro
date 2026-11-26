@@ -6,24 +6,27 @@ interface Props {
 const { locale } = Astro.props;
 ---
 
-<div class="editions">
-  <article>
-    <span class="eyebrow">01 / {t(locale, "readingNote")}</span>
+<div class="edition-pair">
+  <article class="edition">
+    <span class="edition-index">{t(locale, "readingIndex")}</span>
     <h3>{t(locale, "readingTitle")}</h3>
     <p>{t(locale, "readingBody")}</p>
-    <a class="text-link" href={archiveHref(locale)}>
-      {t(locale, "readingLink")} <span aria-hidden="true">↗</span>
-    </a>
-  </article>
-  <article class="workstation-edition">
-    <span class="eyebrow">02 / {t(locale, "workstationNote")}</span>
-    <div class="terminal-label" aria-hidden="true">
-      CIRCA/OS<span>_</span>
+    <div class="edition-foot">
+      <a class="text-link" href={archiveHref(locale)}>
+        {t(locale, "readingLink")} <span aria-hidden="true">↗</span>
+      </a>
+      <span class="edition-note">{t(locale, "readingNote")}</span>
     </div>
+  </article>
+  <article class="edition">
+    <span class="edition-index">{t(locale, "workstationIndex")}</span>
     <h3>{t(locale, "workstationTitle")}</h3>
     <p>{t(locale, "workstationBody")}</p>
-    <a class="text-link" href={archiveHref(locale, "/desktop")}>
-      {t(locale, "workstationLink")} <span aria-hidden="true">↗</span>
-    </a>
+    <div class="edition-foot">
+      <a class="text-link" href={archiveHref(locale, "/desktop")}>
+        {t(locale, "workstationLink")} <span aria-hidden="true">↗</span>
+      </a>
+      <span class="edition-note">{t(locale, "workstationNote")}</span>
+    </div>
   </article>
 </div>

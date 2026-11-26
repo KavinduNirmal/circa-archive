@@ -1,8 +1,10 @@
 # Third-party notices
 
-The project seal at `public/seal.svg` is the existing CIRCA artwork, copied from the archive's supplied `circa_snake_with_eye.svg`; retain the root [NOTICE](../NOTICE) and fiction licence. The public lore diagram is read from its existing repository source without re-licensing it.
+The project seal at `public/seal.svg` is the existing CIRCA artwork, copied from the archive's supplied `circa_snake_with_eye.svg`; retain the root [NOTICE](../NOTICE) and fiction licence. The public lore diagram is read from its existing repository source without re-licensing it. `public/library.jpg` is a supplied editorial plate for the landing page, resized locally; it carries the fiction licence and is not presented as documentary material.
 
-DM Sans, IBM Plex Mono, Instrument Serif and Noto Serif KR are bundled through Fontsource packages under the SIL Open Font License. Their package directories include the copyright and licence files. No remote font or profile-image requests are made.
+IBM Plex Sans, IBM Plex Mono, Instrument Serif and Noto Serif KR are bundled through Fontsource packages under the SIL Open Font License. Their package directories include the copyright and licence files. No remote font or profile-image requests are made.
+
+The GitHub, ChatGPT/OpenAI and Buy Me a Coffee marks are drawn as small inline SVG identifiers for links to those services. They remain trademarks of their owners and are not used as project branding.
 
 The documentation heading and remark transforms were moved from CIRCA's original Next.js implementation under the root MIT licence. Runtime dependencies retain their package licence notices. Astro, Unified, Remark and Rehype are used through package dependencies; no third-party design templates are copied.
 

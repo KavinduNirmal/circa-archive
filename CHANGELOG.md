@@ -4,6 +4,19 @@ All notable changes to CIRCA Archive are documented here. The format follows [Ke
 
 ## [Unreleased]
 
+### Added
+
+- ADR 008 records the v1 public-site scope and the D1–D15 decisions: comments as a separate entity on incident and record pages, filings-only assessments with no self-assessment, public incident-scoped playlists, reserved codes returning `200 Missing Record`, a cosmetic sealed overlay, restricted reads returning `401`, and author-only entity editing.
+- ADR 009 records the versioned, forward-only SQL migration strategy for the archive schema, including a baseline, a schema ledger, and explicit upgrade commands.
+
+### Changed
+
+- The `meta/` project website is rebuilt on Design E: a quiet asymmetric essay on near-white archival paper with burnt-orange ink, an offset reading column, marginal source notes, a peripheral printed dot field, flat hairline records, and no numbered section bands. IBM Plex Sans carries reading copy, Instrument Serif the display, and IBM Plex Mono the annotations. The site's existing navigation is retained but restyled as the study's thin mono strip with plus/minus disclosures, and search is now available only inside the documentation reader. Brand actions use drawn GitHub, ChatGPT and coffee marks, contributor portraits are circular, and the stylesheet is split into token, base, layout, editorial, prose, documentation, and print modules.
+- `AUTHOR_GUIDE.md` now describes the v1 model. Branching, forks, adoption, stewardship, succession, foundational amendments, primary claims, organisation governance, and character-owner notification are removed or marked post-v1.
+- `ARCHITECTURE.md` now states the v1 schema and API contract, adds comments and media, removes vote-derived `contested` status, updates sealed and restricted reads, and marks the workstation, continuations, recognition voting, and moderation console as post-v1.
+- The English and Korean route maps list the routes the tree serves today and the v1 target routes that are still missing.
+- The public documentation, root README, ADR index, fixture ADR, and session ADR describe the API-first public site and the retired comment-as-record framing.
+
 ## [0.2.0] - Unreleased
 
 Development milestone covering authentication and local full-stack operation.

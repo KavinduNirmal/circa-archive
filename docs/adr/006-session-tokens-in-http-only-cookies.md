@@ -4,7 +4,11 @@
 - **Date:** 2026-10-18
 - **Deciders:** Maintainers
 - **Supersedes:** —
-- **Superseded by:** —
+- **Superseded by:** — (the comments framing in the Context below is superseded by [008](008-v1-public-site-scope.md))
+
+## Implementation update — 2026-10-26
+
+The Context paragraph below describes a comment as "filing a record". That framing is superseded by [ADR 008](008-v1-public-site-scope.md): comments are a separate discussion entity, never filings, never searchable, and they target either a record or an incident. The authentication and session decisions in this ADR are unchanged and remain in force.
 
 ## Implementation update — 2026-10-20
 

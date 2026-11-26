@@ -8,7 +8,13 @@ import {
   sourcePath,
 } from "../src/lib/documents";
 import { renderDocument } from "../src/lib/markdown";
-import { archiveHref, projectHref } from "../src/lib/site";
+import { archiveHref, catalogs, locales, projectHref } from "../src/lib/site";
+
+it("keeps every locale catalog in key parity", () => {
+  const english = Object.keys(catalogs.en).sort();
+  for (const locale of locales)
+    expect(Object.keys(catalogs[locale]).sort()).toEqual(english);
+});
 
 describe("public documentation", () => {
   it("exposes exactly the four chapters and retains existing article slugs", () => {
@@ -86,7 +92,8 @@ describe("safe reading and stable anchors", () => {
       "docs/documentation/en/records.md",
       "en",
     );
-    expect(doc.html).toContain("<table>");
+    expect(doc.html).toContain('<div class="table-scroll table-pairs">');
+    expect(doc.html).toContain('<table class="table-pairs">');
     expect(doc.html).toContain('data-alert="warning"');
     expect(doc.html).toContain("<mark");
     expect(doc.html).toContain('data-brand="callout"');

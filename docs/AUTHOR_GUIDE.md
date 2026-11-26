@@ -1,8 +1,8 @@
 # Writing and contributing stories
 
-**Platform authoring framework — pre-release.** This guide describes how contributions should be handled. The current client uses illustrative fixtures; these permissions, review processes, and adoption workflows are not yet implemented.
+**Platform authoring framework — v1 scope recorded, implementation in progress.** The v1 content model is recorded in [ADR 008](adr/008-v1-public-site-scope.md). The running client still uses illustrative fixtures for most archive content and keeps editor drafts in the browser; this guide describes the rules the v1 product will enforce, not features that already work. Where this guide and the running tree disagree, the tree is the current behavior and the difference is tracked as implementation work.
 
-These are rules for authors collaborating on CIRCA Archive. For the fictional world's mechanics, read the [lore references](lore/README.md). Filing, evidence, and continuity remain separate: a published record can be credible without being adopted, and an adopted record can contain an unreliable account.
+These are rules for authors collaborating on CIRCA Archive. For the fictional world's mechanics, read the [lore references](lore/README.md). Filing, evidence, and reader assessment are separate: a published record can be well supported without being adopted into anyone's reading order, and a reader can follow a playlist without that playlist becoming canon.
 
 ## What you can file
 
@@ -18,17 +18,30 @@ These are rules for authors collaborating on CIRCA Archive. For the fictional wo
 
 A filing must make a meaningful contribution. Atmosphere, consequences, and new perspectives count; spam, targeted ridicule, and repetitions do not.
 
-## Start with the Incident's boundaries
+Codes use a minimum six-digit sequence. The reserved ranges are not gaps: a code in a reserved range answers `200` with **Missing Record**, because the archive reserves the number without holding a document. A `404` means the identifier exists but the archive does not hold it. The same rule applies to incidents, explorations, evidence, and recoveries.
 
-The **Founding Author**, called the **Originator** in archival language, creates the original Incident record and identifies its core creative boundaries. That record may establish or hint at rules. Its narrator need not understand what the author has defined.
+## The incident is the hub
 
-Before writing a follow-up, distinguish three categories:
+An Incident is the origin of a story and the address every follow-up points at. Each exploration, evidence filing, and rumour is **filed against** one incident; that relation is the record's parent. There is no separate follow-up chain, fork, branch, continuity, adoption, stewardship, or foundational-amendment mechanism in v1.
 
-| Category                                  | What it protects or describes                                                                      | How another author may respond                                                                       |
-| ----------------------------------------- | -------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| **Core Rules / Foundational Constraints** | The Incident's core identity and non-negotiable creative boundaries, including its primary actors. | Do not invalidate them without an authorized Foundational Amendment. A branch is not an exemption.   |
-| **Established Observations**              | Findings supported by exploration records. They can still be incomplete or mistaken.               | Challenge or revise them through new evidence.                                                       |
-| **Unverified Claims**                     | Speculation, testimony, rumors, hypotheses, and disputed conclusions.                              | Question, contradict, or reinterpret them while respecting Core Rules and collaboration permissions. |
+That means:
+
+- Any signed-in author may file an exploration, evidence, or rumour against an existing incident.
+- A follow-up adds an account. It does not establish the incident's truth, replace its premise, or claim the incident for an organisation.
+- Contradictory accounts coexist. The archive files them side by side and the reader decides what to believe.
+- Changing another author's protected premise is a conduct matter, not a platform transaction. v1 has no amendment button; if a contribution fundamentally rewrites someone else's incident, it may be moderated.
+
+A published incident and its follow-ups are still open to further writing. Publication does not lock an incident, and it does not make any account canonical.
+
+## Core rules and follow-ups
+
+The incident's author establishes its creative boundaries. Before writing a follow-up, distinguish three categories:
+
+| Category                                  | What it protects or describes                                                                      | How another author may respond                                                  |
+| ----------------------------------------- | -------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| **Core Rules / Foundational Constraints** | The Incident's core identity and non-negotiable creative boundaries, including its primary actors. | Do not invalidate them. A new account can interpret them; it cannot erase them. |
+| **Established Observations**              | Findings supported by exploration records. They can still be incomplete or mistaken.               | Challenge or revise them through new evidence.                                  |
+| **Unverified Claims**                     | Speculation, testimony, rumors, hypotheses, and disputed conclusions.                              | Question, contradict, or reinterpret them while respecting the Core Rules.      |
 
 Not every apparent rule discovered in an exploration becomes foundational. A narrator's certainty does not grant permission to rewrite another author's protected premise.
 
@@ -47,91 +60,97 @@ Use a typed `[[...]]` link when a filing mentions an existing archive entity:
 | `CHR`  | Character    | `[[CHR-018257]]` |
 | `ITM`  | Recovery     | `[[ITM-000143]]` |
 
-Incidents, explorations, evidence, organizations, and recoveries can be referenced regardless of recognition or filing status. Characters are different: you must import a character from the editor's **Entity Registry** for this draft. Importing is a request for this document only; it does not license later documents. A character marked **Restricted** opens an acknowledgement warning and notifies its owner when you submit.
+Incidents, explorations, evidence, organizations, and recoveries can be referenced regardless of recognition or filing status. Characters are different: you must import a character from the editor's **Entity Registry** for this draft. Importing is a request for this document only; it does not license later documents. A character marked **Restricted** opens an acknowledgement warning; notifying its owner on submission is deferred and is not part of v1.
 
 For a new organization, character, recovery, or evidence image that does not exist in the archive yet, create it in the Entity Registry. It receives a temporary code such as `TEMP-CHR-01`, tied to your draft. On submission the archive validates every link, creates the permanent entities, replaces the temporary codes, and files the record. If anything fails, the whole submission fails and the draft stays intact. Nothing is left half-created.
 
-A link is navigation, not ownership. Referencing an entity does not let you control its established characterization or claim its Incident.
+A link is navigation, not ownership. Referencing an entity does not let you control its established characterization, claim its Incident, or adopt it into a reading order.
 
-## Filing and adoption
+## Drafts, publication, and persistence
 
-Any eligible author may submit an Exploration Record to an existing Incident, subject to content rules and the permissions in this guide. Publication does not require adoption into its principal continuity.
+Writing happens in a server-persisted draft. A signed-in author can keep several drafts, autosave them, and resume one on another device. Browser storage may hold an offline cache, but it is not the source of truth and losing it must not lose the draft.
 
-The intended sequence is:
+Publishing is one transaction: the server validates the Markdown, links, permissions, and per-type length limits; promotes temporary entities; allocates permanent codes; rewrites tokens; computes the content hash; writes the filing; and writes revision 1. Any failure rolls back and leaves the draft editable. A published filing is visible according to its access policy, and the author is shown on the record.
 
-1. A compliant Exploration Record is published as an independent filing.
-2. Readers discuss it, endorse the writing, and examine its evidence.
-3. The Originator or an authorized Continuity Steward may adopt it into the principal continuity.
-4. If it is not adopted, it remains available as an independent record and can support further writing or an explicitly established branch.
+The per-type limits are:
 
-Votes and comments inform these decisions. They do not automatically amend Core Rules, establish truth, or adopt a record. Declining adoption does not remove a compliant record from the archive.
+| Type        | Words | Characters |
+| ----------- | ----- | ---------- |
+| Incident    | 2,500 | 15,000     |
+| Exploration | 5,000 | 25,000     |
+| Evidence    | 2,000 | 10,000     |
+| Rumour      | 1,000 | 10,000     |
 
-Use **Filed**, **Independent**, **Adopted**, and **Divergent** rather than declaring one account universally canonical. A principal continuity is one curated sequence; readers can follow others.
+Signed-out visitors can read but cannot start a draft, publish, comment, assess, or edit a playlist. Those surfaces show a sign-in action instead of failing silently.
 
-## Keep three kinds of status separate
+## Editing and revisions
 
-| Question        | Examples                                                                         | What it does not decide                                              |
-| --------------- | -------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
-| **Publication** | Draft or published.                                                              | Whether claims are supported or a continuity has adopted the record. |
-| **Evidence**    | Unverified, corroborated, or disputed.                                           | Who may change Core Rules or whether a record belongs to a timeline. |
-| **Continuity**  | Independent, adopted into a named continuity, or part of a divergent continuity. | Whether every interpretation in the record is true.                  |
+An author may edit their own filing, and only their own. Each substantive edit appends a revision with a revision number, editor, date, and reason; the current filing is the latest revision and material history stays visible. v1 has no delete, withdraw, or erase action for authors. Tombstoning is a moderation action, not an author action.
 
-A published, corroborated, independent record has evidence but has not been adopted. A published, disputed, adopted record can belong to a timeline while its interpretation remains contested.
+Do not silently rewrite a contribution other authors have already responded to. A revision is the archive's record of what changed.
 
-These are conceptual distinctions, not implemented status controls. Withdrawal and deletion workflows remain unresolved. Tombstones concern content moderation; non-adoption is not a tombstone.
+## Comments
 
-## Amendments, stewards, and succession
+Comments are discussion, not filings. They have no archive code, do not appear in search results, do not consume a number, and never change canon, evidence, or lifecycle. A comment attaches to one incident or one record.
 
-A **Foundational Amendment** changes a Core Rule with the Founding Author's approval, or approval from someone expressly delegated that authority. Adoption alone does not silently amend a protected constraint.
+- **One reply level.** A root comment may receive replies; replies cannot be replied to.
+- **Guests read, signed-in authors write.** The author identity comes from the account, never from a free-text name field.
+- **One thread per target.** Record pages and incident pages both carry comments.
+- **Authors edit and delete their own comments.** Deleting a root comment hides or tombstones its replies consistently.
+- **Length and rate limits apply.** Coordinated flooding is prohibited.
 
-Record what changed and when the amendment became effective. Preserve older records and the constraints under which they were valid rather than retroactively treating them as violations.
+## Assessment: Corroborate and Contest
 
-The Founding Author may designate **Continuity Stewards** to adopt records and maintain timelines within a stated scope. Stewardship does not automatically include foundational amendment authority, ownership of an organization, or control of unrelated branches.
+Readers may **Corroborate** or **Contest** a filing — an exploration, evidence filing, or rumour. Incidents are not assessed in v1. Assessment is not a truth claim, not a rating of the story's quality, and not adoption.
 
-Authors should be able to configure stewardship and succession in advance. The intended fallback for an inactive Incident without succession arrangements is an orphaned-Incident pool. Inactivity thresholds, pool administration, and the powers of a future steward remain to be defined. Until resolved, inactivity is not blanket permission to rewrite Core Rules; independent filing and branching remain available.
+- One assessment per account per filing, removable at any time.
+- An author cannot assess their own filing, and their assessment does not count.
+- Counts are visible in front of the filing, so readers can judge for themselves.
+- A filing with at least ten assessments and at least 70% Contest carries the **Disputed** advisory above its body. The advisory is text only: it is not a stored status, it does not change default ordering, and it does not determine factual status.
+- The default filing order is chronological. A reader may explicitly choose a top-score sort.
+- Coordinated voting or suppression is prohibited.
 
-## Independent records and branches
+## Playlists
 
-An independent record is not automatically a branch. A **divergent continuity** explicitly links an alternative sequence to its source, with attribution and a visible divergence point. Contributors can write sequels to compliant independent records without erasing the principal timeline.
+A playlist is an author's curated reading order for one incident, not a claim about canon. In v1 every playlist is public.
 
-Two authors may file contradictory expedition outcomes. Both remain available independently unless and until adopted into particular continuities. Choosing one sequence does not invalidate the existence of the other.
-
-A record fork preserves its source lineage. Creating a branch additionally identifies the timeline being followed; the two actions should not be treated as identical.
+- Any signed-in author may create a playlist for an incident, rename it, describe it, add and remove filings, reorder them, and delete it.
+- The incident author's playlist is pinned first. It is not privileged as truth.
+- A record lists the playlists it appears in.
+- Playlist membership does not change publication, evidence, lifecycle, or assessment counts.
+- Private and unlisted playlists are post-v1.
 
 ## Characters and consent
 
-| Declared permission      | What another author may do                                                                                                                                                            |
-| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Open**                 | Use and develop the character within the declared scope and general platform rules. A death may be written in a divergent continuity without ending the character in other timelines. |
-| **Restricted — default** | Reference the character, but preserve established characterization, history, relationships, and narrative agency. The owner is notified on submission and may request a review.       |
+Characters have an owner and a declared usage policy. V1 has two policies:
+
+| Declared permission      | What another author may do                                                                                                                                                                   |
+| ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Open**                 | Reference and develop the character within the declared scope and the platform rules, including changes to characterization, history, and relationships.                                     |
+| **Restricted — default** | Reference the character, but preserve established characterization, history, relationships, and narrative agency. The character may appear; the citing record may not redefine who they are. |
+
+The policy changes what content a record may establish, not whether the character may be cited. Referencing a Restricted character does not require approval, and it does not license a redefinition.
 
 Every import is scoped to one draft. Importing a character in one filing does not grant permission for the next. Declare permissions and any narrower scope clearly. Creating an original investigator remains an option when another character is unavailable for substantial use.
 
-Using a Restricted character requires acknowledging the warning: characterization, history, relationships, and narrative agency remain subject to the Character Usage Guidelines; the owner will be notified when the record is submitted; and confirmed violations may lead to review, moderation, or a content strike.
+Using a Restricted character requires acknowledging the warning: characterization, history, relationships, and narrative agency remain subject to the Character Usage Guidelines, and confirmed violations may lead to review, moderation, or a content strike. Notifying the owner on submission is post-v1; the guide will be updated when that surface exists.
 
 Do not retroactively erase someone else's established character outcome without consent. A new interpretation of an apparent death can be a story development; declaring the preceding contribution never happened is a different action. Arbitrarily invalidating an established survival is prohibited.
 
-Reader preference about character continuities does not override these permissions.
+Reader preference about character continuities does not override these permissions. Character creation and editing are author-only in v1; there is no second-editor or appointed-moderator role.
 
-## Primary actors and consequential outcomes
+## Organisations and recoveries
 
-Primary actor identity belongs to the Incident's Core Rules. Supporting entities, witnesses, temporary antagonists, and secondary actors can be introduced where compatible with those rules.
+Organisations and recoveries are archive entities, not accounts.
 
-Do not replace a protected primary actor or declare that a newly invented character was secretly the true primary actor without an authorized amendment. After an actor is destroyed within a continuity, a successor can be introduced there if the constraints permit. That successor does not replace the actor in every other timeline.
+- An author may create an organisation or recovery and edit the one they created. No organisation moderator role exists in v1.
+- Organisation dossiers carry name, recognition state, established and recognised years, affiliation, description, holdings, references, and an optional logo. Recognition state is display-only in v1; recognition voting and governance are post-v1.
+- Recovery dossiers carry name, aliases, category, description, origin incident, first documented record, documentation status, custody, and references.
+- Both have directories and stable canonical URLs. A dossier is a record of what is known, not a claim of ownership.
 
-Actor destruction, deaths, and permanent-clearance claims may be filed where they respect Core Rules and applicable character permissions. They do not automatically enter the principal continuity. A branch's consequences remain within its sequence unless adopted elsewhere.
+Images for evidence, logos, and galleries upload to archive media storage. S3-compatible storage is the production target, with a local adapter for development. Uploaded assets are tied to a draft until publication, when they become stable references; a browser blob is never the source of truth.
 
-The setting's ordinary [clearance and recurrence rules](lore/Narrative%20flow.md#clearance-and-recurrence) still apply. Permission to submit an outcome is not a universal supernatural method for permanently ending any Incident.
-
-## Nested and connected Incidents
-
-A writer may introduce a nested phenomenon compatible with the surrounding Incident's constraints. If it becomes a persistent, independently explorable system, give it its own Incident record and attribution.
-
-A speculative report can propose a connection to another author's Incident. It does not make that connection authoritative. Establishing a relationship that changes both Incidents' protected identity requires the relevant authors' permissions or authorized amendments; adoption must be considered for each affected continuity.
-
-No single author can use a connection to unilaterally redefine another Incident.
-
-## Content warnings and access
+## Content warnings, access, and classification
 
 Choose a warning tier when filing:
 
@@ -144,17 +163,21 @@ Choose a warning tier when filing:
 
 Specific tags such as `Graphic Violence`, `Psychological Horror`, `Sexual Violence`, `Self-Harm`, and `Major Character Death` may accompany the tier. **No Warnings Apply** means you confirm the listed warnings are not applicable. **Warnings Not Provided** means you have not decided. These are different from **None**; do not present them as equivalent.
 
-Access policy is separate from warnings: `public` reads normally, `sealed` withholds the body until access is requested, and `restricted` is a platform denial shown as a clearance notice. Classification (`LEVEL 3`–`LEVEL 6`) is cosmetic and does not grant access.
+Access policy is separate from warnings:
 
-## Revisions, retractions, and redactions
+- `public` reads normally.
+- `sealed` hides the body behind a cosmetic overlay that any reader can dismiss with a button. It is presentation, not a security boundary: do not put content behind it that must never be shown.
+- `restricted` returns `401` with the diegetic clearance notice. This is a platform denial, not a reader choice.
 
-Revise or retract your own filings through the available controls. Material revisions preserve the historical existence of a contribution that has become part of a collaborative narrative; do not silently rewrite what other authors responded to.
+Classification (`LEVEL 3`–`LEVEL 6`) is cosmetic and grants no access. A restricted filing must not render its body; a sealed filing may show a title and metadata before the overlay is dismissed.
 
-Narrative redaction is allowed for confidentiality, classification, missing information, or deliberate archival presentation. It must not conceal a policy violation or evade moderation.
+## Search, language, and identity
 
-## Conduct, assessment, and appeals
+Search reads the public archive and never returns comments, restricted bodies, or hidden records. `/ko` preselects Korean in the search language field; the reader can still switch languages, and filed content stays in the language it was filed in.
 
-Assessment is a reader action: **Corroborate** or **Contest**, one per account, removable at any time. It is not a truth claim and does not adopt a record. A record may receive a `Disputed` advisory after at least ten assessments with 70% or more Contest; the advisory explicitly says it does not determine factual status. Coordinated voting or suppression is prohibited.
+A record shows its author as `displayName <displayId>`. Comments show the account identity. There is no free-text correspondent field.
+
+## Conduct and appeals
 
 Humor and satire are allowed. Targeted ridicule of another author's Incident, spam, harassment, doxxing, and attempts to seize narrative control are not. Report violations instead of retaliating.
 
@@ -162,18 +185,18 @@ Enforcement may include filing restrictions, content removal, warnings, suspensi
 
 ## Licensing and attribution
 
-Published original creative content is offered under **Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)**. You retain copyright in your contributions. Others may share and adapt the work with attribution, for non-commercial purposes, under the same license.
+Published original creative content is offered under **Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)**. You retain copyright in your contributions. Others may share and adapt the work with attribution, for non-commercial purposes, under the same license. The source code and documentation are licensed separately under MIT; the licence for a part of the repository depends on what it contains.
 
 Do not publish third-party characters, settings, organizations, storylines, or other protected expression without permission. Attribution alone does not grant that permission. Adapting previously published CIRCA material is allowed under its license, but publication here still follows the narrative and conduct rules.
 
 ## Before submitting
 
-Identify the Incident and records you build on, the continuity you follow or where you diverge, the Core Rules you must preserve, and any character permissions or amendments required. Distinguish a new observation from an unverified explanation.
+Identify the Incident you are filing against, the records you build on, the Core Rules you must preserve, and any character import the draft needs. Distinguish a new observation from an unverified explanation. Keep credit and source references visible.
 
-Keep credit and source references visible. An adoption request should identify the destination continuity and any decision needed; it does not make approval automatic.
+Check that the draft is yours to publish, that every wikilink resolves, that any temporary entity is intended, and that the access policy and warnings match the content. If you are editing an existing filing, add a revision reason that tells the next reader what changed.
 
-## Decisions still open
+## Decisions recorded and still open
 
-The framework does not yet settle opting an Incident out of independent contributions, curated pre-publication approval, withdrawal after others have contributed, deletion and preservation responsibilities, succession triggers, the exact recognition threshold for organizations, or the detailed collaboration dispute process.
+The v1 decisions are recorded in [ADR 008](adr/008-v1-public-site-scope.md) and supersede the earlier adoption, branching, stewardship, succession, foundational-amendment, primary-claim, and organisation-governance descriptions. In particular: comments are not records; assessments apply to filings only; self-assessment is excluded; playlists are public only; reserved codes return `200 Missing Record`; sealed records are cosmetic; restricted records return `401`; and entity editing is author-only.
 
-Rumour link tokens, recovery number ranges, sealed-access decision authority, and whether a third `Reference Only` character policy returns remain open. Existing [content and conduct rules](../CODE_OF_CONDUCT.md) still apply; continuity disagreement alone is not permission to harass contributors or erase their work.
+Still open after v1 scoping include the rumour link token, recovery and character number ranges, author deletion and withdrawal, revision visibility, moderation-console design, organisation recognition thresholds, holder-code grammar, and the exact seeded names and codes. The [lore references](lore/README.md) describe the fiction; this guide describes the platform. Existing [content and conduct rules](../CODE_OF_CONDUCT.md) still apply.

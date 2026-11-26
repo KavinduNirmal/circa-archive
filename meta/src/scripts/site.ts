@@ -1,4 +1,3 @@
-const locale = document.documentElement.lang;
 const mobile = document.querySelector<HTMLDetailsElement>("[data-mobile-menu]");
 mobile?.addEventListener("toggle", () =>
   document.body.classList.toggle("menu-open", mobile.open),
@@ -22,6 +21,8 @@ document.addEventListener("click", (event) => {
     .forEach((menu) => {
       menu.open = false;
     });
+  const target = event.target as Element | null;
+  if (mobile?.open && !target?.closest?.(".header-inner")) mobile.open = false;
 });
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape") {
@@ -35,17 +36,19 @@ document.addEventListener("keydown", (event) => {
     }
   }
   if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
-    event.preventDefault();
+    // Search is a documentation tool, not global chrome. On other pages the
+    // shortcut does nothing rather than carrying the reader to another route.
     const search = document.querySelector<HTMLInputElement>(
       "#documentation-search",
     );
     if (search) {
+      event.preventDefault();
       const chapter = document.querySelector<HTMLDetailsElement>(
         ".chapter-disclosure",
       );
       if (chapter) chapter.open = true;
       search.focus();
-    } else location.assign(`/${locale}/documentation/#documentation-search`);
+    }
   }
 });
 document.querySelector("[data-top]")?.addEventListener("click", (event) => {

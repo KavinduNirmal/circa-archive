@@ -1,0 +1,50 @@
+---
+import { t, projectHref, type Locale } from "../lib/site";
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const entries = [
+  {
+    index: "01",
+    title: "beginSettingTitle",
+    body: "beginSettingBody",
+    href: projectHref(locale, "documentation"),
+  },
+  {
+    index: "02",
+    title: "beginLoreTitle",
+    body: "beginLoreBody",
+    href: projectHref(locale, "documentation/lore"),
+  },
+  {
+    index: "03",
+    title: "beginWriteTitle",
+    body: "beginWriteBody",
+    href: projectHref(locale, "documentation/contribution"),
+  },
+  {
+    index: "04",
+    title: "beginBuildTitle",
+    body: "beginBuildBody",
+    href: projectHref(locale, "documentation/building"),
+  },
+];
+---
+
+<ol class="begin-list">
+  {entries.map((entry) => (
+    <li>
+      <a href={entry.href}>
+        <span class="begin-index">{entry.index}</span>
+        <div class="begin-copy">
+          <h3>{t(locale, entry.title)}</h3>
+          <p>{t(locale, entry.body)}</p>
+        </div>
+        <span class="row-arrow" aria-hidden="true">
+          ↗
+        </span>
+      </a>
+    </li>
+  ))}
+</ol>

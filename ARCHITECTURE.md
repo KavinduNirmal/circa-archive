@@ -8,6 +8,8 @@
 **Author:** Project Muse  
 **Purpose:** Technical specification for the CIRCA Archive collaborative storytelling platform.
 
+> **Revision note (2026-10-26).** This pass records the v1 public-site scope and the D1–D15 decisions in [ADR 008](docs/adr/008-v1-public-site-scope.md), and the schema migration strategy in [ADR 009](docs/adr/009-versioned-archive-schema-migrations.md). It prunes adoption, branching, continuities, primary claims, organisation governance, and character-owner notification from the v1 contract; adds comments, media, and revision numbers; and marks the workstation and moderation console as post-v1. Where the running code still implements a pre-decision path, the section says so explicitly.
+>
 > **Revision note (2026-10-21).** This pass incorporates the private development notes on entity types, record types, and platform regulations: typed `[[wikilinks]]`, the draft entity registry, characters and recoveries as first-class entities, revised record taxonomy and identifiers, content warnings, access policy, reviewer assessment, incident playlists, and the public collaboration regulations. Where these notes conflict with earlier draft decisions, this document records the new direction and flags the unresolved remainder rather than silently reconciling it.
 
 ---
@@ -16,7 +18,9 @@
 
 CIRCA Archive is a collaborative storytelling platform where users write, explore, and expand ghost stories within a shared fictional universe. The interface mimics a desktop workstation belonging to C.I.R.C.A. (Commission for Incident Review and Corrective Action), an ancient continuity that predates governments and files records on anomalous incidents.
 
-Users interact with a diegetic desktop environment. Records are authored in Markdown and rendered as paper-like PDFs. The planned platform supports incidents, explorations, evidence, rumours, organization dossiers, characters, recoveries, assessment, moderation, and multiple continuities without a single authority over fictional truth. Authors connect filings with typed `[[wikilinks]]` and may introduce temporary entities from an in-editor registry; submission validates every reference and promotes temporary entities atomically so that no orphaned portfolio entries survive a failed filing. The [Author guide](docs/AUTHOR_GUIDE.md) defines the current pre-release collaboration framework and supersedes older descriptions of unrestricted incident-rule changes or automatic continuity creation; the workflows remain unimplemented.
+Users interact with a diegetic desktop environment. Records are authored in Markdown and rendered as paper-like PDFs. The v1 platform supports incidents, explorations, evidence, rumours, organization dossiers, characters, recoveries, comments, playlists, assessments, and revision history without a single authority over fictional truth. Authors connect filings with typed `[[wikilinks]]` and may introduce temporary entities from an in-editor registry; submission validates every reference and promotes temporary entities atomically so that no orphaned portfolio entries survive a failed filing. The public site's v1 scope and the D1–D15 decisions are recorded in [ADR 008](docs/adr/008-v1-public-site-scope.md); the [Author guide](docs/AUTHOR_GUIDE.md) is the author-facing expression of that scope. Branching, forks, adoption, stewardship, succession, and foundational amendments are not v1 features.
+
+The v1 scope above is fixed by [ADR 008](docs/adr/008-v1-public-site-scope.md). The implementation status is mixed: authentication, global search, destination reads, and sealed access requests exist; filing, drafts, comments, assessments writes, playlists, entity authoring, revisions, and media do not. Code remains the source of truth for current behavior; this document states the target contract, and the gap is tracked as implementation work.
 
 ### 1.1 Core Principles
 
@@ -34,32 +38,33 @@ Users interact with a diegetic desktop environment. Records are authored in Mark
 
 ## 2. Glossary
 
-| Term                | Definition                                                                                                        |
-| ------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| **CIRCA**           | Commission for Incident Review and Corrective Action. Ancient continuity, not a government agency.                |
-| **Incident**        | An anchored supernatural system, distinct from its actors. Code: `INC-{NNNNNN}`.                                  |
-| **Record**          | A filed artifact against an Incident. Types: INCIDENT, EXPLORATION, EVIDENCE, RUMOUR.                             |
-| **Exploration**     | A deliberate expedition into an Incident, filed as `EXP-{NNNNNN}`.                                                |
-| **Evidence**        | Witness statement, interview, document, image, or other account filed as `EVI-{NNNNNN}`.                          |
-| **Rumour**          | Unverified speculation filed against an Incident. Has no inherent archive code and is shown in a separate tab.    |
-| **Recovery / Item** | An object or material recovered from an Incident. Code: `ITM-{NNNNNN}`.                                           |
-| **Org**             | An in-universe body aware of Incidents and active in researching or managing them. Code: `ORG-{NNNNNN}`.          |
-| **Character**       | A person, entity, or role authored as a reusable archive entity. Code: `CHR-{NNNNNN}`.                            |
-| **Dossier**         | Community-maintained organization page, edited by appointed moderators.                                           |
-| **Continuity**      | A connected sequence for an Incident or organization. Principal and divergent sequences coexist.                  |
-| **Primary Claim**   | Display convention for an incident's master file. Singular, cedeable.                                             |
-| **Incident Claim**  | The organization that has claimed an Incident as its own territory; `CIRCA` by default.                           |
-| **Contested**       | Valid state when two orgs claim primary on an incident.                                                           |
-| **Tombstoned**      | A record removed from discoverability for meta violations.                                                        |
-| **Erased**          | An entity whose registry status is retired. The identifier is permanently occupied; the entity is not rendered.   |
-| **Recognition**     | Community-confirmed acceptance of an organization. The organization may exist while unrecognized.                 |
-| **Flair**           | Cosmetic org badge on a user's profile.                                                                           |
-| **Wikilink**        | Typed inline reference such as `[[INC-008928]]`, resolved at submission against permanent archive entities.       |
-| **Entity Registry** | Editor sidepanel for importing entities and minting temporary `TEMP-[TYPE]-[NUMBER]` entities for one draft.      |
-| **Holder Code**     | Cosmetic organization-specific code (`PREFIX`, `NUMBER`, `SUFFIX`, `SEVERITY`) pointing at the archive reference. |
-| **Access Policy**   | `public`, `sealed` (request permission), or `restricted` (platform denied).                                       |
-| **Assessment**      | A reader's `Corroborate` or `Contest` vote. Advisory; never establishes truth.                                    |
-| **Playlist**        | An author's curated reading order for filings against an Incident. Several playlists may coexist.                 |
+| Term                | Definition                                                                                                             |
+| ------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| **CIRCA**           | Commission for Incident Review and Corrective Action. Ancient continuity, not a government agency.                     |
+| **Incident**        | An anchored supernatural system, distinct from its actors. Code: `INC-{NNNNNN}`.                                       |
+| **Record**          | A filed artifact against an Incident. Types: INCIDENT, EXPLORATION, EVIDENCE, RUMOUR.                                  |
+| **Exploration**     | A deliberate expedition into an Incident, filed as `EXP-{NNNNNN}`.                                                     |
+| **Evidence**        | Witness statement, interview, document, image, or other account filed as `EVI-{NNNNNN}`.                               |
+| **Rumour**          | Unverified speculation filed against an Incident. Has no inherent archive code and is shown in a separate tab.         |
+| **Recovery / Item** | An object or material recovered from an Incident. Code: `ITM-{NNNNNN}`.                                                |
+| **Org**             | An in-universe body aware of Incidents and active in researching or managing them. Code: `ORG-{NNNNNN}`.               |
+| **Character**       | A person, entity, or role authored as a reusable archive entity. Code: `CHR-{NNNNNN}`.                                 |
+| **Dossier**         | An organization's archive page. In v1 it is editable only by the author who created the organization.                  |
+| **Continuity**      | A connected sequence for an Incident or organization. Lore uses the term; v1 has no platform continuity object.        |
+| **Primary Claim**   | Display convention for an incident's master file. Retired from v1; post-v1 concept.                                    |
+| **Incident Claim**  | The organization that has claimed an Incident as its own territory; `CIRCA` by default. Display-only in v1.            |
+| **Contested**       | A vote-derived advisory, not a stored status. Shown as text when a filing has at least 10 assessments and 70% contest. |
+| **Tombstoned**      | A record removed from discoverability for meta violations.                                                             |
+| **Erased**          | An entity whose registry status is retired. The identifier is permanently occupied; the entity is not rendered.        |
+| **Recognition**     | Community-confirmed acceptance of an organization. Display-only in v1; recognition voting is post-v1.                  |
+| **Flair**           | Cosmetic org badge on a user's profile.                                                                                |
+| **Wikilink**        | Typed inline reference such as `[[INC-008928]]`, resolved at submission against permanent archive entities.            |
+| **Entity Registry** | Editor sidepanel for importing entities and minting temporary `TEMP-[TYPE]-[NUMBER]` entities for one draft.           |
+| **Holder Code**     | Cosmetic organization-specific code (`PREFIX`, `NUMBER`, `SUFFIX`, `SEVERITY`) pointing at the archive reference.      |
+| **Access Policy**   | `public`, `sealed` (cosmetic overlay), or `restricted` (platform `401`).                                               |
+| **Assessment**      | A reader's `Corroborate` or `Contest` vote on a filing. Advisory; never establishes truth.                             |
+| **Playlist**        | An author's public, incident-scoped curated reading order. Several playlists may coexist.                              |
+| **Comment**         | A threaded discussion entry on an incident or record. Not a filing, not searchable, and not part of canon.             |
 
 ---
 
@@ -129,30 +134,29 @@ Users interact with a diegetic desktop environment. Records are authored in Mark
 - **Markdown Rendering:** `react-markdown` with `remark-gfm`. Custom CSS to mimic paper: serif fonts, page margins, subtle texture.
 - **No PDF generation.** The `.pdf` extension is a diegetic lie; files are Markdown rendered as paper.
 - **Authoring surface (`WRITE.exe`):** a Markdown editor with a right-hand **Entity Registry** sidepanel. The panel has two jobs: import existing characters, organizations, recoveries, incidents, and records; or mint temporary entities for the current draft. The editor offers `[[` completion for known references and marks unresolved tokens inline.
-- **Draft isolation:** temporary entities and character imports belong to the draft id, not to the author's profile. Leaving the draft or failing submission must not leak them into the permanent registry. A successful submission promotes temporary entities, rewrites tokens to permanent codes, and notifies imported character owners.
-- **Restricted character warning:** importing a character whose usage policy is `restricted` opens an acknowledgement dialog. The dialog states that characterization, history, relationships, and narrative agency remain subject to the Character Usage Guidelines, that the owner will be notified on submission, and that confirmed violations may lead to review or a content strike.
+- **Draft isolation:** temporary entities and character imports belong to the draft id, not to the author's profile. Leaving the draft or failing submission must not leak them into the permanent registry. A successful submission promotes temporary entities and rewrites tokens to permanent codes. Owner notification is deferred (D8); the draft records the import and acknowledgement without promising a notification.
+- **Restricted character warning:** importing a character whose usage policy is `restricted` opens an acknowledgement dialog. The dialog states that characterization, history, relationships, and narrative agency remain subject to the Character Usage Guidelines and that confirmed violations may lead to review or a content strike. The owner-notification sentence is post-v1.
 - **Editor validation:** the client can preview links and surface missing codes, but the server owns authoritative resolution. Submission is all-or-nothing.
 
 ### 3.4 Backend Architecture
 
 - **.NET 10 Minimal APIs** for REST endpoints.
 - **EF Core** with PostgreSQL provider.
-- **SignalR** for real-time email delivery, assessment count updates, adoption events, and character-owner notifications.
-- **Submission pipeline (transactional):** parse Markdown and typed wikilinks → validate target existence and visibility → validate character imports and record permissions → allocate permanent identifiers for temporary entities → replace draft tokens with permanent codes → compute content hash → persist the record, its links, playlists membership, and revision 1 → enqueue owner notifications. Any failure rolls back every step, including entity promotion.
+- **SignalR** for real-time email delivery and assessment count updates. Adoption events and character-owner notifications are post-v1.
+- **Submission pipeline (transactional):** parse Markdown and typed wikilinks → validate target existence and visibility → validate character imports and record permissions → allocate permanent identifiers for temporary entities → replace draft tokens with permanent codes → compute content hash → persist the record, its links, playlist membership, and revision 1. Any failure rolls back every step, including entity promotion.
 - **Identifier allocation:** per-type sequences with reserved ranges and a minimum display width of six digits. The sequence value is permanently consumed even if the entity is later erased.
-- **Holder codes:** resolved at filing time from the owning organization's `{PREFIX}{NUMBER}{SUFFIX}` and severity format. Holder codes are cosmetic aliases; the archive reference remains the canonical link target.
+- **Holder codes:** resolved at filing time from the owning organization's `{PREFIX}{NUMBER}{SUFFIX}` and severity format. Holder codes are cosmetic aliases; the archive reference remains the canonical link target. Custom holder-code configuration is post-v1.
 - **Background Services** for:
   - Content hash matching on record submission
   - Duplicate and near-identical entity detection
   - Moderation log aggregation
   - Email digest generation
-  - Assessment threshold checks (`Disputed` advisory)
-  - Character-owner notification delivery
-  - Sealed-access request expiry
+  - Assessment threshold calculation (`Disputed` advisory, computed on read)
+  - Media orphan cleanup
 
 ### 3.5 Database Schema
 
-The schema below has been revised for the entity and reference model in the 2026-10-21 development notes. The core archive entity tables and their search indexes are now scaffolded in `Circa.Archive.Domain` and `Circa.Archive.Infrastructure`; global search is implemented; scoped destination reads and sealed-record access requests are implemented; general archive CRUD remains pending. The remaining schema is still conceptual: it does not yet model versioned foundational constraints, scoped Continuity Stewards and succession, or separate publication, evidentiary, and per-continuity adoption states. Temporary-entity promotion and reference resolution are specified as transactional behavior, but their exact EF Core mapping remains undecided.
+The schema below is the v1 target recorded by [ADR 008](docs/adr/008-v1-public-site-scope.md) and applied by [ADR 009](docs/adr/009-versioned-archive-schema-migrations.md). The core archive entity tables and their search indexes are scaffolded in `Circa.Archive.Domain` and `Circa.Archive.Infrastructure`; global search, scoped destination reads, and sealed access requests are implemented; the v1 tables for comments, revisions, playlists, drafts, temporary entities, entity links, and media remain DDL work. Branching, adoption, continuity, steward, and primary-claim fields are not part of this schema. Temporary-entity promotion and reference resolution are specified as transactional behavior, but their exact EF Core mapping remains undecided.
 
 Naming below is provisional. `Records` means filings against an Incident (`EXP`, `EVI`, `RUM`); the originating Incident remains its own table. `Recoveries` is the archive term for items and appears as `ITM` in display codes.
 
@@ -170,7 +174,6 @@ CREATE TABLE Users (
     PasswordHash TEXT NOT NULL,
     DisplayId VARCHAR(9) NOT NULL UNIQUE,
     DisplayName VARCHAR(64) NOT NULL, -- non-unique generated analyst name
-    AdoptedOrganizationId UUID NULL, -- shared cosmetic flair; null = my.circa.archive
     Role VARCHAR(20) NOT NULL DEFAULT 'author',
     IsActive BOOLEAN NOT NULL DEFAULT TRUE,
     IsBanned BOOLEAN NOT NULL DEFAULT FALSE,
@@ -222,10 +225,12 @@ CREATE TABLE IncidentDesignations (
 CREATE TABLE IncidentRevisions (
     Id UUID PRIMARY KEY,
     IncidentId UUID NOT NULL REFERENCES Incidents(Id),
+    RevisionNumber INT NOT NULL,
     Markdown TEXT NOT NULL,
     EditorId UUID NOT NULL REFERENCES Users(Id),
     Reason TEXT,
-    CreatedAt TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    CreatedAt TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE(IncidentId, RevisionNumber)
 );
 ```
 
@@ -234,7 +239,7 @@ Display rules:
 - Codes are unique, but never database keys. Every table keys on UUIDv7.
 - Reserved ranges return `200` with `Missing Record`, not `404`. A `404` means the identifier exists and the archive does not hold it.
 - `erased` consumes the number permanently while the row is removed from rendering.
-- `sealed` withholds the body on first fetch until an access request is approved; `restricted` returns `401` with the diegetic clearance notice.
+- `sealed` withholds the body behind a cosmetic overlay that a reader dismisses with a button; it is not an authorization boundary. `restricted` returns `401` with the diegetic clearance notice.
 - `WarningDisclosure` distinguishes `none` (author selected no warnings), `no_warnings_apply` (author confirms the listed warnings do not apply), and `not_provided` (author did not decide). These are not interchangeable.
 
 #### 3.5.3 Records
@@ -249,7 +254,7 @@ CREATE TABLE Records (
     AuthorId UUID NOT NULL REFERENCES Users(Id),
     AuthorAffiliationOrgId UUID NULL REFERENCES Organizations(Id),
     Markdown TEXT NOT NULL,
-    FollowsRecordId UUID NULL REFERENCES Records(Id), -- narrative continuation
+    -- FollowsRecordId is retired (D13); existing databases keep the unused column until a later migration drops it.
     AccessPolicy VARCHAR(20) NOT NULL DEFAULT 'public',
     Classification SMALLINT NULL CHECK (Classification BETWEEN 3 AND 6),
     WarningTier VARCHAR(10) NULL,
@@ -266,10 +271,12 @@ CREATE TABLE Records (
 CREATE TABLE RecordRevisions (
     Id UUID PRIMARY KEY,
     RecordId UUID NOT NULL REFERENCES Records(Id),
+    RevisionNumber INT NOT NULL,
     Markdown TEXT NOT NULL,
     EditorId UUID NOT NULL REFERENCES Users(Id),
     Reason TEXT,
-    CreatedAt TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    CreatedAt TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE(RecordId, RevisionNumber)
 );
 
 CREATE TABLE RecordTags (
@@ -282,20 +289,30 @@ CREATE TABLE RecordAssessments (
     Id UUID PRIMARY KEY,
     RecordId UUID NOT NULL REFERENCES Records(Id),
     UserId UUID NOT NULL REFERENCES Users(Id),
-    Assessment VARCHAR(20) NOT NULL, -- corroborate, contest
+    Assessment VARCHAR(20) NOT NULL CHECK (Assessment IN ('corroborate', 'contest')),
     CreatedAt TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UpdatedAt TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     UNIQUE(RecordId, UserId)
 );
 
-CREATE TABLE RecordAccessRequests (
+-- Sealed access requests are not part of v1 (D12). The table remains in older
+-- databases and can return with moderation; the v1 reader uses a cosmetic overlay.
+
+CREATE TABLE Comments (
     Id UUID PRIMARY KEY,
-    RecordId UUID NOT NULL REFERENCES Records(Id),
-    RequesterId UUID NOT NULL REFERENCES Users(Id),
-    Status VARCHAR(20) NOT NULL DEFAULT 'pending', -- pending, approved, denied, expired
-    DecidedBy UUID NULL REFERENCES Users(Id),
-    DecidedAt TIMESTAMPTZ NULL,
-    CreatedAt TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    TargetType VARCHAR(20) NOT NULL CHECK (TargetType IN ('incident', 'record')),
+    TargetId UUID NOT NULL,
+    ParentId UUID NULL REFERENCES Comments(Id), -- one reply level: a parent must itself be a root
+    AuthorId UUID NOT NULL REFERENCES Users(Id),
+    Body TEXT NOT NULL,
+    CreatedAt TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UpdatedAt TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    DeletedAt TIMESTAMPTZ NULL, -- author soft-delete
+    CHECK (ParentId IS NULL OR ParentId <> Id)
 );
+
+CREATE INDEX idx_comments_target ON Comments(TargetType, TargetId, CreatedAt);
+CREATE INDEX idx_comments_parent ON Comments(ParentId);
 
 CREATE TABLE Playlists (
     Id UUID PRIMARY KEY,
@@ -303,6 +320,7 @@ CREATE TABLE Playlists (
     AuthorId UUID NOT NULL REFERENCES Users(Id),
     Title VARCHAR(255) NOT NULL,
     Description TEXT,
+    IsPinned BOOLEAN NOT NULL DEFAULT FALSE, -- at most one pinned playlist per incident
     CreatedAt TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     UpdatedAt TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
@@ -321,9 +339,12 @@ CREATE INDEX idx_records_author ON Records(AuthorId);
 CREATE INDEX idx_records_hash ON Records(ContentHash);
 CREATE INDEX idx_records_assessment ON RecordAssessments(RecordId);
 CREATE INDEX idx_playlists_incident ON Playlists(IncidentId);
+CREATE UNIQUE INDEX ux_playlists_pinned ON Playlists(IncidentId) WHERE IsPinned;
 ```
 
-A `Disputed` advisory is computed, not stored as truth: at least ten total assessments and 70% or more `Contest` produce the archival notice. Assessment never establishes factual status. Rumours have no inherent code but still occupy a numeric sequence so that display ordering and links remain stable once the link format is settled.
+A `Disputed` advisory is computed, not stored: at least ten total assessments and 70% or more `Contest` produce the archival text notice. It does not create a status, change default ordering, or add a search facet value. The author's own assessment is rejected and excluded from counts. Assessments apply to records only (D14), not to incidents. Rumours have no inherent code but still occupy a numeric sequence so that display ordering and links remain stable once the link format is settled.
+
+Comments are not in the search index. Their target is polymorphic because incidents and records are separate tables; `TargetType` plus `TargetId` is the only reference, and the target row owns the lifecycle and visibility. A reply must point at a root comment; there is no second level.
 
 #### 3.5.4 Organizations
 
@@ -344,38 +365,21 @@ CREATE TABLE Organizations (
     Gallery JSONB NOT NULL DEFAULT '[]',
     OrganizationType VARCHAR(20) NULL, -- government, private, religious
     Markdown TEXT NOT NULL DEFAULT '', -- 10,000 words
-    SeverityWords JSONB NOT NULL DEFAULT '[]', -- custom severity vocabulary, max 10 chars each
-    EmailLocalPart VARCHAR(64) NULL, -- replaces my.circa.archive for adopters
-    HolderCodeFormat JSONB NULL, -- {prefix, number, suffix, severity, arrangement}
+    SeverityWords JSONB NOT NULL DEFAULT '[]', -- custom severity vocabulary; post-v1 configuration
+    HolderCodeFormat JSONB NULL, -- {prefix, number, suffix, severity, arrangement}; post-v1 configuration
     RecordStatus VARCHAR(20) NOT NULL DEFAULT 'on_file',
-    VoteScore INT NOT NULL DEFAULT 0,
     CreatedAt TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
-CREATE TABLE OrganizationModerators (
-    OrgId UUID NOT NULL REFERENCES Organizations(Id),
-    UserId UUID NOT NULL REFERENCES Users(Id),
-    AppointedById UUID NOT NULL REFERENCES Users(Id),
-    CreatedAt TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    PRIMARY KEY(OrgId, UserId)
 );
 
 CREATE TABLE OrganizationRevisions (
     Id UUID PRIMARY KEY,
     OrgId UUID NOT NULL REFERENCES Organizations(Id),
+    RevisionNumber INT NOT NULL,
     Markdown TEXT NOT NULL,
     EditorId UUID NOT NULL REFERENCES Users(Id),
     Reason TEXT,
-    CreatedAt TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
-CREATE TABLE OrganizationVotes (
-    Id UUID PRIMARY KEY,
-    OrgId UUID NOT NULL REFERENCES Organizations(Id),
-    UserId UUID NOT NULL REFERENCES Users(Id),
-    Value INT NOT NULL, -- +1 or -1
     CreatedAt TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    UNIQUE(OrgId, UserId)
+    UNIQUE(OrgId, RevisionNumber)
 );
 
 CREATE TABLE OrgMentions (
@@ -387,20 +391,9 @@ CREATE TABLE OrgMentions (
     CreatedAt TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     CHECK ((RecordId IS NOT NULL) <> (IncidentId IS NOT NULL))
 );
-
-CREATE TABLE Recognitions (
-    Id UUID PRIMARY KEY,
-    RecognizingOrgId UUID NOT NULL REFERENCES Organizations(Id),
-    RecognizedOrgId UUID NOT NULL REFERENCES Organizations(Id),
-    RecordId UUID NOT NULL REFERENCES Records(Id),
-    Approved BOOLEAN NOT NULL DEFAULT FALSE,
-    CreatedAt TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
 ```
 
-Recognition is a community vote, not a promotion ladder. An organization exists while `unrecognized` and is adoptable; recognition changes directory standing, not authorship or ownership. The earlier tag → eligible → promoted → rejected model is superseded by this section. Its `ORG-{Letter}-{Number}` carnage letter and `CIRCA-R-` erased codes are retained only for existing identifiers and are not assigned to new organizations.
-
-Organization moderators may update the organization page and dossier. They do not gain platform moderation powers, foundational amendment authority, or control over adopters' records. Custom severity words and holder-code formats are cosmetic configuration.
+Recognition is display-only in v1: `RecognitionState` and `RecognizedYear` are shown, but no vote, moderator appointment, or governance workflow exists. The earlier tag → eligible → promoted → rejected model is not part of v1. `ORG-{Letter}-{Number}` carnage letters and `CIRCA-R-` erased codes are retained only for existing identifiers and are not assigned to new organizations. Organization moderators, recognition votes, adopter flair, and custom holder-code configuration are post-v1. In v1 the author who created the organization is the only editor (D7).
 
 #### 3.5.5 Characters
 
@@ -424,15 +417,14 @@ CREATE TABLE CharacterImports (
     CharacterId UUID NOT NULL REFERENCES Characters(Id),
     ImportedById UUID NOT NULL REFERENCES Users(Id),
     RestrictedAcknowledgedAt TIMESTAMPTZ NULL,
-    OwnerNotifiedAt TIMESTAMPTZ NULL,
     CreatedAt TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     UNIQUE(DraftId, CharacterId)
 );
 ```
 
-`Open` allows another author to adopt the character into a record and alter personality, history, or even kill them within that continuity. `Restricted` is the default: the character may be referenced, but characterization, established history, relationships, and narrative agency remain subject to the Character Usage Guidelines; the owner is notified on submission and may request review. Importing a restricted character requires an explicit acknowledgement stored on `CharacterImports`.
+`Open` allows another author to reference and develop the character within the declared scope, including changes to characterization, history, and relationships. `Restricted` is the default: the character may be referenced, but established characterization, history, relationships, and narrative agency remain subject to the Character Usage Guidelines. The policy changes what a citing record may establish, not whether the character may be cited (D9). Importing a restricted character requires an explicit acknowledgement stored on `CharacterImports`. Owner notification on submission is deferred (D8), so no notification timestamp is part of v1.
 
-The earlier three-value permission model (Open / Permission Required / Reference Only) is superseded by `restricted | open`. The stricter `Reference Only` behavior may be reintroduced as a narrower scope, but the development notes do not define it.
+The earlier three-value permission model (Open / Permission Required / Reference Only) is superseded by `restricted | open`. Character creation and editing are author-only in v1 (D7); there is no second-editor or character-moderator role.
 
 #### 3.5.6 Recoveries (Items)
 
@@ -478,6 +470,8 @@ CREATE TABLE Drafts (
     WarningDisclosure VARCHAR(20) NOT NULL DEFAULT 'not_provided',
     WarningTags TEXT[] NOT NULL DEFAULT '{}',
     Status VARCHAR(20) NOT NULL DEFAULT 'editing', -- editing, submitted, discarded
+    PublishedRecordId UUID NULL REFERENCES Records(Id),
+    PublishedIncidentId UUID NULL REFERENCES Incidents(Id),
     CreatedAt TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     UpdatedAt TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
@@ -510,9 +504,23 @@ CREATE TABLE EntityLinks (
 
 CREATE INDEX idx_entity_links_target ON EntityLinks(TargetType, TargetId);
 CREATE INDEX idx_temporary_entities_draft ON TemporaryEntities(DraftId);
+
+CREATE TABLE MediaAssets (
+    Id UUID PRIMARY KEY,
+    OwnerId UUID NOT NULL REFERENCES Users(Id),
+    DraftId UUID NULL REFERENCES Drafts(Id), -- null once attached to a published filing
+    ObjectKey TEXT NOT NULL, -- S3-compatible key or local adapter path
+    ContentType VARCHAR(100) NOT NULL,
+    ByteSize BIGINT NOT NULL,
+    Status VARCHAR(20) NOT NULL DEFAULT 'pending', -- pending, attached, orphaned
+    CreatedAt TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_media_assets_owner ON MediaAssets(OwnerId);
+CREATE INDEX idx_media_assets_draft ON MediaAssets(DraftId);
 ```
 
-Submission is the only place where a draft becomes permanent. A single transaction validates links and permissions, promotes temporary entities, rewrites temporary tokens to permanent codes, writes revision 1, and moves draft links onto the new record. If anything fails, the whole draft remains editable and no permanent entity is created. This prevents orphaned organizations, characters, recoveries, or evidence from failed filings.
+Submission is the only place where a draft becomes permanent. A single transaction validates links and permissions, promotes temporary entities, rewrites temporary tokens to permanent codes, writes revision 1, attaches media assets to the new filing, and moves draft links onto the new record. If anything fails, the whole draft remains editable and no permanent entity is created. This prevents orphaned organizations, characters, recoveries, or evidence from failed filings. Media storage is S3-compatible in production with a local adapter for development (D10); the object key is stored here, never a browser blob.
 
 #### 3.5.8 Moderation and appeals
 
@@ -620,48 +628,45 @@ All endpoints are versioned via the URL path segment (`/api/v{version}/...`). Th
 
 ### 4.2 Records
 
-| Method | Endpoint                              | Description                                                        |
-| ------ | ------------------------------------- | ------------------------------------------------------------------ |
-| GET    | `/api/v1/records`                     | List records with filters (incident, type, author, status, tags)   |
-| GET    | `/api/v1/records/{id}`                | Get record by ID                                                   |
-| GET    | `/api/v1/records/by-code/{code}`      | Get record by display code; reserved codes return `Missing Record` |
-| POST   | `/api/v1/records`                     | Submit a draft atomically                                          |
-| PATCH  | `/api/v1/records/{id}`                | Revise record (author; creates a revision)                         |
-| DELETE | `/api/v1/records/{id}`                | Erase record; the number remains occupied                          |
-| POST   | `/api/v1/records/{id}/fork`           | Fork record                                                        |
-| POST   | `/api/v1/records/{id}/assess`         | Corroborate or contest                                             |
-| DELETE | `/api/v1/records/{id}/assess`         | Remove own assessment                                              |
-| GET    | `/api/v1/records/{id}/revisions`      | List revisions                                                     |
-| POST   | `/api/v1/records/{id}/access-request` | Request access to a sealed record                                  |
-| POST   | `/api/v1/records/{id}/report`         | Report meta violation                                              |
+| Method | Endpoint                         | Description                                                        |
+| ------ | -------------------------------- | ------------------------------------------------------------------ |
+| GET    | `/api/v1/records`                | List records with filters (incident, type, author, status, tags)   |
+| GET    | `/api/v1/records/{id}`           | Get record by ID                                                   |
+| GET    | `/api/v1/records/by-code/{code}` | Get record by display code; reserved codes return `Missing Record` |
+| POST   | `/api/v1/records`                | Submit a draft atomically                                          |
+| PATCH  | `/api/v1/records/{id}`           | Revise record (author only; creates a revision)                    |
+| POST   | `/api/v1/records/{id}/assess`    | Corroborate or contest (not your own record)                       |
+| DELETE | `/api/v1/records/{id}/assess`    | Remove own assessment                                              |
+| GET    | `/api/v1/records/{id}/revisions` | List revisions                                                     |
+
+Erasing, forking, sealed access requests, and meta reports are not v1 endpoints. Their UI and contracts are post-v1 (D12, D13, and owner scope 0.3).
 
 ### 4.3 Incidents
 
-| Method | Endpoint                               | Description                                           |
-| ------ | -------------------------------------- | ----------------------------------------------------- |
-| GET    | `/api/v1/incidents`                    | List incidents                                        |
-| GET    | `/api/v1/incidents/{id}`               | Get incident with aggregated records                  |
-| POST   | `/api/v1/incidents`                    | Create incident (INCIDENT record)                     |
-| PATCH  | `/api/v1/incidents/{id}/primary-claim` | Set primary claim org (originator, 30-day window)     |
-| PATCH  | `/api/v1/incidents/{id}/claim`         | Set the organization claim, default `CIRCA`           |
-| GET    | `/api/v1/incidents/{id}/designations`  | Get org designations                                  |
-| GET    | `/api/v1/incidents/{id}/filings`       | Paginated filings with assessment counts              |
-| GET    | `/api/v1/incidents/{id}/playlists`     | Curated playlists; the incident author's pinned first |
-| POST   | `/api/v1/incidents/{id}/playlists`     | Create a playlist                                     |
+| Method | Endpoint                              | Description                                           |
+| ------ | ------------------------------------- | ----------------------------------------------------- |
+| GET    | `/api/v1/incidents`                   | List incidents                                        |
+| GET    | `/api/v1/incidents/{id}`              | Get incident with aggregated records                  |
+| POST   | `/api/v1/incidents`                   | Create incident                                       |
+| PATCH  | `/api/v1/incidents/{id}`              | Revise incident (author only; creates a revision)     |
+| GET    | `/api/v1/incidents/{id}/designations` | Get org designations (read-only display)              |
+| GET    | `/api/v1/incidents/{id}/filings`      | Paginated filings with assessment counts              |
+| GET    | `/api/v1/incidents/{id}/playlists`    | Curated playlists; the incident author's pinned first |
+| POST   | `/api/v1/incidents/{id}/playlists`    | Create a playlist                                     |
+
+Primary claims, claim changes, org governance, and continuity adoption are not v1 endpoints.
 
 ### 4.4 Organizations
 
-| Method | Endpoint                     | Description                                    |
-| ------ | ---------------------------- | ---------------------------------------------- |
-| GET    | `/api/v1/orgs`               | List orgs (filter by recognition state, type)  |
-| GET    | `/api/v1/orgs/{id}`          | Get org page and dossier                       |
-| POST   | `/api/v1/orgs`               | Create an organization, initially unrecognized |
-| PATCH  | `/api/v1/orgs/{id}`          | Update org page (moderators only)              |
-| POST   | `/api/v1/orgs/{id}/vote`     | Vote on recognition                            |
-| GET    | `/api/v1/orgs/{id}/dossier`  | Get dossier                                    |
-| PATCH  | `/api/v1/orgs/{id}/dossier`  | Edit dossier (appointed moderators)            |
-| GET    | `/api/v1/orgs/{id}/mentions` | Get records and incidents referencing the org  |
-| GET    | `/api/v1/orgs/{id}/adopters` | List users with the org flair                  |
+| Method | Endpoint                     | Description                                      |
+| ------ | ---------------------------- | ------------------------------------------------ |
+| GET    | `/api/v1/orgs`               | List orgs (filter by recognition state, type)    |
+| GET    | `/api/v1/orgs/{id}`          | Get org page and dossier                         |
+| POST   | `/api/v1/orgs`               | Create an organization; defaults to unrecognized |
+| PATCH  | `/api/v1/orgs/{id}`          | Update the org and dossier (author only)         |
+| GET    | `/api/v1/orgs/{id}/mentions` | Get records and incidents referencing the org    |
+
+Recognition voting, appointed moderators, adopter flair, and organisation continuities are post-v1.
 
 ### 4.5 Characters
 
@@ -689,14 +694,38 @@ All endpoints are versioned via the URL path segment (`/api/v{version}/...`). Th
 | Method | Endpoint                                  | Description                                              |
 | ------ | ----------------------------------------- | -------------------------------------------------------- |
 | POST   | `/api/v1/drafts`                          | Create a draft                                           |
+| GET    | `/api/v1/drafts`                          | List the caller's drafts                                 |
 | GET    | `/api/v1/drafts/{id}`                     | Read a draft                                             |
 | PATCH  | `/api/v1/drafts/{id}`                     | Autosave draft body and metadata                         |
 | POST   | `/api/v1/drafts/{id}/entities`            | Mint a temporary entity (`TEMP-[TYPE]-[NUMBER]`)         |
 | DELETE | `/api/v1/drafts/{id}/entities/{tempCode}` | Remove a temporary entity                                |
 | POST   | `/api/v1/drafts/{id}/imports`             | Import characters for this draft only                    |
 | POST   | `/api/v1/drafts/{id}/validate`            | Resolve links and report missing or forbidden references |
+| POST   | `/api/v1/drafts/{id}/publish`             | Publish atomically; returns the new filing               |
 | DELETE | `/api/v1/drafts/{id}`                     | Discard the draft and its temporary entities             |
 | GET    | `/api/v1/references/{code}`               | Resolve a typed code to its entity summary               |
+
+### 4.7.1 Comments
+
+| Method | Endpoint                          | Description                                            |
+| ------ | --------------------------------- | ------------------------------------------------------ |
+| GET    | `/api/v1/incidents/{id}/comments` | Roots and one-level replies for an incident, paginated |
+| POST   | `/api/v1/incidents/{id}/comments` | Add a root comment or a reply                          |
+| GET    | `/api/v1/records/{id}/comments`   | Roots and one-level replies for a record, paginated    |
+| POST   | `/api/v1/records/{id}/comments`   | Add a root comment or a reply                          |
+| PATCH  | `/api/v1/comments/{id}`           | Edit own comment                                       |
+| DELETE | `/api/v1/comments/{id}`           | Delete own comment (soft delete)                       |
+
+Comment writes use the `writes` policy. Guests read. A reply's parent must be a root comment on the same target; replying to a reply returns `400`. Comments are never search-indexed.
+
+### 4.7.2 Media
+
+| Method | Endpoint             | Description                                             |
+| ------ | -------------------- | ------------------------------------------------------- |
+| POST   | `/api/v1/media`      | Upload an authenticated, size- and type-limited asset   |
+| GET    | `/api/v1/media/{id}` | Serve the asset with its content type and access checks |
+
+Uploads are draft-scoped until publish. Production uses S3-compatible storage; development may use a local adapter. Presigned public URLs are not issued for restricted filings.
 
 ### 4.8 Emails
 
@@ -734,19 +763,29 @@ case-insensitive printed-code prefix, with no relationship lookup.
 
 Responses contain `items`, `page` (number, size, total, totalPages), common-filtered
 `facets`, normalized `applied` filters, and `meta` (codeMatch, holderMatch, language).
-Items distinguish entity `type` from filing `class`, expose lifecycle/access/advisory
-separately from display status, and include plain-text excerpts with UTF-16 highlight
-offsets. Warning tier/disclosure can be null for dossiers. Rumours have null `code`,
-`displayCode=RUM`, a reference number, and an incident parent. Organization codes
-stay canonical while display codes preserve stored legacy aliases.
+Items distinguish entity `type` from filing `class`, expose lifecycle and access
+separately, and include plain-text excerpts with UTF-16 highlight offsets plus
+`corroborateCount`, `contestCount`, `commentCount`, and a nullable `viewerAssessment`. `parent` is the filed-against incident, never a
+continuation chain. Warning tier/disclosure can be null for dossiers. Rumours have
+null `code`, `displayCode=RUM`, a reference number, and an incident parent.
+Organization codes stay canonical while display codes preserve stored legacy aliases.
+Comments are never returned by search.
 
 Public discovery excludes restricted, erased, and tombstoned rows before counts,
-along with records whose incident parent is hidden. Sealed incidents always return
-title-visible metadata stubs. Sealed records return stubs unless the viewer has a
-live session and an approved, dated access request. Ownership and moderation roles
-grant no bypass. Bodies in stubs cannot affect matching, ranking, or excerpts.
-Display status precedence is sealed over contested over on-file within this visible
-set; contested requires at least 10 assessments and at least 70% contest votes.
+along with records whose incident parent is hidden. Sealed records return
+title-visible metadata stubs and a dismissible overlay at the destination; sealed
+incidents behave the same way. Restricted bodies are never returned, and a direct
+read answers `401` with the clearance notice. Ownership and moderation roles grant
+no bypass. Bodies in stubs cannot affect matching, ranking, or excerpts.
+
+`contested` is not a stored status and does not appear as a `status` facet value.
+The `Disputed` advisory is computed from the assessment counts and rendered as text
+above the filing; it has no ordering effect. The default order for a filings feed
+is chronological. Search over a query keeps relevance ordering, and `sort=top`
+(net score, then corroborate count, then filed date) is available where the
+interface exposes it. `/ko` preselects Korean in the client's language field (D11);
+the API's `language` parameter still defaults to `en` for callers without a
+preference.
 
 The endpoint is anonymous and treats invalid/revoked sessions as guests. Every
 response uses `Cache-Control: private, no-store` and `Vary: Cookie`. Pagination
@@ -758,31 +797,32 @@ Retry-After. A 3-second SQL timeout returns 503 `search_unavailable`.
 
 See [search implementation and verification](backend/src/Modules/Archive/Circa.Archive.Infrastructure/Search/README.md)
 and the [additive schema upgrade](backend/src/Modules/Archive/Circa.Archive.Infrastructure/Persistence/README.md).
-The client defaults to fixtures. `SEARCH_SOURCE=api` selects the API for search,
-incident/record pages, and the organization directory. `GET /api/v1/archive/{code}`
-returns safe destination metadata and nullable Markdown; `acknowledge=true` reveals
-sealed incident prose only at the destination. Records require a dated approval for
-the live viewer, including owners/moderators. Visible rumours are nested under their
-incident with `rumour-{referenceNumber}` anchors. Organization canonical/legacy code
-reads populate the filtered directory entry. Hidden entries and hidden-parent filings
-return 404. `POST /api/v1/archive/{code}/access-requests` requires the live write policy
-and creates one pending request per viewer/filing under an advisory transaction lock.
-Existing decisions remain unchanged; approval administration is outside this phase.
-These routes use private/no-store responses and the existing search limiter.
-`bun run --cwd=client test:e2e:search` exercises this path against disposable PostgreSQL.
+
+**Implementation gap.** The current client still defaults to fixtures;
+`SEARCH_SOURCE=api` opts search, incident/record pages, and the organization
+directory into the API, and read parity (milestone M1) removes that branch. The
+current destination reader still requires a dated approval for sealed records and
+exposes `POST /api/v1/archive/{code}/access-requests`; [ADR 008](docs/adr/008-v1-public-site-scope.md)
+retires that path in favour of the cosmetic overlay. The current search response
+also derives a `contested` display status from votes; the v1 contract above removes
+that derivation while keeping the advisory text. Until those changes land, the code
+is the source of truth for current behavior.
 
 ### 4.11 Real-time (SignalR)
 
-| Hub           | Events                                              |
-| ------------- | --------------------------------------------------- |
-| `EmailHub`    | `NewEmail`, `EmailFiled`                            |
-| `VoteHub`     | `AssessmentCountUpdated`                            |
-| `AdoptionHub` | `RecordAdopted`, `OrganizationRecognized`           |
-| `EntityHub`   | `TemporaryEntityPromoted`, `CharacterOwnerNotified` |
+| Hub         | Events                    |
+| ----------- | ------------------------- |
+| `EmailHub`  | `NewEmail`, `EmailFiled`  |
+| `VoteHub`   | `AssessmentCountUpdated`  |
+| `EntityHub` | `TemporaryEntityPromoted` |
+
+SignalR is not required for v1: counts can load with the page and update after the reader's own action. `AdoptionHub` and `CharacterOwnerNotified` are post-v1 (D8 and the retired adoption model).
 
 ---
 
 ## 5. Desktop UI Specification
+
+The workstation is post-v1 (owner scope 0.1). This section is retained as design context for the client shell and is not part of the v1 acceptance gate; fixture-backed workstation behavior continues to be documented by the code and its READMEs.
 
 ### 5.1 Desktop Layout
 
@@ -843,7 +883,7 @@ When a user opens a case folder, they see:
    │   └── 📦 ITM-000143.pdf
    ├── 🖼️ EVIDENCE_01.jpg
    ├── 🖼️ EVIDENCE_02.png
-   └── 📄 FORK_TREE.pdf
+   └── 📄 CASE_REVISIONS.pdf
 ```
 
 **Rules:**
@@ -852,8 +892,7 @@ When a user opens a case folder, they see:
 - Organization holder codes are cosmetic aliases and never replace the archive code in a filename.
 - Maximum two levels of nesting inside a case.
 - Evidence images attached to an Evidence record sit with that record; loose evidence sits flat.
-- Forks live beside their source with `_F1`, `_F2` suffixes.
-- `FORK_TREE.pdf` renders the branch diagram.
+- `CASE_REVISIONS.pdf` lists the incident's revision history. Forks and branch trees are post-v1.
 
 ### 5.4 File Types and Icons
 
@@ -889,10 +928,9 @@ The email client is a desktop app. It has four folders:
   - Case (searchable dropdown, or create a temporary incident)
   - Organization affiliation (searchable dropdown, or create a temporary organization)
   - Type (INCIDENT, EXPLORATION, EVIDENCE, RUMOUR)
-  - Continuation (`Follows`)
   - Access policy and content warnings
 - The Entity Registry sidepanel can mint `TEMP-EVI-01`, `TEMP-CHR-01`, `TEMP-ORG-01`, and `TEMP-ITM-01` entities tied to the draft id. Images added there become temporary evidence until submission.
-- Importing a character records a per-draft usage request. A restricted character opens the acknowledgement dialog described in 3.3.
+- Importing a character records a per-draft usage request. A restricted character opens the acknowledgement dialog described in 3.3; owner notification is post-v1.
 - `[[` completion inserts a typed wikilink. Unresolved tokens block submission rather than producing broken references.
 - Submission promotes temporary entities, replaces temporary tokens with permanent codes, allocates the display code, computes the holder code and content hash, and files the record. Failure leaves the draft intact.
 - Saves as a `.pdf` representation in the correct case folder.
@@ -902,8 +940,7 @@ The email client is a desktop app. It has four folders:
 
 - List view (default): sortable, filterable list of user's records.
 - Card view: grid of recent records with case, organization, and assessment count.
-- Filters: drafts, on file, adopted, forked, tombstoned, disputes, rumours.
-- Shows pending access requests for sealed filings and character-owner notifications.
+- Filters: drafts, on file, tombstoned, disputes, rumours. Adopted and forked records are post-v1.
 - Clicking a record opens it in the reader.
 
 ### 5.8 Recycle Bin
@@ -963,16 +1000,16 @@ The interface ships in English and Korean. This is implemented, in `client/src/i
 
 ### 6.2 Creation Flow
 
-1. User opens `WRITE.exe` and creates a draft.
-2. Chooses or creates the Incident (`INC`) and the author's organization affiliation (default `CIRCA`).
-3. Chooses the record type and optional `Follows` continuation.
-4. Writes Markdown, inserting typed `[[...]]` references and importing characters from the Entity Registry.
-5. Optionally mints temporary entities (`TEMP-EVI-01`, `TEMP-CHR-01`, `TEMP-ORG-01`, `TEMP-ITM-01`) tied to the draft.
-6. Sets access policy and content warnings.
-7. Submits. The server validates every reference and import, promotes temporary entities, allocates permanent codes, rewrites tokens, computes the content hash, and writes revision 1 in one transaction.
-8. If any step fails, nothing is promoted and the draft remains editable.
-9. Imported character owners are notified asynchronously.
-10. The record appears in the Incident's filings and in the author's dashboard.
+1. A signed-in author creates a server-persisted draft.
+2. Chooses the filing type (incident, exploration, evidence, rumour) and, for a follow-up, the Incident it is filed against. An incident draft has no parent.
+3. Writes Markdown, inserting typed `[[...]]` references and importing characters from the Entity Registry.
+4. Optionally mints temporary entities (`TEMP-EVI-01`, `TEMP-CHR-01`, `TEMP-ORG-01`, `TEMP-ITM-01`) tied to the draft.
+5. Sets access policy and content warnings.
+6. Publishes. The server validates every reference and import, enforces the per-type length limit, promotes temporary entities, allocates permanent codes, rewrites tokens, computes the content hash, attaches media, and writes revision 1 in one transaction.
+7. If any step fails, nothing is promoted and the draft remains editable.
+8. The filing appears in the Incident's filings (or the incident directory) and in the author's dashboard.
+
+Character-owner notification is not part of this flow in v1 (D8).
 
 ### 6.3 Filing Status
 
@@ -981,35 +1018,25 @@ The interface ships in English and Korean. This is implemented, in `client/src/i
 - **draft** — editing only; never public.
 - **tombstoned** — moderation removal from discoverability, distinct from erasure.
 
-The authoring framework separates publication, evidentiary support, and continuity adoption. A published record can be corroborated but independent, or disputed yet adopted. Revision and retraction behavior is described in 6.9; the regulations require that material revisions not silently erase prior public contributions.
+Publication, evidentiary support, and reader assessment are separate. A published record can be corroborated or contested, and a reader can place it in a playlist, without any of those changing whether the record is on file. Revision behavior is described in 6.9; material revisions must not silently erase prior public contributions.
 
 ### 6.3.1 Reviewer assessment
 
-- Each account may `Corroborate` or `Contest` a record once and may remove its assessment.
-- Assessments are advisory. They affect ordering and visibility, never factual status or adoption.
-- A record receives the `Disputed` advisory only after at least 10 total assessments with 70% or more `Contest`.
+- Each account may `Corroborate` or `Contest` a record once and may remove its assessment. Assessments apply to records only, not incidents (D14).
+- An author cannot assess their own record, and that assessment is excluded from counts (D3).
+- Assessments are advisory. They never establish factual status or adoption.
+- Counts are shown in front of the record. A record carries the `Disputed` text notice after at least 10 total assessments with 70% or more `Contest`; the notice does not create a status or change default ordering (D2).
 - The advisory text must state that the assessment does not determine the factual status of the documented events.
+- Chronological is the default order. A reader may explicitly choose a top-score sort.
 - Coordinated manipulation and retaliatory voting are prohibited and may be moderated.
 
-### 6.4 Adoption
+### 6.4 Post-v1: adoption and continuities
 
-- Filing does not automatically change an Incident's principal continuity.
-- The Founding Author or an authorized Continuity Steward curates adoption into that sequence. Foundational amendment authority requires explicit delegation beyond ordinary stewardship.
-- Community assessments and comments inform adoption and credibility; they do not automatically make either binding.
-- Core Rules protect an Incident's identity. Evidence-supported observations and unverified claims remain challengeable within those boundaries.
-- Versioned, authorized amendments preserve the effective constraints for earlier records.
-- Character use follows declared permissions, with `restricted` as the default and per-draft imports rather than blanket reuse.
-- Organization continuities remain a separate scope; no organizational account or owner role is introduced.
-- The original author retains credit, and non-adoption does not remove a compliant independent filing.
-- Stewardship, succession, and orphaned-Incident handling are intended workflows, not implemented permissions. See the [Author guide](docs/AUTHOR_GUIDE.md).
+Adoption, continuities, stewardship, succession, and foundational amendments are not v1 features. Filing does not change any canonical sequence, and the platform has no continuity object. The lore can still use that language; the v1 product represents a reader's preferred order as a playlist (6.11). This section is retained as the record of a deferred design.
 
-### 6.5 Forking and Branches
+### 6.5 Retired: forking and branches
 
-- A record fork receives its own `circa_code` and preserves parent lineage through `parent_record_id` in the draft model.
-- Independent publication does not automatically create a divergent continuity.
-- A branch explicitly identifies its source sequence, divergence point, and record lineage. The current schema does not fully model that relationship.
-- Branches preserve foundational constraints and character permissions; they do not grant unrestricted amendment rights.
-- Conflicting outcomes may remain filed independently and be adopted separately. No one branch overwrites every other sequence.
+Forks and branches are not v1 features. A record has one parent relation, `incident_id` (filed against). `follows_record_id` is unused and scheduled for removal (D13). Contradictory accounts remain independent filings against the same incident; no branch object exists.
 
 ### 6.6 Tombstoning
 
@@ -1052,26 +1079,35 @@ Authors write typed references as `[[TYPE-NUMBER]]`:
 
 ### 6.9 Revisions, retractions, and redactions
 
-- Every substantive edit creates a `RecordRevisions` row; revision history is preserved and public where the record is public.
-- Authors may revise or retract their own filings through available functionality. Material revisions must not silently erase the historical existence of a contribution that has become part of a collaborative narrative.
+- Every substantive edit appends a revision with a revision number, editor, date, and reason. Revision history is preserved and visible where the record is public.
+- Authors may revise their own filings. v1 has no author delete, withdraw, or retract action; withdrawal and deletion policy remain open.
 - Narrative redaction uses the archive's `||text||` syntax. Redaction must not be used to conceal policy violations or evade moderation.
-- Erasure consumes the display number permanently and removes the record from rendering.
-- Withdrawal after other authors have built on a record remains an unresolved workflow.
+- Erasure consumes the display number permanently and removes the record from rendering; it is a moderation action, not an author one.
 
 ### 6.10 Access policy and content warnings
 
 - **public:** rendered normally to any reader.
-- **sealed:** the first fetch returns a notice instead of the body; the reader may request explicit access, which is recorded and decided by an authorized party.
-- **restricted:** the platform returns `401` with the diegetic notice `LEVEL 7 or above clearance required`. This is a platform decision, not a fictional classification.
+- **sealed:** the body is hidden behind a cosmetic overlay that a button dismisses. There is no approval queue in v1, and the body is not a security boundary. Do not put content behind a sealed overlay that must never be shown.
+- **restricted:** the platform returns `401` with the diegetic clearance notice built from the cosmetic classification (`LEVEL 3`–`LEVEL 6`). There is no `LEVEL 7` clearance. This is a platform decision, not a fictional classification.
 - Warnings follow AO3-style tiers: `Red` (explicit graphic death, gore, violence), `Yellow` (some mature content), `Green` (none of those). Specific tags such as `Graphic Violence`, `Psychological Horror`, `Sexual Violence`, `Self-Harm`, and `Major Character Death` accompany the tier.
 - `None` (author chose not to include warnings), `No Warnings Apply` (author confirms warnings are not applicable), and `Warnings Not Provided` are distinct states and must not be collapsed in the UI or data model.
 - Classification (`LEVEL 3`–`LEVEL 6`) is a cosmetic clearance rank printed on the sheet; it is not an authorization control.
 
 ### 6.11 Playlists
 
-- Any author may create a playlist of filings for an Incident as their preferred reading order, without establishing canon.
+- Any signed-in author may create a public playlist of filings for an Incident as their preferred reading order, without establishing canon.
 - Several playlists may coexist. The Incident author's playlist is pinned first, but not privileged as truth.
-- Playlist membership does not change adoption, evidence, or visibility.
+- V1 supports create, rename, describe, add, remove, reorder, and delete. Private and unlisted playlists are post-v1 (D4).
+- Playlist membership does not change publication, evidence, assessment, or visibility.
+
+### 6.12 Comments
+
+- A comment targets one incident or one record. It is not a filing, has no code, consumes no number, and never appears in search.
+- A thread is one root comment plus replies. Replies cannot be replied to; a reply's parent must be a root on the same target.
+- Guests read; signed-in users write. The author identity comes from the session, never a free-text field.
+- Authors may edit or soft-delete their own comments. A deleted root hides or tombstones its replies consistently.
+- Comment counts are returned in record and search read models. Comment bodies are not indexed.
+- Length caps and rate limits apply; comments do not vote, carry warnings, or change lifecycle.
 
 ---
 
@@ -1079,51 +1115,47 @@ Authors write typed references as `[[TYPE-NUMBER]]`:
 
 ### 7.1 States
 
-| State            | Directory | Can adopt | Notes                                                              |
-| ---------------- | --------- | --------- | ------------------------------------------------------------------ |
-| **Unrecognized** | Yes       | Yes       | Default on creation. Users may adopt the tag; not mainstream.      |
-| **Recognized**   | Yes       | Yes       | Community vote confirms the organization's place in the directory. |
-| **Erased**       | No        | No        | Registry status retired. The identifier is permanently occupied.   |
+| State            | Directory | Notes                                                                                 |
+| ---------------- | --------- | ------------------------------------------------------------------------------------- |
+| **Unrecognized** | Yes       | Default on creation. Display state only; it does not gate publication or editing.     |
+| **Recognized**   | Yes       | Display state confirmed by the archive's editorial record. No recognition vote in v1. |
+| **Erased**       | No        | Registry status retired by moderation. The identifier is permanently occupied.        |
 
-This state model supersedes the earlier tag → eligible → promoted → rejected → reinstated ladder. Recognition is not endorsement, ownership, or platform authority. Erasure is a registry action; it does not grant the platform ownership of an author's text.
+Recognition is not endorsement, ownership, or platform authority. Erasure is a registry action; it does not grant the platform ownership of an author's text. The earlier tag → eligible → promoted → rejected → reinstated ladder and adoption-based states are not part of v1.
 
 ### 7.2 Code Structure
 
 - **Reference ID:** immutable `ORG-{minimum six digits}`, different from the UUIDv7 key.
 - **Reserved range:** `0-5428` is reserved; new organizations begin at `5429`.
 - **Legacy identifiers:** `ORG-{Letter}-{Number}` and `CIRCA-R-{Number}` are retained only where they already exist. New organizations do not receive carnage letters or erased codes.
-- **Holder codes:** an organization may configure `{PREFIX}{NUMBER}{SUFFIX}` and severity vocabulary for records it holds. These are cosmetic aliases; the archive reference remains canonical.
+- **Holder codes:** an organization may print `{PREFIX}{NUMBER}{SUFFIX}` and severity vocabulary for records it holds. These are cosmetic aliases; the archive reference remains canonical. Custom configuration is post-v1.
 - **Mapping:** the old carnage-letter scheme is distinct from the [Incident classification scale](docs/lore/Classifications.md). Do not recalculate organization identifiers from Incident assessments.
 
 ### 7.3 Organization page
 
-The page carries established year, recognized year, recognition state, filed date, filing author, moderators, geographical influence, personnel count, logo, gallery, type (`government`, `private`, `religious`), and up to 10,000 words of Markdown. It lists records that declare affiliation with the organization and records that reference it.
+The page carries established year, recognized year, recognition state, filed date, filing author, geographical influence, personnel count, logo, gallery, type (`government`, `private`, `religious`), and up to 10,000 words of Markdown. It lists records that declare affiliation with the organization and records that reference it. In v1 the author who created the organization is the only editor (D7).
 
 ### 7.4 Moderation
 
-- Appointed authors may update the organization page and dossier.
-- Organization moderators do not receive platform moderation powers.
+- Organization editing is author-only in v1. Appointed organization moderators and platform moderation powers are post-v1.
 - No organizational account or owner role is introduced.
-- Organization continuities are a separate scope from user adoption.
+- Organization continuities and adoption are not v1 features.
 
 ### 7.5 Recognition vote
 
-- Community vote is advisory and determines directory standing.
-- Exact threshold and quorum remain open; the earlier 20-upvote / 60% threshold may be retained but is not a decision of the 2026-10-21 notes.
-- Recognition does not establish the organization's claims as true.
+- Recognition voting, quorum, thresholds, and revocation are post-v1.
+- In v1 `RecognitionState` is display-only and does not establish the organization's claims as true.
 
 ### 7.6 Erased organizations
 
-- Erased organizations cannot adopt, recognize, or hold continuities.
+- Erased organizations do not appear in the directory and cannot be edited.
 - Their code remains occupied.
 - Records written by or about them remain unless separately moderated.
 - References resolve according to record visibility; erasure must not expose hidden text.
 
 ### 7.7 Near-identical detection
 
-- Fuzzy-match on creation and temporary-entity promotion.
-- Detection does not block; it offers `Same organization`, `Variant`, or `New`.
-- `Variant` requires an explicit relationship to the source organization and must not silently fork an existing identifier.
+Near-identical detection, variant relationships, and duplicate-entity adjudication are post-v1. V1 relies on the author's search and the canonical code allocation; a duplicate is an editorial problem, not a blocking workflow.
 
 ---
 
@@ -1132,7 +1164,7 @@ The page carries established year, recognized year, recognition state, filed dat
 ### 8.1 No Authoritative Canon
 
 - No single canon.
-- Terms: Recognized, Adopted, Continuity, Filed.
+- V1 terms: Recognized, Filed, Playlist. Adopted and Continuity are lore and post-v1 platform concepts.
 
 ### 8.2 Orgs as Mythic Aggregates
 
@@ -1142,21 +1174,19 @@ The page carries established year, recognized year, recognition state, filed dat
 
 ### 8.3 Continuities
 
-- Multiple continuities per org may be displayed as `ORG-005429/C1`, `C2`; legacy `ORG-A-081323/C1` identifiers remain valid.
-- Incidents also have principal and divergent continuities under the authoring framework. Their identifiers, storage, and authorization remain to be designed.
-- A single independent record is not automatically a branch.
-- Readers can follow their preferred continuity; that choice does not override character permissions or foundational constraints.
-- Continuity-specific adoption is separate from publication and evidentiary status.
+Continuities, divergent sequences, and continuity-specific adoption are post-v1. V1 represents a reader's preferred order as a playlist (6.11); it does not assert a canonical timeline. Legacy continuity identifiers, if encountered, are display text and are not resolved by the v1 API.
 
 ### 8.4 Erased Orgs
 
-- Cannot adopt, recognize, or hold continuities.
-- Records remain visible as rumors.
-- Other orgs can adopt erased org's rumors into their own continuities.
+- Erased organizations do not appear in the directory and cannot be edited.
+- Their records remain visible unless separately moderated.
+- Adoption and continuity behavior for erased organizations is post-v1.
 
 ---
 
 ## 9. Moderation
+
+The public site's v1 scope excludes the moderation console; this section describes the conduct model that survives and the console that is post-v1. Tombstoning, appeals, and the moderation log are not v1 UI surfaces, but the content and conduct rules still apply.
 
 ### 9.1 Meta vs In-World
 
@@ -1189,14 +1219,14 @@ The page carries established year, recognized year, recognition state, filed dat
 
 ### 9.3 Assessment vs Reporting
 
-- **Assessment:** `Corroborate` / `Contest`, one per account, removable. Used for sort order, discovery, and an advisory `Disputed` notice; never establishes truth.
-- **Reporting:** Triggers moderation review.
+- **Assessment:** `Corroborate` / `Contest`, one per account, removable. Used for the visible counts, an optional top sort, and an advisory `Disputed` notice; never establishes truth and never changes the default order.
+- **Reporting:** Triggers moderation review. The reporting surface is post-v1.
 
 ### 9.4 Moderator Roles
 
-- **Platform staff:** Meta violations, policy, appeals.
+- **Platform staff:** Meta violations, policy, appeals. The console is post-v1.
 - **Community volunteers:** May be added later for first-pass review.
-- **Organization moderators:** Maintain organization pages and dossiers only.
+- **Organization moderators:** Post-v1. V1 organization editing is author-only.
 - Community never deletes. Staff never assesses as a moderation tool. In-world authority grants no administrative power.
 
 ### 9.5 Platform regulations
@@ -1264,13 +1294,13 @@ The full public regulations should be published alongside the [Author guide](doc
 ## 11. Security and Auth
 
 - JWT-based auth; current implementation uses rotating HttpOnly cookie sessions (see the implementation note at the end of this document).
-- Roles: guest, author, moderator. Organization moderators and character owners are resource-level relationships, not roles.
-- Rate limiting on assessments, reports, submissions, access requests, and character imports.
+- Roles: author and moderator. Guest is the anonymous principal, never a stored role. Organisation moderators and character owners are post-v1 resource relationships.
+- Rate limiting on assessments, comments, submissions, media uploads, and character imports.
 - Content hashing for tombstone matching.
-- S3 signed URLs for evidence.
+- S3-compatible signed URLs for evidence; restricted filings never receive a public presigned URL.
 - Uploaded images are validated and stripped of metadata; temporary evidence is scoped to a draft and removed with it.
-- Character imports record consent and notification timestamps; restricted characters require explicit acknowledgement before submission.
-- Authorization checks cover sealed/restricted reads, author-only revisions, organization-moderator edits, and character ownership. Reference resolution must not leak hidden records.
+- Character imports record consent and the restricted-character acknowledgement. Owner notification is deferred (D8).
+- Authorization checks cover sealed/restricted reads, author-only revisions, and author-only entity edits. Reference resolution must not leak hidden records.
 - Published original content is offered under CC BY-NC-SA 4.0; third-party material requires permission and may be removed.
 
 ---
@@ -1281,27 +1311,28 @@ The full public regulations should be published alongside the [Author guide](doc
 - **Backend:** Docker container on cloud VM or Kubernetes.
 - **Database:** Managed PostgreSQL (e.g., AWS RDS, Supabase).
 - **Storage:** S3-compatible.
-- **SignalR:** Azure SignalR Service or self-hosted.
+- **SignalR:** Azure SignalR Service or self-hosted; not required for v1.
 - **CI/CD:** GitHub Actions.
+- **Schema:** versioned, forward-only SQL migrations with an `archive.schema_migrations` ledger ([ADR 009](docs/adr/009-versioned-archive-schema-migrations.md)). Development may apply them at startup; every other environment applies them through an explicit deployment step with a backup.
 
 ---
 
 ## 13. Open Questions
 
+The D1–D15 answers are recorded in [ADR 008](docs/adr/008-v1-public-site-scope.md). These questions remain open after that scoping:
+
 1. **Rumour links.** Rumours have no inherent code, yet the wikilink table lists `RUM`. What stable token should `[[RUM-...]]` use?
 2. **First live Incident code.** Reserved `0-07539` implies the first live code is `INC-07540`, but the public archive index begins at `INC-07539`. Which is correct?
 3. **Recovery and character ranges.** The notes reserve Organization and Character ranges but not `ITM`. Confirm the starting Item number and whether `0` is reserved.
-4. **Character scope.** Does `Restricted` permit only reference, or also consented characterization? Should `Reference Only` return as a third policy?
-5. **Recognition threshold.** What vote count, quorum, and review period recognize an organization, and can recognition be revoked?
-6. **Sealed access.** Who decides a sealed-access request: the filing author, the Incident author, an organization moderator, or platform staff?
-7. **Withdrawal and deletion.** Can an author permanently erase their own record, and what happens to dependent references and playlists?
-8. **Revision visibility.** Are prior revisions public for every record, or only for adopted or contested filings?
-9. **Rule proposals.** Should foundational amendments be modeled in a `RuleProposal` table instead of a free-text revision reason?
-10. **Primary-claim notification.** Does the claim holder get notified when a new organization files on their Incident? _Leaning yes._
-11. **Moderation record format.** The public moderation note format is not finalized.
-12. **First seeded content.** First organizations, first Incident, and the initial playlists are not written.
-13. **Taskbar behavior.** Single-window or multi-window? _Leaning multi-window._
-14. **Holder-code syntax.** The notes describe `{PREFIX}{NUMBER}{SUFFIX}` with `[SEVERITY]` as a component; the exact grammar and collision rules remain undefined.
+4. **Withdrawal and deletion.** Can an author permanently erase their own record, and what happens to dependent references and playlists? V1 has no author delete.
+5. **Revision visibility.** Are prior revisions public for every record, or only for a subset? V1 preserves them and exposes a revision list; the exact audience is unset.
+6. **Moderation console.** Reporting, tombstone management, appeals, and the public moderation log are post-v1 and need a design.
+7. **Recognition threshold.** If recognition voting returns, what count, quorum, review period, and revocation rule apply?
+8. **Holder-code syntax.** The notes describe `{PREFIX}{NUMBER}{SUFFIX}` with `[SEVERITY]` as a component; the exact grammar and collision rules remain undefined.
+9. **Seeded names and codes.** The seed composition is fixed at three organisations, three incidents, and three recoveries (D6); the actual names, codes, and voices are not written.
+10. **Taskbar behavior.** Single-window or multi-window? _Leaning multi-window._ Post-v1 workstation question.
+
+Resolved by v1: character policy is two tiers with reference allowed under both (D9); sealed access is a cosmetic overlay and takes no decision-maker (D12); adoption, continuities, stewardship, succession, foundational amendments, primary claims, and forks are not v1 features.
 
 ---
 

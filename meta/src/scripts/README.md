@@ -2,12 +2,15 @@
 
 ## Responsibility
 
-Owns the src/scripts portion of the Astro website.
+Progressive enhancements for the project website. Every page remains readable and navigable without these scripts.
 
-## Structure and boundaries
+- `site.ts`: the mobile menu class, mutually exclusive dropdown panels, Escape handling, the documentation-only ⌘K shortcut, legacy fragment forwarding, and the top action.
+- `document.ts`: documentation search loading/filtering, chapter disclosure state, and Markdown copy feedback.
 
-Keep project presentation separate from the Next.js archive and workstation. Public article sources remain in the repository documentation; private notes are never published.
+## Boundaries
+
+Search enhancement is scoped to `[data-docs]`; on every other page the ⌘K shortcut does nothing and no search field exists. No script may send content to a network service, persist choices beyond session storage for chapter groups, or replace native links and disclosures.
 
 ## Usage and verification
 
-From `meta/`, run `bun run typecheck`, `bun run test`, and `bun run build`. See the [project guide](../../README.md) for development and browser checks.
+From `meta/`, run `bun run typecheck`, `bun run test`, and `bun run test:e2e`. See the [project guide](../../README.md).

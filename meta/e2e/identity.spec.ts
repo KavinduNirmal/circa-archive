@@ -5,23 +5,42 @@ test("home follows the editorial narrative and retains the agency motto", async 
   await page.goto("/en/");
   expect(
     await page
-      .locator("main > section")
+      .locator("[data-section]")
       .evaluateAll((nodes) => nodes.map((n) => n.getAttribute("data-section"))),
   ).toEqual([
     "hero",
-    "identity",
-    "introduction",
+    "premise",
+    "witnessing",
+    "fiction",
     "editions",
     "documentation",
     "building",
     "contribution",
     "questions",
+    "closing",
   ]);
   await expect(
     page.getByText("Continuity of record. Continuity of administration.", {
       exact: true,
     }),
   ).toBeVisible();
+  await expect(
+    page.getByText("an empty project", { exact: true }),
+  ).toBeVisible();
+  await expect(page.locator(".begin-list > li")).toHaveCount(4);
+  await expect(
+    page.getByRole("link", { name: "MIT licence", exact: true }),
+  ).toHaveAttribute("href", "https://opensource.org/license/mit");
+  const plate = page.locator(".fiction-plate img");
+  await plate.scrollIntoViewIfNeeded();
+  await expect(plate).toBeVisible();
+  await expect
+    .poll(() =>
+      plate.evaluate(
+        (image: HTMLImageElement) => image.complete && image.naturalWidth > 0,
+      ),
+    )
+    .toBe(true);
 });
 test("shallow pages have no breadcrumbs and sponsor offers both support destinations", async ({
   page,
@@ -66,7 +85,7 @@ test("mobile chapters start compact and remain accessible", async ({
 test("publication controls use the shared type and geometry; document introduction appears once", async ({
   page,
 }) => {
-  await page.goto("/en/");
+  await page.goto("/en/sponsor/");
   const styles = await page
     .locator("a.button")
     .first()
@@ -83,6 +102,12 @@ test("publication controls use the shared type and geometry; document introducti
   expect(styles.transform).toBe("uppercase");
   expect(styles.radius).toBe("0px");
   expect(styles.height).toBeGreaterThanOrEqual(44);
+  await page.goto("/en/");
+  const openingLink = page.locator(".opening-actions a").first();
+  await expect(openingLink).toBeVisible();
+  expect(
+    await openingLink.evaluate((el) => el.getBoundingClientRect().height),
+  ).toBeGreaterThanOrEqual(44);
   await page.goto("/en/documentation/");
   await expect(page.locator(".breadcrumbs")).toHaveCount(1);
   await expect(

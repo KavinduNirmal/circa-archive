@@ -8,18 +8,24 @@ const keys = ["Real", "Write", "Notes", "Reuse", "Language", "Roadmap"];
 ---
 
 <div class="faq-list">
-  {keys.map((key, index) => (
+  {keys.map((key) => (
     <details>
-      <>
-        <summary>
-          <span class="folio">{String(index + 1).padStart(2, "0")}</span>
-          {t(locale, `faq${key}Q`)}
-          <span class="disclosure-plus" aria-hidden="true">
-            +
-          </span>
-        </summary>
-        <p>{t(locale, `faq${key}A`)}</p>
-      </>
+      <summary>
+        {t(locale, `faq${key}Q`)}
+        <span class="disclosure-plus" aria-hidden="true">
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 14 14"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.2"
+          >
+            <path d="M7 1v12M1 7h12" />
+          </svg>
+        </span>
+      </summary>
+      <p>{t(locale, `faq${key}A`)}</p>
     </details>
   ))}
 </div>

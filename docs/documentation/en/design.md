@@ -6,59 +6,67 @@ The repository speaks in three registers. Which one you are in decides almost ev
 
 CIRCA Archive is not one design system. It is three, each answering a different question.
 
-| System          | Surface    | Rule                                                                                                       |
-| --------------- | ---------- | ---------------------------------------------------------------------------------------------------------- |
-| Workstation     | `/desktop` | 1990s institutional software: steel, bevels, dense chrome, 12px. Never use it outside the desktop.         |
-| Reading edition | `/site`    | paper, ink, a serif masthead, filed documents. Depth is a bevel; no gradients.                             |
-| Project page    | `/meta`    | near-black, bone, ember, serif display, mono labels, a hairline field. Not bound by the workstation rules. |
+| System          | Surface    | Rule                                                                                                                |
+| --------------- | ---------- | ------------------------------------------------------------------------------------------------------------------- |
+| Workstation     | `/desktop` | 1990s institutional software: steel, bevels, dense chrome, 12px. Never use it outside the desktop.                  |
+| Reading edition | `/site`    | Paper, ink, a serif masthead, filed documents. Depth is a bevel; no gradients.                                      |
+| Project page    | `/meta`    | Warm archival paper, burnt-orange ink, Instrument Serif display, a printed dot field, and a quiet asymmetric essay. |
 
 > [!NOTE]
 > The project page is the exception
 >
-> It is allowed to look unlike the archive because it answers a different question. The archive links here only through a labelled button.
+> It is allowed to look unlike the archive because it answers a different question. The archive links here only through a labelled action, and none of these project styles reach the archive.
 
-## Project page tokens
+## The project page
 
-The project page's tokens are declared once on .meta-page in components/meta/meta.css. Use them, and do not introduce a fourth accent.
+The project site is a static Astro publication. Its visual world is **the quiet essay with a printed field**: a near-white warm paper ground, one burnt-orange accent, a reading column offset to the right, a mono source note in the margin, and a fixed halftone dot field that fades before the prose. It follows Design E from the recorded studies.
 
-| Token          | Use                                                                            |
-| -------------- | ------------------------------------------------------------------------------ |
-| `--meta-ink`   | the near-black canvas behind every page.                                       |
-| `--meta-bone`  | primary text, the solid key, and the specimen sheet.                           |
-| `--meta-mist`  | secondary text and labels; the smaller size is for captions.                   |
-| `--meta-ember` | index numerals, links, focus rings, and the one accent. Never the only signal. |
-| `--meta-line`  | rules and borders at 14% bone; the soft variant divides sections.              |
-| `--meta-serif` | the argument: display headlines, section titles, quotations, and names.        |
-| `--meta-sans`  | reading copy and controls; 16–17px for body text.                              |
-| `--meta-mono`  | every label, index, caption, command, and code sample.                         |
+The styles are split by responsibility under `meta/src/styles/`: `tokens.css`, `base.css`, `layout.css`, `editorial.css`, `prose.css`, `documentation.css`, and `print.css`, imported in that order by `site.css`. Add a rule to the module that owns the element. Use the tokens; do not introduce a second accent, a gradient, a bevel, or a drop shadow.
 
-The meta scope also carries the shadcn variables, so a primitive from components/ui inherits this palette without restyling globals. Keep meta styles scoped: the workstation stylesheet must not reach in, and this one must not reach out.
+| Token            | Use                                                                          |
+| ---------------- | ---------------------------------------------------------------------------- |
+| `--paper`        | the near-white warm ground of every page.                                    |
+| `--paper-raised` | the navigation bar, dropdown panels, and code surfaces.                      |
+| `--ink`          | headings and primary reading text.                                           |
+| `--ink-body`     | long-form prose.                                                             |
+| `--muted`        | annotations, secondary prose, and labels.                                    |
+| `--accent`       | links, the second display line, the seal, and the printed field. One accent. |
+| `--rule`         | the only structural border: a hairline.                                      |
+| `--serif`        | Instrument Serif for display, section headings, leads, and quotations.       |
+| `--sans`         | IBM Plex Sans for reading copy and controls.                                 |
+| `--mono`         | IBM Plex Mono for codes, annotations, navigation, and controls.              |
+| `--measure`      | 620px for the essay; Markdown prose caps at 68ch.                            |
+
+Noto Serif KR carries Korean display and headings; the sans stack supplies Korean reading copy.
+
+## Layout and navigation
+
+The shell is centred at 1280px with fluid gutters. The essay is offset 22% from the left on wide screens, capped at 620px, with a 190px note in the margin. The note moves into flow below 1180px. Opening pauses, section intervals, and the measure carry the pacing; section numbers are not used because the essay is not a sequence of steps.
+
+The top bar is a flat, 60px mono strip: wordmark at the left, plain links and native disclosures at the right, language switching at the far right. The current page receives a paper fill and an inset ink underline. Navigation must remain usable without JavaScript through native `details`.
+
+Search belongs to the documentation reader alone. It is the only search field in the project site, and the keyboard shortcut does nothing outside documentation.
 
 ## Patterns worth keeping
 
-The field is the visual signature: a measured grid with edge hatching, corner crosses, mono status rails, and a halftone plate built from CSS dot screens. It is decoration, always aria-hidden.
-
-- One focal point per screen, then a second, then the rest.
-- Hairlines instead of cards. A card is a surface, not a default wrapper.
-- Numbers and labels in mono; the argument in serif; reading copy in sans.
-- One accent. If everything is ember, nothing is.
-
-The reference for the landing page is an instrument panel, not a brochure: status lines, plates, measured margins. Add detail a person can read, not noise.
+- One accent. If everything is orange, nothing is orange.
+- Hairlines and whitespace instead of cards. A record extract is a ruled block, not a surface.
+- The dot field is decoration: pointer-transparent, behind content, masked away from the reading column, and hidden in print.
+- The seal is printed small and flat, in the margin or footer, never as a hero plate.
+- Actions are square, mono, and clearly labelled; no pills, badges, or icon-only controls.
+- Code tables, alerts, and record metadata stay inside the documentation's quieter three-column reader.
 
 ## Accessibility
 
-Target WCAG 2.2 AA. Project-page text uses bone or mist on near-black; ember is for labels, numerals, and focus, and never the only carrier of meaning.
+Target WCAG 2.2 AA. Body text clears 4.5:1 against the paper; the burnt-orange accent clears 4.5:1 for small text and is never the only carrier of meaning. Links are underlined, the current page uses a fill plus underline, and focus is a visible 2px ring.
 
-- Every interactive element has a visible focus ring: 2px ember, offset.
-- Motion is one short arrival; honour prefers-reduced-motion.
-- Every plate, chart, and screenshot is decoration with a text caption or aria-hidden.
-- Navigation and language switching are keyboard reachable; the mobile drawer traps focus through Radix Dialog.
-- Content reflows at 320px and 200% zoom without losing function.
-
-Check contrast and focus when you change a control. They are part of the design, not a cleanup pass.
+- Navigation, chapter groups, and questions use native `details`; Escape closes open menus and returns focus.
+- Touch targets are at least 44px for navigation, search, and primary actions.
+- Motion is one short arrival on the opening, disabled by `prefers-reduced-motion`.
+- Content reflows at 320px and 200% zoom without horizontal page overflow; tables and code scroll inside their own frames.
 
 ## Adding a page
 
-A project page is a server component under the meta route, wrapped by the shared chrome. Copy goes in the locale's meta catalog; styles go in meta.css under .meta-page. A documentation page adds a topic in `docs-topics.ts` and Markdown files in `docs/documentation/en/` and `docs/documentation/ko/`. Headings, article text, and relative links come from those files on GitHub.
+A project page is an Astro route under `meta/src/routes/` injected in `astro.config.mjs` and wrapped in `Shell.astro`. Copy goes in both locale catalogs under `meta/messages/`; composition goes in a component or route using the editorial classes. A documentation page is added to `meta/src/lib/registry.ts` with sources at `docs/documentation/{en,ko}/<slug>.md`.
 
-Do not add a page that reaches into the archive's chrome or the workstation's bevels. Do not add a second font, a gradient, or a shadow to make something feel finished. The system's job is restraint with one strong gesture.
+Do not reach into the archive's chrome or the workstation's bevels. Do not add a font, gradient, or shadow to make something feel finished. Restraint and one strong gesture are the system.
